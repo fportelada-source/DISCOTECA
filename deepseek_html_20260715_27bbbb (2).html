@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projeto Discoteca — Lista de Compras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE8DC;
+    --ink:#1B1815;
+    --ink-soft:#4a453e;
+    --card:#242019;
+    --card-line: rgba(237,232,220,0.10);
+    --s-color:#D6432F;
+    --a-color:#E39A2E;
+    --b-color:#4E7A8C;
+    --c-color:#8A8378;
+    --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+  ::selection{ background:var(--s-color); color:var(--paper); }
+
+  .hero{
+    position:relative;
+    padding:64px 6vw 48px;
+    border-bottom:1px solid var(--card-line);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:var(--groove);
+    pointer-events:none;
+  }
+  .hero-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--paper);
+    opacity:0.55;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    font-size:clamp(42px, 7vw, 92px);
+    line-height:0.92;
+    letter-spacing:0.005em;
+    text-transform:uppercase;
+    max-width:14ch;
+  }
+  .hero h1 span{ color:var(--s-color); }
+  .hero-sub{
+    margin-top:20px;
+    max-width:52ch;
+    font-size:16px;
+    color:var(--paper);
+    opacity:0.68;
+    line-height:1.6;
+  }
+  .hero-meter{
+    margin-top:36px;
+    display:flex;
+    gap:2px;
+    max-width:520px;
+  }
+  .hero-meter span{
+    flex:1;
+    height:6px;
+    border-radius:1px;
+  }
+
+  .section{ padding:56px 6vw 8px; }
+  .tier-head{
+    display:flex;
+    align-items:flex-end;
+    gap:18px;
+    margin-bottom:28px;
+    border-bottom:1px solid var(--card-line);
+    padding-bottom:18px;
+  }
+  .tier-stamp{
+    font-family:'Anton', sans-serif;
+    font-size:64px;
+    line-height:0.8;
+    color:var(--ink);
+    background:var(--tier-color);
+    padding:6px 16px 12px;
+    border-radius:6px;
+    transform:rotate(-3deg);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  }
+  .tier-info h2{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--tier-color);
+    margin-bottom:6px;
+  }
+  .tier-info p{
+    font-size:14px;
+    color:var(--paper);
+    opacity:0.6;
+    max-width:60ch;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:18px;
+    padding-bottom:8px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:10px;
+    overflow:hidden;
+    position:relative;
+    transition:transform 0.25s ease, border-color 0.25s ease;
+    border-top:3px solid var(--tier-color);
+  }
+  .card:hover{ transform:translateY(-4px); border-color:rgba(237,232,220,0.28); }
+  
+  .art-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    min-height:230px;
+    display:flex; 
+    align-items:center; 
+    justify-content:center;
+    overflow:hidden;
+    background-size: cover !important;
+    background-position: center !important;
+    background-color: #1a1815;
+  }
+  .art-wrap .groove{
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 50%, transparent 0 18%, rgba(0,0,0,0.35) 19% 20%, transparent 21% 30%, rgba(0,0,0,0.28) 31% 32%, transparent 33%);
+    mix-blend-mode:multiply;
+    pointer-events:none;
+    z-index: 2;
+  }
+  .art-wrap .spine-letter{
+    position:absolute;
+    font-family:'Anton', sans-serif;
+    font-size:130px;
+    line-height:1;
+    color:rgba(255,255,255,0.08);
+    text-transform:uppercase;
+    user-select:none;
+    right:-14px; bottom:-32px;
+    z-index: 1;
+    pointer-events:none;
+  }
+  .art-fallback{
+    position:relative;
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    text-align:center;
+    color:rgba(255,255,255,0.92);
+    letter-spacing:0.01em;
+    padding:0 20px;
+    text-transform:uppercase;
+    line-height:1.3;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  }
+  .priority-tag{
+    position:absolute; top:10px; left:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; font-weight:700;
+    letter-spacing:0.08em;
+    color:var(--ink);
+    background:var(--tier-color);
+    padding:3px 8px;
+    border-radius:4px;
+    z-index: 3;
+  }
+  .card-body{ padding:16px 16px 18px; }
+  .card-body h3{
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    line-height:1.25;
+    margin-bottom:2px;
+  }
+  .card-body .artist{
+    font-size:13px;
+    color:var(--tier-color);
+    font-weight:600;
+    margin-bottom:12px;
+  }
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding-top:10px;
+    border-top:1px dashed var(--card-line);
+  }
+  .meta-row .label{ color:rgba(237,232,220,0.4); text-transform:uppercase; letter-spacing:0.05em; }
+  .meta-row .val{ color:var(--paper); opacity:0.85; text-align:right; max-width:60%; }
+  .meta-block{ margin-bottom:8px; }
+
+  .wildcard{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-left:4px solid var(--c-color);
+    border-radius:8px;
+    padding:20px 22px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+  }
+  .wildcard .chip{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:5px 10px;
+    background:rgba(237,232,220,0.06);
+    border:1px solid var(--card-line);
+    border-radius:20px;
+  }
+  .wildcard .note{
+    width:100%;
+    font-size:13px;
+    color:rgba(237,232,220,0.55);
+    margin-top:6px;
+  }
+
+  .list-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  .list-table tr{ border-bottom:1px solid var(--card-line); }
+  .list-table td{ padding:14px 10px; }
+  .list-table .idx{ font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .list-table .band{ font-weight:600; width:32%; }
+  .list-table .disco{ color:rgba(237,232,220,0.7); font-style:italic; }
+  .list-table tr:hover{ background:rgba(237,232,220,0.03); }
+
+  .art-wrap.has-image .art-fallback {
+    opacity: 0 !important;
+  }
+
+  footer{
+    padding:40px 6vw 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:rgba(237,232,220,0.3);
+    text-align:center;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  @media (max-width:600px){
+    .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
+    .hero h1{ font-size:clamp(34px,11vw,60px); }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-eyebrow">Projeto Discoteca · Curadoria fportelada</div>
+  <h1>Lista de <span>Compras</span></h1>
+  <p class="hero-sub">Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.</p>
+  <div class="hero-meter">
+    <span style="background:var(--s-color)"></span>
+    <span style="background:var(--s-color)"></span>
+    <span style="background:var(--a-color)"></span>
+    <span style="background:var(--a-color)"></span>
+    <span style="background:var(--b-color)"></span>
+    <span style="background:var(--c-color)"></span>
+  </div>
+</section>
+
+<section class="section" style="--tier-color:var(--s-color)">
+  <div class="tier-head">
+    <div class="tier-stamp">S</div>
+    <div class="tier-info">
+      <h2>Prioridade Máxima</h2>
+      <p>Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-s"></div>
+</section>
+
+<section class="section" style="--tier-color:var(--a-color)">
+  <div class="tier-head">
+    <div class="tier-stamp">A</div>
+    <div class="tier-info">
+      <h2>Alta Prioridade</h2>
+      <p>Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-a"></div>
+</section>
+
+<section class="section" style="--tier-color:var(--b-color)">
+  <div class="tier-head">
+    <div class="tier-stamp">B</div>
+    <div class="tier-info">
+      <h2>Sem Urgência</h2>
+      <p>Pegar em promoção ou naturalmente, sem pressa de garimpo.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-b"></div>
+</section>
+
+<section class="section" style="--tier-color:var(--c-color)">
+  <div class="tier-head">
+    <div class="tier-stamp">C</div>
+    <div class="tier-info">
+      <h2>Baixa Prioridade</h2>
+      <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
+    </div>
+  </div>
+  <div class="wildcard">
+    <span class="chip">Slipknot</span>
+    <span class="chip">Korn</span>
+    <span class="chip">Limp Bizkit</span>
+    <span class="chip">Papa Roach</span>
+    <span class="chip">Bad Religion</span>
+    <span class="chip">Avenged Sevenfold</span>
+    <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4)">
+    <div class="tier-info">
+      <h2 style="color:rgba(237,232,220,0.55)">Oportunidades Extras</h2>
+      <p>Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.</p>
+    </div>
+  </div>
+  <table class="list-table" id="extra-list"></table>
+</section>
+
+<footer>Gerado a partir da análise cruzada CSV Spotify × Pontuação Portelada™ · capas via Last.fm API</footer>
+
+<script>
+// ========== DADOS ==========
+const S = [
+  { artist:"Metallica", album:"Ride the Lightning", strategy:"Primeira boa oportunidade", note:"Completa a tríade clássica" },
+  { artist:"Blind Guardian", album:"Imaginations from the Other Side", strategy:"Boa edição", note:"Maior valor afetivo" },
+  { artist:"Architects", album:"The Sky, The Earth & All Between", strategy:"Lançamento/repressagem", note:"Fecha a trilogia" },
+  { artist:"Linkin Park", album:"Hybrid Theory", strategy:"Alta prioridade", note:"Conjunto com Meteora" },
+  { artist:"System of a Down", album:"Toxicity", strategy:"Alta prioridade", note:"Representativo da playlist" },
+];
+
+const A = [
+  { artist:"Pennywise", album:"Full Circle", strategy:"Bom preço", note:"Histórico" },
+  { artist:"Trivium", album:"The Sin and the Sentence", strategy:"Após S", note:"Entrada da banda" },
+  { artist:"Black Sabbath", album:"Paranoid", strategy:"Boa edição", note:"Origem do heavy metal" },
+  { artist:"Iron Maiden", album:"Powerslave", strategy:"Oportunidade", note:"Clássico" },
+  { artist:"Megadeth", album:"Rust in Peace", strategy:"Oportunidade", note:"Thrash" },
+];
+
+const B = [
+  { artist:"The Warning", album:"ERROR", strategy:"Promoções", note:"Sem urgência" },
+  { artist:"Angra", album:"Rebirth", strategy:"Naturalmente", note:"Sem urgência" },
+];
+
+const EXTRA = [
+  { artist:"Seether", album:"Finding Beauty in Negative Spaces" },
+  { artist:"Machine Head", album:"The Blackening" },
+  { artist:"Týr", album:"By the Light of the Northern Star" },
+  { artist:"Godsmack", album:"Faceless" },
+  { artist:"Dream Theater", album:"Metropolis Pt. 2" },
+  { artist:"Lamb of God", album:"Ashes of the Wake" },
+  { artist:"The Offspring", album:"Smash" },
+  { artist:"Disturbed", album:"The Sickness" },
+  { artist:"Tremonti", album:"A Dying Machine" },
+  { artist:"Bring Me The Horizon", album:"Sempiternal" },
+  { artist:"Amon Amarth", album:"Twilight of the Thunder God" },
+  { artist:"Devilskin", album:"Be Like the River" },
+  { artist:"Breed 77", album:"In My Blood" },
+  { artist:"Not Enough Space", album:"Weaponized" },
+  { artist:"Alter Bridge", album:"Blackbird" },
+];
+
+// ========== LAST.FM API ==========
+// Chave pública do Last.fm (gratuita, sem restrições)
+const LASTFM_API_KEY = 'b25b959554ed76058ac220b7b2e0a026';
+const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
+
+async function getAlbumCoverFromLastFm(artist, album) {
+  const params = new URLSearchParams({
+    method: 'album.getinfo',
+    api_key: LASTFM_API_KEY,
+    artist: artist,
+    album: album,
+    format: 'json'
+  });
+
+  const url = `${LASTFM_API_URL}?${params.toString()}`;
+  
+  try {
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(8000)
+    });
+    
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const data = await response.json();
+    
+    // Verifica se tem dados do álbum
+    if (data && data.album && data.album.image) {
+      // Last.fm retorna imagens em 4 tamanhos: small, medium, large, extralarge
+      // Pegamos a maior disponível
+      const images = data.album.image;
+      const sizes = ['extralarge', 'large', 'medium', 'small'];
+      
+      for (const size of sizes) {
+        const img = images.find(i => i.size === size);
+        if (img && img['#text'] && img['#text'].trim() !== '') {
+          return img['#text'];
+        }
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.log(`Last.fm error for ${artist} - ${album}:`, error.message);
+    return null;
+  }
+}
+
+// ========== BUSCA DE CAPA ==========
+async function fetchAlbumArt(artist, album, elementId, fallbackTextId) {
+  const artWrap = document.getElementById(elementId);
+  const fallbackText = document.getElementById(fallbackTextId);
+  
+  if (!artWrap) return;
+  
+  try {
+    // Busca no Last.fm
+    const coverUrl = await getAlbumCoverFromLastFm(artist, album);
+    
+    if (coverUrl) {
+      // Testa se a imagem carrega
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Timeout')), 10000);
+        
+        img.onload = () => {
+          clearTimeout(timeout);
+          artWrap.style.backgroundImage = `url('${coverUrl}')`;
+          artWrap.style.backgroundSize = 'cover';
+          artWrap.style.backgroundPosition = 'center';
+          artWrap.classList.add('has-image');
+          if (fallbackText) fallbackText.style.opacity = '0';
+          resolve();
+        };
+        
+        img.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error('Failed to load image'));
+        };
+        
+        img.src = coverUrl;
+      });
+      return;
+    }
+    
+    // Se não encontrou capa, mantém o fundo escuro
+    if (fallbackText) {
+      fallbackText.style.opacity = '0.8';
+    }
+    
+  } catch (error) {
+    console.log(`Erro ao buscar capa para ${artist} - ${album}:`, error.message);
+    if (fallbackText) {
+      fallbackText.style.opacity = '0.8';
+    }
+  }
+}
+
+// ========== CRIAÇÃO DOS CARDS ==========
+function makeCard(item, tag, tierHex, index){
+  const card = document.createElement('div');
+  card.className = 'card';
+  const letter = item.album.trim().charAt(0);
+  const elementId = `art-wrap-${tag}-${index}`;
+  const fallbackTextId = `fallback-${tag}-${index}`;
+  
+  card.innerHTML = `
+    <div class="art-wrap" id="${elementId}" style="background: #1a1815; background-size: cover; background-position: center;">
+      <span class="priority-tag">${tag}</span>
+      <div class="groove"></div>
+      <div class="spine-letter">${letter}</div>
+      <div class="art-fallback" id="${fallbackTextId}">${item.artist}<br>${item.album}</div>
+    </div>
+    <div class="card-body">
+      <h3>${item.album}</h3>
+      <div class="artist">${item.artist}</div>
+      <div class="meta-block">
+        <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.strategy}</span></div>
+      </div>
+      <div class="meta-row"><span class="label">Nota</span><span class="val">${item.note}</span></div>
+    </div>
+  `;
+  
+  // Busca a capa após o elemento estar no DOM
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      fetchAlbumArt(item.artist, item.album, elementId, fallbackTextId);
+    }, 100);
+  });
+  
+  return card;
+}
+
+// ========== RENDERIZAÇÃO ==========
+function renderGrid(id, data, tag, tierHex){
+  const grid = document.getElementById(id);
+  if (!grid) return;
+  
+  data.forEach((item, index) => {
+    const card = makeCard(item, tag, tierHex, index);
+    grid.appendChild(card);
+  });
+}
+
+// ========== INICIALIZAÇÃO ==========
+document.addEventListener('DOMContentLoaded', () => {
+  renderGrid('grid-s', S, 'S', '#D6432F');
+  renderGrid('grid-a', A, 'A', '#E39A2E');
+  renderGrid('grid-b', B, 'B', '#4E7A8C');
+
+  const extraTable = document.getElementById('extra-list');
+  if (extraTable) {
+    EXTRA.forEach((item, i) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="idx">${String(i+1).padStart(2,'0')}</td>
+        <td class="band">${item.artist}</td>
+        <td class="disco">${item.album}</td>
+      `;
+      extraTable.appendChild(row);
+    });
+  }
+});
+</script>
+</body>
+</html>

@@ -19,6 +19,9 @@
     --b-color:#4E7A8C;
     --c-color:#8A8378;
     --d-color:#6B5B7B;
+    --e-color:#5C6B7A;
+    --f-color:#7A6B5C;
+    --g-color:#5C7A6B;
     --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -242,6 +245,52 @@
     margin-top:6px;
   }
 
+  /* DROPDOWN - Oportunidades Extras */
+  .dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    transition: opacity 0.2s ease;
+  }
+  .dropdown-toggle:hover {
+    opacity: 0.8;
+  }
+  .dropdown-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 18px;
+    color: rgba(237,232,220,0.4);
+    line-height: 1;
+  }
+  .dropdown-arrow.open {
+    transform: rotate(180deg);
+  }
+  .dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .dropdown-content.open {
+    max-height: 2000px;
+    opacity: 1;
+    margin-top: 24px;
+  }
+  .dropdown-content .list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .dropdown-content .list-table tr { border-bottom: 1px solid var(--card-line); }
+  .dropdown-content .list-table td { padding: 14px 10px; }
+  .dropdown-content .list-table .idx { font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .dropdown-content .list-table .band { font-weight:600; width:32%; }
+  .dropdown-content .list-table .disco { color:rgba(237,232,220,0.7); font-style:italic; }
+  .dropdown-content .list-table tr:hover { background:rgba(237,232,220,0.03); }
+
   .list-table{
     width:100%;
     border-collapse:collapse;
@@ -342,17 +391,27 @@
   </div>
 </section>
 
+<!-- DROPDOWN: Oportunidades Extras -->
 <section class="section">
-  <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4)">
-    <div class="tier-info">
-      <h2 style="color:rgba(237,232,220,0.55)">Oportunidades Extras</h2>
-      <p>Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.</p>
+  <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4); border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+    <div class="tier-info" style="width: 100%;">
+      <div class="dropdown-toggle" onclick="toggleDropdown()">
+        <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
+          Oportunidades Extras
+        </h2>
+        <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+      </div>
+      <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
+        Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
+      </p>
     </div>
   </div>
-  <table class="list-table" id="extra-list"></table>
+  <div class="dropdown-content" id="dropdownContent">
+    <table class="list-table" id="extra-list"></table>
+  </div>
 </section>
 
-<!-- NOVA SEÇÃO: DESCOBERTAS DO ANO -->
+<!-- SEÇÃO 2026 -->
 <section class="section" style="--tier-color:var(--d-color)">
   <div class="tier-head">
     <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2026</div>
@@ -362,6 +421,42 @@
     </div>
   </div>
   <div class="grid" id="grid-d"></div>
+</section>
+
+<!-- SEÇÃO 2025 -->
+<section class="section" style="--tier-color:var(--e-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2025</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>2025 foi o ano em que o metalcore moderno passou definitivamente a dominar minhas descobertas.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-e"></div>
+</section>
+
+<!-- SEÇÃO 2024 -->
+<section class="section" style="--tier-color:var(--f-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2024</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>Em 2024 minhas descobertas passaram a reforçar bandas já importantes e ampliaram meu interesse pelo metal moderno.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-f"></div>
+</section>
+
+<!-- SEÇÃO 2023 -->
+<section class="section" style="--tier-color:var(--g-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2023</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>As bandas abaixo representam as descobertas que definiram meu ano de 2023 e iniciaram uma nova fase da minha curadoria musical.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-g"></div>
 </section>
 
 <footer>Gerado a partir da análise cruzada CSV Spotify × Pontuação Portelada™ · capas via Last.fm API</footer>
@@ -407,7 +502,7 @@ const EXTRA = [
   { artist:"Alter Bridge", album:"Blackbird" },
 ];
 
-// NOVA SEÇÃO: DESCOBERTAS DO ANO
+// SEÇÃO 2026
 const D = [
   { 
     artist:"Of Mice & Men", 
@@ -438,6 +533,108 @@ const D = [
     album:"The Death We Seek", 
     strategy:"Grande potencial", 
     note:"Uma das bandas que mais conversa com o som moderno que procuro desde Architects. Merece acompanhamento nos próximos anos."
+  },
+];
+
+// SEÇÃO 2025 - SUBSTITUÍDO: Lift The Curse → Bring Me The Horizon
+const E = [
+  { 
+    artist:"Architects", 
+    album:"The Sky, The Earth & All Between", 
+    strategy:"Banda do ano", 
+    note:"Nenhuma outra banda marcou tanto minhas descobertas em 2025. Consolidou-se como uma das mais importantes da minha coleção."
+  },
+  { 
+    artist:"Bring Me The Horizon", 
+    album:"Sempiternal", 
+    strategy:"Maior novidade", 
+    note:"A descoberta inédita mais marcante do ano e uma forte candidata a crescer nos próximos anos."
+  },
+  { 
+    artist:"Atreyu", 
+    album:"The Curse", 
+    strategy:"Metalcore clássico", 
+    note:"Uma banda histórica do gênero que ganhou nova força através das minhas descobertas."
+  },
+  { 
+    artist:"The Devil Wears Prada", 
+    album:"Color Decay", 
+    strategy:"Nova geração", 
+    note:"Uma das bandas que melhor representa o metalcore melódico contemporâneo."
+  },
+  { 
+    artist:"We Came As Romans", 
+    album:"Darkbloom", 
+    strategy:"Grande potencial", 
+    note:"Uma descoberta consistente que conversa diretamente com o som moderno que procuro desde Architects."
+  },
+];
+
+// SEÇÃO 2024 - SUBSTITUÍDO: Lockjaw → Falling In Reverse
+const F = [
+  { 
+    artist:"The Warning", 
+    album:"Keep Me Fed", 
+    strategy:"Confirmação do ano", 
+    note:"A banda deixou de ser uma descoberta e passou a fazer parte definitiva da minha identidade musical."
+  },
+  { 
+    artist:"Linkin Park", 
+    album:"From Zero", 
+    strategy:"O retorno mais esperado", 
+    note:"Um dos acontecimentos musicais mais importantes do ano e um álbum que imediatamente entrou para minha coleção ideal."
+  },
+  { 
+    artist:"Falling In Reverse", 
+    album:"Popular Monster", 
+    strategy:"Grande surpresa", 
+    note:"Uma descoberta completamente inesperada que merece continuar sendo acompanhada."
+  },
+  { 
+    artist:"Bullet For My Valentine", 
+    album:"The Poison", 
+    strategy:"Reencontro", 
+    note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória."
+  },
+  { 
+    artist:"Machine Head", 
+    album:"The Blackening", 
+    strategy:"Thrash moderno", 
+    note:"Uma das bandas que melhor representa a evolução do heavy metal moderno."
+  },
+];
+
+// SEÇÃO 2023
+const G = [
+  { 
+    artist:"The Warning", 
+    album:"ERROR", 
+    strategy:"Maior descoberta de 2023", 
+    note:"A banda que abriu uma nova fase da minha coleção. Mistura perfeita entre peso, melodias e personalidade."
+  },
+  { 
+    artist:"Breed 77", 
+    album:"In My Blood", 
+    strategy:"Redescoberta inesperada", 
+    note:"Uma banda que passou despercebida durante muitos anos e finalmente encontrou seu espaço na minha playlist."
+  },
+  { 
+    artist:"Seether", 
+    album:"Finding Beauty in Negative Spaces", 
+    strategy:"Rock alternativo de referência", 
+    note:"Representa muito bem o lado mais melódico do hard rock moderno presente nas minhas descobertas."
+  },
+  { 
+    artist:"Soilwork", 
+    album:"Stabbing the Drama", 
+    strategy:"Peso com melodia", 
+    note:"Uma das bandas que melhor equilibra agressividade e refrões marcantes."
+  },
+  { 
+    artist:"Project46", 
+    album:"Que Seja Feita a Nossa Vontade", 
+    strategy:"Representante nacional", 
+    note:"A principal descoberta brasileira daquele ano e uma ótima representante do metal moderno nacional."
   },
 ];
 
@@ -533,6 +730,14 @@ async function fetchAlbumArt(artist, album, elementId, fallbackTextId) {
   }
 }
 
+// ========== DROPDOWN ==========
+function toggleDropdown() {
+  const content = document.getElementById('dropdownContent');
+  const arrow = document.getElementById('dropdownArrow');
+  content.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
 // ========== CRIAÇÃO DOS CARDS ==========
 function makeCard(item, tag, tierHex, index){
   const card = document.createElement('div');
@@ -583,9 +788,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGrid('grid-s', S, 'S', '#D6432F');
   renderGrid('grid-a', A, 'A', '#E39A2E');
   renderGrid('grid-b', B, 'B', '#4E7A8C');
-  
-  // Nova seção Descobertas do Ano
   renderGrid('grid-d', D, 'D', '#6B5B7B');
+  renderGrid('grid-e', E, 'E', '#5C6B7A');
+  renderGrid('grid-f', F, 'F', '#7A6B5C');
+  renderGrid('grid-g', G, 'G', '#5C7A6B');
 
   const extraTable = document.getElementById('extra-list');
   if (extraTable) {

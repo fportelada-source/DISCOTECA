@@ -18,6 +18,7 @@
     --a-color:#E39A2E;
     --b-color:#4E7A8C;
     --c-color:#8A8378;
+    --d-color:#6B5B7B;
     --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -351,6 +352,18 @@
   <table class="list-table" id="extra-list"></table>
 </section>
 
+<!-- NOVA SEÇÃO: DESCOBERTAS DO ANO -->
+<section class="section" style="--tier-color:var(--d-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2026</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>As bandas abaixo representam as descobertas mais marcantes de 2026 através do Discovery Weekly. Não são as bandas que mais ouvi no ano, mas aquelas que mais se aproximaram de conquistar um lugar na Coleção Portelada.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-d"></div>
+</section>
+
 <footer>Gerado a partir da análise cruzada CSV Spotify × Pontuação Portelada™ · capas via Last.fm API</footer>
 
 <script>
@@ -394,8 +407,41 @@ const EXTRA = [
   { artist:"Alter Bridge", album:"Blackbird" },
 ];
 
+// NOVA SEÇÃO: DESCOBERTAS DO ANO
+const D = [
+  { 
+    artist:"Of Mice & Men", 
+    album:"Echo", 
+    strategy:"Maior descoberta de 2026", 
+    note:"Foi a banda que mais conseguiu reproduzir a sensação que Architects proporcionou anteriormente. Não substitui Architects, mas representa a descoberta mais importante do ano."
+  },
+  { 
+    artist:"Parkway Drive", 
+    album:"Darker Still", 
+    strategy:"Redescoberta do ano", 
+    note:"A banda já fazia parte da minha história, mas somente em 2026 ganhou espaço definitivo na minha curadoria através do Discovery Weekly."
+  },
+  { 
+    artist:"Elwood Stray", 
+    album:"Gone With The Flow", 
+    strategy:"Maior novidade", 
+    note:"A descoberta totalmente inédita mais interessante do ano e uma das bandas modernas que mais despertou minha curiosidade."
+  },
+  { 
+    artist:"Polaris", 
+    album:"Fatalism", 
+    strategy:"Continuar acompanhando", 
+    note:"Uma das bandas que melhor representa a nova geração do metalcore melódico e possui grande potencial para integrar a coleção futuramente."
+  },
+  { 
+    artist:"Currents", 
+    album:"The Death We Seek", 
+    strategy:"Grande potencial", 
+    note:"Uma das bandas que mais conversa com o som moderno que procuro desde Architects. Merece acompanhamento nos próximos anos."
+  },
+];
+
 // ========== LAST.FM API ==========
-// Chave pública do Last.fm (gratuita, sem restrições)
 const LASTFM_API_KEY = 'b25b959554ed76058ac220b7b2e0a026';
 const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 
@@ -419,10 +465,7 @@ async function getAlbumCoverFromLastFm(artist, album) {
     
     const data = await response.json();
     
-    // Verifica se tem dados do álbum
     if (data && data.album && data.album.image) {
-      // Last.fm retorna imagens em 4 tamanhos: small, medium, large, extralarge
-      // Pegamos a maior disponível
       const images = data.album.image;
       const sizes = ['extralarge', 'large', 'medium', 'small'];
       
@@ -449,11 +492,9 @@ async function fetchAlbumArt(artist, album, elementId, fallbackTextId) {
   if (!artWrap) return;
   
   try {
-    // Busca no Last.fm
     const coverUrl = await getAlbumCoverFromLastFm(artist, album);
     
     if (coverUrl) {
-      // Testa se a imagem carrega
       const img = new Image();
       img.crossOrigin = 'anonymous';
       
@@ -480,7 +521,6 @@ async function fetchAlbumArt(artist, album, elementId, fallbackTextId) {
       return;
     }
     
-    // Se não encontrou capa, mantém o fundo escuro
     if (fallbackText) {
       fallbackText.style.opacity = '0.8';
     }
@@ -512,13 +552,12 @@ function makeCard(item, tag, tierHex, index){
       <h3>${item.album}</h3>
       <div class="artist">${item.artist}</div>
       <div class="meta-block">
-        <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.strategy}</span></div>
+        <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.strategy}</span></div>
       </div>
       <div class="meta-row"><span class="label">Nota</span><span class="val">${item.note}</span></div>
     </div>
   `;
   
-  // Busca a capa após o elemento estar no DOM
   requestAnimationFrame(() => {
     setTimeout(() => {
       fetchAlbumArt(item.artist, item.album, elementId, fallbackTextId);
@@ -544,6 +583,9 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGrid('grid-s', S, 'S', '#D6432F');
   renderGrid('grid-a', A, 'A', '#E39A2E');
   renderGrid('grid-b', B, 'B', '#4E7A8C');
+  
+  // Nova seção Descobertas do Ano
+  renderGrid('grid-d', D, 'D', '#6B5B7B');
 
   const extraTable = document.getElementById('extra-list');
   if (extraTable) {

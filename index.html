@@ -1007,6 +1007,8 @@
 <script>
 // ========== API ==========
 const API = 'https://fportelada.pythonanywhere.com';
+
+// ========== VARIÁVEIS GLOBAIS ==========
 let usuarioId = null;
 let usuarioNome = null;
 let colecao = [];
@@ -1045,7 +1047,7 @@ document.getElementById('btnLogout').addEventListener('click', function() {
     });
 });
 
-// ========== VERIFICAR SESSÃO ==========
+// ========== VERIFICAR SESSÃO E CARREGAR DADOS ==========
 function verificarSessao() {
   const params = new URLSearchParams(window.location.search);
   const userId = params.get('user_id');
@@ -1064,35 +1066,54 @@ function verificarSessao() {
 
   fetch(API + '/sessao')
     .then(r => r.json())
-    .then(d => {
-      if (d.logado) {
-        usuarioId = d.usuario_id;
-        usuarioNome = d.nome;
+    .then(data => {
+      if (data.logado) {
+        usuarioId = data.usuario_id;
+        usuarioNome = data.nome;
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
-        document.getElementById('userNameDisplay').textContent = '👤 ' + (d.nome || 'Usuário');
+        document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
         carregarDados();
       }
     })
-    .catch(() => {});
+    .catch(err => {
+      console.error('Erro ao verificar sessão:', err);
+    });
 }
 
 // ========== CARREGAR DADOS ==========
 function carregarDados() {
+  console.log('Carregando dados...');
+  
+  // Coleção
   fetch(API + '/colecao')
     .then(r => r.json())
-    .then(d => { colecao = Array.isArray(d) ? d : []; renderColecao(); })
-    .catch(() => {});
+    .then(data => {
+      colecao = Array.isArray(data) ? data : [];
+      console.log('Coleção carregada:', colecao.length, 'itens');
+      renderColecao();
+    })
+    .catch(err => console.error('Erro ao carregar coleção:', err));
 
+  // Recomendações
   fetch(API + '/recomendacoes')
     .then(r => r.json())
-    .then(d => { recomendacoes = Array.isArray(d) ? d : []; renderRecomendacoes(); })
-    .catch(() => {});
+    .then(data => {
+      recomendacoes = Array.isArray(data) ? data : [];
+      console.log('Recomendações carregadas:', recomendacoes.length, 'itens');
+      renderRecomendacoes();
+    })
+    .catch(err => console.error('Erro ao carregar recomendações:', err));
 
+  // Descobertas
   fetch(API + '/descobertas')
     .then(r => r.json())
-    .then(d => { descobertas = Array.isArray(d) ? d : []; renderDescobertas(); })
-    .catch(() => {});
+    .then(data => {
+      descobertas = Array.isArray(data) ? data : [];
+      console.log('Descobertas carregadas:', descobertas.length, 'itens');
+      renderDescobertas();
+    })
+    .catch(err => console.error('Erro ao carregar descobertas:', err));
 }
 
 // ========== LAST.FM ==========
@@ -1118,6 +1139,7 @@ function renderColecao() {
   
   if (!colecao || colecao.length === 0) {
     grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
+    document.getElementById('colecao-badge').textContent = '0';
     return;
   }
 
@@ -1227,6 +1249,7 @@ function renderDescobertas() {
 
   if (!descobertas || descobertas.length === 0) {
     grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p><p style="font-size:12px;opacity:0.5;">Suas descobertas aparecerão aqui após importar as playlists.</p></div>`;
+    document.getElementById('descobertas-badge').textContent = '0';
     return;
   }
 

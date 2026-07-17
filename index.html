@@ -19,7 +19,18 @@
     --b-color:#4E7A8C;
     --c-color:#8A8378;
     --d-color:#6B5B7B;
+    --e-color:#5C6B7A;
+    --f-color:#7A6B5C;
+    --g-color:#5C7A6B;
+    --h-color:#8A6B7B;
+    --i-color:#6B7A8A;
+    --j-color:#7A8A6B;
+    --k-color:#8A7A6B;
+    --l-color:#6B8A7A;
     --colecao-color:#B8A88A;
+    --vinil-color:#E8C87A;
+    --cd-color:#7AB8D8;
+    --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -31,85 +42,6 @@
   }
   ::selection{ background:var(--s-color); color:var(--paper); }
 
-  /* ===== LOGIN ===== */
-  .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
-    padding: 40px 20px;
-  }
-  .login-box {
-    background: var(--card);
-    border: 1px solid var(--card-line);
-    border-radius: 16px;
-    padding: 48px 40px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-  }
-  .login-box .logo {
-    font-family: 'Anton', sans-serif;
-    font-size: 48px;
-    letter-spacing: 0.02em;
-    margin-bottom: 8px;
-  }
-  .login-box .logo span { color: var(--s-color); }
-  .login-box .sub {
-    font-size: 14px;
-    opacity: 0.5;
-    margin-bottom: 32px;
-  }
-  .login-btn {
-    background: #ffffff;
-    color: #1a1815;
-    border: none;
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    justify-content: center;
-  }
-  .login-btn:hover { opacity: 0.85; transform: scale(1.02); }
-  .login-btn svg { width: 20px; height: 20px; }
-  .login-error { color: #f44336; font-size: 14px; margin-top: 16px; display: none; }
-
-  /* ===== USER BAR ===== */
-  .user-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 6vw;
-    border-bottom: 1px solid var(--card-line);
-    background: var(--ink);
-    position: sticky;
-    top: 0;
-    z-index: 99;
-  }
-  .user-bar .user-name { font-size: 13px; opacity: 0.6; }
-  .user-bar .logout-btn {
-    background: transparent;
-    border: 1px solid var(--card-line);
-    color: var(--paper);
-    padding: 4px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: 0.2s;
-  }
-  .user-bar .logout-btn:hover {
-    background: var(--s-color);
-    color: var(--ink);
-    border-color: var(--s-color);
-  }
-
-  /* ===== HERO ===== */
   .hero{
     position:relative;
     padding:64px 6vw 48px;
@@ -120,7 +52,7 @@
   .hero::before{
     content:"";
     position:absolute; inset:0;
-    background: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
+    background:var(--groove);
     pointer-events:none;
   }
   .hero-eyebrow{
@@ -131,6 +63,7 @@
     color:var(--paper);
     opacity:0.55;
     margin-bottom:18px;
+    transition: opacity 0.3s ease;
   }
   .hero h1{
     font-family:'Anton', sans-serif;
@@ -140,6 +73,7 @@
     letter-spacing:0.005em;
     text-transform:uppercase;
     max-width:14ch;
+    transition: all 0.4s ease;
   }
   .hero h1 span{ color:var(--s-color); }
   .hero-sub{
@@ -149,12 +83,14 @@
     color:var(--paper);
     opacity:0.68;
     line-height:1.6;
+    transition: all 0.4s ease;
   }
   .hero-meter{
     margin-top:36px;
     display:flex;
     gap:2px;
     max-width:520px;
+    transition: opacity 0.3s ease;
   }
   .hero-meter span{
     flex:1;
@@ -166,7 +102,6 @@
   .hero-state-descobertas .hero h1 span { color: var(--d-color); }
   .hero-state-colecao .hero h1 span { color: var(--colecao-color); }
 
-  /* ===== TABS ===== */
   .tabs-container{
     padding: 0 6vw;
     border-bottom: 1px solid var(--card-line);
@@ -193,8 +128,11 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border-bottom: 2px solid transparent;
+    position: relative;
   }
-  .tab-btn:hover{ opacity: 0.7; }
+  .tab-btn:hover{
+    opacity: 0.7;
+  }
   .tab-btn.active{
     opacity: 1;
     border-bottom-color: var(--s-color);
@@ -236,7 +174,6 @@
     to{ opacity: 1; transform: translateY(0); }
   }
 
-  /* ===== SECTION ===== */
   .section{ padding: 40px 6vw 8px; }
   .tier-head{
     display:flex;
@@ -261,6 +198,10 @@
     font-size:48px;
     padding:6px 14px 10px;
   }
+  .tier-stamp.tiny{
+    font-size:28px;
+    padding:4px 10px 6px;
+  }
   .tier-info h2{
     font-family:'JetBrains Mono', monospace;
     font-size:13px;
@@ -282,8 +223,6 @@
     gap:18px;
     padding-bottom:8px;
   }
-
-  /* ===== CARDS ===== */
   .card{
     background:var(--card);
     border:1px solid var(--card-line);
@@ -373,6 +312,102 @@
   .meta-row .val{ color:var(--paper); opacity:0.85; text-align:right; max-width:60%; }
   .meta-block{ margin-bottom:8px; }
 
+  .wildcard{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-left:4px solid var(--c-color);
+    border-radius:8px;
+    padding:20px 22px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+  }
+  .wildcard .chip{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:5px 10px;
+    background:rgba(237,232,220,0.06);
+    border:1px solid var(--card-line);
+    border-radius:20px;
+  }
+  .wildcard .note{
+    width:100%;
+    font-size:13px;
+    color:rgba(237,232,220,0.55);
+    margin-top:6px;
+  }
+
+  .dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    transition: opacity 0.2s ease;
+  }
+  .dropdown-toggle:hover {
+    opacity: 0.8;
+  }
+  .dropdown-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 18px;
+    color: rgba(237,232,220,0.4);
+    line-height: 1;
+  }
+  .dropdown-arrow.open {
+    transform: rotate(180deg);
+  }
+  .dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .dropdown-content.open {
+    max-height: 2000px;
+    opacity: 1;
+    margin-top: 24px;
+  }
+  .dropdown-content .list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .dropdown-content .list-table tr { border-bottom: 1px solid var(--card-line); }
+  .dropdown-content .list-table td { padding: 14px 10px; }
+  .dropdown-content .list-table .idx { font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .dropdown-content .list-table .band { font-weight:600; width:32%; }
+  .dropdown-content .list-table .disco { color:rgba(237,232,220,0.7); font-style:italic; }
+  .dropdown-content .list-table tr:hover { background:rgba(237,232,220,0.03); }
+
+  .list-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  .list-table tr{ border-bottom:1px solid var(--card-line); }
+  .list-table td{ padding:14px 10px; }
+  .list-table .idx{ font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .list-table .band{ font-weight:600; width:32%; }
+  .list-table .disco{ color:rgba(237,232,220,0.7); font-style:italic; }
+  .list-table tr:hover{ background:rgba(237,232,220,0.03); }
+
+  .art-wrap.has-image .art-fallback {
+    opacity: 0 !important;
+  }
+
+  .format-badge{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: rgba(237,232,220,0.08);
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    opacity: 0.6;
+  }
+
   .cond-badge{
     display: inline-block;
     font-family: 'JetBrains Mono', monospace;
@@ -390,17 +425,125 @@
   .cond-p{ color: #f44336; border-color: #f44336; }
   .cond-m{ color: #00BCD4; border-color: #00BCD4; }
 
-  .empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    opacity: 0.4;
-    grid-column: 1 / -1;
+  .section-subtitle{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--paper);
+    opacity: 0.5;
+    margin-bottom: 24px;
+    padding-left: 4px;
+    letter-spacing: 0.02em;
   }
-  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
-  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
-  .empty-state p { font-size: 14px; opacity: 0.7; }
 
-  .hidden { display: none !important; }
+  footer{
+    padding:40px 6vw 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:rgba(237,232,220,0.3);
+    text-align:center;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .modal-header h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.02em;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--paper);
+    font-size: 28px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: 0.2s;
+  }
+  .modal-close:hover { opacity: 1; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: var(--ink);
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--s-color);
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .form-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .form-btn:hover { opacity: 0.8; }
+  .form-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .form-msg { font-size: 13px; padding: 10px 0 0; text-align: center; }
+  .form-msg.success { color: #4CAF50; }
+  .form-msg.error { color: #f44336; }
 
   .add-btn {
     background: var(--s-color);
@@ -426,15 +569,69 @@
     align-items: center;
   }
 
-  footer{
-    padding:40px 6vw 0;
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px;
-    color:rgba(237,232,220,0.3);
-    text-align:center;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
+  /* Upload */
+  .upload-area {
+    background: var(--card);
+    border: 2px dashed var(--card-line);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: 0.3s;
+    margin-bottom: 16px;
   }
+  .upload-area:hover { border-color: var(--s-color); }
+  .upload-area .icon { font-size: 28px; margin-bottom: 4px; }
+  .upload-area p { opacity: 0.5; font-size: 14px; }
+  .upload-area input { display: none; }
+  .upload-area label {
+    display: inline-block;
+    background: var(--s-color);
+    color: var(--ink);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+  }
+  .upload-area label:hover { opacity: 0.8; }
+  .upload-status {
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: 0.6;
+  }
+  .upload-status.success { color: #4CAF50; }
+  .upload-status.error { color: #f44336; }
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width:600px){ .upload-grid { grid-template-columns:1fr; } }
+
+  .btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+    width: 100%;
+  }
+  .btn:hover { opacity: 0.8; }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    opacity: 0.4;
+    grid-column: 1 / -1;
+  }
+  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; opacity: 0.7; }
 
   .ano-divider {
     font-family: 'Anton', sans-serif;
@@ -453,54 +650,10 @@
     margin-left: 12px;
   }
 
-  /* ===== DROPDOWN ===== */
-  .dropdown-toggle {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    user-select: none;
-    transition: opacity 0.2s ease;
-    margin-top: 28px;
-    padding-top: 28px;
-    border-top: 1px solid var(--card-line);
-  }
-  .dropdown-toggle:hover { opacity: 0.8; }
-  .dropdown-arrow {
-    display: inline-block;
-    transition: transform 0.3s ease;
-    font-size: 18px;
-    color: rgba(237,232,220,0.4);
-    line-height: 1;
-  }
-  .dropdown-arrow.open { transform: rotate(180deg); }
-  .dropdown-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
-    opacity: 0;
-    margin-top: 0;
-  }
-  .dropdown-content.open {
-    max-height: 2000px;
-    opacity: 1;
-    margin-top: 16px;
-  }
-  .dropdown-content .list-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  .dropdown-content .list-table tr { border-bottom: 1px solid var(--card-line); }
-  .dropdown-content .list-table td { padding: 12px 8px; }
-  .dropdown-content .list-table .idx { font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
-  .dropdown-content .list-table .band { font-weight:600; width:32%; }
-  .dropdown-content .list-table .disco { color:rgba(237,232,220,0.7); font-style:italic; }
-  .dropdown-content .list-table tr:hover { background:rgba(237,232,220,0.03); }
-
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
     .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
+    .tier-stamp.tiny{ font-size:22px; padding:4px 8px 5px; }
     .hero h1{ font-size:clamp(34px,11vw,60px); }
     .tab-btn{ font-size:11px; padding:10px 14px 12px; }
     .tabs{ gap:2px; }
@@ -536,7 +689,6 @@
     <button class="logout-btn" id="btnLogout">Sair</button>
   </div>
 
-  <!-- HERO -->
   <section class="hero hero-state-compras" id="heroSection">
     <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria</div>
     <h1 id="heroTitle">Lista de <span id="heroHighlight">Compras</span></h1>
@@ -551,12 +703,12 @@
     </div>
   </section>
 
-  <!-- TABS -->
   <div class="tabs-container">
     <div class="tabs">
       <button class="tab-btn active" data-tab="tab-compras">📋 Compras</button>
       <button class="tab-btn" data-tab="tab-descobertas">🔍 Descobertas <span class="tab-badge" id="descobertas-badge">0</span></button>
       <button class="tab-btn" data-tab="tab-colecao">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
+      <button class="tab-btn" data-tab="tab-importar">📤 Importar</button>
     </div>
   </div>
 
@@ -600,31 +752,32 @@
           <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
         </div>
       </div>
-      <div class="grid" id="grid-c"></div>
+      <div class="wildcard">
+        <span class="chip">Slipknot</span>
+        <span class="chip">Korn</span>
+        <span class="chip">Limp Bizkit</span>
+        <span class="chip">Papa Roach</span>
+        <span class="chip">Bad Religion</span>
+        <span class="chip">Avenged Sevenfold</span>
+        <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
+      </div>
+      
+      <!-- DROPDOWN: Oportunidades Extras -->
+      <div style="margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--card-line);">
+        <div class="dropdown-toggle" onclick="toggleDropdown()">
+          <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
+            Oportunidades Extras
+          </h2>
+          <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+        </div>
+        <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
+          Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
+        </p>
+        <div class="dropdown-content" id="dropdownContent">
+          <table class="list-table" id="extra-list"></table>
+        </div>
+      </div>
     </section>
-
-    <!-- ===== DROPDOWN: OPORTUNIDADES EXTRAS ===== -->
-    <div style="margin-top: 20px;">
-      <div class="dropdown-toggle" onclick="toggleDropdown()">
-        <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
-          Oportunidades Extras
-        </h2>
-        <span class="dropdown-arrow" id="dropdownArrow">▾</span>
-      </div>
-      <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
-        Bandas sem prioridade definida — avaliar caso a caso se surgir oportunidade.
-      </p>
-      <div class="dropdown-content" id="dropdownContent">
-        <table class="list-table" id="extra-list">
-          <tr><td class="idx">01</td><td class="band">Slipknot</td><td class="disco">Iowa</td></tr>
-          <tr><td class="idx">02</td><td class="band">Korn</td><td class="disco">Follow the Leader</td></tr>
-          <tr><td class="idx">03</td><td class="band">Limp Bizkit</td><td class="disco">Chocolate Starfish and the Hot Dog Flavored Water</td></tr>
-          <tr><td class="idx">04</td><td class="band">Papa Roach</td><td class="disco">Infest</td></tr>
-          <tr><td class="idx">05</td><td class="band">Bad Religion</td><td class="disco">The Process of Belief</td></tr>
-          <tr><td class="idx">06</td><td class="band">Avenged Sevenfold</td><td class="disco">City of Evil</td></tr>
-        </table>
-      </div>
-    </div>
   </div>
 
   <!-- ===== TAB: DESCOBERTAS ===== -->
@@ -650,11 +803,137 @@
           <h2 style="color:var(--colecao-color);">Coleção</h2>
           <p>Registro de todos os discos que já fazem parte da sua coleção física.</p>
         </div>
+        <div class="add-btn-wrap">
+          <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
+        </div>
       </div>
       <div class="grid" id="grid-colecao"></div>
     </section>
   </div>
 
+  <!-- ===== TAB: IMPORTAR ===== -->
+  <div id="tab-importar" class="tab-content">
+    <section class="section" style="--tier-color:var(--colecao-color)">
+      <div class="tier-head">
+        <div class="tier-stamp small">📤</div>
+        <div class="tier-info">
+          <h2 style="color:var(--colecao-color);">Importar Dados</h2>
+          <p>Faça upload dos seus CSVs para gerar recomendações personalizadas.</p>
+        </div>
+      </div>
+      <div style="max-width:800px; margin:0 auto;">
+        <div class="upload-grid">
+          <div class="upload-area">
+            <div class="icon">🏆</div>
+            <p><strong>Top do Ano</strong></p>
+            <label for="upload-top">Escolher CSV</label>
+            <input type="file" id="upload-top" accept=".csv">
+            <div id="status-top" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">🔍</div>
+            <p><strong>Descobertas</strong></p>
+            <label for="upload-desc">Escolher CSV</label>
+            <input type="file" id="upload-desc" accept=".csv">
+            <div id="status-desc" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">⭐</div>
+            <p><strong>Favoritos</strong></p>
+            <label for="upload-fav">Escolher CSV</label>
+            <input type="file" id="upload-fav" accept=".csv">
+            <div id="status-fav" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">💿</div>
+            <p><strong>Discogs (Coleção)</strong></p>
+            <label for="upload-discogs">Escolher CSV</label>
+            <input type="file" id="upload-discogs" accept=".csv">
+            <div id="status-discogs" class="upload-status"></div>
+          </div>
+        </div>
+        <button class="btn" id="btn-gerar">⚡ Gerar Recomendações</button>
+        <div id="status-gerar" class="upload-status" style="text-align:center;margin-top:8px;"></div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalAdicionar">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>➕ Adicionar Disco</h2>
+      <button class="modal-close" id="btnFecharModal">✕</button>
+    </div>
+    <form id="form-adicionar">
+      <div class="form-group">
+        <label>Artista *</label>
+        <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
+      </div>
+      <div class="form-group">
+        <label>Álbum *</label>
+        <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Formato</label>
+          <select id="campo-formato">
+            <option value="">Selecione</option>
+            <option value="LP">LP</option>
+            <option value="2xLP">2xLP</option>
+            <option value="CD">CD</option>
+            <option value="2xCD">2xCD</option>
+            <option value="EP">EP</option>
+            <option value="Cassete">Cassete</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço (R$)</label>
+          <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Condição da Mídia</label>
+          <select id="campo-condicao-midia">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Condição da Capa</label>
+          <select id="campo-condicao-capa">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Data de Aquisição</label>
+        <input type="date" id="campo-data">
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
+      </div>
+      <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
+      <div class="form-msg" id="form-msg"></div>
+    </form>
+  </div>
 </div>
 
 <footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
@@ -669,13 +948,107 @@ let colecao = [];
 let recomendacoes = [];
 let descobertas = [];
 
-// ========== DROPDOWN ==========
-function toggleDropdown() {
-  const content = document.getElementById('dropdownContent');
-  const arrow = document.getElementById('dropdownArrow');
-  content.classList.toggle('open');
-  arrow.classList.toggle('open');
-}
+// ========== DADOS ESTÁTICOS ==========
+const S = [
+  { artist:"Metallica", album:"Ride the Lightning", strategy:"Primeira boa oportunidade", note:"Completa a tríade clássica" },
+  { artist:"Blind Guardian", album:"Imaginations from the Other Side", strategy:"Boa edição", note:"Maior valor afetivo" },
+  { artist:"Architects", album:"The Sky, The Earth & All Between", strategy:"Lançamento/repressagem", note:"Fecha a trilogia" },
+  { artist:"Linkin Park", album:"Hybrid Theory", strategy:"Alta prioridade", note:"Conjunto com Meteora" },
+  { artist:"System of a Down", album:"Toxicity", strategy:"Alta prioridade", note:"Representativo da playlist" },
+];
+
+const A = [
+  { artist:"Pennywise", album:"Full Circle", strategy:"Bom preço", note:"Histórico" },
+  { artist:"Trivium", album:"The Sin and the Sentence", strategy:"Após S", note:"Entrada da banda" },
+  { artist:"Black Sabbath", album:"Paranoid", strategy:"Boa edição", note:"Origem do heavy metal" },
+  { artist:"Iron Maiden", album:"Powerslave", strategy:"Oportunidade", note:"Clássico" },
+  { artist:"Megadeth", album:"Rust in Peace", strategy:"Oportunidade", note:"Thrash" },
+];
+
+const B = [
+  { artist:"The Warning", album:"ERROR", strategy:"Promoções", note:"Sem urgência" },
+  { artist:"Angra", album:"Rebirth", strategy:"Naturalmente", note:"Sem urgência" },
+];
+
+const EXTRA = [
+  { artist:"Slipknot", album:"Iowa" },
+  { artist:"Korn", album:"Follow the Leader" },
+  { artist:"Limp Bizkit", album:"Chocolate Starfish and the Hot Dog Flavored Water" },
+  { artist:"Papa Roach", album:"Infest" },
+  { artist:"Bad Religion", album:"The Process of Belief" },
+  { artist:"Avenged Sevenfold", album:"City of Evil" },
+];
+
+// ========== DESCOBERTAS ESTÁTICAS ==========
+const DESCOBERTAS = [
+  { ano: 2026, artista: "Of Mice & Men", album: "Echo", titulo: "Maior descoberta de 2026", descricao: "Foi a banda que mais conseguiu reproduzir a sensação que Architects proporcionou anteriormente." },
+  { ano: 2026, artista: "Parkway Drive", album: "Darker Still", titulo: "Redescoberta do ano", descricao: "A banda já fazia parte da minha história, mas somente em 2026 ganhou espaço definitivo." },
+  { ano: 2026, artista: "Elwood Stray", album: "Gone With The Flow", titulo: "Maior novidade", descricao: "A descoberta totalmente inédita mais interessante do ano." },
+  { ano: 2026, artista: "Polaris", album: "Fatalism", titulo: "Continuar acompanhando", descricao: "Uma das bandas que melhor representa a nova geração do metalcore melódico." },
+  { ano: 2026, artista: "Currents", album: "The Death We Seek", titulo: "Grande potencial", descricao: "Uma das bandas que mais conversa com o som moderno que procuro." },
+  { ano: 2025, artista: "Architects", album: "The Sky, The Earth & All Between", titulo: "Banda do ano", descricao: "Nenhuma outra banda marcou tanto minhas descobertas em 2025." },
+  { ano: 2025, artista: "Bring Me The Horizon", album: "Sempiternal", titulo: "Maior novidade", descricao: "A descoberta inédita mais marcante do ano." },
+  { ano: 2025, artista: "Atreyu", album: "The Curse", titulo: "Metalcore clássico", descricao: "Uma banda histórica do gênero que ganhou nova força." },
+  { ano: 2025, artista: "The Devil Wears Prada", album: "Color Decay", titulo: "Nova geração", descricao: "Uma das bandas que melhor representa o metalcore melódico contemporâneo." },
+  { ano: 2025, artista: "We Came As Romans", album: "Darkbloom", titulo: "Grande potencial", descricao: "Uma descoberta consistente que conversa diretamente com o som moderno." },
+  { ano: 2024, artista: "The Warning", album: "Keep Me Fed", titulo: "Confirmação do ano", descricao: "A banda deixou de ser uma descoberta e passou a fazer parte definitiva da identidade musical." },
+  { ano: 2024, artista: "Linkin Park", album: "From Zero", titulo: "O retorno mais esperado", descricao: "Um dos acontecimentos musicais mais importantes do ano." },
+  { ano: 2024, artista: "Falling In Reverse", album: "Popular Monster", titulo: "Grande surpresa", descricao: "Uma descoberta completamente inesperada que merece continuar sendo acompanhada." },
+  { ano: 2024, artista: "Bullet For My Valentine", album: "The Poison", titulo: "Reencontro", descricao: "O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da trajetória." },
+  { ano: 2024, artista: "Machine Head", album: "The Blackening", titulo: "Thrash moderno", descricao: "Uma das bandas que melhor representa a evolução do heavy metal moderno." },
+  { ano: 2023, artista: "The Warning", album: "ERROR", titulo: "Maior descoberta de 2023", descricao: "A banda que abriu uma nova fase da coleção." },
+  { ano: 2023, artista: "Breed 77", album: "In My Blood", titulo: "Redescoberta inesperada", descricao: "Uma banda que passou despercebida durante muitos anos." },
+  { ano: 2023, artista: "Seether", album: "Finding Beauty in Negative Spaces", titulo: "Rock alternativo de referência", descricao: "Representa muito bem o lado mais melódico do hard rock moderno." },
+  { ano: 2023, artista: "Soilwork", album: "Stabbing the Drama", titulo: "Peso com melodia", descricao: "Uma das bandas que melhor equilibra agressividade e refrões marcantes." },
+  { ano: 2023, artista: "Project46", album: "Que Seja Feita a Nossa Vontade", titulo: "Representante nacional", descricao: "A principal descoberta brasileira daquele ano." },
+  { ano: 2022, artista: "Bullet For My Valentine", album: "The Poison", titulo: "Banda do ano", descricao: "A principal descoberta daquele ano." },
+  { ano: 2022, artista: "zebrahead", album: "MFZB", titulo: "Punk Rock moderno", descricao: "Continuou sendo uma presença constante nas minhas descobertas." },
+  { ano: 2022, artista: "Self Deception", album: "Destroy the Art", titulo: "Nova geração", descricao: "Uma das bandas modernas que mais chamou minha atenção." },
+  { ano: 2022, artista: "Tremonti", album: "Marching in Time", titulo: "Guitarras modernas", descricao: "Uma das descobertas mais consistentes do ano." },
+  { ano: 2022, artista: "The Offspring", album: "Smash", titulo: "Redescoberta", descricao: "Representa o reencontro com uma das bandas mais importantes do punk rock melódico." },
+  { ano: 2021, artista: "Nightrage", album: "Wolf to Man", titulo: "Maior descoberta de 2021", descricao: "A banda inédita que mais marcou minhas descobertas." },
+  { ano: 2021, artista: "Trivium", album: "In the Court of the Dragon", titulo: "Consolidação", descricao: "Deixou de ser apenas uma descoberta para se tornar uma das bandas centrais." },
+  { ano: 2021, artista: "Bullet For My Valentine", album: "Bullet For My Valentine", titulo: "Reencontro", descricao: "O Discovery Weekly reacendeu meu interesse." },
+  { ano: 2021, artista: "Soilwork", album: "Verkligheten", titulo: "Melodic Death moderno", descricao: "Uma das bandas que melhor representou o peso melódico." },
+  { ano: 2021, artista: "Crobot", album: "Motherbrain", titulo: "Hard Rock moderno", descricao: "Uma descoberta diferente que trouxe variedade à curadoria." },
+  { ano: 2020, artista: "Trivium", album: "What The Dead Men Say", titulo: "Banda do ano", descricao: "A banda que mais cresceu na minha curadoria." },
+  { ano: 2020, artista: "Atreyu", album: "The Curse", titulo: "Metalcore clássico", descricao: "Uma das descobertas mais importantes para entender a evolução do gênero." },
+  { ano: 2020, artista: "zebrahead", album: "MFZB", titulo: "Punk Rock moderno", descricao: "Trouxe novamente o punk melódico para minhas descobertas." },
+  { ano: 2020, artista: "Saint Asonia", album: "Flawed Design", titulo: "Rock moderno", descricao: "Uma descoberta consistente que ampliou meu interesse pelo hard rock contemporâneo." },
+  { ano: 2020, artista: "Any Given Day", album: "Overpower", titulo: "Metalcore moderno", descricao: "Uma das bandas que antecipou a direção que minha curadoria seguiria." },
+  { ano: 2019, artista: "All That Remains", album: "The Fall of Ideals", titulo: "Banda do ano", descricao: "A principal descoberta de 2019 e uma das maiores portas de entrada para o metalcore melódico." },
+  { ano: 2019, artista: "Machine Head", album: "The Blackening", titulo: "Thrash moderno", descricao: "Uma descoberta que ampliou minha visão sobre o heavy metal moderno." },
+  { ano: 2019, artista: "Amon Amarth", album: "Twilight of the Thunder God", titulo: "Melodic Death Metal", descricao: "Uma das bandas que melhor representa o peso épico." },
+  { ano: 2019, artista: "Orbit Culture", album: "Nija", titulo: "Peso contemporâneo", descricao: "Uma descoberta marcante que representa a nova geração do metal pesado." },
+  { ano: 2019, artista: "Days Of Jupiter", album: "Panoptical", titulo: "Hard Rock moderno", descricao: "Representa muito bem o lado mais melódico das minhas descobertas." },
+  { ano: 2018, artista: "Persuader", album: "When Eden Burns", titulo: "Maior descoberta de 2018", descricao: "A banda que mais marcou o início da minha fase de descobertas." },
+  { ano: 2018, artista: "Sister Sin", album: "Now and Forever", titulo: "Hard Rock moderno", descricao: "Uma descoberta que trouxe peso e atitude." },
+  { ano: 2018, artista: "Mystic Prophecy", album: "War Brigade", titulo: "Power Metal contemporâneo", descricao: "Representa a continuidade da minha paixão pelo heavy e power metal europeu." },
+  { ano: 2018, artista: "Egypt Central", album: "White Rabbit", titulo: "Rock alternativo", descricao: "Uma das descobertas que ampliaram meu lado mais acessível." },
+  { ano: 2018, artista: "Meshiaak", album: "Alliance of Thieves", titulo: "Thrash moderno", descricao: "Uma excelente descoberta para representar o thrash metal contemporâneo." },
+];
+
+// ========== COLEÇÃO ESTÁTICA ==========
+const VINIL = [
+  { artist: "Metallica", album: "Master of Puppets", format: "LP · RE · RM", condition: "NM", sleeve: "VG+", date: "2026-07-09" },
+  { artist: "Basttardz", album: "Brasil com Z / Auschwitz Tropical", format: "LP · Gre", condition: "M", sleeve: "M", date: "2026-07-05" },
+  { artist: "Megadeth", album: "Peace Sells... But Who's Buying?", format: "LP · Album", condition: "G", sleeve: "P", date: "2026-07-05" },
+  { artist: "Bullet For My Valentine", album: "Bullet For My Valentine", format: "2xLP · Dlx · Black", condition: "NM", sleeve: "NM", date: "2026-07-10" },
+  { artist: "Metallica", album: "...And Justice For All", format: "2xLP · Album", condition: "", sleeve: "", date: "2026-07-02" },
+  { artist: "Linkin Park", album: "Meteora", format: "LP · Ltd · RE · Gat", condition: "", sleeve: "", date: "2026-07-02" },
+];
+
+const CD = [
+  { artist: "Iron Maiden", album: "Edward The Great - The Greatest Hits", format: "CD · Comp", condition: "G", sleeve: "No Cover", date: "2026-07-07" },
+  { artist: "Iron Maiden", album: "Rock In Rio", format: "2xCD · Enh · 3-D", condition: "P", sleeve: "No Cover", date: "2026-07-07" },
+  { artist: "Angra", album: "Freedom Call", format: "CD · EP · RE", condition: "G", sleeve: "No Cover", date: "2026-07-07" },
+  { artist: "Angra", album: "Rebirth", format: "CD · Album", condition: "P", sleeve: "No Cover", date: "2026-07-05" },
+  { artist: "Metallica", album: "...And Justice For All", format: "CD · RP · PRS", condition: "F", sleeve: "No Cover", date: "2026-07-07" },
+  { artist: "Blind Guardian", album: "Nightfall In Middle-Earth", format: "CD · Album", condition: "G", sleeve: "No Cover", date: "2026-07-07" },
+  { artist: "Blind Guardian", album: "A Night At The Opera", format: "CD · Album", condition: "P", sleeve: "No Cover", date: "2026-07-07" },
+  { artist: "Blind Guardian", album: "Tokyo Tales", format: "CD · Album", condition: "F", sleeve: "No Cover", date: "2026-07-07" },
+  { artist: "The Rolling Stones", album: "Bridges To Babylon", format: "CD · Album", condition: "F", sleeve: "No Cover", date: "2026-07-07" },
+];
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
@@ -735,29 +1108,10 @@ function verificarSessao() {
 
 // ========== CARREGAR DADOS ==========
 function carregarDados() {
-  fetch(API + '/colecao?user_id=' + usuarioId)
-    .then(r => r.json())
-    .then(data => {
-      colecao = Array.isArray(data) ? data : [];
-      renderColecao();
-    })
-    .catch(() => {});
-
-  fetch(API + '/recomendacoes?user_id=' + usuarioId)
-    .then(r => r.json())
-    .then(data => {
-      recomendacoes = Array.isArray(data) ? data : [];
-      renderRecomendacoes();
-    })
-    .catch(() => {});
-
-  fetch(API + '/descobertas?user_id=' + usuarioId)
-    .then(r => r.json())
-    .then(data => {
-      descobertas = Array.isArray(data) ? data : [];
-      renderDescobertas();
-    })
-    .catch(() => {});
+  renderColecao();
+  renderRecomendacoes();
+  renderDescobertas();
+  renderExtra();
 }
 
 // ========== RENDER ==========
@@ -765,51 +1119,51 @@ function renderColecao() {
   const grid = document.getElementById('grid-colecao');
   if (!grid) return;
   
-  if (!colecao || colecao.length === 0) {
+  const todos = [...VINIL, ...CD];
+  if (todos.length === 0) {
     grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
     document.getElementById('colecao-badge').textContent = '0';
     return;
   }
 
-  grid.innerHTML = colecao.map((item, i) => {
-    const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-    const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+  grid.innerHTML = todos.map((item, i) => {
+    const condClass = item.condition ? `cond-${item.condition.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const sleeveClass = item.sleeve ? `cond-${item.sleeve.toLowerCase().replace(/[^a-z]/g, '')}` : '';
     const letter = item.album ? item.album.charAt(0) : '?';
     return `
       <div class="card" id="colecao-card-${i}">
         <div class="art-wrap" id="colecao-art-${i}" style="background: var(--colecao-color); background-size: cover; background-position: center;">
           <span class="priority-tag" style="background:var(--colecao-color);color:var(--ink);">💿</span>
           <div class="spine-letter">${letter}</div>
-          <div class="art-fallback" id="colecao-fallback-${i}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          <div class="art-fallback" id="colecao-fallback-${i}" style="opacity:0.6;">${item.artist || '?'}<br>${item.album || '?'}</div>
         </div>
         <div class="card-body">
           <h3>${item.album || '?'}</h3>
-          <div class="artist" style="color:var(--colecao-color);">${item.artista || 'Artista desconhecido'}</div>
+          <div class="artist" style="color:var(--colecao-color);">${item.artist || 'Artista desconhecido'}</div>
           <div class="meta-block">
-            <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+            <div class="meta-row"><span class="label">Formato</span><span class="val">${item.format || '—'}</span></div>
           </div>
           <div class="meta-row">
             <span class="label">Condição</span>
             <span class="val">
-              ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
-              ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
-              ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+              ${item.condition ? `<span class="cond-badge ${condClass}">${item.condition}</span>` : ''}
+              ${item.sleeve ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.sleeve}</span>` : ''}
+              ${!item.condition && !item.sleeve ? '—' : ''}
             </span>
           </div>
-          ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${Number(item.preco).toFixed(2)}</span></div>` : ''}
+          ${item.date ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.date}</span></div>` : ''}
         </div>
       </div>
     `;
   }).join('');
 
-  document.getElementById('colecao-badge').textContent = colecao.length;
+  document.getElementById('colecao-badge').textContent = todos.length;
 }
 
 function renderRecomendacoes() {
-  const tiers = { S: [], A: [], B: [], C: [] };
-  recomendacoes.forEach(r => { if (tiers[r.tier]) tiers[r.tier].push(r); });
-
-  ['S', 'A', 'B', 'C'].forEach(tier => {
+  const tiers = { S: S, A: A, B: B };
+  
+  ['S', 'A', 'B'].forEach(tier => {
     const grid = document.getElementById(`grid-${tier.toLowerCase()}`);
     if (!grid) return;
     const items = tiers[tier] || [];
@@ -819,7 +1173,7 @@ function renderRecomendacoes() {
       return;
     }
 
-    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' : '#8A8378';
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : '#4E7A8C';
     grid.innerHTML = items.map((item, idx) => {
       const letter = item.album ? item.album.charAt(0) : '?';
       const id = `rec-${tier}-${idx}`;
@@ -828,15 +1182,15 @@ function renderRecomendacoes() {
           <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
             <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
             <div class="spine-letter">${letter}</div>
-            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artist || '?'}<br>${item.album || '?'}</div>
           </div>
           <div class="card-body">
             <h3>${item.album || 'Álbum'}</h3>
-            <div class="artist" style="color:${tierColor};">${item.artista || 'Artista desconhecido'}</div>
+            <div class="artist" style="color:${tierColor};">${item.artist || 'Artista desconhecido'}</div>
             <div class="meta-block">
-              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.strategy || ''}</span></div>
             </div>
-            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
+            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.note || ''}</span></div>
           </div>
         </div>
       `;
@@ -848,7 +1202,7 @@ function renderDescobertas() {
   const grid = document.getElementById('grid-descobertas');
   if (!grid) return;
 
-  if (!descobertas || descobertas.length === 0) {
+  if (!DESCOBERTAS || DESCOBERTAS.length === 0) {
     grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p></div>`;
     document.getElementById('descobertas-badge').textContent = '0';
     return;
@@ -856,13 +1210,12 @@ function renderDescobertas() {
 
   // Agrupa por ano
   const anos = {};
-  descobertas.forEach(item => {
+  DESCOBERTAS.forEach(item => {
     const ano = item.ano || 'Sem ano';
     if (!anos[ano]) anos[ano] = [];
     anos[ano].push(item);
   });
 
-  // Ordena anos decrescente
   const anosOrdenados = Object.keys(anos).sort((a, b) => {
     if (a === 'Sem ano') return 1;
     if (b === 'Sem ano') return -1;
@@ -892,7 +1245,199 @@ function renderDescobertas() {
   });
 
   grid.innerHTML = html;
-  document.getElementById('descobertas-badge').textContent = descobertas.length;
+  document.getElementById('descobertas-badge').textContent = DESCOBERTAS.length;
+}
+
+function renderExtra() {
+  const table = document.getElementById('extra-list');
+  if (!table) return;
+  
+  EXTRA.forEach((item, i) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="idx">${String(i+1).padStart(2,'0')}</td>
+      <td class="band">${item.artist}</td>
+      <td class="disco">${item.album}</td>
+    `;
+    table.appendChild(row);
+  });
+}
+
+// ========== DROPDOWN ==========
+function toggleDropdown() {
+  const content = document.getElementById('dropdownContent');
+  const arrow = document.getElementById('dropdownArrow');
+  content.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+// ========== MODAL ==========
+const modal = document.getElementById('modalAdicionar');
+const btnAbrir = document.getElementById('btnAbrirModal');
+const btnFechar = document.getElementById('btnFecharModal');
+
+function abrirModal() {
+  modal.classList.add('open');
+  document.getElementById('form-msg').textContent = '';
+  document.getElementById('form-msg').className = 'form-msg';
+  document.getElementById('btn-submit').disabled = false;
+}
+
+function fecharModal() {
+  modal.classList.remove('open');
+}
+
+btnAbrir.addEventListener('click', abrirModal);
+btnFechar.addEventListener('click', fecharModal);
+modal.addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') fecharModal();
+});
+
+// ========== ADICIONAR DISCO ==========
+document.getElementById('form-adicionar').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById('btn-submit');
+  const msg = document.getElementById('form-msg');
+  btn.disabled = true;
+  msg.textContent = '⏳ Salvando...';
+  msg.className = 'form-msg';
+
+  const dados = {
+    artista: document.getElementById('campo-artista').value.trim(),
+    album: document.getElementById('campo-album').value.trim(),
+    formato: document.getElementById('campo-formato').value,
+    condicao_midia: document.getElementById('campo-condicao-midia').value,
+    condicao_capa: document.getElementById('campo-condicao-capa').value,
+    preco: parseFloat(document.getElementById('campo-preco').value) || null,
+    data_aquisicao: document.getElementById('campo-data').value || null,
+    notas: document.getElementById('campo-notas').value.trim()
+  };
+
+  if (!dados.artista || !dados.album) {
+    msg.textContent = '⚠️ Artista e álbum são obrigatórios!';
+    msg.className = 'form-msg error';
+    btn.disabled = false;
+    return;
+  }
+
+  fetch(API + '/adicionar_disco?user_id=' + usuarioId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  })
+  .then(res => res.json())
+  .then(resultado => {
+    if (resultado.sucesso) {
+      msg.textContent = '✅ ' + resultado.mensagem;
+      msg.className = 'form-msg success';
+      document.getElementById('campo-artista').value = '';
+      document.getElementById('campo-album').value = '';
+      document.getElementById('campo-formato').value = '';
+      document.getElementById('campo-condicao-midia').value = '';
+      document.getElementById('campo-condicao-capa').value = '';
+      document.getElementById('campo-preco').value = '';
+      document.getElementById('campo-data').value = '';
+      document.getElementById('campo-notas').value = '';
+      carregarDados();
+      setTimeout(fecharModal, 1000);
+    } else {
+      msg.textContent = '❌ ' + (resultado.erro || 'Erro ao adicionar');
+      msg.className = 'form-msg error';
+    }
+  })
+  .catch(() => {
+    msg.textContent = '❌ Erro de conexão';
+    msg.className = 'form-msg error';
+  })
+  .finally(() => {
+    btn.disabled = false;
+  });
+});
+
+// ========== UPLOADS ==========
+function uploadPlaylist(tipo, input) {
+  const status = document.getElementById(`status-${tipo}`);
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('tipo', tipo);
+  fd.append('arquivo', file);
+  fetch(API + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function uploadDiscogs(input) {
+  const status = document.getElementById('status-discogs');
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('arquivo', file);
+  fetch(API + '/importar_colecao?user_id=' + usuarioId, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function gerarRecomendacoes() {
+  const status = document.getElementById('status-gerar');
+  const btn = document.getElementById('btn-gerar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+  status.textContent = '⏳ Processando...';
+  status.className = 'upload-status';
+  fetch(API + '/gerar_recomendacoes?user_id=' + usuarioId, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = '⚡ Gerar Recomendações';
+    });
 }
 
 // ========== TABS ==========
@@ -926,6 +1471,12 @@ function switchTab(tabId) {
     title.innerHTML = 'Minha <span>Coleção</span>';
     sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
     meter.style.display = 'none';
+  } else if (tabId === 'tab-importar') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Importar';
+    title.innerHTML = 'Importar <span>Dados</span>';
+    sub.textContent = 'Faça upload dos seus CSVs para gerar recomendações personalizadas.';
+    meter.style.display = 'none';
   }
 }
 
@@ -935,6 +1486,20 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     switchTab(this.dataset.tab);
   });
 });
+
+document.getElementById('upload-top').addEventListener('change', function() {
+  uploadPlaylist('top', this);
+});
+document.getElementById('upload-desc').addEventListener('change', function() {
+  uploadPlaylist('descobertas', this);
+});
+document.getElementById('upload-fav').addEventListener('change', function() {
+  uploadPlaylist('favoritos', this);
+});
+document.getElementById('upload-discogs').addEventListener('change', function() {
+  uploadDiscogs(this);
+});
+document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
 
 // ========== INICIAR ==========
 document.addEventListener('DOMContentLoaded', verificarSessao);

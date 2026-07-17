@@ -27,6 +27,7 @@
   .status { font-size:12px; margin-top:8px; opacity:0.6; }
   .btn { background:#D6432F; color:#1a1815; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer; margin-top:12px; }
   .user { font-size:12px; opacity:0.4; margin-bottom:12px; }
+  #loginError { color:#f44336; font-size:13px; margin-top:12px; display:none; }
 </style>
 </head>
 <body>
@@ -34,8 +35,8 @@
 <div id="loginScreen" class="box">
   <h1>Discoteca<span>.</span></h1>
   <p>Sua coleção de discos, organizada.</p>
-  <button onclick="loginGoogle()">Entrar com Google</button>
-  <div id="loginError" style="color:#f44336;font-size:13px;margin-top:12px;display:none;"></div>
+  <button id="btnLogin">Entrar com Google</button>
+  <div id="loginError">Erro ao fazer login. Tente novamente.</div>
 </div>
 
 <div id="appScreen" class="box hidden">
@@ -97,9 +98,25 @@
 const API = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null, colecao = [], recomendacoes = [], descobertas = [];
 
-function loginGoogle() {
-  fetch(API+'/login').then(r=>r.json()).then(d=>{if(d.auth_url)window.location.href=d.auth_url;});
-}
+document.getElementById('btnLogin').addEventListener('click', function() {
+  const btn = this;
+  const error = document.getElementById('loginError');
+  btn.disabled = true;
+  error.style.display = 'none';
+  fetch(API+'/login')
+    .then(r => r.json())
+    .then(d => {
+      if (d.auth_url) {
+        window.location.href = d.auth_url;
+      } else {
+        throw new Error('URL não recebida');
+      }
+    })
+    .catch(() => {
+      error.style.display = 'block';
+      btn.disabled = false;
+    });
+});
 
 function verificarSessao() {
   const url = new URL(window.location);
@@ -114,15 +131,18 @@ function verificarSessao() {
     carregarDados();
     return;
   }
-  fetch(API+'/sessao').then(r=>r.json()).then(d=>{
-    if(d.logado) {
-      usuarioId = d.usuario_id;
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('appScreen').classList.remove('hidden');
-      document.getElementById('userInfo').textContent = '👤 ' + (d.nome || '');
-      carregarDados();
-    }
-  }).catch(()=>{});
+  fetch(API+'/sessao')
+    .then(r => r.json())
+    .then(d => {
+      if(d.logado) {
+        usuarioId = d.usuario_id;
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appScreen').classList.remove('hidden');
+        document.getElementById('userInfo').textContent = '👤 ' + (d.nome || '');
+        carregarDados();
+      }
+    })
+    .catch(() => {});
 }
 
 function carregarDados() {

@@ -453,6 +453,51 @@
     margin-left: 12px;
   }
 
+  /* ===== DROPDOWN ===== */
+  .dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    transition: opacity 0.2s ease;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--card-line);
+  }
+  .dropdown-toggle:hover { opacity: 0.8; }
+  .dropdown-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 18px;
+    color: rgba(237,232,220,0.4);
+    line-height: 1;
+  }
+  .dropdown-arrow.open { transform: rotate(180deg); }
+  .dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .dropdown-content.open {
+    max-height: 2000px;
+    opacity: 1;
+    margin-top: 16px;
+  }
+  .dropdown-content .list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .dropdown-content .list-table tr { border-bottom: 1px solid var(--card-line); }
+  .dropdown-content .list-table td { padding: 12px 8px; }
+  .dropdown-content .list-table .idx { font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .dropdown-content .list-table .band { font-weight:600; width:32%; }
+  .dropdown-content .list-table .disco { color:rgba(237,232,220,0.7); font-style:italic; }
+  .dropdown-content .list-table tr:hover { background:rgba(237,232,220,0.03); }
+
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
     .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
@@ -557,6 +602,29 @@
       </div>
       <div class="grid" id="grid-c"></div>
     </section>
+
+    <!-- ===== DROPDOWN: OPORTUNIDADES EXTRAS ===== -->
+    <div style="margin-top: 20px;">
+      <div class="dropdown-toggle" onclick="toggleDropdown()">
+        <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
+          Oportunidades Extras
+        </h2>
+        <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+      </div>
+      <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
+        Bandas sem prioridade definida — avaliar caso a caso se surgir oportunidade.
+      </p>
+      <div class="dropdown-content" id="dropdownContent">
+        <table class="list-table" id="extra-list">
+          <tr><td class="idx">01</td><td class="band">Slipknot</td><td class="disco">Iowa</td></tr>
+          <tr><td class="idx">02</td><td class="band">Korn</td><td class="disco">Follow the Leader</td></tr>
+          <tr><td class="idx">03</td><td class="band">Limp Bizkit</td><td class="disco">Chocolate Starfish and the Hot Dog Flavored Water</td></tr>
+          <tr><td class="idx">04</td><td class="band">Papa Roach</td><td class="disco">Infest</td></tr>
+          <tr><td class="idx">05</td><td class="band">Bad Religion</td><td class="disco">The Process of Belief</td></tr>
+          <tr><td class="idx">06</td><td class="band">Avenged Sevenfold</td><td class="disco">City of Evil</td></tr>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- ===== TAB: DESCOBERTAS ===== -->
@@ -600,6 +668,14 @@ let usuarioId = null;
 let colecao = [];
 let recomendacoes = [];
 let descobertas = [];
+
+// ========== DROPDOWN ==========
+function toggleDropdown() {
+  const content = document.getElementById('dropdownContent');
+  const arrow = document.getElementById('dropdownArrow');
+  content.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {

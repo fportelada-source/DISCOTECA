@@ -743,6 +743,9 @@
     margin-left: 12px;
   }
 
+  /* ===== UTILITIES ===== */
+  .hidden { display: none !important; }
+
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
     .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
@@ -774,7 +777,7 @@
 </div>
 
 <!-- ===== APP ===== -->
-<div id="appScreen" class="hidden">
+<div id="appScreen" style="display:none;">
 
   <!-- BARRA DO USUÁRIO -->
   <div class="user-bar">
@@ -837,38 +840,21 @@
       </div>
       <div class="grid" id="grid-b"></div>
     </section>
+    
+    <!-- DROPDOWN: Oportunidades Extras (única seção C) -->
     <section class="section" style="--tier-color:var(--c-color)">
       <div class="tier-head">
         <div class="tier-stamp">C</div>
         <div class="tier-info">
-          <h2>Baixa Prioridade</h2>
-          <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
+          <h2>Oportunidades Extras</h2>
+          <p>Bandas sem prioridade definida — avaliar caso a caso se surgir oportunidade.</p>
+        </div>
+        <div class="add-btn-wrap" style="margin-left:auto;">
+          <button class="add-btn" onclick="toggleDropdown()" style="width:48px;height:48px;border-radius:50%;font-size:20px;background:var(--c-color);color:var(--ink);border:none;cursor:pointer;">▼</button>
         </div>
       </div>
-      <div class="wildcard">
-        <span class="chip">Slipknot</span>
-        <span class="chip">Korn</span>
-        <span class="chip">Limp Bizkit</span>
-        <span class="chip">Papa Roach</span>
-        <span class="chip">Bad Religion</span>
-        <span class="chip">Avenged Sevenfold</span>
-        <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
-      </div>
-      
-      <!-- DROPDOWN: Oportunidades Extras -->
-      <div style="margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--card-line);">
-        <div class="dropdown-toggle" onclick="toggleDropdown()">
-          <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
-            Oportunidades Extras
-          </h2>
-          <span class="dropdown-arrow" id="dropdownArrow">▾</span>
-        </div>
-        <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
-          Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
-        </p>
-        <div class="dropdown-content" id="dropdownContent">
-          <table class="list-table" id="extra-list"></table>
-        </div>
+      <div class="dropdown-content" id="dropdownContent" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease,opacity 0.3s ease,margin 0.3s ease;opacity:0;margin-top:0;">
+        <table class="list-table" id="extra-list"></table>
       </div>
     </section>
   </div>
@@ -1068,7 +1054,6 @@ const EXTRA = [
   { artist:"Avenged Sevenfold", album:"City of Evil" },
 ];
 
-// ========== DESCOBERTAS ==========
 const DESCOBERTAS = [
   { ano: 2026, artista: "Of Mice & Men", album: "Echo", titulo: "Maior descoberta de 2026", descricao: "Foi a banda que mais conseguiu reproduzir a sensação que Architects proporcionou anteriormente." },
   { ano: 2026, artista: "Parkway Drive", album: "Darker Still", titulo: "Redescoberta do ano", descricao: "A banda já fazia parte da minha história, mas somente em 2026 ganhou espaço definitivo." },
@@ -1147,8 +1132,8 @@ function verificarSessao() {
   const nome = params.get('nome');
 
   if (userId && nome) {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
     document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
     window.history.replaceState({}, document.title, window.location.pathname);
     carregarDados();
@@ -1159,8 +1144,8 @@ function verificarSessao() {
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('appScreen').classList.remove('hidden');
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('appScreen').style.display = 'block';
         document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
         carregarDados();
       }

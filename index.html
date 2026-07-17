@@ -19,7 +19,18 @@
     --b-color:#4E7A8C;
     --c-color:#8A8378;
     --d-color:#6B5B7B;
+    --e-color:#5C6B7A;
+    --f-color:#7A6B5C;
+    --g-color:#5C7A6B;
+    --h-color:#8A6B7B;
+    --i-color:#6B7A8A;
+    --j-color:#7A8A6B;
+    --k-color:#8A7A6B;
+    --l-color:#6B8A7A;
     --colecao-color:#B8A88A;
+    --vinil-color:#E8C87A;
+    --cd-color:#7AB8D8;
+    --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -31,85 +42,6 @@
   }
   ::selection{ background:var(--s-color); color:var(--paper); }
 
-  /* ===== LOGIN ===== */
-  .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
-    padding: 40px 20px;
-  }
-  .login-box {
-    background: var(--card);
-    border: 1px solid var(--card-line);
-    border-radius: 16px;
-    padding: 48px 40px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-  }
-  .login-box .logo {
-    font-family: 'Anton', sans-serif;
-    font-size: 48px;
-    letter-spacing: 0.02em;
-    margin-bottom: 8px;
-  }
-  .login-box .logo span { color: var(--s-color); }
-  .login-box .sub {
-    font-size: 14px;
-    opacity: 0.5;
-    margin-bottom: 32px;
-  }
-  .login-btn {
-    background: #ffffff;
-    color: #1a1815;
-    border: none;
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    justify-content: center;
-  }
-  .login-btn:hover { opacity: 0.85; transform: scale(1.02); }
-  .login-btn svg { width: 20px; height: 20px; }
-  .login-error { color: #f44336; font-size: 14px; margin-top: 16px; display: none; }
-
-  /* ===== USER BAR ===== */
-  .user-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 6vw;
-    border-bottom: 1px solid var(--card-line);
-    background: var(--ink);
-    position: sticky;
-    top: 0;
-    z-index: 99;
-  }
-  .user-bar .user-name { font-size: 13px; opacity: 0.6; }
-  .user-bar .logout-btn {
-    background: transparent;
-    border: 1px solid var(--card-line);
-    color: var(--paper);
-    padding: 4px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: 0.2s;
-  }
-  .user-bar .logout-btn:hover {
-    background: var(--s-color);
-    color: var(--ink);
-    border-color: var(--s-color);
-  }
-
-  /* ===== HERO ===== */
   .hero{
     position:relative;
     padding:64px 6vw 48px;
@@ -120,7 +52,7 @@
   .hero::before{
     content:"";
     position:absolute; inset:0;
-    background: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
+    background:var(--groove);
     pointer-events:none;
   }
   .hero-eyebrow{
@@ -131,6 +63,7 @@
     color:var(--paper);
     opacity:0.55;
     margin-bottom:18px;
+    transition: opacity 0.3s ease;
   }
   .hero h1{
     font-family:'Anton', sans-serif;
@@ -140,6 +73,7 @@
     letter-spacing:0.005em;
     text-transform:uppercase;
     max-width:14ch;
+    transition: all 0.4s ease;
   }
   .hero h1 span{ color:var(--s-color); }
   .hero-sub{
@@ -149,12 +83,14 @@
     color:var(--paper);
     opacity:0.68;
     line-height:1.6;
+    transition: all 0.4s ease;
   }
   .hero-meter{
     margin-top:36px;
     display:flex;
     gap:2px;
     max-width:520px;
+    transition: opacity 0.3s ease;
   }
   .hero-meter span{
     flex:1;
@@ -166,7 +102,6 @@
   .hero-state-descobertas .hero h1 span { color: var(--d-color); }
   .hero-state-colecao .hero h1 span { color: var(--colecao-color); }
 
-  /* ===== TABS ===== */
   .tabs-container{
     padding: 0 6vw;
     border-bottom: 1px solid var(--card-line);
@@ -193,8 +128,11 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border-bottom: 2px solid transparent;
+    position: relative;
   }
-  .tab-btn:hover{ opacity: 0.7; }
+  .tab-btn:hover{
+    opacity: 0.7;
+  }
   .tab-btn.active{
     opacity: 1;
     border-bottom-color: var(--s-color);
@@ -236,7 +174,6 @@
     to{ opacity: 1; transform: translateY(0); }
   }
 
-  /* ===== SECTION ===== */
   .section{ padding: 40px 6vw 8px; }
   .tier-head{
     display:flex;
@@ -261,6 +198,10 @@
     font-size:48px;
     padding:6px 14px 10px;
   }
+  .tier-stamp.tiny{
+    font-size:28px;
+    padding:4px 10px 6px;
+  }
   .tier-info h2{
     font-family:'JetBrains Mono', monospace;
     font-size:13px;
@@ -282,8 +223,6 @@
     gap:18px;
     padding-bottom:8px;
   }
-
-  /* ===== CARDS ===== */
   .card{
     background:var(--card);
     border:1px solid var(--card-line);
@@ -373,6 +312,102 @@
   .meta-row .val{ color:var(--paper); opacity:0.85; text-align:right; max-width:60%; }
   .meta-block{ margin-bottom:8px; }
 
+  .wildcard{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-left:4px solid var(--c-color);
+    border-radius:8px;
+    padding:20px 22px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+  }
+  .wildcard .chip{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:5px 10px;
+    background:rgba(237,232,220,0.06);
+    border:1px solid var(--card-line);
+    border-radius:20px;
+  }
+  .wildcard .note{
+    width:100%;
+    font-size:13px;
+    color:rgba(237,232,220,0.55);
+    margin-top:6px;
+  }
+
+  .dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    transition: opacity 0.2s ease;
+  }
+  .dropdown-toggle:hover {
+    opacity: 0.8;
+  }
+  .dropdown-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 18px;
+    color: rgba(237,232,220,0.4);
+    line-height: 1;
+  }
+  .dropdown-arrow.open {
+    transform: rotate(180deg);
+  }
+  .dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .dropdown-content.open {
+    max-height: 2000px;
+    opacity: 1;
+    margin-top: 24px;
+  }
+  .dropdown-content .list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .dropdown-content .list-table tr { border-bottom: 1px solid var(--card-line); }
+  .dropdown-content .list-table td { padding: 14px 10px; }
+  .dropdown-content .list-table .idx { font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .dropdown-content .list-table .band { font-weight:600; width:32%; }
+  .dropdown-content .list-table .disco { color:rgba(237,232,220,0.7); font-style:italic; }
+  .dropdown-content .list-table tr:hover { background:rgba(237,232,220,0.03); }
+
+  .list-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  .list-table tr{ border-bottom:1px solid var(--card-line); }
+  .list-table td{ padding:14px 10px; }
+  .list-table .idx{ font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .list-table .band{ font-weight:600; width:32%; }
+  .list-table .disco{ color:rgba(237,232,220,0.7); font-style:italic; }
+  .list-table tr:hover{ background:rgba(237,232,220,0.03); }
+
+  .art-wrap.has-image .art-fallback {
+    opacity: 0 !important;
+  }
+
+  .format-badge{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: rgba(237,232,220,0.08);
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    opacity: 0.6;
+  }
+
   .cond-badge{
     display: inline-block;
     font-family: 'JetBrains Mono', monospace;
@@ -390,17 +425,238 @@
   .cond-p{ color: #f44336; border-color: #f44336; }
   .cond-m{ color: #00BCD4; border-color: #00BCD4; }
 
+  .section-subtitle{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--paper);
+    opacity: 0.5;
+    margin-bottom: 24px;
+    padding-left: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  footer{
+    padding:40px 6vw 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:rgba(237,232,220,0.3);
+    text-align:center;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
   .empty-state {
     text-align: center;
     padding: 80px 20px;
     opacity: 0.4;
     grid-column: 1 / -1;
   }
-  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
-  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
-  .empty-state p { font-size: 14px; opacity: 0.7; }
+  .empty-state .icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+  .empty-state h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .empty-state p {
+    font-size: 14px;
+    opacity: 0.7;
+  }
 
-  .hidden { display: none !important; }
+  /* ===== LOGIN ===== */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 40px 20px;
+  }
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-box .logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 48px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .login-box .logo span { color: var(--s-color); }
+  .login-box .sub {
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 32px;
+  }
+  .login-btn {
+    background: #ffffff;
+    color: #1a1815;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+  .login-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+  .login-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .login-error {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  /* ===== USER BAR ===== */
+  .user-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 6vw;
+    border-bottom: 1px solid var(--card-line);
+    background: var(--ink);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  .user-bar .user-name {
+    font-size: 13px;
+    opacity: 0.6;
+  }
+  .user-bar .logout-btn {
+    background: transparent;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 4px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+  }
+  .user-bar .logout-btn:hover {
+    background: var(--s-color);
+    color: var(--ink);
+    border-color: var(--s-color);
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .modal-header h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.02em;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--paper);
+    font-size: 28px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: 0.2s;
+  }
+  .modal-close:hover { opacity: 1; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: var(--ink);
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--s-color);
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .form-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .form-btn:hover { opacity: 0.8; }
+  .form-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .form-msg { font-size: 13px; padding: 10px 0 0; text-align: center; }
+  .form-msg.success { color: #4CAF50; }
+  .form-msg.error { color: #f44336; }
 
   .add-btn {
     background: var(--s-color);
@@ -426,19 +682,67 @@
     align-items: center;
   }
 
-  footer{
-    padding:40px 6vw 0;
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px;
-    color:rgba(237,232,220,0.3);
-    text-align:center;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
+  /* Upload */
+  .upload-area {
+    background: var(--card);
+    border: 2px dashed var(--card-line);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: 0.3s;
+    margin-bottom: 16px;
   }
+  .upload-area:hover { border-color: var(--s-color); }
+  .upload-area .icon { font-size: 28px; margin-bottom: 4px; }
+  .upload-area p { opacity: 0.5; font-size: 14px; }
+  .upload-area input { display: none; }
+  .upload-area label {
+    display: inline-block;
+    background: var(--s-color);
+    color: var(--ink);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+  }
+  .upload-area label:hover { opacity: 0.8; }
+  .upload-status {
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: 0.6;
+  }
+  .upload-status.success { color: #4CAF50; }
+  .upload-status.error { color: #f44336; }
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width:600px){ .upload-grid { grid-template-columns:1fr; } }
+
+  .btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+    width: 100%;
+  }
+  .btn:hover { opacity: 0.8; }
+
+  /* ===== UTILITIES ===== */
+  .hidden { display: none !important; }
 
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
     .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
+    .tier-stamp.tiny{ font-size:22px; padding:4px 8px 5px; }
     .hero h1{ font-size:clamp(34px,11vw,60px); }
     .tab-btn{ font-size:11px; padding:10px 14px 12px; }
     .tabs{ gap:2px; }
@@ -473,12 +777,11 @@
     <button class="logout-btn" id="btnLogout">Sair</button>
   </div>
 
-  <!-- HERO -->
-  <section class="hero hero-state-colecao" id="heroSection">
-    <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Coleção</div>
-    <h1 id="heroTitle">Minha <span id="heroHighlight">Coleção</span></h1>
-    <p class="hero-sub" id="heroSub">Gerencie todos os discos que fazem parte da sua coleção física.</p>
-    <div class="hero-meter" id="heroMeter" style="display:none;">
+  <section class="hero hero-state-compras" id="heroSection">
+    <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria</div>
+    <h1 id="heroTitle">Lista de <span id="heroHighlight">Compras</span></h1>
+    <p class="hero-sub" id="heroSub">Prioridade S → C, baseado nas suas playlists importadas.</p>
+    <div class="hero-meter" id="heroMeter">
       <span style="background:var(--s-color)"></span>
       <span style="background:var(--s-color)"></span>
       <span style="background:var(--a-color)"></span>
@@ -488,17 +791,17 @@
     </div>
   </section>
 
-  <!-- TABS -->
   <div class="tabs-container">
     <div class="tabs">
-      <button class="tab-btn" data-tab="tab-compras">📋 Compras</button>
+      <button class="tab-btn active" data-tab="tab-compras">📋 Compras</button>
       <button class="tab-btn" data-tab="tab-descobertas">🔍 Descobertas <span class="tab-badge" id="descobertas-badge">0</span></button>
-      <button class="tab-btn active" data-tab="tab-colecao">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
+      <button class="tab-btn" data-tab="tab-colecao">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
+      <button class="tab-btn" data-tab="tab-importar">📤 Importar</button>
     </div>
   </div>
 
-  <!-- ===== TAB: COMPRAS ===== -->
-  <div id="tab-compras" class="tab-content">
+  <!-- ===== TAB 1: COMPRAS ===== -->
+  <div id="tab-compras" class="tab-content active">
     <section class="section" style="--tier-color:var(--s-color)">
       <div class="tier-head">
         <div class="tier-stamp">S</div>
@@ -537,11 +840,26 @@
           <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
         </div>
       </div>
-      <div class="grid" id="grid-c"></div>
+      
+      <!-- DROPDOWN: Oportunidades Extras -->
+      <div style="margin-top: 28px; border-top: 1px solid var(--card-line); padding-top: 28px;">
+        <div class="dropdown-toggle" onclick="toggleDropdown()">
+          <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
+            Oportunidades Extras
+          </h2>
+          <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+        </div>
+        <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
+          Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
+        </p>
+        <div class="dropdown-content" id="dropdownContent">
+          <table class="list-table" id="extra-list"></table>
+        </div>
+      </div>
     </section>
   </div>
 
-  <!-- ===== TAB: DESCOBERTAS ===== -->
+  <!-- ===== TAB 2: DESCOBERTAS ===== -->
   <div id="tab-descobertas" class="tab-content">
     <section class="section" style="--tier-color:var(--d-color)">
       <div class="tier-head">
@@ -555,8 +873,8 @@
     </section>
   </div>
 
-  <!-- ===== TAB: COLEÇÃO ===== -->
-  <div id="tab-colecao" class="tab-content active">
+  <!-- ===== TAB 3: COLEÇÃO ===== -->
+  <div id="tab-colecao" class="tab-content">
     <section class="section" style="--tier-color:var(--colecao-color)">
       <div class="tier-head">
         <div class="tier-stamp small">💿</div>
@@ -572,6 +890,129 @@
     </section>
   </div>
 
+  <!-- ===== TAB 4: IMPORTAR ===== -->
+  <div id="tab-importar" class="tab-content">
+    <section class="section" style="--tier-color:var(--colecao-color)">
+      <div class="tier-head">
+        <div class="tier-stamp small">📤</div>
+        <div class="tier-info">
+          <h2 style="color:var(--colecao-color);">Importar Dados</h2>
+          <p>Faça upload dos seus CSVs para gerar recomendações personalizadas.</p>
+        </div>
+      </div>
+      <div style="max-width:800px; margin:0 auto;">
+        <div class="upload-grid">
+          <div class="upload-area">
+            <div class="icon">🏆</div>
+            <p><strong>Top do Ano</strong></p>
+            <label for="upload-top">Escolher CSV</label>
+            <input type="file" id="upload-top" accept=".csv">
+            <div id="status-top" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">🔍</div>
+            <p><strong>Descobertas</strong></p>
+            <label for="upload-desc">Escolher CSV</label>
+            <input type="file" id="upload-desc" accept=".csv">
+            <div id="status-desc" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">⭐</div>
+            <p><strong>Favoritos</strong></p>
+            <label for="upload-fav">Escolher CSV</label>
+            <input type="file" id="upload-fav" accept=".csv">
+            <div id="status-fav" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">💿</div>
+            <p><strong>Discogs (Coleção)</strong></p>
+            <label for="upload-discogs">Escolher CSV</label>
+            <input type="file" id="upload-discogs" accept=".csv">
+            <div id="status-discogs" class="upload-status"></div>
+          </div>
+        </div>
+        <button class="btn" id="btn-gerar">⚡ Gerar Recomendações</button>
+        <div id="status-gerar" class="upload-status" style="text-align:center;margin-top:8px;"></div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalAdicionar">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>➕ Adicionar Disco</h2>
+      <button class="modal-close" id="btnFecharModal">✕</button>
+    </div>
+    <form id="form-adicionar">
+      <div class="form-group">
+        <label>Artista *</label>
+        <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
+      </div>
+      <div class="form-group">
+        <label>Álbum *</label>
+        <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Formato</label>
+          <select id="campo-formato">
+            <option value="">Selecione</option>
+            <option value="LP">LP</option>
+            <option value="2xLP">2xLP</option>
+            <option value="CD">CD</option>
+            <option value="2xCD">2xCD</option>
+            <option value="EP">EP</option>
+            <option value="Cassete">Cassete</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço (R$)</label>
+          <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Condição da Mídia</label>
+          <select id="campo-condicao-midia">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Condição da Capa</label>
+          <select id="campo-condicao-capa">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Data de Aquisição</label>
+        <input type="date" id="campo-data">
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
+      </div>
+      <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
+      <div class="form-msg" id="form-msg"></div>
+    </form>
+  </div>
 </div>
 
 <footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
@@ -582,25 +1023,29 @@
 // ========== API ==========
 const API = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
+let usuarioNome = null;
 let colecao = [];
 let recomendacoes = [];
 let descobertas = [];
 
-// ========== LAST.FM ==========
-const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
-
-function getCoverUrl(artist, album) {
-  return fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.album && data.album.image) {
-        const img = data.album.image.find(i => i.size === 'extralarge');
-        return img && img['#text'] ? img['#text'] : null;
-      }
-      return null;
-    })
-    .catch(() => null);
-}
+// ========== DADOS ESTÁTICOS (fallback) ==========
+const EXTRA = [
+  { artist:"Seether", album:"Finding Beauty in Negative Spaces" },
+  { artist:"Machine Head", album:"The Blackening" },
+  { artist:"Týr", album:"By the Light of the Northern Star" },
+  { artist:"Godsmack", album:"Faceless" },
+  { artist:"Dream Theater", album:"Metropolis Pt. 2" },
+  { artist:"Lamb of God", album:"Ashes of the Wake" },
+  { artist:"The Offspring", album:"Smash" },
+  { artist:"Disturbed", album:"The Sickness" },
+  { artist:"Tremonti", album:"A Dying Machine" },
+  { artist:"Bring Me The Horizon", album:"Sempiternal" },
+  { artist:"Amon Amarth", album:"Twilight of the Thunder God" },
+  { artist:"Devilskin", album:"Be Like the River" },
+  { artist:"Breed 77", album:"In My Blood" },
+  { artist:"Not Enough Space", album:"Weaponized" },
+  { artist:"Alter Bridge", album:"Blackbird" },
+];
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
@@ -636,6 +1081,7 @@ function verificarSessao() {
 
   if (userId && nome) {
     usuarioId = userId;
+    usuarioNome = nome;
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
     document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
@@ -649,6 +1095,7 @@ function verificarSessao() {
     .then(data => {
       if (data.logado) {
         usuarioId = data.usuario_id;
+        usuarioNome = data.nome;
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
         document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
@@ -660,29 +1107,37 @@ function verificarSessao() {
 
 // ========== CARREGAR DADOS ==========
 function carregarDados() {
+  console.log('Carregando dados... usuarioId:', usuarioId);
+  
   fetch(API + '/colecao?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
       colecao = Array.isArray(data) ? data : [];
+      console.log('Coleção carregada:', colecao.length, 'itens');
       renderColecao();
     })
-    .catch(() => {});
+    .catch(err => console.error('Erro ao carregar coleção:', err));
 
   fetch(API + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
       recomendacoes = Array.isArray(data) ? data : [];
+      console.log('Recomendações carregadas:', recomendacoes.length, 'itens');
       renderRecomendacoes();
     })
-    .catch(() => {});
+    .catch(err => console.error('Erro ao carregar recomendações:', err));
 
   fetch(API + '/descobertas?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
       descobertas = Array.isArray(data) ? data : [];
+      console.log('Descobertas carregadas:', descobertas.length, 'itens');
       renderDescobertas();
     })
-    .catch(() => {});
+    .catch(err => console.error('Erro ao carregar descobertas:', err));
+
+  // Extra - sempre estático
+  renderExtra();
 }
 
 // ========== RENDER ==========
@@ -702,14 +1157,14 @@ function renderColecao() {
     const letter = item.album ? item.album.charAt(0) : '?';
     return `
       <div class="card" id="colecao-card-${i}">
-        <div class="art-wrap" id="colecao-art-${i}" style="background:#1a1815;background-size:cover;background-position:center;">
+        <div class="art-wrap" id="colecao-art-${i}" style="background: var(--colecao-color); background-size: cover; background-position: center;">
           <span class="priority-tag" style="background:var(--colecao-color);color:var(--ink);">💿</span>
           <div class="spine-letter">${letter}</div>
-          <div class="art-fallback" id="colecao-fallback-${i}">${item.artist}<br>${item.album}</div>
+          <div class="art-fallback" id="colecao-fallback-${i}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
         </div>
         <div class="card-body">
           <h3>${item.album || '?'}</h3>
-          <div class="artist" style="color:var(--colecao-color);">${item.artist}</div>
+          <div class="artist" style="color:var(--colecao-color);">${item.artista || 'Artista desconhecido'}</div>
           <div class="meta-block">
             <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
           </div>
@@ -727,19 +1182,6 @@ function renderColecao() {
     `;
   }).join('');
 
-  colecao.forEach((item, i) => {
-    getCoverUrl(item.artist, item.album).then(url => {
-      const wrap = document.getElementById(`colecao-art-${i}`);
-      const fallback = document.getElementById(`colecao-fallback-${i}`);
-      if (url && wrap) {
-        wrap.style.backgroundImage = `url('${url}')`;
-        wrap.style.backgroundSize = 'cover';
-        wrap.style.backgroundPosition = 'center';
-        if (fallback) fallback.style.opacity = '0';
-      }
-    });
-  });
-
   document.getElementById('colecao-badge').textContent = colecao.length;
 }
 
@@ -753,7 +1195,7 @@ function renderRecomendacoes() {
     const items = tiers[tier] || [];
     
     if (items.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
+      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p><p style="font-size:12px;opacity:0.5;">Importe suas playlists e clique em "Gerar Recomendações".</p></div>`;
       return;
     }
 
@@ -763,14 +1205,14 @@ function renderRecomendacoes() {
       const id = `rec-${tier}-${idx}`;
       return `
         <div class="card" id="${id}">
-          <div class="art-wrap" id="art-${id}" style="background:#1a1815;background-size:cover;background-position:center;">
+          <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
             <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
             <div class="spine-letter">${letter}</div>
-            <div class="art-fallback" id="fallback-${id}">${item.artist}<br>${item.album}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
           </div>
           <div class="card-body">
             <h3>${item.album || 'Álbum'}</h3>
-            <div class="artist" style="color:${tierColor};">${item.artist}</div>
+            <div class="artist" style="color:${tierColor};">${item.artista || 'Artista desconhecido'}</div>
             <div class="meta-block">
               <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
             </div>
@@ -779,20 +1221,6 @@ function renderRecomendacoes() {
         </div>
       `;
     }).join('');
-
-    items.forEach((item, idx) => {
-      const id = `rec-${tier}-${idx}`;
-      getCoverUrl(item.artist, item.album).then(url => {
-        const wrap = document.getElementById(`art-${id}`);
-        const fallback = document.getElementById(`fallback-${id}`);
-        if (url && wrap) {
-          wrap.style.backgroundImage = `url('${url}')`;
-          wrap.style.backgroundSize = 'cover';
-          wrap.style.backgroundPosition = 'center';
-          if (fallback) fallback.style.opacity = '0';
-        }
-      });
-    });
   });
 }
 
@@ -801,7 +1229,7 @@ function renderDescobertas() {
   if (!grid) return;
 
   if (!descobertas || descobertas.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p><p style="font-size:12px;opacity:0.5;">Suas descobertas aparecerão aqui após importar as playlists.</p></div>`;
     document.getElementById('descobertas-badge').textContent = '0';
     return;
   }
@@ -811,14 +1239,14 @@ function renderDescobertas() {
     const id = `desc-${idx}`;
     return `
       <div class="card" id="${id}">
-        <div class="art-wrap" id="art-${id}" style="background:#1a1815;background-size:cover;background-position:center;">
+        <div class="art-wrap" id="art-${id}" style="background: var(--d-color); background-size: cover; background-position: center;">
           <span class="priority-tag" style="background:var(--d-color);color:var(--ink);">${item.ano || '2025'}</span>
           <div class="spine-letter">${letter}</div>
-          <div class="art-fallback" id="fallback-${id}">${item.artist}<br>${item.album}</div>
+          <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
         </div>
         <div class="card-body">
           <h3>${item.album || 'Álbum'}</h3>
-          <div class="artist" style="color:var(--d-color);">${item.artist}</div>
+          <div class="artist" style="color:var(--d-color);">${item.artista || 'Artista desconhecido'}</div>
           <div class="meta-block">
             <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.titulo || ''}</span></div>
           </div>
@@ -828,21 +1256,199 @@ function renderDescobertas() {
     `;
   }).join('');
 
-  descobertas.forEach((item, idx) => {
-    const id = `desc-${idx}`;
-    getCoverUrl(item.artist, item.album).then(url => {
-      const wrap = document.getElementById(`art-${id}`);
-      const fallback = document.getElementById(`fallback-${id}`);
-      if (url && wrap) {
-        wrap.style.backgroundImage = `url('${url}')`;
-        wrap.style.backgroundSize = 'cover';
-        wrap.style.backgroundPosition = 'center';
-        if (fallback) fallback.style.opacity = '0';
-      }
-    });
-  });
-
   document.getElementById('descobertas-badge').textContent = descobertas.length;
+}
+
+function renderExtra() {
+  const table = document.getElementById('extra-list');
+  if (!table) return;
+  
+  EXTRA.forEach((item, i) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="idx">${String(i+1).padStart(2,'0')}</td>
+      <td class="band">${item.artist}</td>
+      <td class="disco">${item.album}</td>
+    `;
+    table.appendChild(row);
+  });
+}
+
+// ========== DROPDOWN ==========
+function toggleDropdown() {
+  const content = document.getElementById('dropdownContent');
+  const arrow = document.getElementById('dropdownArrow');
+  content.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+// ========== MODAL ==========
+const modal = document.getElementById('modalAdicionar');
+const btnAbrir = document.getElementById('btnAbrirModal');
+const btnFechar = document.getElementById('btnFecharModal');
+
+function abrirModal() {
+  modal.classList.add('open');
+  document.getElementById('form-msg').textContent = '';
+  document.getElementById('form-msg').className = 'form-msg';
+  document.getElementById('btn-submit').disabled = false;
+}
+
+function fecharModal() {
+  modal.classList.remove('open');
+}
+
+btnAbrir.addEventListener('click', abrirModal);
+btnFechar.addEventListener('click', fecharModal);
+modal.addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') fecharModal();
+});
+
+// ========== ADICIONAR DISCO ==========
+document.getElementById('form-adicionar').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById('btn-submit');
+  const msg = document.getElementById('form-msg');
+  btn.disabled = true;
+  msg.textContent = '⏳ Salvando...';
+  msg.className = 'form-msg';
+
+  const dados = {
+    artista: document.getElementById('campo-artista').value.trim(),
+    album: document.getElementById('campo-album').value.trim(),
+    formato: document.getElementById('campo-formato').value,
+    condicao_midia: document.getElementById('campo-condicao-midia').value,
+    condicao_capa: document.getElementById('campo-condicao-capa').value,
+    preco: parseFloat(document.getElementById('campo-preco').value) || null,
+    data_aquisicao: document.getElementById('campo-data').value || null,
+    notas: document.getElementById('campo-notas').value.trim()
+  };
+
+  if (!dados.artista || !dados.album) {
+    msg.textContent = '⚠️ Artista e álbum são obrigatórios!';
+    msg.className = 'form-msg error';
+    btn.disabled = false;
+    return;
+  }
+
+  fetch(API + '/adicionar_disco?user_id=' + usuarioId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  })
+  .then(res => res.json())
+  .then(resultado => {
+    if (resultado.sucesso) {
+      msg.textContent = '✅ ' + resultado.mensagem;
+      msg.className = 'form-msg success';
+      document.getElementById('campo-artista').value = '';
+      document.getElementById('campo-album').value = '';
+      document.getElementById('campo-formato').value = '';
+      document.getElementById('campo-condicao-midia').value = '';
+      document.getElementById('campo-condicao-capa').value = '';
+      document.getElementById('campo-preco').value = '';
+      document.getElementById('campo-data').value = '';
+      document.getElementById('campo-notas').value = '';
+      carregarDados();
+      setTimeout(fecharModal, 1000);
+    } else {
+      msg.textContent = '❌ ' + (resultado.erro || 'Erro ao adicionar');
+      msg.className = 'form-msg error';
+    }
+  })
+  .catch(() => {
+    msg.textContent = '❌ Erro de conexão';
+    msg.className = 'form-msg error';
+  })
+  .finally(() => {
+    btn.disabled = false;
+  });
+});
+
+// ========== UPLOADS ==========
+function uploadPlaylist(tipo, input) {
+  const status = document.getElementById(`status-${tipo}`);
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('tipo', tipo);
+  fd.append('arquivo', file);
+  fetch(API + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function uploadDiscogs(input) {
+  const status = document.getElementById('status-discogs');
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('arquivo', file);
+  fetch(API + '/importar_colecao?user_id=' + usuarioId, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function gerarRecomendacoes() {
+  const status = document.getElementById('status-gerar');
+  const btn = document.getElementById('btn-gerar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+  status.textContent = '⏳ Processando...';
+  status.className = 'upload-status';
+  fetch(API + '/gerar_recomendacoes?user_id=' + usuarioId, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = '⚡ Gerar Recomendações';
+    });
 }
 
 // ========== TABS ==========
@@ -876,6 +1482,12 @@ function switchTab(tabId) {
     title.innerHTML = 'Minha <span>Coleção</span>';
     sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
     meter.style.display = 'none';
+  } else if (tabId === 'tab-importar') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Importar';
+    title.innerHTML = 'Importar <span>Dados</span>';
+    sub.textContent = 'Faça upload dos seus CSVs para gerar recomendações personalizadas.';
+    meter.style.display = 'none';
   }
 }
 
@@ -885,6 +1497,20 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     switchTab(this.dataset.tab);
   });
 });
+
+document.getElementById('upload-top').addEventListener('change', function() {
+  uploadPlaylist('top', this);
+});
+document.getElementById('upload-desc').addEventListener('change', function() {
+  uploadPlaylist('descobertas', this);
+});
+document.getElementById('upload-fav').addEventListener('change', function() {
+  uploadPlaylist('favoritos', this);
+});
+document.getElementById('upload-discogs').addEventListener('change', function() {
+  uploadDiscogs(this);
+});
+document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
 
 // ========== INICIAR ==========
 document.addEventListener('DOMContentLoaded', verificarSessao);

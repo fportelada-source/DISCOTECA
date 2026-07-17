@@ -1006,11 +1006,13 @@
 
 <script>
 // ========== API ==========
-const API = 'https://fportelada.pythonanywhere.com';
+// PEGA O user_id DA URL E USA NA API
+const params = new URLSearchParams(window.location.search);
+const userId = params.get('user_id');
+const API = 'https://fportelada.pythonanywhere.com?user_id=' + (userId || '');
 
-// ========== VARIÁVEIS GLOBAIS ==========
-let usuarioId = null;
-let usuarioNome = null;
+let usuarioId = userId;
+let usuarioNome = params.get('nome') || null;
 let colecao = [];
 let recomendacoes = [];
 let descobertas = [];
@@ -1021,7 +1023,7 @@ document.getElementById('btnLogin').addEventListener('click', function() {
   const error = document.getElementById('loginError');
   btn.disabled = true;
   error.style.display = 'none';
-  fetch(API + '/login')
+  fetch('https://fportelada.pythonanywhere.com/login')
     .then(r => r.json())
     .then(d => {
       if (d.auth_url) {
@@ -1038,13 +1040,7 @@ document.getElementById('btnLogin').addEventListener('click', function() {
 
 // ========== LOGOUT ==========
 document.getElementById('btnLogout').addEventListener('click', function() {
-  fetch(API + '/logout', { method: 'POST' })
-    .then(() => {
-      window.location.href = window.location.pathname;
-    })
-    .catch(() => {
-      window.location.href = window.location.pathname;
-    });
+  window.location.href = window.location.pathname;
 });
 
 // ========== VERIFICAR SESSÃO E CARREGAR DADOS ==========
@@ -1059,12 +1055,11 @@ function verificarSessao() {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
     document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
-    window.history.replaceState({}, document.title, window.location.pathname);
     carregarDados();
     return;
   }
 
-  fetch(API + '/sessao')
+  fetch('https://fportelada.pythonanywhere.com/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
@@ -1085,8 +1080,11 @@ function verificarSessao() {
 function carregarDados() {
   console.log('Carregando dados...');
   
-  // Coleção
-  fetch(API + '/colecao')
+  const urlColecao = 'https://fportelada.pythonanywhere.com/colecao' + (usuarioId ? '?user_id=' + usuarioId : '');
+  const urlRecomendacoes = 'https://fportelada.pythonanywhere.com/recomendacoes' + (usuarioId ? '?user_id=' + usuarioId : '');
+  const urlDescobertas = 'https://fportelada.pythonanywhere.com/descobertas' + (usuarioId ? '?user_id=' + usuarioId : '');
+  
+  fetch(urlColecao)
     .then(r => r.json())
     .then(data => {
       colecao = Array.isArray(data) ? data : [];
@@ -1095,8 +1093,7 @@ function carregarDados() {
     })
     .catch(err => console.error('Erro ao carregar coleção:', err));
 
-  // Recomendações
-  fetch(API + '/recomendacoes')
+  fetch(urlRecomendacoes)
     .then(r => r.json())
     .then(data => {
       recomendacoes = Array.isArray(data) ? data : [];
@@ -1105,8 +1102,7 @@ function carregarDados() {
     })
     .catch(err => console.error('Erro ao carregar recomendações:', err));
 
-  // Descobertas
-  fetch(API + '/descobertas')
+  fetch(urlDescobertas)
     .then(r => r.json())
     .then(data => {
       descobertas = Array.isArray(data) ? data : [];
@@ -1345,7 +1341,7 @@ document.getElementById('form-adicionar').addEventListener('submit', function(e)
     return;
   }
 
-  fetch(API + '/adicionar_disco', {
+  fetch('https://fportelada.pythonanywhere.com/adicionar_disco', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dados)
@@ -1389,7 +1385,7 @@ function uploadPlaylist(tipo, input) {
   const fd = new FormData();
   fd.append('tipo', tipo);
   fd.append('arquivo', file);
-  fetch(API + '/importar_playlist', { method: 'POST', body: fd })
+  fetch('https://fportelada.pythonanywhere.com/importar_playlist', { method: 'POST', body: fd })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1414,7 +1410,7 @@ function uploadDiscogs(input) {
   status.className = 'upload-status';
   const fd = new FormData();
   fd.append('arquivo', file);
-  fetch(API + '/importar_colecao', { method: 'POST', body: fd })
+  fetch('https://fportelada.pythonanywhere.com/importar_colecao', { method: 'POST', body: fd })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1439,7 +1435,7 @@ function gerarRecomendacoes() {
   btn.textContent = '⏳ Gerando...';
   status.textContent = '⏳ Processando...';
   status.className = 'upload-status';
-  fetch(API + '/gerar_recomendacoes', { method: 'POST' })
+  fetch('https://fportelada.pythonanywhere.com/gerar_recomendacoes', { method: 'POST' })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {

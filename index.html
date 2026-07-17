@@ -1050,15 +1050,27 @@ let descobertas = [];
 
 // ========== LOGIN ==========
 function loginGoogle() {
+  const btn = document.querySelector('.login-btn');
+  const error = document.getElementById('loginError');
+  btn.disabled = true;
+  error.style.display = 'none';
+  
   fetch(`${API_BASE}/login`)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error('Erro na API');
+      return res.json();
+    })
     .then(data => {
       if (data.auth_url) {
         window.location.href = data.auth_url;
+      } else {
+        throw new Error('URL de autenticação não recebida');
       }
     })
     .catch(err => {
-      document.getElementById('loginError').style.display = 'block';
+      error.textContent = '❌ ' + err.message;
+      error.style.display = 'block';
+      btn.disabled = false;
     });
 }
 
@@ -1073,13 +1085,11 @@ function verificarSessao() {
     usuarioNome = nome;
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
-    // Limpa URL
     window.history.replaceState({}, document.title, window.location.pathname);
     carregarDados();
     return;
   }
 
-  // Tenta verificar via sessão
   fetch(`${API_BASE}/sessao`)
     .then(res => res.json())
     .then(data => {
@@ -1089,46 +1099,40 @@ function verificarSessao() {
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
         carregarDados();
-      } else {
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('appScreen').classList.add('hidden');
       }
     })
-    .catch(() => {
-      document.getElementById('loginScreen').classList.remove('hidden');
-      document.getElementById('appScreen').classList.add('hidden');
-    });
+    .catch(() => {});
 }
 
 // ========== CARREGAR DADOS ==========
 function carregarDados() {
-  // Carrega coleção
   fetch(`${API_BASE}/colecao`)
     .then(res => res.json())
     .then(data => {
-      colecao = data;
+      colecao = Array.isArray(data) ? data : [];
       renderColecao();
       document.getElementById('colecao-badge').textContent = colecao.length;
       document.getElementById('status-colecao').textContent = `Coleção: ${colecao.length}`;
-    });
+    })
+    .catch(() => {});
 
-  // Carrega recomendações
   fetch(`${API_BASE}/recomendacoes`)
     .then(res => res.json())
     .then(data => {
-      recomendacoes = data;
+      recomendacoes = Array.isArray(data) ? data : [];
       renderRecomendacoes();
       document.getElementById('status-recomendacoes').textContent = `Recomendações: ${recomendacoes.length}`;
-    });
+    })
+    .catch(() => {});
 
-  // Carrega descobertas
   fetch(`${API_BASE}/descobertas`)
     .then(res => res.json())
     .then(data => {
-      descobertas = data;
+      descobertas = Array.isArray(data) ? data : [];
       renderDescobertas();
       document.getElementById('descobertas-badge').textContent = descobertas.length;
-    });
+    })
+    .catch(() => {});
 }
 
 // ========== LAST.FM API (capas) ==========
@@ -1200,7 +1204,6 @@ function renderColecao() {
 
     grid.appendChild(card);
 
-    // Carrega capa
     getAlbumCover(item.artist, item.album).then(url => {
       const wrap = document.getElementById(`art-colecao-${index}`);
       const fallback = document.getElementById(`fallback-colecao-${index}`);
@@ -1533,12 +1536,10 @@ function switchTab(tabId) {
 document.addEventListener('DOMContentLoaded', () => {
   verificarSessao();
 
-  // Fecha modal com ESC
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') fecharModal();
   });
 
-  // Fecha modal clicando fora
   document.getElementById('modalAdicionar').addEventListener('click', function(e) {
     if (e.target === this) fecharModal();
   });

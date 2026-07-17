@@ -1225,7 +1225,9 @@ function renderDescobertas(dados) {
   let html = '';
   anosOrdenados.forEach(ano => {
     const items = anos[ano];
-    html += `<div class="ano-divider">${ano} <span>${items.length} descoberta${items.length > 1 ? 's' : ''}</span></div>`;
+    // TÍTULO DO ANO (fora do grid)
+    html += `<div class="ano-divider" style="grid-column: 1 / -1; margin: 40px 0 16px 0;">${ano} <span>${items.length} descoberta${items.length > 1 ? 's' : ''}</span></div>`;
+    // CARDS DO ANO (dentro do grid)
     html += items.map((item, idx) => {
       const id = `desc-${ano}-${idx}`;
       return `

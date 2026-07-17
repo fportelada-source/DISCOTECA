@@ -19,6 +19,8 @@
   .tab-content.active{display:block;}
   .empty{opacity:0.4;padding:20px 0;text-align:center;}
   .user-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(237,232,220,0.1);margin-bottom:16px;}
+  .ano-divider{font-size:24px;font-weight:bold;margin:32px 0 16px 0;padding-bottom:8px;border-bottom:2px solid rgba(237,232,220,0.1);}
+  .ano-divider span{opacity:0.6;font-size:14px;font-weight:normal;margin-left:12px;}
 </style>
 </head>
 <body>
@@ -169,13 +171,36 @@ function renderDescobertas() {
     div.innerHTML = '<div class="empty">Nenhuma descoberta</div>';
     return;
   }
-  div.innerHTML = descobertas.map(item => `
-    <div class="card">
-      <h3>${item.album || '?'}</h3>
-      <div class="artist">${item.artista || 'Artista'}</div>
-      <div class="meta">${item.titulo || ''} ${item.ano ? '· ' + item.ano : ''}</div>
-    </div>
-  `).join('');
+
+  // Agrupa por ano
+  const anos = {};
+  descobertas.forEach(item => {
+    const ano = item.ano || 'Sem ano';
+    if (!anos[ano]) anos[ano] = [];
+    anos[ano].push(item);
+  });
+
+  // Ordena anos decrescente
+  const anosOrdenados = Object.keys(anos).sort((a, b) => {
+    if (a === 'Sem ano') return 1;
+    if (b === 'Sem ano') return -1;
+    return b - a;
+  });
+
+  let html = '';
+  anosOrdenados.forEach(ano => {
+    const items = anos[ano];
+    html += `<div class="ano-divider">${ano} <span>${items.length} descoberta${items.length > 1 ? 's' : ''}</span></div>`;
+    html += items.map(item => `
+      <div class="card">
+        <h3>${item.album || '?'}</h3>
+        <div class="artist">${item.artista || 'Artista'}</div>
+        <div class="meta">${item.titulo || ''}${item.descricao ? ' — ' + item.descricao : ''}</div>
+      </div>
+    `).join('');
+  });
+
+  div.innerHTML = html;
 }
 
 function switchTab(tab) {

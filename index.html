@@ -28,7 +28,6 @@
   .btn { background:#D6432F; color:#1a1815; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer; margin-top:12px; }
   .user { font-size:12px; opacity:0.4; margin-bottom:12px; }
   #loginError { color:#f44336; font-size:13px; margin-top:12px; display:none; }
-  .loading { opacity:0.5; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -44,10 +43,10 @@
   <div class="user" id="userInfo"></div>
   <h1>Discoteca<span>.</span></h1>
   <div class="tabs">
-    <button class="tab active" data-tab="compras">📋 Compras</button>
-    <button class="tab" data-tab="descobertas">🔍 Descobertas</button>
-    <button class="tab" data-tab="colecao">💿 Coleção</button>
-    <button class="tab" data-tab="importar">📤 Importar</button>
+    <button class="tab active" data-tab="compras" onclick="switchTab('compras')">📋 Compras</button>
+    <button class="tab" data-tab="descobertas" onclick="switchTab('descobertas')">🔍 Descobertas</button>
+    <button class="tab" data-tab="colecao" onclick="switchTab('colecao')">💿 Coleção</button>
+    <button class="tab" data-tab="importar" onclick="switchTab('importar')">📤 Importar</button>
   </div>
 
   <div id="tab-compras">
@@ -69,308 +68,159 @@
     <div class="upload-area">
       <p><strong>🏆 Top do Ano</strong></p>
       <label for="upload-top">Escolher CSV</label>
-      <input type="file" id="upload-top" accept=".csv">
+      <input type="file" id="upload-top" accept=".csv" onchange="uploadPlaylist('top',this)">
       <div id="status-top" class="status"></div>
     </div>
     <div class="upload-area">
       <p><strong>🔍 Descobertas</strong></p>
       <label for="upload-desc">Escolher CSV</label>
-      <input type="file" id="upload-desc" accept=".csv">
+      <input type="file" id="upload-desc" accept=".csv" onchange="uploadPlaylist('descobertas',this)">
       <div id="status-desc" class="status"></div>
     </div>
     <div class="upload-area">
       <p><strong>⭐ Favoritos</strong></p>
       <label for="upload-fav">Escolher CSV</label>
-      <input type="file" id="upload-fav" accept=".csv">
+      <input type="file" id="upload-fav" accept=".csv" onchange="uploadPlaylist('favoritos',this)">
       <div id="status-fav" class="status"></div>
     </div>
     <div class="upload-area">
       <p><strong>💿 Discogs (Coleção)</strong></p>
       <label for="upload-discogs">Escolher CSV</label>
-      <input type="file" id="upload-discogs" accept=".csv">
+      <input type="file" id="upload-discogs" accept=".csv" onchange="uploadDiscogs(this)">
       <div id="status-discogs" class="status"></div>
     </div>
-    <button class="btn" id="btn-gerar">⚡ Gerar Recomendações</button>
+    <button class="btn" onclick="gerarRecomendacoes()" id="btn-gerar">⚡ Gerar Recomendações</button>
     <div id="status-gerar" class="status"></div>
   </div>
 </div>
 
 <script>
-(function() {
-  const API = 'https://fportelada.pythonanywhere.com';
+const API = 'https://fportelada.pythonanywhere.com';
+let usuarioId = null, colecao = [], recomendacoes = [], descobertas = [];
 
-  // ========== ELEMENTOS ==========
-  const loginScreen = document.getElementById('loginScreen');
-  const appScreen = document.getElementById('appScreen');
-  const btnLogin = document.getElementById('btnLogin');
-  const loginError = document.getElementById('loginError');
-  const userInfo = document.getElementById('userInfo');
-
-  // ========== LOGIN ==========
-  btnLogin.addEventListener('click', function() {
-    const btn = this;
-    btn.disabled = true;
-    btn.textContent = '⏳ Carregando...';
-    loginError.style.display = 'none';
-
-    fetch(API + '/login')
-      .then(r => r.json())
-      .then(data => {
-        if (data.auth_url) {
-          window.location.href = data.auth_url;
-        } else {
-          throw new Error('URL não recebida');
-        }
-      })
-      .catch(() => {
-        loginError.style.display = 'block';
-        btn.disabled = false;
-        btn.textContent = 'Entrar com Google';
-      });
-  });
-
-  // ========== VERIFICAR SESSÃO ==========
-  function verificarSessao() {
-    const params = new URLSearchParams(window.location.search);
-    const userId = params.get('user_id');
-    const nome = params.get('nome');
-
-    if (userId && nome) {
-      loginScreen.classList.add('hidden');
-      appScreen.classList.remove('hidden');
-      userInfo.textContent = '👤 ' + nome;
-      window.history.replaceState({}, document.title, window.location.pathname);
-      carregarDados();
-      return;
-    }
-
-    fetch(API + '/sessao')
-      .then(r => r.json())
-      .then(data => {
-        if (data.logado) {
-          loginScreen.classList.add('hidden');
-          appScreen.classList.remove('hidden');
-          userInfo.textContent = '👤 ' + (data.nome || '');
-          carregarDados();
-        }
-      })
-      .catch(() => {
-        // Se a API estiver fora, mostra login mesmo assim
-      });
-  }
-
-  // ========== CARREGAR DADOS ==========
-  function carregarDados() {
-    fetch(API + '/colecao')
-      .then(r => r.json())
-      .then(data => {
-        colecao = Array.isArray(data) ? data : [];
-        renderColecao();
-      })
-      .catch(() => {});
-
-    fetch(API + '/recomendacoes')
-      .then(r => r.json())
-      .then(data => {
-        recomendacoes = Array.isArray(data) ? data : [];
-        renderRecomendacoes();
-      })
-      .catch(() => {});
-
-    fetch(API + '/descobertas')
-      .then(r => r.json())
-      .then(data => {
-        descobertas = Array.isArray(data) ? data : [];
-        renderDescobertas();
-      })
-      .catch(() => {});
-  }
-
-  // ========== VARIÁVEIS ==========
-  let colecao = [];
-  let recomendacoes = [];
-  let descobertas = [];
-
-  // ========== RENDERIZAR ==========
-  function renderColecao() {
-    const g = document.getElementById('grid-colecao');
-    if (!g) return;
-    if (colecao.length === 0) {
-      g.innerHTML = '<p style="opacity:0.4;grid-column:1/-1;text-align:center;">Nenhum disco</p>';
-      return;
-    }
-    g.innerHTML = colecao.map(i => `
-      <div class="card">
-        <h4>${i.album || '?'}</h4>
-        <div class="artist">${i.artista}</div>
-        <div class="meta">${i.formato || '—'} | ${i.condicao_midia || ''} ${i.condicao_capa ? '/' + i.condicao_capa : ''}</div>
-      </div>
-    `).join('');
-  }
-
-  function renderRecomendacoes() {
-    const tiers = { S: [], A: [], B: [], C: [] };
-    recomendacoes.forEach(r => { if (tiers[r.tier]) tiers[r.tier].push(r); });
-
-    ['S', 'A', 'B', 'C'].forEach(t => {
-      const g = document.getElementById('grid-' + t.toLowerCase());
-      if (!g) return;
-      const items = tiers[t] || [];
-      if (items.length === 0) {
-        g.innerHTML = '<p style="opacity:0.4;grid-column:1/-1;text-align:center;">Nenhuma recomendação</p>';
-        return;
+document.getElementById('btnLogin').addEventListener('click', function() {
+  const btn = this;
+  const error = document.getElementById('loginError');
+  btn.disabled = true;
+  error.style.display = 'none';
+  fetch(API+'/login')
+    .then(r => r.json())
+    .then(d => {
+      if (d.auth_url) {
+        window.location.href = d.auth_url;
+      } else {
+        throw new Error('URL não recebida');
       }
-      g.innerHTML = items.map(i => `
-        <div class="card">
-          <h4>${i.album || '?'}</h4>
-          <div class="artist">${i.artista}</div>
-          <div class="meta">${i.estrategia || ''}</div>
-        </div>
-      `).join('');
+    })
+    .catch(() => {
+      error.style.display = 'block';
+      btn.disabled = false;
     });
+});
+
+function verificarSessao() {
+  const url = new URL(window.location);
+  const id = url.searchParams.get('user_id');
+  const nome = url.searchParams.get('nome');
+  if(id && nome) {
+    usuarioId = id;
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('userInfo').textContent = '👤 ' + nome;
+    window.history.replaceState({},'',window.location.pathname);
+    carregarDados();
+    return;
   }
+  fetch(API+'/sessao')
+    .then(r => r.json())
+    .then(d => {
+      if(d.logado) {
+        usuarioId = d.usuario_id;
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appScreen').classList.remove('hidden');
+        document.getElementById('userInfo').textContent = '👤 ' + (d.nome || '');
+        carregarDados();
+      }
+    })
+    .catch(() => {});
+}
 
-  function renderDescobertas() {
-    const g = document.getElementById('grid-descobertas');
-    if (!g) return;
-    if (descobertas.length === 0) {
-      g.innerHTML = '<p style="opacity:0.4;grid-column:1/-1;text-align:center;">Nenhuma descoberta</p>';
-      return;
-    }
-    g.innerHTML = descobertas.map(i => `
-      <div class="card">
-        <h4>${i.album || '?'}</h4>
-        <div class="artist">${i.artista}</div>
-        <div class="meta">${i.titulo || ''}</div>
-      </div>
-    `).join('');
-  }
+function carregarDados() {
+  fetch(API+'/colecao').then(r=>r.json()).then(d=>{colecao=d;renderColecao();});
+  fetch(API+'/recomendacoes').then(r=>r.json()).then(d=>{recomendacoes=d;renderRecomendacoes();});
+  fetch(API+'/descobertas').then(r=>r.json()).then(d=>{descobertas=d;renderDescobertas();});
+}
 
-  // ========== UPLOAD PLAYLIST ==========
-  function uploadPlaylist(tipo, input) {
-    const status = document.getElementById('status-' + tipo);
-    const file = input.files[0];
-    if (!file) return;
+function renderColecao() {
+  const g = document.getElementById('grid-colecao');
+  g.innerHTML = colecao.length ? colecao.map(i=>`
+    <div class="card"><h4>${i.album||'?'}</h4><div class="artist">${i.artista}</div>
+    <div class="meta">${i.formato||'—'} | ${i.condicao_midia||''} ${i.condicao_capa?'/'+i.condicao_capa:''}</div></div>
+  `).join('') : '<p style="opacity:0.4;">Nenhum disco</p>';
+}
 
-    status.textContent = '⏳ Enviando...';
-    status.style.color = '';
-
-    const fd = new FormData();
-    fd.append('tipo', tipo);
-    fd.append('arquivo', file);
-
-    fetch(API + '/importar_playlist', { method: 'POST', body: fd })
-      .then(r => r.json())
-      .then(d => {
-        if (d.sucesso) {
-          status.textContent = '✅ ' + d.mensagem;
-          status.style.color = '#4CAF50';
-        } else {
-          status.textContent = '❌ ' + (d.erro || 'Erro');
-          status.style.color = '#f44336';
-        }
-      })
-      .catch(() => {
-        status.textContent = '❌ Erro de conexão';
-        status.style.color = '#f44336';
-      });
-  }
-
-  // ========== UPLOAD DISCOGS ==========
-  function uploadDiscogs(input) {
-    const status = document.getElementById('status-discogs');
-    const file = input.files[0];
-    if (!file) return;
-
-    status.textContent = '⏳ Enviando...';
-    status.style.color = '';
-
-    const fd = new FormData();
-    fd.append('arquivo', file);
-
-    fetch(API + '/importar_colecao', { method: 'POST', body: fd })
-      .then(r => r.json())
-      .then(d => {
-        if (d.sucesso) {
-          status.textContent = '✅ ' + d.mensagem;
-          status.style.color = '#4CAF50';
-          carregarDados();
-        } else {
-          status.textContent = '❌ ' + (d.erro || 'Erro');
-          status.style.color = '#f44336';
-        }
-      })
-      .catch(() => {
-        status.textContent = '❌ Erro de conexão';
-        status.style.color = '#f44336';
-      });
-  }
-
-  // ========== GERAR RECOMENDAÇÕES ==========
-  function gerarRecomendacoes() {
-    const status = document.getElementById('status-gerar');
-    const btn = document.getElementById('btn-gerar');
-
-    btn.disabled = true;
-    btn.textContent = '⏳ Gerando...';
-    status.textContent = '⏳ Processando...';
-    status.style.color = '';
-
-    fetch(API + '/gerar_recomendacoes', { method: 'POST' })
-      .then(r => r.json())
-      .then(d => {
-        if (d.sucesso) {
-          status.textContent = '✅ ' + d.mensagem;
-          status.style.color = '#4CAF50';
-          carregarDados();
-        } else {
-          status.textContent = '❌ ' + (d.erro || 'Erro');
-          status.style.color = '#f44336';
-        }
-      })
-      .catch(() => {
-        status.textContent = '❌ Erro de conexão';
-        status.style.color = '#f44336';
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = '⚡ Gerar Recomendações';
-      });
-  }
-
-  // ========== TABS ==========
-  function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
-
-    document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
-    document.getElementById('tab-' + tab).classList.remove('hidden');
-  }
-
-  // ========== EVENTOS ==========
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-      switchTab(this.dataset.tab);
-    });
+function renderRecomendacoes() {
+  const tiers = {S:[],A:[],B:[],C:[]};
+  recomendacoes.forEach(r=>{if(tiers[r.tier])tiers[r.tier].push(r);});
+  ['S','A','B','C'].forEach(t=>{
+    const g = document.getElementById('grid-'+t.toLowerCase());
+    if(!g) return;
+    g.innerHTML = tiers[t].length ? tiers[t].map(i=>
+      `<div class="card"><h4>${i.album||'?'}</h4><div class="artist">${i.artista}</div>
+      <div class="meta">${i.estrategia||''}</div></div>`
+    ).join('') : '<p style="opacity:0.4;">Nenhuma recomendação</p>';
   });
+}
 
-  document.getElementById('upload-top').addEventListener('change', function() {
-    uploadPlaylist('top', this);
-  });
-  document.getElementById('upload-desc').addEventListener('change', function() {
-    uploadPlaylist('descobertas', this);
-  });
-  document.getElementById('upload-fav').addEventListener('change', function() {
-    uploadPlaylist('favoritos', this);
-  });
-  document.getElementById('upload-discogs').addEventListener('change', function() {
-    uploadDiscogs(this);
-  });
-  document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
+function renderDescobertas() {
+  const g = document.getElementById('grid-descobertas');
+  g.innerHTML = descobertas.length ? descobertas.map(i=>
+    `<div class="card"><h4>${i.album||'?'}</h4><div class="artist">${i.artista}</div>
+    <div class="meta">${i.titulo||''}</div></div>`
+  ).join('') : '<p style="opacity:0.4;">Nenhuma descoberta</p>';
+}
 
-  // ========== INICIAR ==========
-  document.addEventListener('DOMContentLoaded', verificarSessao);
-})();
+function uploadPlaylist(tipo, input) {
+  const status = document.getElementById('status-'+tipo);
+  const file = input.files[0];
+  if(!file) return;
+  status.textContent = '⏳ Enviando...';
+  const fd = new FormData();
+  fd.append('tipo', tipo);
+  fd.append('arquivo', file);
+  fetch(API+'/importar_playlist', {method:'POST',body:fd})
+    .then(r=>r.json()).then(d=>{status.textContent=d.sucesso?'✅ '+d.mensagem:'❌ '+d.erro;status.style.color=d.sucesso?'#4CAF50':'#f44336';})
+    .catch(()=>{status.textContent='❌ Erro';status.style.color='#f44336';});
+}
+
+function uploadDiscogs(input) {
+  const status = document.getElementById('status-discogs');
+  const file = input.files[0];
+  if(!file) return;
+  status.textContent = '⏳ Enviando...';
+  const fd = new FormData();
+  fd.append('arquivo', file);
+  fetch(API+'/importar_colecao', {method:'POST',body:fd})
+    .then(r=>r.json()).then(d=>{status.textContent=d.sucesso?'✅ '+d.mensagem:'❌ '+d.erro;status.style.color=d.sucesso?'#4CAF50':'#f44336';if(d.sucesso)carregarDados();})
+    .catch(()=>{status.textContent='❌ Erro';status.style.color='#f44336';});
+}
+
+function gerarRecomendacoes() {
+  const status = document.getElementById('status-gerar');
+  status.textContent = '⏳ Gerando...';
+  fetch(API+'/gerar_recomendacoes', {method:'POST'})
+    .then(r=>r.json()).then(d=>{status.textContent=d.sucesso?'✅ '+d.mensagem:'❌ '+d.erro;status.style.color=d.sucesso?'#4CAF50':'#f44336';if(d.sucesso)carregarDados();})
+    .catch(()=>{status.textContent='❌ Erro';status.style.color='#f44336';});
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content,.tab-content.hidden').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', verificarSessao);
 </script>
 </body>
 </html>

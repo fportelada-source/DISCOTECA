@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discoteca</title>
+<style>
+  body { background:#1B1815; color:#EDE8DC; font-family:sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
+  .box { background:#242019; padding:48px; border-radius:16px; text-align:center; max-width:400px; border:1px solid rgba(237,232,220,0.1); }
+  h1 { font-size:48px; margin-bottom:8px; }
+  h1 span { color:#D6432F; }
+  p { opacity:0.6; margin-bottom:32px; }
+  button { background:#fff; color:#1a1815; border:none; padding:14px 32px; border-radius:8px; font-weight:600; font-size:16px; cursor:pointer; width:100%; }
+  button:hover { opacity:0.85; }
+  .hidden { display:none; }
+  .tabs { display:flex; gap:8px; margin:20px 0; flex-wrap:wrap; justify-content:center; }
+  .tab { background:transparent; border:1px solid rgba(237,232,220,0.1); color:#EDE8DC; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px; }
+  .tab.active { border-color:#D6432F; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-top:16px; }
+  .card { background:#242019; border-radius:8px; padding:12px; border:1px solid rgba(237,232,220,0.05); text-align:left; }
+  .card h4 { margin:0 0 4px; font-size:14px; }
+  .card .artist { font-size:12px; opacity:0.6; }
+  .card .meta { font-size:11px; opacity:0.4; margin-top:8px; border-top:1px solid rgba(237,232,220,0.05); padding-top:8px; }
+  .upload-area { border:2px dashed rgba(237,232,220,0.1); padding:24px; border-radius:8px; margin:12px 0; text-align:center; }
+  .upload-area label { background:#D6432F; color:#1a1815; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:600; display:inline-block; margin-top:8px; }
+  .upload-area input { display:none; }
+  .status { font-size:12px; margin-top:8px; opacity:0.6; }
+  .btn { background:#D6432F; color:#1a1815; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer; margin-top:12px; }
+  .user { font-size:12px; opacity:0.4; margin-bottom:12px; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="box">
+  <h1>Discoteca<span>.</span></h1>
+  <p>Sua coleção de discos, organizada.</p>
+  <button onclick="loginGoogle()">Entrar com Google</button>
+  <div id="loginError" style="color:#f44336;font-size:13px;margin-top:12px;display:none;"></div>
+</div>
+
+<div id="appScreen" class="box hidden">
+  <div class="user" id="userInfo"></div>
+  <h1>Discoteca<span>.</span></h1>
+  <div class="tabs">
+    <button class="tab active" data-tab="compras" onclick="switchTab('compras')">📋 Compras</button>
+    <button class="tab" data-tab="descobertas" onclick="switchTab('descobertas')">🔍 Descobertas</button>
+    <button class="tab" data-tab="colecao" onclick="switchTab('colecao')">💿 Coleção</button>
+    <button class="tab" data-tab="importar" onclick="switchTab('importar')">📤 Importar</button>
+  </div>
+
+  <div id="tab-compras">
+    <div class="grid" id="grid-s"></div>
+    <div class="grid" id="grid-a"></div>
+    <div class="grid" id="grid-b"></div>
+    <div class="grid" id="grid-c"></div>
+  </div>
+
+  <div id="tab-descobertas" class="hidden">
+    <div class="grid" id="grid-descobertas"></div>
+  </div>
+
+  <div id="tab-colecao" class="hidden">
+    <div class="grid" id="grid-colecao"></div>
+  </div>
+
+  <div id="tab-importar" class="hidden">
+    <div class="upload-area">
+      <p><strong>🏆 Top do Ano</strong></p>
+      <label for="upload-top">Escolher CSV</label>
+      <input type="file" id="upload-top" accept=".csv" onchange="uploadPlaylist('top',this)">
+      <div id="status-top" class="status"></div>
+    </div>
+    <div class="upload-area">
+      <p><strong>🔍 Descobertas</strong></p>
+      <label for="upload-desc">Escolher CSV</label>
+      <input type="file" id="upload-desc" accept=".csv" onchange="uploadPlaylist('descobertas',this)">
+      <div id="status-desc" class="status"></div>
+    </div>
+    <div class="upload-area">
+      <p><strong>⭐ Favoritos</strong></p>
+      <label for="upload-fav">Escolher CSV</label>
+      <input type="file" id="upload-fav" accept=".csv" onchange="uploadPlaylist('favoritos',this)">
+      <div id="status-fav" class="status"></div>
+    </div>
+    <div class="upload-area">
+      <p><strong>💿 Discogs (Coleção)</strong></p>
+      <label for="upload-discogs">Escolher CSV</label>
+      <input type="file" id="upload-discogs" accept=".csv" onchange="uploadDiscogs(this)">
+      <div id="status-discogs" class="status"></div>
+    </div>
+    <button class="btn" onclick="gerarRecomendacoes()" id="btn-gerar">⚡ Gerar Recomendações</button>
+    <div id="status-gerar" class="status"></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://fportelada.pythonanywhere.com';
+let usuarioId = null, colecao = [], recomendacoes = [], descobertas = [];
+
+function loginGoogle() {
+  fetch(API+'/login').then(r=>r.json()).then(d=>{if(d.auth_url)window.location.href=d.auth_url;});
+}
+
+function verificarSessao() {
+  const url = new URL(window.location);
+  const id = url.searchParams.get('user_id');
+  const nome = url.searchParams.get('nome');
+  if(id && nome) {
+    usuarioId = id;
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('userInfo').textContent = '👤 ' + nome;
+    window.history.replaceState({},'',window.location.pathname);
+    carregarDados();
+    return;
+  }
+  fetch(API+'/sessao').then(r=>r.json()).then(d=>{
+    if(d.logado) {
+      usuarioId = d.usuario_id;
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appScreen').classList.remove('hidden');
+      document.getElementById('userInfo').textContent = '👤 ' + (d.nome || '');
+      carregarDados();
+    }
+  }).catch(()=>{});
+}
+
+function carregarDados() {
+  fetch(API+'/colecao').then(r=>r.json()).then(d=>{colecao=d;renderColecao();});
+  fetch(API+'/recomendacoes').then(r=>r.json()).then(d=>{recomendacoes=d;renderRecomendacoes();});
+  fetch(API+'/descobertas').then(r=>r.json()).then(d=>{descobertas=d;renderDescobertas();});
+}
+
+function renderColecao() {
+  const g = document.getElementById('grid-colecao');
+  g.innerHTML = colecao.length ? colecao.map(i=>`
+    <div class="card"><h4>${i.album||'?'}</h4><div class="artist">${i.artista}</div>
+    <div class="meta">${i.formato||'—'} | ${i.condicao_midia||''} ${i.condicao_capa?'/'+i.condicao_capa:''}</div></div>
+  `).join('') : '<p style="opacity:0.4;">Nenhum disco</p>';
+}
+
+function renderRecomendacoes() {
+  const tiers = {S:[],A:[],B:[],C:[]};
+  recomendacoes.forEach(r=>{if(tiers[r.tier])tiers[r.tier].push(r);});
+  ['S','A','B','C'].forEach(t=>{
+    const g = document.getElementById('grid-'+t.toLowerCase());
+    if(!g) return;
+    g.innerHTML = tiers[t].length ? tiers[t].map(i=>
+      `<div class="card"><h4>${i.album||'?'}</h4><div class="artist">${i.artista}</div>
+      <div class="meta">${i.estrategia||''}</div></div>`
+    ).join('') : '<p style="opacity:0.4;">Nenhuma recomendação</p>';
+  });
+}
+
+function renderDescobertas() {
+  const g = document.getElementById('grid-descobertas');
+  g.innerHTML = descobertas.length ? descobertas.map(i=>
+    `<div class="card"><h4>${i.album||'?'}</h4><div class="artist">${i.artista}</div>
+    <div class="meta">${i.titulo||''}</div></div>`
+  ).join('') : '<p style="opacity:0.4;">Nenhuma descoberta</p>';
+}
+
+function uploadPlaylist(tipo, input) {
+  const status = document.getElementById('status-'+tipo);
+  const file = input.files[0];
+  if(!file) return;
+  status.textContent = '⏳ Enviando...';
+  const fd = new FormData();
+  fd.append('tipo', tipo);
+  fd.append('arquivo', file);
+  fetch(API+'/importar_playlist', {method:'POST',body:fd})
+    .then(r=>r.json()).then(d=>{status.textContent=d.sucesso?'✅ '+d.mensagem:'❌ '+d.erro;status.style.color=d.sucesso?'#4CAF50':'#f44336';})
+    .catch(()=>{status.textContent='❌ Erro';status.style.color='#f44336';});
+}
+
+function uploadDiscogs(input) {
+  const status = document.getElementById('status-discogs');
+  const file = input.files[0];
+  if(!file) return;
+  status.textContent = '⏳ Enviando...';
+  const fd = new FormData();
+  fd.append('arquivo', file);
+  fetch(API+'/importar_colecao', {method:'POST',body:fd})
+    .then(r=>r.json()).then(d=>{status.textContent=d.sucesso?'✅ '+d.mensagem:'❌ '+d.erro;status.style.color=d.sucesso?'#4CAF50':'#f44336';if(d.sucesso)carregarDados();})
+    .catch(()=>{status.textContent='❌ Erro';status.style.color='#f44336';});
+}
+
+function gerarRecomendacoes() {
+  const status = document.getElementById('status-gerar');
+  status.textContent = '⏳ Gerando...';
+  fetch(API+'/gerar_recomendacoes', {method:'POST'})
+    .then(r=>r.json()).then(d=>{status.textContent=d.sucesso?'✅ '+d.mensagem:'❌ '+d.erro;status.style.color=d.sucesso?'#4CAF50':'#f44336';if(d.sucesso)carregarDados();})
+    .catch(()=>{status.textContent='❌ Erro';status.style.color='#f44336';});
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content,.tab-content.hidden').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', verificarSessao);
+</script>
+</body>
+</html>

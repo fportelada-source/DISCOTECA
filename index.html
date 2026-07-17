@@ -924,6 +924,82 @@
 
 </div>
 
+<!-- ===== MODAL: Adicionar Disco ===== -->
+<div class="modal-overlay" id="modalAdicionar">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>➕ Adicionar Disco</h2>
+      <button class="modal-close" id="btnFecharModal">✕</button>
+    </div>
+    <form id="form-adicionar">
+      <div class="form-group">
+        <label>Artista *</label>
+        <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
+      </div>
+      <div class="form-group">
+        <label>Álbum *</label>
+        <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Formato</label>
+          <select id="campo-formato">
+            <option value="">Selecione</option>
+            <option value="LP">LP</option>
+            <option value="2xLP">2xLP</option>
+            <option value="CD">CD</option>
+            <option value="2xCD">2xCD</option>
+            <option value="EP">EP</option>
+            <option value="Cassete">Cassete</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço (R$)</label>
+          <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Condição da Mídia</label>
+          <select id="campo-condicao-midia">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Condição da Capa</label>
+          <select id="campo-condicao-capa">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Data de Aquisição</label>
+        <input type="date" id="campo-data">
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
+      </div>
+      <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
+      <div class="form-msg" id="form-msg"></div>
+    </form>
+  </div>
+</div>
+
 <footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
   Projeto Discoteca — Sua coleção, suas recomendações.
 </footer>

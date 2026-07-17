@@ -797,10 +797,10 @@
 
   <div class="tabs-container">
     <div class="tabs">
-      <button class="tab-btn active" data-tab="tab-compras">📋 Lista de Compras</button>
-      <button class="tab-btn" data-tab="tab-descobertas">🔍 Descobertas <span class="tab-badge">2018-2026</span></button>
-      <button class="tab-btn" data-tab="tab-colecao">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
-      <button class="tab-btn" data-tab="tab-importar">📤 Importar</button>
+      <button class="tab-btn active" data-tab="tab-compras" onclick="switchTab('tab-compras')">📋 Lista de Compras</button>
+      <button class="tab-btn" data-tab="tab-descobertas" onclick="switchTab('tab-descobertas')">🔍 Descobertas <span class="tab-badge">2018-2026</span></button>
+      <button class="tab-btn" data-tab="tab-colecao" onclick="switchTab('tab-colecao')">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
+      <button class="tab-btn" data-tab="tab-importar" onclick="switchTab('tab-importar')">📤 Importar</button>
     </div>
   </div>
 
@@ -832,6 +832,10 @@
     <section class="section" style="--tier-color:var(--b-color)">
       <div class="tier-head">
         <div class="tier-stamp">B</div>
+        <div class="tier-info">
+          <h2>Sem Urgência</h2>
+          <p>Pegar em promoção ou naturalmente, sem pressa de garimpo.</p>
+        </div>
       </div>
       <div class="grid" id="grid-b"></div>
     </section>

@@ -19,17 +19,7 @@
     --b-color:#4E7A8C;
     --c-color:#8A8378;
     --d-color:#6B5B7B;
-    --e-color:#5C6B7A;
-    --f-color:#7A6B5C;
-    --g-color:#5C7A6B;
-    --h-color:#8A6B7B;
-    --i-color:#6B7A8A;
-    --j-color:#7A8A6B;
-    --k-color:#8A7A6B;
-    --l-color:#6B8A7A;
     --colecao-color:#B8A88A;
-    --vinil-color:#E8C87A;
-    --cd-color:#7AB8D8;
     --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -445,6 +435,119 @@
     text-transform:uppercase;
   }
 
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    opacity: 0.4;
+    grid-column: 1 / -1;
+  }
+  .empty-state .icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+  .empty-state h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .empty-state p {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  /* ===== LOGIN ===== */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 40px 20px;
+  }
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-box .logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 48px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .login-box .logo span { color: var(--s-color); }
+  .login-box .sub {
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 32px;
+  }
+  .login-btn {
+    background: #ffffff;
+    color: #1a1815;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+  .login-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+  .login-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .login-error {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  /* ===== USER BAR ===== */
+  .user-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 6vw;
+    border-bottom: 1px solid var(--card-line);
+    background: var(--ink);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  .user-bar .user-name {
+    font-size: 13px;
+    opacity: 0.6;
+  }
+  .user-bar .logout-btn {
+    background: transparent;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 4px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+  }
+  .user-bar .logout-btn:hover {
+    background: var(--s-color);
+    color: var(--ink);
+    border-color: var(--s-color);
+  }
+
   /* ===== MODAL ===== */
   .modal-overlay {
     display: none;
@@ -622,16 +725,6 @@
     width: 100%;
   }
   .btn:hover { opacity: 0.8; }
-
-  .empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    opacity: 0.4;
-    grid-column: 1 / -1;
-  }
-  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
-  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
-  .empty-state p { font-size: 14px; opacity: 0.7; }
 
   .ano-divider {
     font-family: 'Anton', sans-serif;
@@ -943,10 +1036,6 @@
 <script>
 // ========== API ==========
 const API = 'https://fportelada.pythonanywhere.com';
-let usuarioId = null;
-let colecao = [];
-let recomendacoes = [];
-let descobertas = [];
 
 // ========== DADOS ESTÁTICOS ==========
 const S = [
@@ -979,7 +1068,7 @@ const EXTRA = [
   { artist:"Avenged Sevenfold", album:"City of Evil" },
 ];
 
-// ========== DESCOBERTAS ESTÁTICAS ==========
+// ========== DESCOBERTAS ==========
 const DESCOBERTAS = [
   { ano: 2026, artista: "Of Mice & Men", album: "Echo", titulo: "Maior descoberta de 2026", descricao: "Foi a banda que mais conseguiu reproduzir a sensação que Architects proporcionou anteriormente." },
   { ano: 2026, artista: "Parkway Drive", album: "Darker Still", titulo: "Redescoberta do ano", descricao: "A banda já fazia parte da minha história, mas somente em 2026 ganhou espaço definitivo." },
@@ -1001,34 +1090,9 @@ const DESCOBERTAS = [
   { ano: 2023, artista: "Seether", album: "Finding Beauty in Negative Spaces", titulo: "Rock alternativo de referência", descricao: "Representa muito bem o lado mais melódico do hard rock moderno." },
   { ano: 2023, artista: "Soilwork", album: "Stabbing the Drama", titulo: "Peso com melodia", descricao: "Uma das bandas que melhor equilibra agressividade e refrões marcantes." },
   { ano: 2023, artista: "Project46", album: "Que Seja Feita a Nossa Vontade", titulo: "Representante nacional", descricao: "A principal descoberta brasileira daquele ano." },
-  { ano: 2022, artista: "Bullet For My Valentine", album: "The Poison", titulo: "Banda do ano", descricao: "A principal descoberta daquele ano." },
-  { ano: 2022, artista: "zebrahead", album: "MFZB", titulo: "Punk Rock moderno", descricao: "Continuou sendo uma presença constante nas minhas descobertas." },
-  { ano: 2022, artista: "Self Deception", album: "Destroy the Art", titulo: "Nova geração", descricao: "Uma das bandas modernas que mais chamou minha atenção." },
-  { ano: 2022, artista: "Tremonti", album: "Marching in Time", titulo: "Guitarras modernas", descricao: "Uma das descobertas mais consistentes do ano." },
-  { ano: 2022, artista: "The Offspring", album: "Smash", titulo: "Redescoberta", descricao: "Representa o reencontro com uma das bandas mais importantes do punk rock melódico." },
-  { ano: 2021, artista: "Nightrage", album: "Wolf to Man", titulo: "Maior descoberta de 2021", descricao: "A banda inédita que mais marcou minhas descobertas." },
-  { ano: 2021, artista: "Trivium", album: "In the Court of the Dragon", titulo: "Consolidação", descricao: "Deixou de ser apenas uma descoberta para se tornar uma das bandas centrais." },
-  { ano: 2021, artista: "Bullet For My Valentine", album: "Bullet For My Valentine", titulo: "Reencontro", descricao: "O Discovery Weekly reacendeu meu interesse." },
-  { ano: 2021, artista: "Soilwork", album: "Verkligheten", titulo: "Melodic Death moderno", descricao: "Uma das bandas que melhor representou o peso melódico." },
-  { ano: 2021, artista: "Crobot", album: "Motherbrain", titulo: "Hard Rock moderno", descricao: "Uma descoberta diferente que trouxe variedade à curadoria." },
-  { ano: 2020, artista: "Trivium", album: "What The Dead Men Say", titulo: "Banda do ano", descricao: "A banda que mais cresceu na minha curadoria." },
-  { ano: 2020, artista: "Atreyu", album: "The Curse", titulo: "Metalcore clássico", descricao: "Uma das descobertas mais importantes para entender a evolução do gênero." },
-  { ano: 2020, artista: "zebrahead", album: "MFZB", titulo: "Punk Rock moderno", descricao: "Trouxe novamente o punk melódico para minhas descobertas." },
-  { ano: 2020, artista: "Saint Asonia", album: "Flawed Design", titulo: "Rock moderno", descricao: "Uma descoberta consistente que ampliou meu interesse pelo hard rock contemporâneo." },
-  { ano: 2020, artista: "Any Given Day", album: "Overpower", titulo: "Metalcore moderno", descricao: "Uma das bandas que antecipou a direção que minha curadoria seguiria." },
-  { ano: 2019, artista: "All That Remains", album: "The Fall of Ideals", titulo: "Banda do ano", descricao: "A principal descoberta de 2019 e uma das maiores portas de entrada para o metalcore melódico." },
-  { ano: 2019, artista: "Machine Head", album: "The Blackening", titulo: "Thrash moderno", descricao: "Uma descoberta que ampliou minha visão sobre o heavy metal moderno." },
-  { ano: 2019, artista: "Amon Amarth", album: "Twilight of the Thunder God", titulo: "Melodic Death Metal", descricao: "Uma das bandas que melhor representa o peso épico." },
-  { ano: 2019, artista: "Orbit Culture", album: "Nija", titulo: "Peso contemporâneo", descricao: "Uma descoberta marcante que representa a nova geração do metal pesado." },
-  { ano: 2019, artista: "Days Of Jupiter", album: "Panoptical", titulo: "Hard Rock moderno", descricao: "Representa muito bem o lado mais melódico das minhas descobertas." },
-  { ano: 2018, artista: "Persuader", album: "When Eden Burns", titulo: "Maior descoberta de 2018", descricao: "A banda que mais marcou o início da minha fase de descobertas." },
-  { ano: 2018, artista: "Sister Sin", album: "Now and Forever", titulo: "Hard Rock moderno", descricao: "Uma descoberta que trouxe peso e atitude." },
-  { ano: 2018, artista: "Mystic Prophecy", album: "War Brigade", titulo: "Power Metal contemporâneo", descricao: "Representa a continuidade da minha paixão pelo heavy e power metal europeu." },
-  { ano: 2018, artista: "Egypt Central", album: "White Rabbit", titulo: "Rock alternativo", descricao: "Uma das descobertas que ampliaram meu lado mais acessível." },
-  { ano: 2018, artista: "Meshiaak", album: "Alliance of Thieves", titulo: "Thrash moderno", descricao: "Uma excelente descoberta para representar o thrash metal contemporâneo." },
 ];
 
-// ========== COLEÇÃO ESTÁTICA ==========
+// ========== COLEÇÃO ==========
 const VINIL = [
   { artist: "Metallica", album: "Master of Puppets", format: "LP · RE · RM", condition: "NM", sleeve: "VG+", date: "2026-07-09" },
   { artist: "Basttardz", album: "Brasil com Z / Auschwitz Tropical", format: "LP · Gre", condition: "M", sleeve: "M", date: "2026-07-05" },
@@ -1083,7 +1147,6 @@ function verificarSessao() {
   const nome = params.get('nome');
 
   if (userId && nome) {
-    usuarioId = userId;
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
     document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
@@ -1096,7 +1159,6 @@ function verificarSessao() {
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
-        usuarioId = data.usuario_id;
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
         document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
@@ -1208,7 +1270,6 @@ function renderDescobertas() {
     return;
   }
 
-  // Agrupa por ano
   const anos = {};
   DESCOBERTAS.forEach(item => {
     const ano = item.ano || 'Sem ano';
@@ -1324,7 +1385,7 @@ document.getElementById('form-adicionar').addEventListener('submit', function(e)
     return;
   }
 
-  fetch(API + '/adicionar_disco?user_id=' + usuarioId, {
+  fetch(API + '/adicionar_disco', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dados)
@@ -1368,7 +1429,7 @@ function uploadPlaylist(tipo, input) {
   const fd = new FormData();
   fd.append('tipo', tipo);
   fd.append('arquivo', file);
-  fetch(API + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: fd })
+  fetch(API + '/importar_playlist', { method: 'POST', body: fd })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1393,7 +1454,7 @@ function uploadDiscogs(input) {
   status.className = 'upload-status';
   const fd = new FormData();
   fd.append('arquivo', file);
-  fetch(API + '/importar_colecao?user_id=' + usuarioId, { method: 'POST', body: fd })
+  fetch(API + '/importar_colecao', { method: 'POST', body: fd })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1418,7 +1479,7 @@ function gerarRecomendacoes() {
   btn.textContent = '⏳ Gerando...';
   status.textContent = '⏳ Processando...';
   status.className = 'upload-status';
-  fetch(API + '/gerar_recomendacoes?user_id=' + usuarioId, { method: 'POST' })
+  fetch(API + '/gerar_recomendacoes', { method: 'POST' })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {

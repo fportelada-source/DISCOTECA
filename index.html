@@ -525,33 +525,162 @@
     margin-top: 16px;
     display: none;
   }
-  .user-info {
+
+  /* ===== USER INFO / LOGOUT ===== */
+  .user-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0 16px;
+    padding: 12px 6vw;
     border-bottom: 1px solid var(--card-line);
-    margin-bottom: 16px;
+    background: var(--ink);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  .user-bar .user-name {
     font-size: 13px;
     opacity: 0.6;
   }
-  .user-info .logout-btn {
-    background: none;
+  .user-bar .logout-btn {
+    background: transparent;
     border: 1px solid var(--card-line);
     color: var(--paper);
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     transition: 0.2s;
   }
-  .user-info .logout-btn:hover {
+  .user-bar .logout-btn:hover {
     background: var(--s-color);
     color: var(--ink);
     border-color: var(--s-color);
   }
-  .hidden { display: none !important; }
-  .mt-16 { margin-top: 16px; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .modal-header h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.02em;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--paper);
+    font-size: 28px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: 0.2s;
+  }
+  .modal-close:hover { opacity: 1; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: var(--ink);
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--s-color);
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .form-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .form-btn:hover { opacity: 0.8; }
+  .form-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .form-msg { font-size: 13px; padding: 10px 0 0; text-align: center; }
+  .form-msg.success { color: #4CAF50; }
+  .form-msg.error { color: #f44336; }
+
+  .add-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .add-btn:hover { transform: scale(1.05); opacity: 0.85; }
+  .tier-head .add-btn-wrap {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
 
   /* Upload */
   .upload-area {
@@ -617,6 +746,7 @@
     .tabs-container{ padding: 0 4vw; }
     .section{ padding: 32px 4vw 8px; }
     .login-box { padding: 32px 20px; }
+    .user-bar { padding: 8px 4vw; }
   }
 </style>
 </head>
@@ -637,6 +767,12 @@
 
 <!-- ===== APP ===== -->
 <div id="appScreen" class="hidden">
+
+  <!-- BARRA DO USUÁRIO -->
+  <div class="user-bar">
+    <span class="user-name" id="userNameDisplay">👤 Carregando...</span>
+    <button class="logout-btn" id="btnLogout">Sair</button>
+  </div>
 
   <section class="hero hero-state-compras" id="heroSection">
     <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria</div>
@@ -728,6 +864,9 @@
           <h2 style="color:var(--colecao-color);">Coleção</h2>
           <p>Registro de todos os discos que já fazem parte da sua coleção física.</p>
         </div>
+        <div class="add-btn-wrap">
+          <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
+        </div>
       </div>
       <div class="grid" id="grid-colecao"></div>
     </section>
@@ -782,6 +921,82 @@
 
 </div>
 
+<!-- ===== MODAL: Adicionar Disco ===== -->
+<div class="modal-overlay" id="modalAdicionar">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>➕ Adicionar Disco</h2>
+      <button class="modal-close" id="btnFecharModal">✕</button>
+    </div>
+    <form id="form-adicionar">
+      <div class="form-group">
+        <label>Artista *</label>
+        <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
+      </div>
+      <div class="form-group">
+        <label>Álbum *</label>
+        <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Formato</label>
+          <select id="campo-formato">
+            <option value="">Selecione</option>
+            <option value="LP">LP</option>
+            <option value="2xLP">2xLP</option>
+            <option value="CD">CD</option>
+            <option value="2xCD">2xCD</option>
+            <option value="EP">EP</option>
+            <option value="Cassete">Cassete</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço (R$)</label>
+          <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Condição da Mídia</label>
+          <select id="campo-condicao-midia">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Condição da Capa</label>
+          <select id="campo-condicao-capa">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Data de Aquisição</label>
+        <input type="date" id="campo-data">
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
+      </div>
+      <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
+      <div class="form-msg" id="form-msg"></div>
+    </form>
+  </div>
+</div>
+
 <footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
   Projeto Discoteca — Sua coleção, suas recomendações.
 </footer>
@@ -816,6 +1031,17 @@ document.getElementById('btnLogin').addEventListener('click', function() {
     });
 });
 
+// ========== LOGOUT ==========
+document.getElementById('btnLogout').addEventListener('click', function() {
+  fetch(API + '/logout', { method: 'POST' })
+    .then(() => {
+      window.location.href = window.location.pathname;
+    })
+    .catch(() => {
+      window.location.href = window.location.pathname;
+    });
+});
+
 // ========== VERIFICAR SESSÃO ==========
 function verificarSessao() {
   const params = new URLSearchParams(window.location.search);
@@ -827,6 +1053,7 @@ function verificarSessao() {
     usuarioNome = nome;
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
     window.history.replaceState({}, document.title, window.location.pathname);
     carregarDados();
     return;
@@ -840,6 +1067,7 @@ function verificarSessao() {
         usuarioNome = d.nome;
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
+        document.getElementById('userNameDisplay').textContent = '👤 ' + (d.nome || 'Usuário');
         carregarDados();
       }
     })
@@ -1037,6 +1265,93 @@ function renderDescobertas() {
 
   document.getElementById('descobertas-badge').textContent = descobertas.length;
 }
+
+// ========== MODAL ==========
+const modal = document.getElementById('modalAdicionar');
+const btnAbrir = document.getElementById('btnAbrirModal');
+const btnFechar = document.getElementById('btnFecharModal');
+
+function abrirModal() {
+  modal.classList.add('open');
+  document.getElementById('form-msg').textContent = '';
+  document.getElementById('form-msg').className = 'form-msg';
+  document.getElementById('btn-submit').disabled = false;
+}
+
+function fecharModal() {
+  modal.classList.remove('open');
+}
+
+btnAbrir.addEventListener('click', abrirModal);
+btnFechar.addEventListener('click', fecharModal);
+modal.addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') fecharModal();
+});
+
+// ========== ADICIONAR DISCO ==========
+document.getElementById('form-adicionar').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById('btn-submit');
+  const msg = document.getElementById('form-msg');
+  btn.disabled = true;
+  msg.textContent = '⏳ Salvando...';
+  msg.className = 'form-msg';
+
+  const dados = {
+    artista: document.getElementById('campo-artista').value.trim(),
+    album: document.getElementById('campo-album').value.trim(),
+    formato: document.getElementById('campo-formato').value,
+    condicao_midia: document.getElementById('campo-condicao-midia').value,
+    condicao_capa: document.getElementById('campo-condicao-capa').value,
+    preco: parseFloat(document.getElementById('campo-preco').value) || null,
+    data_aquisicao: document.getElementById('campo-data').value || null,
+    notas: document.getElementById('campo-notas').value.trim()
+  };
+
+  if (!dados.artista || !dados.album) {
+    msg.textContent = '⚠️ Artista e álbum são obrigatórios!';
+    msg.className = 'form-msg error';
+    btn.disabled = false;
+    return;
+  }
+
+  fetch(API + '/adicionar_disco', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  })
+  .then(res => res.json())
+  .then(resultado => {
+    if (resultado.sucesso) {
+      msg.textContent = '✅ ' + resultado.mensagem;
+      msg.className = 'form-msg success';
+      document.getElementById('campo-artista').value = '';
+      document.getElementById('campo-album').value = '';
+      document.getElementById('campo-formato').value = '';
+      document.getElementById('campo-condicao-midia').value = '';
+      document.getElementById('campo-condicao-capa').value = '';
+      document.getElementById('campo-preco').value = '';
+      document.getElementById('campo-data').value = '';
+      document.getElementById('campo-notas').value = '';
+      carregarDados();
+      setTimeout(fecharModal, 1000);
+    } else {
+      msg.textContent = '❌ ' + (resultado.erro || 'Erro ao adicionar');
+      msg.className = 'form-msg error';
+    }
+  })
+  .catch(() => {
+    msg.textContent = '❌ Erro de conexão';
+    msg.className = 'form-msg error';
+  })
+  .finally(() => {
+    btn.disabled = false;
+  });
+});
 
 // ========== UPLOADS ==========
 function uploadPlaylist(tipo, input) {

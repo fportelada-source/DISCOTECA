@@ -1287,7 +1287,10 @@ function renderRecomendacoes(dados) {
 
 function renderDescobertas(dados) {
   const grid = document.getElementById('grid-descobertas');
-  if (!grid) return;
+  if (!grid) {
+    console.error('Elemento grid-descobertas não encontrado');
+    return;
+  }
 
   if (!dados || dados.length === 0) {
     grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p></div>`;

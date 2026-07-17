@@ -842,4 +842,347 @@ function verificarSessao() {
         document.getElementById('appScreen').classList.remove('hidden');
         carregarDados();
       }
-   
+    })
+    .catch(() => {});
+}
+
+// ========== CARREGAR DADOS ==========
+function carregarDados() {
+  fetch(API + '/colecao')
+    .then(r => r.json())
+    .then(d => { colecao = Array.isArray(d) ? d : []; renderColecao(); })
+    .catch(() => {});
+
+  fetch(API + '/recomendacoes')
+    .then(r => r.json())
+    .then(d => { recomendacoes = Array.isArray(d) ? d : []; renderRecomendacoes(); })
+    .catch(() => {});
+
+  fetch(API + '/descobertas')
+    .then(r => r.json())
+    .then(d => { descobertas = Array.isArray(d) ? d : []; renderDescobertas(); })
+    .catch(() => {});
+}
+
+// ========== LAST.FM ==========
+const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
+
+function getCoverUrl(artist, album) {
+  return fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.album && data.album.image) {
+        const img = data.album.image.find(i => i.size === 'extralarge');
+        return img && img['#text'] ? img['#text'] : null;
+      }
+      return null;
+    })
+    .catch(() => null);
+}
+
+// ========== RENDER ==========
+function renderColecao() {
+  const grid = document.getElementById('grid-colecao');
+  if (!grid) return;
+  
+  if (!colecao || colecao.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = colecao.map((item, i) => {
+    const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const letter = item.album ? item.album.charAt(0) : '?';
+    return `
+      <div class="card" id="colecao-card-${i}">
+        <div class="art-wrap" id="colecao-art-${i}" style="background:#1a1815;background-size:cover;background-position:center;">
+          <span class="priority-tag" style="background:var(--colecao-color);color:var(--ink);">💿</span>
+          <div class="spine-letter">${letter}</div>
+          <div class="art-fallback" id="colecao-fallback-${i}">${item.artist}<br>${item.album}</div>
+        </div>
+        <div class="card-body">
+          <h3>${item.album || '?'}</h3>
+          <div class="artist" style="color:var(--colecao-color);">${item.artist}</div>
+          <div class="meta-block">
+            <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+          </div>
+          <div class="meta-row">
+            <span class="label">Condição</span>
+            <span class="val">
+              ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
+              ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
+              ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+            </span>
+          </div>
+          ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${Number(item.preco).toFixed(2)}</span></div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  colecao.forEach((item, i) => {
+    getCoverUrl(item.artist, item.album).then(url => {
+      const wrap = document.getElementById(`colecao-art-${i}`);
+      const fallback = document.getElementById(`colecao-fallback-${i}`);
+      if (url && wrap) {
+        wrap.style.backgroundImage = `url('${url}')`;
+        wrap.style.backgroundSize = 'cover';
+        wrap.style.backgroundPosition = 'center';
+        if (fallback) fallback.style.opacity = '0';
+      }
+    });
+  });
+
+  document.getElementById('colecao-badge').textContent = colecao.length;
+}
+
+function renderRecomendacoes() {
+  const tiers = { S: [], A: [], B: [], C: [] };
+  recomendacoes.forEach(r => { if (tiers[r.tier]) tiers[r.tier].push(r); });
+
+  ['S', 'A', 'B', 'C'].forEach(tier => {
+    const grid = document.getElementById(`grid-${tier.toLowerCase()}`);
+    if (!grid) return;
+    const items = tiers[tier] || [];
+    
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p><p style="font-size:12px;opacity:0.5;">Importe suas playlists e clique em "Gerar Recomendações".</p></div>`;
+      return;
+    }
+
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' : '#8A8378';
+    grid.innerHTML = items.map((item, idx) => {
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `rec-${tier}-${idx}`;
+      return `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background:#1a1815;background-size:cover;background-position:center;">
+            <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}">${item.artist}<br>${item.album}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || 'Álbum'}</h3>
+            <div class="artist" style="color:${tierColor};">${item.artist}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+            </div>
+            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    items.forEach((item, idx) => {
+      const id = `rec-${tier}-${idx}`;
+      getCoverUrl(item.artist, item.album).then(url => {
+        const wrap = document.getElementById(`art-${id}`);
+        const fallback = document.getElementById(`fallback-${id}`);
+        if (url && wrap) {
+          wrap.style.backgroundImage = `url('${url}')`;
+          wrap.style.backgroundSize = 'cover';
+          wrap.style.backgroundPosition = 'center';
+          if (fallback) fallback.style.opacity = '0';
+        }
+      });
+    });
+  });
+}
+
+function renderDescobertas() {
+  const grid = document.getElementById('grid-descobertas');
+  if (!grid) return;
+
+  if (!descobertas || descobertas.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p><p style="font-size:12px;opacity:0.5;">Suas descobertas aparecerão aqui após importar as playlists.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = descobertas.map((item, idx) => {
+    const letter = item.album ? item.album.charAt(0) : '?';
+    const id = `desc-${idx}`;
+    return `
+      <div class="card" id="${id}">
+        <div class="art-wrap" id="art-${id}" style="background:#1a1815;background-size:cover;background-position:center;">
+          <span class="priority-tag" style="background:var(--d-color);color:var(--ink);">${item.ano || '2025'}</span>
+          <div class="spine-letter">${letter}</div>
+          <div class="art-fallback" id="fallback-${id}">${item.artist}<br>${item.album}</div>
+        </div>
+        <div class="card-body">
+          <h3>${item.album || 'Álbum'}</h3>
+          <div class="artist" style="color:var(--d-color);">${item.artist}</div>
+          <div class="meta-block">
+            <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.titulo || ''}</span></div>
+          </div>
+          <div class="meta-row"><span class="label">Nota</span><span class="val">${item.descricao || ''}</span></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  descobertas.forEach((item, idx) => {
+    const id = `desc-${idx}`;
+    getCoverUrl(item.artist, item.album).then(url => {
+      const wrap = document.getElementById(`art-${id}`);
+      const fallback = document.getElementById(`fallback-${id}`);
+      if (url && wrap) {
+        wrap.style.backgroundImage = `url('${url}')`;
+        wrap.style.backgroundSize = 'cover';
+        wrap.style.backgroundPosition = 'center';
+        if (fallback) fallback.style.opacity = '0';
+      }
+    });
+  });
+
+  document.getElementById('descobertas-badge').textContent = descobertas.length;
+}
+
+// ========== UPLOADS ==========
+function uploadPlaylist(tipo, input) {
+  const status = document.getElementById(`status-${tipo}`);
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('tipo', tipo);
+  fd.append('arquivo', file);
+  fetch(API + '/importar_playlist', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function uploadDiscogs(input) {
+  const status = document.getElementById('status-discogs');
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('arquivo', file);
+  fetch(API + '/importar_colecao', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function gerarRecomendacoes() {
+  const status = document.getElementById('status-gerar');
+  const btn = document.getElementById('btn-gerar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+  status.textContent = '⏳ Processando...';
+  status.className = 'upload-status';
+  fetch(API + '/gerar_recomendacoes', { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = '⚡ Gerar Recomendações';
+    });
+}
+
+// ========== TABS ==========
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+
+  const hero = document.getElementById('heroSection');
+  const eyebrow = document.getElementById('heroEyebrow');
+  const title = document.getElementById('heroTitle');
+  const sub = document.getElementById('heroSub');
+  const meter = document.getElementById('heroMeter');
+
+  if (tabId === 'tab-compras') {
+    hero.className = 'hero hero-state-compras';
+    eyebrow.textContent = 'Projeto Discoteca · Recomendações';
+    title.innerHTML = 'Lista de <span>Compras</span>';
+    sub.textContent = 'Prioridade S → C, baseado nas suas playlists importadas.';
+    meter.style.display = 'flex';
+  } else if (tabId === 'tab-descobertas') {
+    hero.className = 'hero hero-state-descobertas';
+    eyebrow.textContent = 'Projeto Discoteca · Descobertas';
+    title.innerHTML = 'Descobertas <span>Musicais</span>';
+    sub.textContent = 'Bandas que marcaram suas descobertas através do Discovery Weekly.';
+    meter.style.display = 'none';
+  } else if (tabId === 'tab-colecao') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Coleção';
+    title.innerHTML = 'Minha <span>Coleção</span>';
+    sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
+    meter.style.display = 'none';
+  } else if (tabId === 'tab-importar') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Importar';
+    title.innerHTML = 'Importar <span>Dados</span>';
+    sub.textContent = 'Faça upload dos seus CSVs para gerar recomendações personalizadas.';
+    meter.style.display = 'none';
+  }
+}
+
+// ========== EVENTOS ==========
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    switchTab(this.dataset.tab);
+  });
+});
+
+document.getElementById('upload-top').addEventListener('change', function() {
+  uploadPlaylist('top', this);
+});
+document.getElementById('upload-desc').addEventListener('change', function() {
+  uploadPlaylist('descobertas', this);
+});
+document.getElementById('upload-fav').addEventListener('change', function() {
+  uploadPlaylist('favoritos', this);
+});
+document.getElementById('upload-discogs').addEventListener('change', function() {
+  uploadDiscogs(this);
+});
+document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
+
+// ========== INICIAR ==========
+document.addEventListener('DOMContentLoaded', verificarSessao);
+</script>
+</body>
+</html>

@@ -736,6 +736,9 @@
   }
   .btn:hover { opacity: 0.8; }
 
+  /* ===== UTILITIES ===== */
+  .hidden { display: none !important; }
+
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
     .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
@@ -766,7 +769,7 @@
 </div>
 
 <!-- ===== APP (só aparece depois do login) ===== -->
-<div id="appScreen" style="display:none;">
+<div id="appScreen" class="hidden">
 
   <!-- BARRA DO USUÁRIO -->
   <div class="user-bar">
@@ -975,8 +978,8 @@ function verificarSessao() {
   if (userId && nome) {
     usuarioId = userId;
     usuarioNome = nome;
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
     document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
     window.history.replaceState({}, document.title, window.location.pathname);
     carregarDados();
@@ -989,8 +992,8 @@ function verificarSessao() {
       if (d.logado) {
         usuarioId = d.usuario_id;
         usuarioNome = d.nome;
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('appScreen').style.display = 'block';
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appScreen').classList.remove('hidden');
         document.getElementById('userNameDisplay').textContent = '👤 ' + (d.nome || 'Usuário');
         carregarDados();
       }

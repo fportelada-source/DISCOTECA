@@ -22,6 +22,11 @@
     --e-color:#5C6B7A;
     --f-color:#7A6B5C;
     --g-color:#5C7A6B;
+    --h-color:#8A6B7B;
+    --i-color:#6B7A8A;
+    --j-color:#7A8A6B;
+    --k-color:#8A7A6B;
+    --l-color:#6B8A7A;
     --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -459,6 +464,66 @@
   <div class="grid" id="grid-g"></div>
 </section>
 
+<!-- SEÇÃO 2022 -->
+<section class="section" style="--tier-color:var(--h-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2022</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>2022 serviu como transição para a fase dominada pelo metalcore moderno.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-h"></div>
+</section>
+
+<!-- SEÇÃO 2021 -->
+<section class="section" style="--tier-color:var(--i-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2021</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>2021 aprofundou meu interesse pelo metal moderno e consolidou bandas que se tornariam importantes nos anos seguintes.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-i"></div>
+</section>
+
+<!-- SEÇÃO 2020 -->
+<section class="section" style="--tier-color:var(--j-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2020</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>2020 marcou a aproximação definitiva com o metalcore moderno.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-j"></div>
+</section>
+
+<!-- SEÇÃO 2019 -->
+<section class="section" style="--tier-color:var(--k-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2019</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>2019 consolidou o metal moderno como uma das principais direções das minhas descobertas.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-k"></div>
+</section>
+
+<!-- SEÇÃO 2018 -->
+<section class="section" style="--tier-color:var(--l-color)">
+  <div class="tier-head">
+    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2018</div>
+    <div class="tier-info">
+      <h2>Descobertas do Ano</h2>
+      <p>As primeiras grandes descobertas registradas. O início da curadoria que anos depois daria origem ao Projeto Discoteca.</p>
+    </div>
+  </div>
+  <div class="grid" id="grid-l"></div>
+</section>
+
 <footer>Gerado a partir da análise cruzada CSV Spotify × Pontuação Portelada™ · capas via Last.fm API</footer>
 
 <script>
@@ -536,7 +601,7 @@ const D = [
   },
 ];
 
-// SEÇÃO 2025 - SUBSTITUÍDO: Lift The Curse → Bring Me The Horizon
+// SEÇÃO 2025
 const E = [
   { 
     artist:"Architects", 
@@ -570,7 +635,7 @@ const E = [
   },
 ];
 
-// SEÇÃO 2024 - SUBSTITUÍDO: Lockjaw → Falling In Reverse
+// SEÇÃO 2024
 const F = [
   { 
     artist:"The Warning", 
@@ -635,6 +700,176 @@ const G = [
     album:"Que Seja Feita a Nossa Vontade", 
     strategy:"Representante nacional", 
     note:"A principal descoberta brasileira daquele ano e uma ótima representante do metal moderno nacional."
+  },
+];
+
+// SEÇÃO 2022 - SUBSTITUÍDO: Seether → Tremonti
+const H = [
+  { 
+    artist:"Bullet For My Valentine", 
+    album:"The Poison", 
+    strategy:"Banda do ano", 
+    note:"A principal descoberta daquele ano e uma das bandas mais importantes da coleção."
+  },
+  { 
+    artist:"zebrahead", 
+    album:"MFZB", 
+    strategy:"Punk Rock moderno", 
+    note:"Continuou sendo uma presença constante nas minhas descobertas."
+  },
+  { 
+    artist:"Self Deception", 
+    album:"Destroy the Art", 
+    strategy:"Nova geração", 
+    note:"Uma das bandas modernas que mais chamou minha atenção naquele ano."
+  },
+  { 
+    artist:"Tremonti", 
+    album:"Marching in Time", 
+    strategy:"Guitarras modernas", 
+    note:"Uma das descobertas mais consistentes do ano e excelente representante do heavy/hard rock moderno."
+  },
+  { 
+    artist:"The Offspring", 
+    album:"Smash", 
+    strategy:"Redescoberta", 
+    note:"Representa o reencontro com uma das bandas mais importantes do punk rock melódico."
+  },
+];
+
+// SEÇÃO 2021 - SUBSTITUÍDO: Seether → Soilwork
+const I = [
+  { 
+    artist:"Nightrage", 
+    album:"Wolf to Man", 
+    strategy:"Maior descoberta de 2021", 
+    note:"A banda inédita que mais marcou minhas descobertas naquele ano."
+  },
+  { 
+    artist:"Trivium", 
+    album:"In the Court of the Dragon", 
+    strategy:"Consolidação", 
+    note:"Deixou de ser apenas uma descoberta para se tornar uma das bandas centrais da minha coleção."
+  },
+  { 
+    artist:"Bullet For My Valentine", 
+    album:"Bullet For My Valentine", 
+    strategy:"Reencontro", 
+    note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória."
+  },
+  { 
+    artist:"Soilwork", 
+    album:"Verkligheten", 
+    strategy:"Melodic Death moderno", 
+    note:"Uma das bandas que melhor representou o peso melódico presente nas minhas descobertas daquele ano."
+  },
+  { 
+    artist:"Crobot", 
+    album:"Motherbrain", 
+    strategy:"Hard Rock moderno", 
+    note:"Uma descoberta diferente que trouxe variedade à minha curadoria."
+  },
+];
+
+// SEÇÃO 2020 - SUBSTITUÍDO: Oracle → Any Given Day
+const J = [
+  { 
+    artist:"Trivium", 
+    album:"What The Dead Men Say", 
+    strategy:"Banda do ano", 
+    note:"A banda que mais cresceu na minha curadoria e abriu caminho para tudo o que viria depois."
+  },
+  { 
+    artist:"Atreyu", 
+    album:"The Curse", 
+    strategy:"Metalcore clássico", 
+    note:"Uma das descobertas mais importantes para entender a evolução do gênero."
+  },
+  { 
+    artist:"zebrahead", 
+    album:"MFZB", 
+    strategy:"Punk Rock moderno", 
+    note:"Trouxe novamente o punk melódico para minhas descobertas."
+  },
+  { 
+    artist:"Saint Asonia", 
+    album:"Flawed Design", 
+    strategy:"Rock moderno", 
+    note:"Uma descoberta consistente que ampliou meu interesse pelo hard rock contemporâneo."
+  },
+  { 
+    artist:"Any Given Day", 
+    album:"Overpower", 
+    strategy:"Metalcore moderno", 
+    note:"Uma das bandas que antecipou a direção que minha curadoria seguiria nos anos seguintes."
+  },
+];
+
+// SEÇÃO 2019 - SUBSTITUÍDO: Doom Unit → Orbit Culture
+const K = [
+  { 
+    artist:"All That Remains", 
+    album:"The Fall of Ideals", 
+    strategy:"Banda do ano", 
+    note:"A principal descoberta de 2019 e uma das maiores portas de entrada para o metalcore melódico."
+  },
+  { 
+    artist:"Machine Head", 
+    album:"The Blackening", 
+    strategy:"Thrash moderno", 
+    note:"Uma descoberta que ampliou minha visão sobre o heavy metal moderno."
+  },
+  { 
+    artist:"Amon Amarth", 
+    album:"Twilight of the Thunder God", 
+    strategy:"Melodic Death Metal", 
+    note:"Uma das bandas que melhor representa o peso épico descoberto naquele ano."
+  },
+  { 
+    artist:"Orbit Culture", 
+    album:"Nija", 
+    strategy:"Peso contemporâneo", 
+    note:"Uma descoberta marcante que representa muito bem a nova geração do metal pesado."
+  },
+  { 
+    artist:"Days Of Jupiter", 
+    album:"Panoptical", 
+    strategy:"Hard Rock moderno", 
+    note:"Representa muito bem o lado mais melódico das minhas descobertas."
+  },
+];
+
+// SEÇÃO 2018
+const L = [
+  { 
+    artist:"Persuader", 
+    album:"When Eden Burns", 
+    strategy:"Maior descoberta de 2018", 
+    note:"A banda que mais marcou o início da minha fase de descobertas e reforçou meu interesse pelo power metal moderno."
+  },
+  { 
+    artist:"Sister Sin", 
+    album:"Now and Forever", 
+    strategy:"Hard Rock moderno", 
+    note:"Uma descoberta que trouxe peso e atitude, ampliando meu interesse por bandas lideradas por vocais femininos."
+  },
+  { 
+    artist:"Mystic Prophecy", 
+    album:"War Brigade", 
+    strategy:"Power Metal contemporâneo", 
+    note:"Representa a continuidade da minha paixão pelo heavy e power metal europeu."
+  },
+  { 
+    artist:"Egypt Central", 
+    album:"White Rabbit", 
+    strategy:"Rock alternativo", 
+    note:"Uma das descobertas que ampliaram meu lado mais acessível sem abandonar o peso."
+  },
+  { 
+    artist:"Meshiaak", 
+    album:"Alliance of Thieves", 
+    strategy:"Thrash moderno", 
+    note:"Uma excelente descoberta para representar o thrash metal contemporâneo."
   },
 ];
 
@@ -792,6 +1027,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGrid('grid-e', E, 'E', '#5C6B7A');
   renderGrid('grid-f', F, 'F', '#7A6B5C');
   renderGrid('grid-g', G, 'G', '#5C7A6B');
+  renderGrid('grid-h', H, 'H', '#8A6B7B');
+  renderGrid('grid-i', I, 'I', '#6B7A8A');
+  renderGrid('grid-j', J, 'J', '#7A8A6B');
+  renderGrid('grid-k', K, 'K', '#8A7A6B');
+  renderGrid('grid-l', L, 'L', '#6B8A7A');
 
   const extraTable = document.getElementById('extra-list');
   if (extraTable) {

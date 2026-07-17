@@ -1,64 +1,624 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Discoteca - Teste</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projeto Discoteca — Lista de Compras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  body{background:#1B1815;color:#EDE8DC;font-family:sans-serif;padding:20px;}
-  .card{background:#242019;padding:12px;margin:8px 0;border-radius:6px;border:1px solid rgba(237,232,220,0.05);}
-  .card .artist{opacity:0.6;font-size:14px;}
-  .card .album{font-size:16px;font-weight:bold;}
-  .login-box{background:#242019;padding:40px;border-radius:12px;max-width:400px;margin:40px auto;text-align:center;}
-  .login-btn{background:#fff;color:#1a1815;border:none;padding:12px 24px;border-radius:6px;font-weight:600;cursor:pointer;font-size:16px;}
-  .hidden{display:none !important;}
-  .tab{display:inline-block;padding:8px 16px;cursor:pointer;border-bottom:2px solid transparent;}
-  .tab.active{border-bottom-color:#D6432F;}
+  :root{
+    --paper:#EDE8DC;
+    --ink:#1B1815;
+    --ink-soft:#4a453e;
+    --card:#242019;
+    --card-line: rgba(237,232,220,0.10);
+    --s-color:#D6432F;
+    --a-color:#E39A2E;
+    --b-color:#4E7A8C;
+    --c-color:#8A8378;
+    --d-color:#6B5B7B;
+    --colecao-color:#B8A88A;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+  ::selection{ background:var(--s-color); color:var(--paper); }
+
+  /* ===== LOGIN ===== */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 40px 20px;
+  }
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-box .logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 48px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .login-box .logo span { color: var(--s-color); }
+  .login-box .sub {
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 32px;
+  }
+  .login-btn {
+    background: #ffffff;
+    color: #1a1815;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+  .login-btn:hover { opacity: 0.85; transform: scale(1.02); }
+  .login-btn svg { width: 20px; height: 20px; }
+  .login-error { color: #f44336; font-size: 14px; margin-top: 16px; display: none; }
+
+  /* ===== USER BAR ===== */
+  .user-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 6vw;
+    border-bottom: 1px solid var(--card-line);
+    background: var(--ink);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  .user-bar .user-name { font-size: 13px; opacity: 0.6; }
+  .user-bar .logout-btn {
+    background: transparent;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 4px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+  }
+  .user-bar .logout-btn:hover {
+    background: var(--s-color);
+    color: var(--ink);
+    border-color: var(--s-color);
+  }
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    padding:64px 6vw 48px;
+    border-bottom:1px solid var(--card-line);
+    overflow:hidden;
+    transition: all 0.4s ease;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+  }
+  .hero-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--paper);
+    opacity:0.55;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    font-size:clamp(42px, 7vw, 92px);
+    line-height:0.92;
+    letter-spacing:0.005em;
+    text-transform:uppercase;
+    max-width:14ch;
+  }
+  .hero h1 span{ color:var(--s-color); }
+  .hero-sub{
+    margin-top:20px;
+    max-width:52ch;
+    font-size:16px;
+    color:var(--paper);
+    opacity:0.68;
+    line-height:1.6;
+  }
+  .hero-meter{
+    margin-top:36px;
+    display:flex;
+    gap:2px;
+    max-width:520px;
+  }
+  .hero-meter span{
+    flex:1;
+    height:6px;
+    border-radius:1px;
+  }
+
+  .hero-state-compras .hero h1 span { color: var(--s-color); }
+  .hero-state-descobertas .hero h1 span { color: var(--d-color); }
+  .hero-state-colecao .hero h1 span { color: var(--colecao-color); }
+
+  /* ===== TABS ===== */
+  .tabs-container{
+    padding: 0 6vw;
+    border-bottom: 1px solid var(--card-line);
+    position: sticky;
+    top: 0;
+    background: var(--ink);
+    z-index: 100;
+  }
+  .tabs{
+    display: flex;
+    gap: 4px;
+    padding: 12px 0 0 0;
+  }
+  .tab-btn{
+    background: transparent;
+    border: none;
+    color: var(--paper);
+    opacity: 0.4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 24px 14px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+  }
+  .tab-btn:hover{ opacity: 0.7; }
+  .tab-btn.active{
+    opacity: 1;
+    border-bottom-color: var(--s-color);
+  }
+  .tab-btn .tab-badge{
+    display: inline-block;
+    background: var(--s-color);
+    color: var(--ink);
+    font-size: 10px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 700;
+  }
+  .tab-btn[data-tab="tab-descobertas"].active{
+    border-bottom-color: var(--d-color);
+  }
+  .tab-btn[data-tab="tab-descobertas"].active .tab-badge{
+    background: var(--d-color);
+  }
+  .tab-btn[data-tab="tab-colecao"].active{
+    border-bottom-color: var(--colecao-color);
+  }
+  .tab-btn[data-tab="tab-colecao"].active .tab-badge{
+    background: var(--colecao-color);
+    color: var(--ink);
+  }
+
+  .tab-content{
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .tab-content.active{
+    display: block;
+  }
+
+  @keyframes fadeIn{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== SECTION ===== */
+  .section{ padding: 40px 6vw 8px; }
+  .tier-head{
+    display:flex;
+    align-items:flex-end;
+    gap:18px;
+    margin-bottom:28px;
+    border-bottom:1px solid var(--card-line);
+    padding-bottom:18px;
+  }
+  .tier-stamp{
+    font-family:'Anton', sans-serif;
+    font-size:64px;
+    line-height:0.8;
+    color:var(--ink);
+    background:var(--tier-color);
+    padding:6px 16px 12px;
+    border-radius:6px;
+    transform:rotate(-3deg);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  }
+  .tier-stamp.small{
+    font-size:48px;
+    padding:6px 14px 10px;
+  }
+  .tier-info h2{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--tier-color);
+    margin-bottom:6px;
+  }
+  .tier-info p{
+    font-size:14px;
+    color:var(--paper);
+    opacity:0.6;
+    max-width:60ch;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:18px;
+    padding-bottom:8px;
+  }
+
+  /* ===== CARDS ===== */
+  .card{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:10px;
+    overflow:hidden;
+    position:relative;
+    transition:transform 0.25s ease, border-color 0.25s ease;
+    border-top:3px solid var(--tier-color);
+  }
+  .card:hover{ transform:translateY(-4px); border-color:rgba(237,232,220,0.28); }
+  
+  .art-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    min-height:230px;
+    display:flex; 
+    align-items:center; 
+    justify-content:center;
+    overflow:hidden;
+    background-size: cover !important;
+    background-position: center !important;
+    background-color: #1a1815;
+  }
+  .art-wrap .spine-letter{
+    position:absolute;
+    font-family:'Anton', sans-serif;
+    font-size:130px;
+    line-height:1;
+    color:rgba(255,255,255,0.08);
+    text-transform:uppercase;
+    user-select:none;
+    right:-14px; bottom:-32px;
+    z-index: 1;
+    pointer-events:none;
+  }
+  .art-fallback{
+    position:relative;
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    text-align:center;
+    color:rgba(255,255,255,0.92);
+    letter-spacing:0.01em;
+    padding:0 20px;
+    text-transform:uppercase;
+    line-height:1.3;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  }
+  .priority-tag{
+    position:absolute; top:10px; left:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; font-weight:700;
+    letter-spacing:0.08em;
+    color:var(--ink);
+    background:var(--tier-color);
+    padding:3px 8px;
+    border-radius:4px;
+    z-index: 3;
+  }
+  .card-body{ padding:16px 16px 18px; }
+  .card-body h3{
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    line-height:1.25;
+    margin-bottom:2px;
+  }
+  .card-body .artist{
+    font-size:13px;
+    color:var(--tier-color);
+    font-weight:600;
+    margin-bottom:12px;
+  }
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding-top:10px;
+    border-top:1px dashed var(--card-line);
+  }
+  .meta-row .label{ color:rgba(237,232,220,0.4); text-transform:uppercase; letter-spacing:0.05em; }
+  .meta-row .val{ color:var(--paper); opacity:0.85; text-align:right; max-width:60%; }
+  .meta-block{ margin-bottom:8px; }
+
+  .cond-badge{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-line);
+    margin-right: 4px;
+  }
+  .cond-nm{ color: #4CAF50; border-color: #4CAF50; }
+  .cond-vgplus{ color: #8BC34A; border-color: #8BC34A; }
+  .cond-vg{ color: #FFC107; border-color: #FFC107; }
+  .cond-g{ color: #FF9800; border-color: #FF9800; }
+  .cond-f{ color: #FF5722; border-color: #FF5722; }
+  .cond-p{ color: #f44336; border-color: #f44336; }
+  .cond-m{ color: #00BCD4; border-color: #00BCD4; }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    opacity: 0.4;
+    grid-column: 1 / -1;
+  }
+  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; opacity: 0.7; }
+
+  .hidden { display: none !important; }
+
+  .add-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .add-btn:hover { transform: scale(1.05); opacity: 0.85; }
+  .tier-head .add-btn-wrap {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  footer{
+    padding:40px 6vw 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:rgba(237,232,220,0.3);
+    text-align:center;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  @media (max-width:600px){
+    .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
+    .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
+    .hero h1{ font-size:clamp(34px,11vw,60px); }
+    .tab-btn{ font-size:11px; padding:10px 14px 12px; }
+    .tabs{ gap:2px; }
+    .tabs-container{ padding: 0 4vw; }
+    .section{ padding: 32px 4vw 8px; }
+    .login-box { padding: 32px 20px; }
+    .user-bar { padding: 8px 4vw; }
+  }
 </style>
 </head>
 <body>
 
-<div id="loginScreen" class="login-box">
-  <h1>Discoteca</h1>
-  <button class="login-btn" id="btnLogin">Entrar com Google</button>
-  <div id="loginError" style="color:#f44336;margin-top:12px;display:none;">Erro</div>
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen" class="login-container">
+  <div class="login-box">
+    <div class="logo">Discoteca<span>.</span></div>
+    <p class="sub">Sua coleção de discos, organizada com recomendações personalizadas.</p>
+    <button class="login-btn" id="btnLogin">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Entrar com Google
+    </button>
+    <div id="loginError" class="login-error">Erro ao fazer login. Tente novamente.</div>
+  </div>
 </div>
 
+<!-- ===== APP ===== -->
 <div id="appScreen" class="hidden">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(237,232,220,0.1);">
-    <span id="userName">👤 Carregando...</span>
-    <button id="btnLogout" style="background:none;border:1px solid rgba(237,232,220,0.2);color:#EDE8DC;padding:4px 12px;border-radius:4px;cursor:pointer;">Sair</button>
+
+  <!-- BARRA DO USUÁRIO -->
+  <div class="user-bar">
+    <span class="user-name" id="userNameDisplay">👤 Carregando...</span>
+    <button class="logout-btn" id="btnLogout">Sair</button>
   </div>
 
-  <h1>Discoteca</h1>
-  <p id="subTitle" style="opacity:0.5;">Sua coleção</p>
+  <!-- HERO -->
+  <section class="hero hero-state-colecao" id="heroSection">
+    <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Coleção</div>
+    <h1 id="heroTitle">Minha <span id="heroHighlight">Coleção</span></h1>
+    <p class="hero-sub" id="heroSub">Gerencie todos os discos que fazem parte da sua coleção física.</p>
+    <div class="hero-meter" id="heroMeter" style="display:none;">
+      <span style="background:var(--s-color)"></span>
+      <span style="background:var(--s-color)"></span>
+      <span style="background:var(--a-color)"></span>
+      <span style="background:var(--a-color)"></span>
+      <span style="background:var(--b-color)"></span>
+      <span style="background:var(--c-color)"></span>
+    </div>
+  </section>
 
-  <div style="margin:16px 0;">
-    <span class="tab active" data-tab="colecao" onclick="switchTab('colecao')">💿 Coleção</span>
-    <span class="tab" data-tab="compras" onclick="switchTab('compras')">📋 Compras</span>
-    <span class="tab" data-tab="descobertas" onclick="switchTab('descobertas')">🔍 Descobertas</span>
+  <!-- TABS -->
+  <div class="tabs-container">
+    <div class="tabs">
+      <button class="tab-btn" data-tab="tab-compras">📋 Compras</button>
+      <button class="tab-btn" data-tab="tab-descobertas">🔍 Descobertas <span class="tab-badge" id="descobertas-badge">0</span></button>
+      <button class="tab-btn active" data-tab="tab-colecao">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
+    </div>
   </div>
 
-  <div id="tab-colecao" class="tab-content"></div>
-  <div id="tab-compras" class="tab-content" style="display:none;"></div>
-  <div id="tab-descobertas" class="tab-content" style="display:none;"></div>
+  <!-- ===== TAB: COMPRAS ===== -->
+  <div id="tab-compras" class="tab-content">
+    <section class="section" style="--tier-color:var(--s-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">S</div>
+        <div class="tier-info">
+          <h2>Prioridade Máxima</h2>
+          <p>Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-s"></div>
+    </section>
+    <section class="section" style="--tier-color:var(--a-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">A</div>
+        <div class="tier-info">
+          <h2>Alta Prioridade</h2>
+          <p>Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-a"></div>
+    </section>
+    <section class="section" style="--tier-color:var(--b-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">B</div>
+        <div class="tier-info">
+          <h2>Sem Urgência</h2>
+          <p>Pegar em promoção ou naturalmente, sem pressa de garimpo.</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-b"></div>
+    </section>
+    <section class="section" style="--tier-color:var(--c-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">C</div>
+        <div class="tier-info">
+          <h2>Baixa Prioridade</h2>
+          <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-c"></div>
+    </section>
+  </div>
+
+  <!-- ===== TAB: DESCOBERTAS ===== -->
+  <div id="tab-descobertas" class="tab-content">
+    <section class="section" style="--tier-color:var(--d-color)">
+      <div class="tier-head">
+        <div class="tier-stamp small">2026</div>
+        <div class="tier-info">
+          <h2>Descobertas do Ano</h2>
+          <p>Bandas que marcaram suas descobertas através do Discovery Weekly.</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-descobertas"></div>
+    </section>
+  </div>
+
+  <!-- ===== TAB: COLEÇÃO ===== -->
+  <div id="tab-colecao" class="tab-content active">
+    <section class="section" style="--tier-color:var(--colecao-color)">
+      <div class="tier-head">
+        <div class="tier-stamp small">💿</div>
+        <div class="tier-info">
+          <h2 style="color:var(--colecao-color);">Coleção</h2>
+          <p>Registro de todos os discos que já fazem parte da sua coleção física.</p>
+        </div>
+        <div class="add-btn-wrap">
+          <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
+        </div>
+      </div>
+      <div class="grid" id="grid-colecao"></div>
+    </section>
+  </div>
+
 </div>
+
+<footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
+  Projeto Discoteca — Sua coleção, suas recomendações.
+</footer>
 
 <script>
-// ========== CONFIG ==========
+// ========== API ==========
 const API = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
+let colecao = [];
+let recomendacoes = [];
+let descobertas = [];
+
+// ========== LAST.FM ==========
+const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
+
+function getCoverUrl(artist, album) {
+  return fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.album && data.album.image) {
+        const img = data.album.image.find(i => i.size === 'extralarge');
+        return img && img['#text'] ? img['#text'] : null;
+      }
+      return null;
+    })
+    .catch(() => null);
+}
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
   const btn = this;
+  const error = document.getElementById('loginError');
   btn.disabled = true;
+  error.style.display = 'none';
   fetch(API + '/login')
     .then(r => r.json())
     .then(d => {
-      if (d.auth_url) window.location.href = d.auth_url;
+      if (d.auth_url) {
+        window.location.href = d.auth_url;
+      } else {
+        throw new Error('URL não recebida');
+      }
     })
     .catch(() => {
-      document.getElementById('loginError').style.display = 'block';
+      error.style.display = 'block';
       btn.disabled = false;
     });
 });
@@ -78,7 +638,8 @@ function verificarSessao() {
     usuarioId = userId;
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
-    document.getElementById('userName').textContent = '👤 ' + nome;
+    document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
+    window.history.replaceState({}, document.title, window.location.pathname);
     carregarDados();
     return;
   }
@@ -90,7 +651,7 @@ function verificarSessao() {
         usuarioId = data.usuario_id;
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
-        document.getElementById('userName').textContent = '👤 ' + (data.nome || 'Usuário');
+        document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
         carregarDados();
       }
     })
@@ -99,98 +660,231 @@ function verificarSessao() {
 
 // ========== CARREGAR DADOS ==========
 function carregarDados() {
-  console.log('Carregando dados... usuarioId:', usuarioId);
-  
-  const urlBase = API + '?user_id=' + usuarioId;
-
   fetch(API + '/colecao?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
-      console.log('Coleção recebida:', data);
-      renderColecao(data);
+      colecao = Array.isArray(data) ? data : [];
+      renderColecao();
     })
-    .catch(err => console.error('Erro coleção:', err));
+    .catch(() => {});
 
   fetch(API + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
-      console.log('Recomendações recebidas:', data);
-      renderRecomendacoes(data);
+      recomendacoes = Array.isArray(data) ? data : [];
+      renderRecomendacoes();
     })
-    .catch(err => console.error('Erro recomendações:', err));
+    .catch(() => {});
 
   fetch(API + '/descobertas?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
-      console.log('Descobertas recebidas:', data);
-      renderDescobertas(data);
+      descobertas = Array.isArray(data) ? data : [];
+      renderDescobertas();
     })
-    .catch(err => console.error('Erro descobertas:', err));
+    .catch(() => {});
 }
 
 // ========== RENDER ==========
-function renderColecao(dados) {
-  const div = document.getElementById('tab-colecao');
-  if (!dados || dados.length === 0) {
-    div.innerHTML = '<p style="opacity:0.4;">Nenhum disco na coleção</p>';
-    return;
-  }
-  div.innerHTML = dados.map(item => `
-    <div class="card">
-      <div class="album">${item.album || '?'}</div>
-      <div class="artist">${item.artista}</div>
-      <div style="font-size:11px;opacity:0.4;margin-top:4px;">${item.formato || '—'} | ${item.condicao_midia || ''} ${item.condicao_capa ? '/' + item.condicao_capa : ''}</div>
-    </div>
-  `).join('');
-}
-
-function renderRecomendacoes(dados) {
-  const div = document.getElementById('tab-compras');
-  if (!dados || dados.length === 0) {
-    div.innerHTML = '<p style="opacity:0.4;">Nenhuma recomendação</p>';
-    return;
-  }
-  const tiers = {S:[], A:[], B:[], C:[]};
-  dados.forEach(r => { if (tiers[r.tier]) tiers[r.tier].push(r); });
+function renderColecao() {
+  const grid = document.getElementById('grid-colecao');
+  if (!grid) return;
   
-  let html = '';
-  ['S','A','B','C'].forEach(tier => {
-    const items = tiers[tier] || [];
-    if (items.length === 0) return;
-    html += `<h3 style="color:${tier==='S'?'#D6432F':tier==='A'?'#E39A2E':tier==='B'?'#4E7A8C':'#8A8378'};">Tier ${tier}</h3>`;
-    html += items.map(item => `
-      <div class="card">
-        <div class="album">${item.album || '?'}</div>
-        <div class="artist">${item.artista}</div>
-        <div style="font-size:11px;opacity:0.4;margin-top:4px;">${item.estrategia || ''}</div>
-      </div>
-    `).join('');
-  });
-  div.innerHTML = html || '<p style="opacity:0.4;">Nenhuma recomendação</p>';
-}
-
-function renderDescobertas(dados) {
-  const div = document.getElementById('tab-descobertas');
-  if (!dados || dados.length === 0) {
-    div.innerHTML = '<p style="opacity:0.4;">Nenhuma descoberta</p>';
+  if (!colecao || colecao.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
+    document.getElementById('colecao-badge').textContent = '0';
     return;
   }
-  div.innerHTML = dados.map(item => `
-    <div class="card">
-      <div class="album">${item.album || '?'}</div>
-      <div class="artist">${item.artista}</div>
-      <div style="font-size:11px;opacity:0.4;margin-top:4px;">${item.titulo || ''} ${item.ano ? '· ' + item.ano : ''}</div>
-    </div>
-  `).join('');
+
+  grid.innerHTML = colecao.map((item, i) => {
+    const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const letter = item.album ? item.album.charAt(0) : '?';
+    return `
+      <div class="card" id="colecao-card-${i}">
+        <div class="art-wrap" id="colecao-art-${i}" style="background:#1a1815;background-size:cover;background-position:center;">
+          <span class="priority-tag" style="background:var(--colecao-color);color:var(--ink);">💿</span>
+          <div class="spine-letter">${letter}</div>
+          <div class="art-fallback" id="colecao-fallback-${i}">${item.artist}<br>${item.album}</div>
+        </div>
+        <div class="card-body">
+          <h3>${item.album || '?'}</h3>
+          <div class="artist" style="color:var(--colecao-color);">${item.artist}</div>
+          <div class="meta-block">
+            <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+          </div>
+          <div class="meta-row">
+            <span class="label">Condição</span>
+            <span class="val">
+              ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
+              ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
+              ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+            </span>
+          </div>
+          ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${Number(item.preco).toFixed(2)}</span></div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  colecao.forEach((item, i) => {
+    getCoverUrl(item.artist, item.album).then(url => {
+      const wrap = document.getElementById(`colecao-art-${i}`);
+      const fallback = document.getElementById(`colecao-fallback-${i}`);
+      if (url && wrap) {
+        wrap.style.backgroundImage = `url('${url}')`;
+        wrap.style.backgroundSize = 'cover';
+        wrap.style.backgroundPosition = 'center';
+        if (fallback) fallback.style.opacity = '0';
+      }
+    });
+  });
+
+  document.getElementById('colecao-badge').textContent = colecao.length;
+}
+
+function renderRecomendacoes() {
+  const tiers = { S: [], A: [], B: [], C: [] };
+  recomendacoes.forEach(r => { if (tiers[r.tier]) tiers[r.tier].push(r); });
+
+  ['S', 'A', 'B', 'C'].forEach(tier => {
+    const grid = document.getElementById(`grid-${tier.toLowerCase()}`);
+    if (!grid) return;
+    const items = tiers[tier] || [];
+    
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
+      return;
+    }
+
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' : '#8A8378';
+    grid.innerHTML = items.map((item, idx) => {
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `rec-${tier}-${idx}`;
+      return `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background:#1a1815;background-size:cover;background-position:center;">
+            <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}">${item.artist}<br>${item.album}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || 'Álbum'}</h3>
+            <div class="artist" style="color:${tierColor};">${item.artist}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+            </div>
+            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    items.forEach((item, idx) => {
+      const id = `rec-${tier}-${idx}`;
+      getCoverUrl(item.artist, item.album).then(url => {
+        const wrap = document.getElementById(`art-${id}`);
+        const fallback = document.getElementById(`fallback-${id}`);
+        if (url && wrap) {
+          wrap.style.backgroundImage = `url('${url}')`;
+          wrap.style.backgroundSize = 'cover';
+          wrap.style.backgroundPosition = 'center';
+          if (fallback) fallback.style.opacity = '0';
+        }
+      });
+    });
+  });
+}
+
+function renderDescobertas() {
+  const grid = document.getElementById('grid-descobertas');
+  if (!grid) return;
+
+  if (!descobertas || descobertas.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p></div>`;
+    document.getElementById('descobertas-badge').textContent = '0';
+    return;
+  }
+
+  grid.innerHTML = descobertas.map((item, idx) => {
+    const letter = item.album ? item.album.charAt(0) : '?';
+    const id = `desc-${idx}`;
+    return `
+      <div class="card" id="${id}">
+        <div class="art-wrap" id="art-${id}" style="background:#1a1815;background-size:cover;background-position:center;">
+          <span class="priority-tag" style="background:var(--d-color);color:var(--ink);">${item.ano || '2025'}</span>
+          <div class="spine-letter">${letter}</div>
+          <div class="art-fallback" id="fallback-${id}">${item.artist}<br>${item.album}</div>
+        </div>
+        <div class="card-body">
+          <h3>${item.album || 'Álbum'}</h3>
+          <div class="artist" style="color:var(--d-color);">${item.artist}</div>
+          <div class="meta-block">
+            <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.titulo || ''}</span></div>
+          </div>
+          <div class="meta-row"><span class="label">Nota</span><span class="val">${item.descricao || ''}</span></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  descobertas.forEach((item, idx) => {
+    const id = `desc-${idx}`;
+    getCoverUrl(item.artist, item.album).then(url => {
+      const wrap = document.getElementById(`art-${id}`);
+      const fallback = document.getElementById(`fallback-${id}`);
+      if (url && wrap) {
+        wrap.style.backgroundImage = `url('${url}')`;
+        wrap.style.backgroundSize = 'cover';
+        wrap.style.backgroundPosition = 'center';
+        if (fallback) fallback.style.opacity = '0';
+      }
+    });
+  });
+
+  document.getElementById('descobertas-badge').textContent = descobertas.length;
 }
 
 // ========== TABS ==========
-function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  document.getElementById('tab-' + tab).style.display = 'block';
-  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-  document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+
+  const hero = document.getElementById('heroSection');
+  const eyebrow = document.getElementById('heroEyebrow');
+  const title = document.getElementById('heroTitle');
+  const sub = document.getElementById('heroSub');
+  const meter = document.getElementById('heroMeter');
+
+  if (tabId === 'tab-compras') {
+    hero.className = 'hero hero-state-compras';
+    eyebrow.textContent = 'Projeto Discoteca · Recomendações';
+    title.innerHTML = 'Lista de <span>Compras</span>';
+    sub.textContent = 'Prioridade S → C, baseado nas suas playlists importadas.';
+    meter.style.display = 'flex';
+  } else if (tabId === 'tab-descobertas') {
+    hero.className = 'hero hero-state-descobertas';
+    eyebrow.textContent = 'Projeto Discoteca · Descobertas';
+    title.innerHTML = 'Descobertas <span>Musicais</span>';
+    sub.textContent = 'Bandas que marcaram suas descobertas através do Discovery Weekly.';
+    meter.style.display = 'none';
+  } else if (tabId === 'tab-colecao') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Coleção';
+    title.innerHTML = 'Minha <span>Coleção</span>';
+    sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
+    meter.style.display = 'none';
+  }
 }
+
+// ========== EVENTOS ==========
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    switchTab(this.dataset.tab);
+  });
+});
 
 // ========== INICIAR ==========
 document.addEventListener('DOMContentLoaded', verificarSessao);

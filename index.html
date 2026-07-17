@@ -27,6 +27,9 @@
     --j-color:#7A8A6B;
     --k-color:#8A7A6B;
     --l-color:#6B8A7A;
+    --colecao-color:#B8A88A;
+    --vinil-color:#E8C87A;
+    --cd-color:#7AB8D8;
     --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -44,6 +47,7 @@
     padding:64px 6vw 48px;
     border-bottom:1px solid var(--card-line);
     overflow:hidden;
+    transition: all 0.4s ease;
   }
   .hero::before{
     content:"";
@@ -59,6 +63,7 @@
     color:var(--paper);
     opacity:0.55;
     margin-bottom:18px;
+    transition: opacity 0.3s ease;
   }
   .hero h1{
     font-family:'Anton', sans-serif;
@@ -68,6 +73,7 @@
     letter-spacing:0.005em;
     text-transform:uppercase;
     max-width:14ch;
+    transition: all 0.4s ease;
   }
   .hero h1 span{ color:var(--s-color); }
   .hero-sub{
@@ -77,12 +83,14 @@
     color:var(--paper);
     opacity:0.68;
     line-height:1.6;
+    transition: all 0.4s ease;
   }
   .hero-meter{
     margin-top:36px;
     display:flex;
     gap:2px;
     max-width:520px;
+    transition: opacity 0.3s ease;
   }
   .hero-meter span{
     flex:1;
@@ -90,7 +98,83 @@
     border-radius:1px;
   }
 
-  .section{ padding:56px 6vw 8px; }
+  .hero-state-compras .hero h1 span { color: var(--s-color); }
+  .hero-state-descobertas .hero h1 span { color: var(--d-color); }
+  .hero-state-colecao .hero h1 span { color: var(--colecao-color); }
+
+  .tabs-container{
+    padding: 0 6vw;
+    border-bottom: 1px solid var(--card-line);
+    position: sticky;
+    top: 0;
+    background: var(--ink);
+    z-index: 100;
+  }
+  .tabs{
+    display: flex;
+    gap: 4px;
+    padding: 12px 0 0 0;
+  }
+  .tab-btn{
+    background: transparent;
+    border: none;
+    color: var(--paper);
+    opacity: 0.4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 24px 14px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+    position: relative;
+  }
+  .tab-btn:hover{
+    opacity: 0.7;
+  }
+  .tab-btn.active{
+    opacity: 1;
+    border-bottom-color: var(--s-color);
+  }
+  .tab-btn .tab-badge{
+    display: inline-block;
+    background: var(--s-color);
+    color: var(--ink);
+    font-size: 10px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 700;
+  }
+  .tab-btn[data-tab="tab-descobertas"].active{
+    border-bottom-color: var(--d-color);
+  }
+  .tab-btn[data-tab="tab-descobertas"].active .tab-badge{
+    background: var(--d-color);
+  }
+  .tab-btn[data-tab="tab-colecao"].active{
+    border-bottom-color: var(--colecao-color);
+  }
+  .tab-btn[data-tab="tab-colecao"].active .tab-badge{
+    background: var(--colecao-color);
+    color: var(--ink);
+  }
+
+  .tab-content{
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .tab-content.active{
+    display: block;
+  }
+
+  @keyframes fadeIn{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .section{ padding: 40px 6vw 8px; }
   .tier-head{
     display:flex;
     align-items:flex-end;
@@ -109,6 +193,14 @@
     border-radius:6px;
     transform:rotate(-3deg);
     box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  }
+  .tier-stamp.small{
+    font-size:48px;
+    padding:6px 14px 10px;
+  }
+  .tier-stamp.tiny{
+    font-size:28px;
+    padding:4px 10px 6px;
   }
   .tier-info h2{
     font-family:'JetBrains Mono', monospace;
@@ -154,13 +246,6 @@
     background-size: cover !important;
     background-position: center !important;
     background-color: #1a1815;
-  }
-  .art-wrap .groove{
-    position:absolute; inset:0;
-    background: radial-gradient(circle at 50% 50%, transparent 0 18%, rgba(0,0,0,0.35) 19% 20%, transparent 21% 30%, rgba(0,0,0,0.28) 31% 32%, transparent 33%);
-    mix-blend-mode:multiply;
-    pointer-events:none;
-    z-index: 2;
   }
   .art-wrap .spine-letter{
     position:absolute;
@@ -250,7 +335,6 @@
     margin-top:6px;
   }
 
-  /* DROPDOWN - Oportunidades Extras */
   .dropdown-toggle {
     cursor: pointer;
     display: flex;
@@ -312,6 +396,45 @@
     opacity: 0 !important;
   }
 
+  .format-badge{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: rgba(237,232,220,0.08);
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    opacity: 0.6;
+  }
+
+  .cond-badge{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-line);
+    margin-right: 4px;
+  }
+  .cond-nm{ color: #4CAF50; border-color: #4CAF50; }
+  .cond-vgplus{ color: #8BC34A; border-color: #8BC34A; }
+  .cond-vg{ color: #FFC107; border-color: #FFC107; }
+  .cond-g{ color: #FF9800; border-color: #FF9800; }
+  .cond-f{ color: #FF5722; border-color: #FF5722; }
+  .cond-p{ color: #f44336; border-color: #f44336; }
+  .cond-m{ color: #00BCD4; border-color: #00BCD4; }
+
+  .section-subtitle{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--paper);
+    opacity: 0.5;
+    margin-bottom: 24px;
+    padding-left: 4px;
+    letter-spacing: 0.02em;
+  }
+
   footer{
     padding:40px 6vw 0;
     font-family:'JetBrains Mono', monospace;
@@ -324,17 +447,24 @@
 
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
+    .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
+    .tier-stamp.tiny{ font-size:22px; padding:4px 8px 5px; }
     .hero h1{ font-size:clamp(34px,11vw,60px); }
+    .tab-btn{ font-size:11px; padding:10px 14px 12px; }
+    .tabs{ gap:2px; }
+    .tabs-container{ padding: 0 4vw; }
+    .section{ padding: 32px 4vw 8px; }
   }
 </style>
 </head>
 <body>
 
-<section class="hero">
-  <div class="hero-eyebrow">Projeto Discoteca · Curadoria fportelada</div>
-  <h1>Lista de <span>Compras</span></h1>
-  <p class="hero-sub">Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.</p>
-  <div class="hero-meter">
+<!-- ===== HERO ===== -->
+<section class="hero hero-state-compras" id="heroSection">
+  <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria fportelada</div>
+  <h1 id="heroTitle">Lista de <span id="heroHighlight">Compras</span></h1>
+  <p class="hero-sub" id="heroSub">Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.</p>
+  <div class="hero-meter" id="heroMeter">
     <span style="background:var(--s-color)"></span>
     <span style="background:var(--s-color)"></span>
     <span style="background:var(--a-color)"></span>
@@ -344,187 +474,235 @@
   </div>
 </section>
 
-<section class="section" style="--tier-color:var(--s-color)">
-  <div class="tier-head">
-    <div class="tier-stamp">S</div>
-    <div class="tier-info">
-      <h2>Prioridade Máxima</h2>
-      <p>Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.</p>
-    </div>
+<!-- TABS -->
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tab-compras" onclick="switchTab('tab-compras')">📋 Lista de Compras</button>
+    <button class="tab-btn" data-tab="tab-descobertas" onclick="switchTab('tab-descobertas')">🔍 Descobertas <span class="tab-badge">2018-2026</span></button>
+    <button class="tab-btn" data-tab="tab-colecao" onclick="switchTab('tab-colecao')">💿 Coleção <span class="tab-badge">15 discos</span></button>
   </div>
-  <div class="grid" id="grid-s"></div>
-</section>
+</div>
 
-<section class="section" style="--tier-color:var(--a-color)">
-  <div class="tier-head">
-    <div class="tier-stamp">A</div>
-    <div class="tier-info">
-      <h2>Alta Prioridade</h2>
-      <p>Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.</p>
-    </div>
-  </div>
-  <div class="grid" id="grid-a"></div>
-</section>
+<!-- ===== TAB 1: LISTA DE COMPRAS ===== -->
+<div id="tab-compras" class="tab-content active">
 
-<section class="section" style="--tier-color:var(--b-color)">
-  <div class="tier-head">
-    <div class="tier-stamp">B</div>
-    <div class="tier-info">
-      <h2>Sem Urgência</h2>
-      <p>Pegar em promoção ou naturalmente, sem pressa de garimpo.</p>
-    </div>
-  </div>
-  <div class="grid" id="grid-b"></div>
-</section>
-
-<section class="section" style="--tier-color:var(--c-color)">
-  <div class="tier-head">
-    <div class="tier-stamp">C</div>
-    <div class="tier-info">
-      <h2>Baixa Prioridade</h2>
-      <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
-    </div>
-  </div>
-  <div class="wildcard">
-    <span class="chip">Slipknot</span>
-    <span class="chip">Korn</span>
-    <span class="chip">Limp Bizkit</span>
-    <span class="chip">Papa Roach</span>
-    <span class="chip">Bad Religion</span>
-    <span class="chip">Avenged Sevenfold</span>
-    <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
-  </div>
-</section>
-
-<!-- DROPDOWN: Oportunidades Extras -->
-<section class="section">
-  <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4); border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
-    <div class="tier-info" style="width: 100%;">
-      <div class="dropdown-toggle" onclick="toggleDropdown()">
-        <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
-          Oportunidades Extras
-        </h2>
-        <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+  <section class="section" style="--tier-color:var(--s-color)">
+    <div class="tier-head">
+      <div class="tier-stamp">S</div>
+      <div class="tier-info">
+        <h2>Prioridade Máxima</h2>
+        <p>Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.</p>
       </div>
-      <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
-        Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
-      </p>
     </div>
-  </div>
-  <div class="dropdown-content" id="dropdownContent">
-    <table class="list-table" id="extra-list"></table>
-  </div>
-</section>
+    <div class="grid" id="grid-s"></div>
+  </section>
 
-<!-- SEÇÃO 2026 -->
-<section class="section" style="--tier-color:var(--d-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2026</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>As bandas abaixo representam as descobertas mais marcantes de 2026 através do Discovery Weekly. Não são as bandas que mais ouvi no ano, mas aquelas que mais se aproximaram de conquistar um lugar na Coleção Portelada.</p>
+  <section class="section" style="--tier-color:var(--a-color)">
+    <div class="tier-head">
+      <div class="tier-stamp">A</div>
+      <div class="tier-info">
+        <h2>Alta Prioridade</h2>
+        <p>Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.</p>
+      </div>
     </div>
-  </div>
-  <div class="grid" id="grid-d"></div>
-</section>
+    <div class="grid" id="grid-a"></div>
+  </section>
 
-<!-- SEÇÃO 2025 -->
-<section class="section" style="--tier-color:var(--e-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2025</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>2025 foi o ano em que o metalcore moderno passou definitivamente a dominar minhas descobertas.</p>
+  <section class="section" style="--tier-color:var(--b-color)">
+    <div class="tier-head">
+      <div class="tier-stamp">B</div>
+      <div class="tier-info">
+        <h2>Sem Urgência</h2>
+        <p>Pegar em promoção ou naturalmente, sem pressa de garimpo.</p>
+      </div>
     </div>
-  </div>
-  <div class="grid" id="grid-e"></div>
-</section>
+    <div class="grid" id="grid-b"></div>
+  </section>
 
-<!-- SEÇÃO 2024 -->
-<section class="section" style="--tier-color:var(--f-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2024</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>Em 2024 minhas descobertas passaram a reforçar bandas já importantes e ampliaram meu interesse pelo metal moderno.</p>
+  <section class="section" style="--tier-color:var(--c-color)">
+    <div class="tier-head">
+      <div class="tier-stamp">C</div>
+      <div class="tier-info">
+        <h2>Baixa Prioridade</h2>
+        <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
+      </div>
     </div>
-  </div>
-  <div class="grid" id="grid-f"></div>
-</section>
-
-<!-- SEÇÃO 2023 -->
-<section class="section" style="--tier-color:var(--g-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2023</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>As bandas abaixo representam as descobertas que definiram meu ano de 2023 e iniciaram uma nova fase da minha curadoria musical.</p>
+    <div class="wildcard">
+      <span class="chip">Slipknot</span>
+      <span class="chip">Korn</span>
+      <span class="chip">Limp Bizkit</span>
+      <span class="chip">Papa Roach</span>
+      <span class="chip">Bad Religion</span>
+      <span class="chip">Avenged Sevenfold</span>
+      <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
     </div>
-  </div>
-  <div class="grid" id="grid-g"></div>
-</section>
+  </section>
 
-<!-- SEÇÃO 2022 -->
-<section class="section" style="--tier-color:var(--h-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2022</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>2022 serviu como transição para a fase dominada pelo metalcore moderno.</p>
+  <!-- DROPDOWN: Oportunidades Extras -->
+  <section class="section">
+    <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4); border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+      <div class="tier-info" style="width: 100%;">
+        <div class="dropdown-toggle" onclick="toggleDropdown()">
+          <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
+            Oportunidades Extras
+          </h2>
+          <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+        </div>
+        <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
+          Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
+        </p>
+      </div>
     </div>
-  </div>
-  <div class="grid" id="grid-h"></div>
-</section>
-
-<!-- SEÇÃO 2021 -->
-<section class="section" style="--tier-color:var(--i-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2021</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>2021 aprofundou meu interesse pelo metal moderno e consolidou bandas que se tornariam importantes nos anos seguintes.</p>
+    <div class="dropdown-content" id="dropdownContent">
+      <table class="list-table" id="extra-list"></table>
     </div>
-  </div>
-  <div class="grid" id="grid-i"></div>
-</section>
+  </section>
 
-<!-- SEÇÃO 2020 -->
-<section class="section" style="--tier-color:var(--j-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2020</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>2020 marcou a aproximação definitiva com o metalcore moderno.</p>
+</div>
+
+<!-- ===== TAB 2: DESCOBERTAS ===== -->
+<div id="tab-descobertas" class="tab-content">
+
+  <!-- 2026 -->
+  <section class="section" style="--tier-color:var(--d-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2026</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>As bandas abaixo representam as descobertas mais marcantes de 2026 através do Discovery Weekly. Não são as bandas que mais ouvi no ano, mas aquelas que mais se aproximaram de conquistar um lugar na Coleção Portelada.</p>
+      </div>
     </div>
-  </div>
-  <div class="grid" id="grid-j"></div>
-</section>
+    <div class="grid" id="grid-d"></div>
+  </section>
 
-<!-- SEÇÃO 2019 -->
-<section class="section" style="--tier-color:var(--k-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2019</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>2019 consolidou o metal moderno como uma das principais direções das minhas descobertas.</p>
+  <!-- 2025 -->
+  <section class="section" style="--tier-color:var(--e-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2025</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>2025 foi o ano em que o metalcore moderno passou definitivamente a dominar minhas descobertas.</p>
+      </div>
     </div>
-  </div>
-  <div class="grid" id="grid-k"></div>
-</section>
+    <div class="grid" id="grid-e"></div>
+  </section>
 
-<!-- SEÇÃO 2018 -->
-<section class="section" style="--tier-color:var(--l-color)">
-  <div class="tier-head">
-    <div class="tier-stamp" style="font-size:48px; padding:6px 14px 10px;">2018</div>
-    <div class="tier-info">
-      <h2>Descobertas do Ano</h2>
-      <p>As primeiras grandes descobertas registradas. O início da curadoria que anos depois daria origem ao Projeto Discoteca.</p>
+  <!-- 2024 -->
+  <section class="section" style="--tier-color:var(--f-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2024</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>Em 2024 minhas descobertas passaram a reforçar bandas já importantes e ampliaram meu interesse pelo metal moderno.</p>
+      </div>
     </div>
-  </div>
-  <div class="grid" id="grid-l"></div>
-</section>
+    <div class="grid" id="grid-f"></div>
+  </section>
 
-<footer>Gerado a partir da análise cruzada CSV Spotify × Pontuação Portelada™ · capas via Last.fm API</footer>
+  <!-- 2023 -->
+  <section class="section" style="--tier-color:var(--g-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2023</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>As bandas abaixo representam as descobertas que definiram meu ano de 2023 e iniciaram uma nova fase da minha curadoria musical.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-g"></div>
+  </section>
+
+  <!-- 2022 -->
+  <section class="section" style="--tier-color:var(--h-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2022</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>2022 serviu como transição para a fase dominada pelo metalcore moderno.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-h"></div>
+  </section>
+
+  <!-- 2021 -->
+  <section class="section" style="--tier-color:var(--i-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2021</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>2021 aprofundou meu interesse pelo metal moderno e consolidou bandas que se tornariam importantes nos anos seguintes.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-i"></div>
+  </section>
+
+  <!-- 2020 -->
+  <section class="section" style="--tier-color:var(--j-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2020</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>2020 marcou a aproximação definitiva com o metalcore moderno.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-j"></div>
+  </section>
+
+  <!-- 2019 -->
+  <section class="section" style="--tier-color:var(--k-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2019</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>2019 consolidou o metal moderno como uma das principais direções das minhas descobertas.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-k"></div>
+  </section>
+
+  <!-- 2018 -->
+  <section class="section" style="--tier-color:var(--l-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small">2018</div>
+      <div class="tier-info">
+        <h2>Descobertas do Ano</h2>
+        <p>As primeiras grandes descobertas registradas. O início da curadoria que anos depois daria origem ao Projeto Discoteca.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-l"></div>
+  </section>
+
+</div>
+
+<!-- ===== TAB 3: COLEÇÃO ===== -->
+<div id="tab-colecao" class="tab-content">
+
+  <!-- VINIL -->
+  <section class="section" style="--tier-color:var(--vinil-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small" style="background:var(--vinil-color);">🎵</div>
+      <div class="tier-info">
+        <h2 style="color:var(--vinil-color);">Vinil</h2>
+        <p>Discos em formato LP, edições especiais e prensagens.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-vinil"></div>
+  </section>
+
+  <!-- CD -->
+  <section class="section" style="--tier-color:var(--cd-color)">
+    <div class="tier-head">
+      <div class="tier-stamp small" style="background:var(--cd-color);">💿</div>
+      <div class="tier-info">
+        <h2 style="color:var(--cd-color);">CD</h2>
+        <p>Compact discs, incluindo edições comuns, EP e compilações.</p>
+      </div>
+    </div>
+    <div class="grid" id="grid-cd"></div>
+  </section>
+
+</div>
+
+<footer>Gerado a partir da análise cruzada CSV Spotify × Pontuação Portelada™ · capas via Last.fm API · Coleção importada do Discogs</footer>
 
 <script>
 // ========== DADOS ==========
@@ -569,315 +747,275 @@ const EXTRA = [
 
 // SEÇÃO 2026
 const D = [
-  { 
-    artist:"Of Mice & Men", 
-    album:"Echo", 
-    strategy:"Maior descoberta de 2026", 
-    note:"Foi a banda que mais conseguiu reproduzir a sensação que Architects proporcionou anteriormente. Não substitui Architects, mas representa a descoberta mais importante do ano."
-  },
-  { 
-    artist:"Parkway Drive", 
-    album:"Darker Still", 
-    strategy:"Redescoberta do ano", 
-    note:"A banda já fazia parte da minha história, mas somente em 2026 ganhou espaço definitivo na minha curadoria através do Discovery Weekly."
-  },
-  { 
-    artist:"Elwood Stray", 
-    album:"Gone With The Flow", 
-    strategy:"Maior novidade", 
-    note:"A descoberta totalmente inédita mais interessante do ano e uma das bandas modernas que mais despertou minha curiosidade."
-  },
-  { 
-    artist:"Polaris", 
-    album:"Fatalism", 
-    strategy:"Continuar acompanhando", 
-    note:"Uma das bandas que melhor representa a nova geração do metalcore melódico e possui grande potencial para integrar a coleção futuramente."
-  },
-  { 
-    artist:"Currents", 
-    album:"The Death We Seek", 
-    strategy:"Grande potencial", 
-    note:"Uma das bandas que mais conversa com o som moderno que procuro desde Architects. Merece acompanhamento nos próximos anos."
-  },
+  { artist:"Of Mice & Men", album:"Echo", strategy:"Maior descoberta de 2026", note:"Foi a banda que mais conseguiu reproduzir a sensação que Architects proporcionou anteriormente. Não substitui Architects, mas representa a descoberta mais importante do ano." },
+  { artist:"Parkway Drive", album:"Darker Still", strategy:"Redescoberta do ano", note:"A banda já fazia parte da minha história, mas somente em 2026 ganhou espaço definitivo na minha curadoria através do Discovery Weekly." },
+  { artist:"Elwood Stray", album:"Gone With The Flow", strategy:"Maior novidade", note:"A descoberta totalmente inédita mais interessante do ano e uma das bandas modernas que mais despertou minha curiosidade." },
+  { artist:"Polaris", album:"Fatalism", strategy:"Continuar acompanhando", note:"Uma das bandas que melhor representa a nova geração do metalcore melódico e possui grande potencial para integrar a coleção futuramente." },
+  { artist:"Currents", album:"The Death We Seek", strategy:"Grande potencial", note:"Uma das bandas que mais conversa com o som moderno que procuro desde Architects. Merece acompanhamento nos próximos anos." },
 ];
 
 // SEÇÃO 2025
 const E = [
-  { 
-    artist:"Architects", 
-    album:"The Sky, The Earth & All Between", 
-    strategy:"Banda do ano", 
-    note:"Nenhuma outra banda marcou tanto minhas descobertas em 2025. Consolidou-se como uma das mais importantes da minha coleção."
-  },
-  { 
-    artist:"Bring Me The Horizon", 
-    album:"Sempiternal", 
-    strategy:"Maior novidade", 
-    note:"A descoberta inédita mais marcante do ano e uma forte candidata a crescer nos próximos anos."
-  },
-  { 
-    artist:"Atreyu", 
-    album:"The Curse", 
-    strategy:"Metalcore clássico", 
-    note:"Uma banda histórica do gênero que ganhou nova força através das minhas descobertas."
-  },
-  { 
-    artist:"The Devil Wears Prada", 
-    album:"Color Decay", 
-    strategy:"Nova geração", 
-    note:"Uma das bandas que melhor representa o metalcore melódico contemporâneo."
-  },
-  { 
-    artist:"We Came As Romans", 
-    album:"Darkbloom", 
-    strategy:"Grande potencial", 
-    note:"Uma descoberta consistente que conversa diretamente com o som moderno que procuro desde Architects."
-  },
+  { artist:"Architects", album:"The Sky, The Earth & All Between", strategy:"Banda do ano", note:"Nenhuma outra banda marcou tanto minhas descobertas em 2025. Consolidou-se como uma das mais importantes da minha coleção." },
+  { artist:"Bring Me The Horizon", album:"Sempiternal", strategy:"Maior novidade", note:"A descoberta inédita mais marcante do ano e uma forte candidata a crescer nos próximos anos." },
+  { artist:"Atreyu", album:"The Curse", strategy:"Metalcore clássico", note:"Uma banda histórica do gênero que ganhou nova força através das minhas descobertas." },
+  { artist:"The Devil Wears Prada", album:"Color Decay", strategy:"Nova geração", note:"Uma das bandas que melhor representa o metalcore melódico contemporâneo." },
+  { artist:"We Came As Romans", album:"Darkbloom", strategy:"Grande potencial", note:"Uma descoberta consistente que conversa diretamente com o som moderno que procuro desde Architects." },
 ];
 
 // SEÇÃO 2024
 const F = [
-  { 
-    artist:"The Warning", 
-    album:"Keep Me Fed", 
-    strategy:"Confirmação do ano", 
-    note:"A banda deixou de ser uma descoberta e passou a fazer parte definitiva da minha identidade musical."
-  },
-  { 
-    artist:"Linkin Park", 
-    album:"From Zero", 
-    strategy:"O retorno mais esperado", 
-    note:"Um dos acontecimentos musicais mais importantes do ano e um álbum que imediatamente entrou para minha coleção ideal."
-  },
-  { 
-    artist:"Falling In Reverse", 
-    album:"Popular Monster", 
-    strategy:"Grande surpresa", 
-    note:"Uma descoberta completamente inesperada que merece continuar sendo acompanhada."
-  },
-  { 
-    artist:"Bullet For My Valentine", 
-    album:"The Poison", 
-    strategy:"Reencontro", 
-    note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória."
-  },
-  { 
-    artist:"Machine Head", 
-    album:"The Blackening", 
-    strategy:"Thrash moderno", 
-    note:"Uma das bandas que melhor representa a evolução do heavy metal moderno."
-  },
+  { artist:"The Warning", album:"Keep Me Fed", strategy:"Confirmação do ano", note:"A banda deixou de ser uma descoberta e passou a fazer parte definitiva da minha identidade musical." },
+  { artist:"Linkin Park", album:"From Zero", strategy:"O retorno mais esperado", note:"Um dos acontecimentos musicais mais importantes do ano e um álbum que imediatamente entrou para minha coleção ideal." },
+  { artist:"Falling In Reverse", album:"Popular Monster", strategy:"Grande surpresa", note:"Uma descoberta completamente inesperada que merece continuar sendo acompanhada." },
+  { artist:"Bullet For My Valentine", album:"The Poison", strategy:"Reencontro", note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória." },
+  { artist:"Machine Head", album:"The Blackening", strategy:"Thrash moderno", note:"Uma das bandas que melhor representa a evolução do heavy metal moderno." },
 ];
 
 // SEÇÃO 2023
 const G = [
-  { 
-    artist:"The Warning", 
-    album:"ERROR", 
-    strategy:"Maior descoberta de 2023", 
-    note:"A banda que abriu uma nova fase da minha coleção. Mistura perfeita entre peso, melodias e personalidade."
-  },
-  { 
-    artist:"Breed 77", 
-    album:"In My Blood", 
-    strategy:"Redescoberta inesperada", 
-    note:"Uma banda que passou despercebida durante muitos anos e finalmente encontrou seu espaço na minha playlist."
-  },
-  { 
-    artist:"Seether", 
-    album:"Finding Beauty in Negative Spaces", 
-    strategy:"Rock alternativo de referência", 
-    note:"Representa muito bem o lado mais melódico do hard rock moderno presente nas minhas descobertas."
-  },
-  { 
-    artist:"Soilwork", 
-    album:"Stabbing the Drama", 
-    strategy:"Peso com melodia", 
-    note:"Uma das bandas que melhor equilibra agressividade e refrões marcantes."
-  },
-  { 
-    artist:"Project46", 
-    album:"Que Seja Feita a Nossa Vontade", 
-    strategy:"Representante nacional", 
-    note:"A principal descoberta brasileira daquele ano e uma ótima representante do metal moderno nacional."
-  },
+  { artist:"The Warning", album:"ERROR", strategy:"Maior descoberta de 2023", note:"A banda que abriu uma nova fase da minha coleção. Mistura perfeita entre peso, melodias e personalidade." },
+  { artist:"Breed 77", album:"In My Blood", strategy:"Redescoberta inesperada", note:"Uma banda que passou despercebida durante muitos anos e finalmente encontrou seu espaço na minha playlist." },
+  { artist:"Seether", album:"Finding Beauty in Negative Spaces", strategy:"Rock alternativo de referência", note:"Representa muito bem o lado mais melódico do hard rock moderno presente nas minhas descobertas." },
+  { artist:"Soilwork", album:"Stabbing the Drama", strategy:"Peso com melodia", note:"Uma das bandas que melhor equilibra agressividade e refrões marcantes." },
+  { artist:"Project46", album:"Que Seja Feita a Nossa Vontade", strategy:"Representante nacional", note:"A principal descoberta brasileira daquele ano e uma ótima representante do metal moderno nacional." },
 ];
 
-// SEÇÃO 2022 - SUBSTITUÍDO: Seether → Tremonti
+// SEÇÃO 2022
 const H = [
-  { 
-    artist:"Bullet For My Valentine", 
-    album:"The Poison", 
-    strategy:"Banda do ano", 
-    note:"A principal descoberta daquele ano e uma das bandas mais importantes da coleção."
-  },
-  { 
-    artist:"zebrahead", 
-    album:"MFZB", 
-    strategy:"Punk Rock moderno", 
-    note:"Continuou sendo uma presença constante nas minhas descobertas."
-  },
-  { 
-    artist:"Self Deception", 
-    album:"Destroy the Art", 
-    strategy:"Nova geração", 
-    note:"Uma das bandas modernas que mais chamou minha atenção naquele ano."
-  },
-  { 
-    artist:"Tremonti", 
-    album:"Marching in Time", 
-    strategy:"Guitarras modernas", 
-    note:"Uma das descobertas mais consistentes do ano e excelente representante do heavy/hard rock moderno."
-  },
-  { 
-    artist:"The Offspring", 
-    album:"Smash", 
-    strategy:"Redescoberta", 
-    note:"Representa o reencontro com uma das bandas mais importantes do punk rock melódico."
-  },
+  { artist:"Bullet For My Valentine", album:"The Poison", strategy:"Banda do ano", note:"A principal descoberta daquele ano e uma das bandas mais importantes da coleção." },
+  { artist:"zebrahead", album:"MFZB", strategy:"Punk Rock moderno", note:"Continuou sendo uma presença constante nas minhas descobertas." },
+  { artist:"Self Deception", album:"Destroy the Art", strategy:"Nova geração", note:"Uma das bandas modernas que mais chamou minha atenção naquele ano." },
+  { artist:"Tremonti", album:"Marching in Time", strategy:"Guitarras modernas", note:"Uma das descobertas mais consistentes do ano e excelente representante do heavy/hard rock moderno." },
+  { artist:"The Offspring", album:"Smash", strategy:"Redescoberta", note:"Representa o reencontro com uma das bandas mais importantes do punk rock melódico." },
 ];
 
-// SEÇÃO 2021 - SUBSTITUÍDO: Seether → Soilwork
+// SEÇÃO 2021
 const I = [
-  { 
-    artist:"Nightrage", 
-    album:"Wolf to Man", 
-    strategy:"Maior descoberta de 2021", 
-    note:"A banda inédita que mais marcou minhas descobertas naquele ano."
-  },
-  { 
-    artist:"Trivium", 
-    album:"In the Court of the Dragon", 
-    strategy:"Consolidação", 
-    note:"Deixou de ser apenas uma descoberta para se tornar uma das bandas centrais da minha coleção."
-  },
-  { 
-    artist:"Bullet For My Valentine", 
-    album:"Bullet For My Valentine", 
-    strategy:"Reencontro", 
-    note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória."
-  },
-  { 
-    artist:"Soilwork", 
-    album:"Verkligheten", 
-    strategy:"Melodic Death moderno", 
-    note:"Uma das bandas que melhor representou o peso melódico presente nas minhas descobertas daquele ano."
-  },
-  { 
-    artist:"Crobot", 
-    album:"Motherbrain", 
-    strategy:"Hard Rock moderno", 
-    note:"Uma descoberta diferente que trouxe variedade à minha curadoria."
-  },
+  { artist:"Nightrage", album:"Wolf to Man", strategy:"Maior descoberta de 2021", note:"A banda inédita que mais marcou minhas descobertas naquele ano." },
+  { artist:"Trivium", album:"In the Court of the Dragon", strategy:"Consolidação", note:"Deixou de ser apenas uma descoberta para se tornar uma das bandas centrais da minha coleção." },
+  { artist:"Bullet For My Valentine", album:"Bullet For My Valentine", strategy:"Reencontro", note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória." },
+  { artist:"Soilwork", album:"Verkligheten", strategy:"Melodic Death moderno", note:"Uma das bandas que melhor representou o peso melódico presente nas minhas descobertas daquele ano." },
+  { artist:"Crobot", album:"Motherbrain", strategy:"Hard Rock moderno", note:"Uma descoberta diferente que trouxe variedade à minha curadoria." },
 ];
 
-// SEÇÃO 2020 - SUBSTITUÍDO: Oracle → Any Given Day
+// SEÇÃO 2020
 const J = [
-  { 
-    artist:"Trivium", 
-    album:"What The Dead Men Say", 
-    strategy:"Banda do ano", 
-    note:"A banda que mais cresceu na minha curadoria e abriu caminho para tudo o que viria depois."
-  },
-  { 
-    artist:"Atreyu", 
-    album:"The Curse", 
-    strategy:"Metalcore clássico", 
-    note:"Uma das descobertas mais importantes para entender a evolução do gênero."
-  },
-  { 
-    artist:"zebrahead", 
-    album:"MFZB", 
-    strategy:"Punk Rock moderno", 
-    note:"Trouxe novamente o punk melódico para minhas descobertas."
-  },
-  { 
-    artist:"Saint Asonia", 
-    album:"Flawed Design", 
-    strategy:"Rock moderno", 
-    note:"Uma descoberta consistente que ampliou meu interesse pelo hard rock contemporâneo."
-  },
-  { 
-    artist:"Any Given Day", 
-    album:"Overpower", 
-    strategy:"Metalcore moderno", 
-    note:"Uma das bandas que antecipou a direção que minha curadoria seguiria nos anos seguintes."
-  },
+  { artist:"Trivium", album:"What The Dead Men Say", strategy:"Banda do ano", note:"A banda que mais cresceu na minha curadoria e abriu caminho para tudo o que viria depois." },
+  { artist:"Atreyu", album:"The Curse", strategy:"Metalcore clássico", note:"Uma das descobertas mais importantes para entender a evolução do gênero." },
+  { artist:"zebrahead", album:"MFZB", strategy:"Punk Rock moderno", note:"Trouxe novamente o punk melódico para minhas descobertas." },
+  { artist:"Saint Asonia", album:"Flawed Design", strategy:"Rock moderno", note:"Uma descoberta consistente que ampliou meu interesse pelo hard rock contemporâneo." },
+  { artist:"Any Given Day", album:"Overpower", strategy:"Metalcore moderno", note:"Uma das bandas que antecipou a direção que minha curadoria seguiria nos anos seguintes." },
 ];
 
-// SEÇÃO 2019 - SUBSTITUÍDO: Doom Unit → Orbit Culture
+// SEÇÃO 2019
 const K = [
-  { 
-    artist:"All That Remains", 
-    album:"The Fall of Ideals", 
-    strategy:"Banda do ano", 
-    note:"A principal descoberta de 2019 e uma das maiores portas de entrada para o metalcore melódico."
-  },
-  { 
-    artist:"Machine Head", 
-    album:"The Blackening", 
-    strategy:"Thrash moderno", 
-    note:"Uma descoberta que ampliou minha visão sobre o heavy metal moderno."
-  },
-  { 
-    artist:"Amon Amarth", 
-    album:"Twilight of the Thunder God", 
-    strategy:"Melodic Death Metal", 
-    note:"Uma das bandas que melhor representa o peso épico descoberto naquele ano."
-  },
-  { 
-    artist:"Orbit Culture", 
-    album:"Nija", 
-    strategy:"Peso contemporâneo", 
-    note:"Uma descoberta marcante que representa muito bem a nova geração do metal pesado."
-  },
-  { 
-    artist:"Days Of Jupiter", 
-    album:"Panoptical", 
-    strategy:"Hard Rock moderno", 
-    note:"Representa muito bem o lado mais melódico das minhas descobertas."
-  },
+  { artist:"All That Remains", album:"The Fall of Ideals", strategy:"Banda do ano", note:"A principal descoberta de 2019 e uma das maiores portas de entrada para o metalcore melódico." },
+  { artist:"Machine Head", album:"The Blackening", strategy:"Thrash moderno", note:"Uma descoberta que ampliou minha visão sobre o heavy metal moderno." },
+  { artist:"Amon Amarth", album:"Twilight of the Thunder God", strategy:"Melodic Death Metal", note:"Uma das bandas que melhor representa o peso épico descoberto naquele ano." },
+  { artist:"Orbit Culture", album:"Nija", strategy:"Peso contemporâneo", note:"Uma descoberta marcante que representa muito bem a nova geração do metal pesado." },
+  { artist:"Days Of Jupiter", album:"Panoptical", strategy:"Hard Rock moderno", note:"Representa muito bem o lado mais melódico das minhas descobertas." },
 ];
 
 // SEÇÃO 2018
 const L = [
+  { artist:"Persuader", album:"When Eden Burns", strategy:"Maior descoberta de 2018", note:"A banda que mais marcou o início da minha fase de descobertas e reforçou meu interesse pelo power metal moderno." },
+  { artist:"Sister Sin", album:"Now and Forever", strategy:"Hard Rock moderno", note:"Uma descoberta que trouxe peso e atitude, ampliando meu interesse por bandas lideradas por vocais femininos." },
+  { artist:"Mystic Prophecy", album:"War Brigade", strategy:"Power Metal contemporâneo", note:"Representa a continuidade da minha paixão pelo heavy e power metal europeu." },
+  { artist:"Egypt Central", album:"White Rabbit", strategy:"Rock alternativo", note:"Uma das descobertas que ampliaram meu lado mais acessível sem abandonar o peso." },
+  { artist:"Meshiaak", album:"Alliance of Thieves", strategy:"Thrash moderno", note:"Uma excelente descoberta para representar o thrash metal contemporâneo." },
+];
+
+// ========== COLEÇÃO (Importada do Discogs) ==========
+// VINIL
+const VINIL = [
   { 
-    artist:"Persuader", 
-    album:"When Eden Burns", 
-    strategy:"Maior descoberta de 2018", 
-    note:"A banda que mais marcou o início da minha fase de descobertas e reforçou meu interesse pelo power metal moderno."
+    artist: "Metallica", 
+    album: "Master of Puppets", 
+    format: "LP · RE · RM", 
+    condition: "NM",
+    sleeve: "VG+",
+    date: "2026-07-09"
   },
   { 
-    artist:"Sister Sin", 
-    album:"Now and Forever", 
-    strategy:"Hard Rock moderno", 
-    note:"Uma descoberta que trouxe peso e atitude, ampliando meu interesse por bandas lideradas por vocais femininos."
+    artist: "Basttardz", 
+    album: "Brasil com Z / Auschwitz Tropical", 
+    format: "LP · Gre", 
+    condition: "M",
+    sleeve: "M",
+    date: "2026-07-05"
   },
   { 
-    artist:"Mystic Prophecy", 
-    album:"War Brigade", 
-    strategy:"Power Metal contemporâneo", 
-    note:"Representa a continuidade da minha paixão pelo heavy e power metal europeu."
+    artist: "Megadeth", 
+    album: "Peace Sells... But Who's Buying?", 
+    format: "LP · Album", 
+    condition: "G",
+    sleeve: "P",
+    date: "2026-07-05"
   },
   { 
-    artist:"Egypt Central", 
-    album:"White Rabbit", 
-    strategy:"Rock alternativo", 
-    note:"Uma das descobertas que ampliaram meu lado mais acessível sem abandonar o peso."
+    artist: "Bullet For My Valentine", 
+    album: "Bullet For My Valentine", 
+    format: "2xLP · Dlx · Black", 
+    condition: "NM",
+    sleeve: "NM",
+    date: "2026-07-10"
   },
   { 
-    artist:"Meshiaak", 
-    album:"Alliance of Thieves", 
-    strategy:"Thrash moderno", 
-    note:"Uma excelente descoberta para representar o thrash metal contemporâneo."
+    artist: "Metallica", 
+    album: "...And Justice For All", 
+    format: "2xLP · Album", 
+    condition: "",
+    sleeve: "",
+    date: "2026-07-02"
+  },
+  { 
+    artist: "Linkin Park", 
+    album: "Meteora", 
+    format: "LP · Ltd · RE · Gat", 
+    condition: "",
+    sleeve: "",
+    date: "2026-07-02"
   },
 ];
+
+// CD
+const CD = [
+  { 
+    artist: "Iron Maiden", 
+    album: "Edward The Great - The Greatest Hits", 
+    format: "CD · Comp", 
+    condition: "G",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+  { 
+    artist: "Iron Maiden", 
+    album: "Rock In Rio", 
+    format: "2xCD · Enh · 3-D", 
+    condition: "P",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+  { 
+    artist: "Angra", 
+    album: "Freedom Call", 
+    format: "CD · EP · RE", 
+    condition: "G",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+  { 
+    artist: "Angra", 
+    album: "Rebirth", 
+    format: "CD · Album", 
+    condition: "P",
+    sleeve: "No Cover",
+    date: "2026-07-05"
+  },
+  { 
+    artist: "Metallica", 
+    album: "...And Justice For All", 
+    format: "CD · RP · PRS", 
+    condition: "F",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+  { 
+    artist: "Blind Guardian", 
+    album: "Nightfall In Middle-Earth", 
+    format: "CD · Album", 
+    condition: "G",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+  { 
+    artist: "Blind Guardian", 
+    album: "A Night At The Opera", 
+    format: "CD · Album", 
+    condition: "P",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+  { 
+    artist: "Blind Guardian", 
+    album: "Tokyo Tales", 
+    format: "CD · Album", 
+    condition: "F",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+  { 
+    artist: "The Rolling Stones", 
+    album: "Bridges To Babylon", 
+    format: "CD · Album", 
+    condition: "F",
+    sleeve: "No Cover",
+    date: "2026-07-07"
+  },
+];
+
+// ========== HERO CONFIG ==========
+const heroConfig = {
+  'tab-compras': {
+    eyebrow: 'Projeto Discoteca · Curadoria fportelada',
+    title: 'Lista de <span>Compras</span>',
+    sub: 'Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.',
+    showMeter: true,
+    stateClass: 'hero-state-compras'
+  },
+  'tab-descobertas': {
+    eyebrow: 'Projeto Discoteca · Descobertas',
+    title: 'Descobertas <span>2018-2026</span>',
+    sub: 'Todas as bandas que marcaram minhas descobertas através do Discovery Weekly ao longo dos anos. Do power metal ao metalcore moderno.',
+    showMeter: false,
+    stateClass: 'hero-state-descobertas'
+  },
+  'tab-colecao': {
+    eyebrow: 'Projeto Discoteca · Coleção',
+    title: 'Minha <span>Coleção</span>',
+    sub: 'Registro de todos os discos que já fazem parte da Coleção Portelada. Importado do Discogs em julho de 2026.',
+    showMeter: false,
+    stateClass: 'hero-state-colecao'
+  }
+};
+
+function updateHero(tabId) {
+  const config = heroConfig[tabId];
+  if (!config) return;
+
+  const hero = document.getElementById('heroSection');
+  const eyebrow = document.getElementById('heroEyebrow');
+  const title = document.getElementById('heroTitle');
+  const sub = document.getElementById('heroSub');
+  const meter = document.getElementById('heroMeter');
+
+  hero.classList.remove('hero-state-compras', 'hero-state-descobertas', 'hero-state-colecao');
+  hero.classList.add(config.stateClass);
+
+  eyebrow.textContent = config.eyebrow;
+  title.innerHTML = config.title;
+  sub.textContent = config.sub;
+  meter.style.display = config.showMeter ? 'flex' : 'none';
+}
 
 // ========== LAST.FM API ==========
 const LASTFM_API_KEY = 'b25b959554ed76058ac220b7b2e0a026';
 const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 
+// Mapeamento manual para capas que o Last.fm pode não encontrar
+const MANUAL_COVERS = {
+  'basttardz_brasil com z / auschwitz tropical': 'https://i.imgur.com/nlcvybH.jpeg',
+  'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
+};
+
 async function getAlbumCoverFromLastFm(artist, album) {
+  // Verifica capa manual
+  const manualKey = `${artist.toLowerCase()}_${album.toLowerCase()}`;
+  if (MANUAL_COVERS[manualKey]) {
+    return MANUAL_COVERS[manualKey];
+  }
+
   const params = new URLSearchParams({
     method: 'album.getinfo',
     api_key: LASTFM_API_KEY,
@@ -973,6 +1111,22 @@ function toggleDropdown() {
   arrow.classList.toggle('open');
 }
 
+// ========== TABS ==========
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+  
+  updateHero(tabId);
+}
+
 // ========== CRIAÇÃO DOS CARDS ==========
 function makeCard(item, tag, tierHex, index){
   const card = document.createElement('div');
@@ -984,7 +1138,6 @@ function makeCard(item, tag, tierHex, index){
   card.innerHTML = `
     <div class="art-wrap" id="${elementId}" style="background: #1a1815; background-size: cover; background-position: center;">
       <span class="priority-tag">${tag}</span>
-      <div class="groove"></div>
       <div class="spine-letter">${letter}</div>
       <div class="art-fallback" id="${fallbackTextId}">${item.artist}<br>${item.album}</div>
     </div>
@@ -995,6 +1148,53 @@ function makeCard(item, tag, tierHex, index){
         <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.strategy}</span></div>
       </div>
       <div class="meta-row"><span class="label">Nota</span><span class="val">${item.note}</span></div>
+    </div>
+  `;
+  
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      fetchAlbumArt(item.artist, item.album, elementId, fallbackTextId);
+    }, 100);
+  });
+  
+  return card;
+}
+
+// ========== CRIAÇÃO DOS CARDS DA COLEÇÃO ==========
+function makeColecaoCard(item, index, section){
+  const card = document.createElement('div');
+  card.className = 'card';
+  const letter = item.album.trim().charAt(0);
+  const elementId = `art-wrap-colecao-${section}-${index}`;
+  const fallbackTextId = `fallback-colecao-${section}-${index}`;
+  
+  const condClass = item.condition ? `cond-${item.condition.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+  const sleeveClass = item.sleeve ? `cond-${item.sleeve.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+  
+  const tagIcon = section === 'vinil' ? '🎵' : '💿';
+  const tagColor = section === 'vinil' ? 'var(--vinil-color)' : 'var(--cd-color)';
+  
+  card.innerHTML = `
+    <div class="art-wrap" id="${elementId}" style="background: #1a1815; background-size: cover; background-position: center;">
+      <span class="priority-tag" style="background:${tagColor}; color:var(--ink);">${tagIcon}</span>
+      <div class="spine-letter">${letter}</div>
+      <div class="art-fallback" id="${fallbackTextId}">${item.artist}<br>${item.album}</div>
+    </div>
+    <div class="card-body">
+      <h3>${item.album}</h3>
+      <div class="artist" style="color:${tagColor};">${item.artist}</div>
+      <div class="meta-block">
+        <div class="meta-row"><span class="label">Formato</span><span class="val">${item.format}</span></div>
+      </div>
+      <div class="meta-row">
+        <span class="label">Condição</span>
+        <span class="val">
+          ${item.condition ? `<span class="cond-badge ${condClass}">${item.condition}</span>` : ''}
+          ${item.sleeve ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.sleeve}</span>` : ''}
+          ${!item.condition && !item.sleeve ? '—' : ''}
+        </span>
+      </div>
+      ${item.date ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.date}</span></div>` : ''}
     </div>
   `;
   
@@ -1018,11 +1218,34 @@ function renderGrid(id, data, tag, tierHex){
   });
 }
 
+function renderColecao(){
+  // Vinil
+  const gridVinil = document.getElementById('grid-vinil');
+  if (gridVinil) {
+    VINIL.forEach((item, index) => {
+      const card = makeColecaoCard(item, index, 'vinil');
+      gridVinil.appendChild(card);
+    });
+  }
+
+  // CD
+  const gridCd = document.getElementById('grid-cd');
+  if (gridCd) {
+    CD.forEach((item, index) => {
+      const card = makeColecaoCard(item, index, 'cd');
+      gridCd.appendChild(card);
+    });
+  }
+}
+
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', () => {
+  // Lista de Compras
   renderGrid('grid-s', S, 'S', '#D6432F');
   renderGrid('grid-a', A, 'A', '#E39A2E');
   renderGrid('grid-b', B, 'B', '#4E7A8C');
+  
+  // Descobertas
   renderGrid('grid-d', D, 'D', '#6B5B7B');
   renderGrid('grid-e', E, 'E', '#5C6B7A');
   renderGrid('grid-f', F, 'F', '#7A6B5C');
@@ -1033,6 +1256,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGrid('grid-k', K, 'K', '#8A7A6B');
   renderGrid('grid-l', L, 'L', '#6B8A7A');
 
+  // Coleção
+  renderColecao();
+
+  // Oportunidades Extras
   const extraTable = document.getElementById('extra-list');
   if (extraTable) {
     EXTRA.forEach((item, i) => {
@@ -1045,6 +1272,8 @@ document.addEventListener('DOMContentLoaded', () => {
       extraTable.appendChild(row);
     });
   }
+
+  updateHero('tab-compras');
 });
 </script>
 </body>

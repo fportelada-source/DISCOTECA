@@ -798,7 +798,7 @@
   <div class="tabs-container">
     <div class="tabs">
       <button class="tab-btn active" data-tab="tab-compras" onclick="switchTab('tab-compras')">📋 Lista de Compras</button>
-      <button class="tab-btn" data-tab="tab-descobertas" onclick="switchTab('tab-descobertas')">🔍 Descobertas <span class="tab-badge">2018-2026</span></button>
+      <button class="tab-btn" data-tab="tab-descobertas" onclick="switchTab('tab-descobertas')">🔍 Descobertas <span class="tab-badge" id="descobertas-badge">0</span></button>
       <button class="tab-btn" data-tab="tab-colecao" onclick="switchTab('tab-colecao')">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
       <button class="tab-btn" data-tab="tab-importar" onclick="switchTab('tab-importar')">📤 Importar</button>
     </div>
@@ -889,7 +889,7 @@
         <div class="tier-stamp small">2026</div>
         <div class="tier-info">
           <h2>Descobertas do Ano</h2>
-          <p>As bandas abaixo representam as descobertas mais marcantes de 2026 através do Discovery Weekly. Não são as bandas que mais ouvi no ano, mas aquelas que mais se aproximaram de conquistar um lugar na Coleção Portelada.</p>
+          <p>Bandas que marcaram suas descobertas através do Discovery Weekly.</p>
         </div>
       </div>
       <div class="grid" id="grid-d"></div>
@@ -1145,199 +1145,9 @@
 </footer>
 
 <script>
-// ========== DADOS ==========
-const S = [
-  { artist:"Metallica", album:"Ride the Lightning", strategy:"Primeira boa oportunidade", note:"Completa a tríade clássica" },
-  { artist:"Blind Guardian", album:"Imaginations from the Other Side", strategy:"Boa edição", note:"Maior valor afetivo" },
-  { artist:"Architects", album:"The Sky, The Earth & All Between", strategy:"Lançamento/repressagem", note:"Fecha a trilogia" },
-  { artist:"Linkin Park", album:"Hybrid Theory", strategy:"Alta prioridade", note:"Conjunto com Meteora" },
-  { artist:"System of a Down", album:"Toxicity", strategy:"Alta prioridade", note:"Representativo da playlist" },
-];
-
-const A = [
-  { artist:"Pennywise", album:"Full Circle", strategy:"Bom preço", note:"Histórico" },
-  { artist:"Trivium", album:"The Sin and the Sentence", strategy:"Após S", note:"Entrada da banda" },
-  { artist:"Black Sabbath", album:"Paranoid", strategy:"Boa edição", note:"Origem do heavy metal" },
-  { artist:"Iron Maiden", album:"Powerslave", strategy:"Oportunidade", note:"Clássico" },
-  { artist:"Megadeth", album:"Rust in Peace", strategy:"Oportunidade", note:"Thrash" },
-];
-
-const B = [
-  { artist:"The Warning", album:"ERROR", strategy:"Promoções", note:"Sem urgência" },
-  { artist:"Angra", album:"Rebirth", strategy:"Naturalmente", note:"Sem urgência" },
-];
-
-const EXTRA = [
-  { artist:"Seether", album:"Finding Beauty in Negative Spaces" },
-  { artist:"Machine Head", album:"The Blackening" },
-  { artist:"Týr", album:"By the Light of the Northern Star" },
-  { artist:"Godsmack", album:"Faceless" },
-  { artist:"Dream Theater", album:"Metropolis Pt. 2" },
-  { artist:"Lamb of God", album:"Ashes of the Wake" },
-  { artist:"The Offspring", album:"Smash" },
-  { artist:"Disturbed", album:"The Sickness" },
-  { artist:"Tremonti", album:"A Dying Machine" },
-  { artist:"Bring Me The Horizon", album:"Sempiternal" },
-  { artist:"Amon Amarth", album:"Twilight of the Thunder God" },
-  { artist:"Devilskin", album:"Be Like the River" },
-  { artist:"Breed 77", album:"In My Blood" },
-  { artist:"Not Enough Space", album:"Weaponized" },
-  { artist:"Alter Bridge", album:"Blackbird" },
-];
-
-// SEÇÃO 2026
-const D = [
-  { artist:"Of Mice & Men", album:"Echo", strategy:"Maior descoberta de 2026", note:"Foi a banda que mais conseguiu reproduzir a sensação que Architects proporcionou anteriormente. Não substitui Architects, mas representa a descoberta mais importante do ano." },
-  { artist:"Parkway Drive", album:"Darker Still", strategy:"Redescoberta do ano", note:"A banda já fazia parte da minha história, mas somente em 2026 ganhou espaço definitivo na minha curadoria através do Discovery Weekly." },
-  { artist:"Elwood Stray", album:"Gone With The Flow", strategy:"Maior novidade", note:"A descoberta totalmente inédita mais interessante do ano e uma das bandas modernas que mais despertou minha curiosidade." },
-  { artist:"Polaris", album:"Fatalism", strategy:"Continuar acompanhando", note:"Uma das bandas que melhor representa a nova geração do metalcore melódico e possui grande potencial para integrar a coleção futuramente." },
-  { artist:"Currents", album:"The Death We Seek", strategy:"Grande potencial", note:"Uma das bandas que mais conversa com o som moderno que procuro desde Architects. Merece acompanhamento nos próximos anos." },
-];
-
-// SEÇÃO 2025
-const E = [
-  { artist:"Architects", album:"The Sky, The Earth & All Between", strategy:"Banda do ano", note:"Nenhuma outra banda marcou tanto minhas descobertas em 2025. Consolidou-se como uma das mais importantes da minha coleção." },
-  { artist:"Bring Me The Horizon", album:"Sempiternal", strategy:"Maior novidade", note:"A descoberta inédita mais marcante do ano e uma forte candidata a crescer nos próximos anos." },
-  { artist:"Atreyu", album:"The Curse", strategy:"Metalcore clássico", note:"Uma banda histórica do gênero que ganhou nova força através das minhas descobertas." },
-  { artist:"The Devil Wears Prada", album:"Color Decay", strategy:"Nova geração", note:"Uma das bandas que melhor representa o metalcore melódico contemporâneo." },
-  { artist:"We Came As Romans", album:"Darkbloom", strategy:"Grande potencial", note:"Uma descoberta consistente que conversa diretamente com o som moderno que procuro desde Architects." },
-];
-
-// SEÇÃO 2024
-const F = [
-  { artist:"The Warning", album:"Keep Me Fed", strategy:"Confirmação do ano", note:"A banda deixou de ser uma descoberta e passou a fazer parte definitiva da minha identidade musical." },
-  { artist:"Linkin Park", album:"From Zero", strategy:"O retorno mais esperado", note:"Um dos acontecimentos musicais mais importantes do ano e um álbum que imediatamente entrou para minha coleção ideal." },
-  { artist:"Falling In Reverse", album:"Popular Monster", strategy:"Grande surpresa", note:"Uma descoberta completamente inesperada que merece continuar sendo acompanhada." },
-  { artist:"Bullet For My Valentine", album:"The Poison", strategy:"Reencontro", note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória." },
-  { artist:"Machine Head", album:"The Blackening", strategy:"Thrash moderno", note:"Uma das bandas que melhor representa a evolução do heavy metal moderno." },
-];
-
-// SEÇÃO 2023
-const G = [
-  { artist:"The Warning", album:"ERROR", strategy:"Maior descoberta de 2023", note:"A banda que abriu uma nova fase da minha coleção. Mistura perfeita entre peso, melodias e personalidade." },
-  { artist:"Breed 77", album:"In My Blood", strategy:"Redescoberta inesperada", note:"Uma banda que passou despercebida durante muitos anos e finalmente encontrou seu espaço na minha playlist." },
-  { artist:"Seether", album:"Finding Beauty in Negative Spaces", strategy:"Rock alternativo de referência", note:"Representa muito bem o lado mais melódico do hard rock moderno presente nas minhas descobertas." },
-  { artist:"Soilwork", album:"Stabbing the Drama", strategy:"Peso com melodia", note:"Uma das bandas que melhor equilibra agressividade e refrões marcantes." },
-  { artist:"Project46", album:"Que Seja Feita a Nossa Vontade", strategy:"Representante nacional", note:"A principal descoberta brasileira daquele ano e uma ótima representante do metal moderno nacional." },
-];
-
-// SEÇÃO 2022
-const H = [
-  { artist:"Bullet For My Valentine", album:"The Poison", strategy:"Banda do ano", note:"A principal descoberta daquele ano e uma das bandas mais importantes da coleção." },
-  { artist:"zebrahead", album:"MFZB", strategy:"Punk Rock moderno", note:"Continuou sendo uma presença constante nas minhas descobertas." },
-  { artist:"Self Deception", album:"Destroy the Art", strategy:"Nova geração", note:"Uma das bandas modernas que mais chamou minha atenção naquele ano." },
-  { artist:"Tremonti", album:"Marching in Time", strategy:"Guitarras modernas", note:"Uma das descobertas mais consistentes do ano e excelente representante do heavy/hard rock moderno." },
-  { artist:"The Offspring", album:"Smash", strategy:"Redescoberta", note:"Representa o reencontro com uma das bandas mais importantes do punk rock melódico." },
-];
-
-// SEÇÃO 2021
-const I = [
-  { artist:"Nightrage", album:"Wolf to Man", strategy:"Maior descoberta de 2021", note:"A banda inédita que mais marcou minhas descobertas naquele ano." },
-  { artist:"Trivium", album:"In the Court of the Dragon", strategy:"Consolidação", note:"Deixou de ser apenas uma descoberta para se tornar uma das bandas centrais da minha coleção." },
-  { artist:"Bullet For My Valentine", album:"Bullet For My Valentine", strategy:"Reencontro", note:"O Discovery Weekly reacendeu meu interesse por uma das bandas mais importantes da minha trajetória." },
-  { artist:"Soilwork", album:"Verkligheten", strategy:"Melodic Death moderno", note:"Uma das bandas que melhor representou o peso melódico presente nas minhas descobertas daquele ano." },
-  { artist:"Crobot", album:"Motherbrain", strategy:"Hard Rock moderno", note:"Uma descoberta diferente que trouxe variedade à minha curadoria." },
-];
-
-// SEÇÃO 2020
-const J = [
-  { artist:"Trivium", album:"What The Dead Men Say", strategy:"Banda do ano", note:"A banda que mais cresceu na minha curadoria e abriu caminho para tudo o que viria depois." },
-  { artist:"Atreyu", album:"The Curse", strategy:"Metalcore clássico", note:"Uma das descobertas mais importantes para entender a evolução do gênero." },
-  { artist:"zebrahead", album:"MFZB", strategy:"Punk Rock moderno", note:"Trouxe novamente o punk melódico para minhas descobertas." },
-  { artist:"Saint Asonia", album:"Flawed Design", strategy:"Rock moderno", note:"Uma descoberta consistente que ampliou meu interesse pelo hard rock contemporâneo." },
-  { artist:"Any Given Day", album:"Overpower", strategy:"Metalcore moderno", note:"Uma das bandas que antecipou a direção que minha curadoria seguiria nos anos seguintes." },
-];
-
-// SEÇÃO 2019
-const K = [
-  { artist:"All That Remains", album:"The Fall of Ideals", strategy:"Banda do ano", note:"A principal descoberta de 2019 e uma das maiores portas de entrada para o metalcore melódico." },
-  { artist:"Machine Head", album:"The Blackening", strategy:"Thrash moderno", note:"Uma descoberta que ampliou minha visão sobre o heavy metal moderno." },
-  { artist:"Amon Amarth", album:"Twilight of the Thunder God", strategy:"Melodic Death Metal", note:"Uma das bandas que melhor representa o peso épico descoberto naquele ano." },
-  { artist:"Orbit Culture", album:"Nija", strategy:"Peso contemporâneo", note:"Uma descoberta marcante que representa muito bem a nova geração do metal pesado." },
-  { artist:"Days Of Jupiter", album:"Panoptical", strategy:"Hard Rock moderno", note:"Representa muito bem o lado mais melódico das minhas descobertas." },
-];
-
-// SEÇÃO 2018
-const L = [
-  { artist:"Persuader", album:"When Eden Burns", strategy:"Maior descoberta de 2018", note:"A banda que mais marcou o início da minha fase de descobertas e reforçou meu interesse pelo power metal moderno." },
-  { artist:"Sister Sin", album:"Now and Forever", strategy:"Hard Rock moderno", note:"Uma descoberta que trouxe peso e atitude, ampliando meu interesse por bandas lideradas por vocais femininos." },
-  { artist:"Mystic Prophecy", album:"War Brigade", strategy:"Power Metal contemporâneo", note:"Representa a continuidade da minha paixão pelo heavy e power metal europeu." },
-  { artist:"Egypt Central", album:"White Rabbit", strategy:"Rock alternativo", note:"Uma das descobertas que ampliaram meu lado mais acessível sem abandonar o peso." },
-  { artist:"Meshiaak", album:"Alliance of Thieves", strategy:"Thrash moderno", note:"Uma excelente descoberta para representar o thrash metal contemporâneo." },
-];
-
-// ========== COLEÇÃO ==========
-const VINIL = [
-  { artist: "Metallica", album: "Master of Puppets", format: "LP · RE · RM", condition: "NM", sleeve: "VG+", date: "2026-07-09" },
-  { artist: "Basttardz", album: "Brasil com Z / Auschwitz Tropical", format: "LP · Gre", condition: "M", sleeve: "M", date: "2026-07-05" },
-  { artist: "Megadeth", album: "Peace Sells... But Who's Buying?", format: "LP · Album", condition: "G", sleeve: "P", date: "2026-07-05" },
-  { artist: "Bullet For My Valentine", album: "Bullet For My Valentine", format: "2xLP · Dlx · Black", condition: "NM", sleeve: "NM", date: "2026-07-10" },
-  { artist: "Metallica", album: "...And Justice For All", format: "2xLP · Album", condition: "", sleeve: "", date: "2026-07-02" },
-  { artist: "Linkin Park", album: "Meteora", format: "LP · Ltd · RE · Gat", condition: "", sleeve: "", date: "2026-07-02" },
-];
-
-const CD = [
-  { artist: "Iron Maiden", album: "Edward The Great - The Greatest Hits", format: "CD · Comp", condition: "G", sleeve: "No Cover", date: "2026-07-07" },
-  { artist: "Iron Maiden", album: "Rock In Rio", format: "2xCD · Enh · 3-D", condition: "P", sleeve: "No Cover", date: "2026-07-07" },
-  { artist: "Angra", album: "Freedom Call", format: "CD · EP · RE", condition: "G", sleeve: "No Cover", date: "2026-07-07" },
-  { artist: "Angra", album: "Rebirth", format: "CD · Album", condition: "P", sleeve: "No Cover", date: "2026-07-05" },
-  { artist: "Metallica", album: "...And Justice For All", format: "CD · RP · PRS", condition: "F", sleeve: "No Cover", date: "2026-07-07" },
-  { artist: "Blind Guardian", album: "Nightfall In Middle-Earth", format: "CD · Album", condition: "G", sleeve: "No Cover", date: "2026-07-07" },
-  { artist: "Blind Guardian", album: "A Night At The Opera", format: "CD · Album", condition: "P", sleeve: "No Cover", date: "2026-07-07" },
-  { artist: "Blind Guardian", album: "Tokyo Tales", format: "CD · Album", condition: "F", sleeve: "No Cover", date: "2026-07-07" },
-  { artist: "The Rolling Stones", album: "Bridges To Babylon", format: "CD · Album", condition: "F", sleeve: "No Cover", date: "2026-07-07" },
-];
-
-// ========== HERO CONFIG ==========
-const heroConfig = {
-  'tab-compras': {
-    eyebrow: 'Projeto Discoteca · Curadoria fportelada',
-    title: 'Lista de <span>Compras</span>',
-    sub: 'Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.',
-    showMeter: true,
-    stateClass: 'hero-state-compras'
-  },
-  'tab-descobertas': {
-    eyebrow: 'Projeto Discoteca · Descobertas',
-    title: 'Descobertas <span>2018-2026</span>',
-    sub: 'Todas as bandas que marcaram minhas descobertas através do Discovery Weekly ao longo dos anos. Do power metal ao metalcore moderno.',
-    showMeter: false,
-    stateClass: 'hero-state-descobertas'
-  },
-  'tab-colecao': {
-    eyebrow: 'Projeto Discoteca · Coleção',
-    title: 'Minha <span>Coleção</span>',
-    sub: 'Registro de todos os discos que já fazem parte da Coleção Portelada. Importado do Discogs em julho de 2026.',
-    showMeter: false,
-    stateClass: 'hero-state-colecao'
-  },
-  'tab-importar': {
-    eyebrow: 'Projeto Discoteca · Importar',
-    title: 'Importar <span>Dados</span>',
-    sub: 'Faça upload dos seus CSVs para gerar recomendações personalizadas.',
-    showMeter: false,
-    stateClass: 'hero-state-colecao'
-  }
-};
-
-function updateHero(tabId) {
-  const config = heroConfig[tabId];
-  if (!config) return;
-
-  const hero = document.getElementById('heroSection');
-  const eyebrow = document.getElementById('heroEyebrow');
-  const title = document.getElementById('heroTitle');
-  const sub = document.getElementById('heroSub');
-  const meter = document.getElementById('heroMeter');
-
-  hero.classList.remove('hero-state-compras', 'hero-state-descobertas', 'hero-state-colecao');
-  hero.classList.add(config.stateClass);
-
-  eyebrow.textContent = config.eyebrow;
-  title.innerHTML = config.title;
-  sub.textContent = config.sub;
-  meter.style.display = config.showMeter ? 'flex' : 'none';
-}
+// ========== API ==========
+const API_URL = 'https://fportelada.pythonanywhere.com';
+let usuarioId = null;
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
@@ -1345,7 +1155,7 @@ document.getElementById('btnLogin').addEventListener('click', function() {
   const error = document.getElementById('loginError');
   btn.disabled = true;
   error.style.display = 'none';
-  fetch('https://fportelada.pythonanywhere.com/login')
+  fetch(API_URL + '/login')
     .then(r => r.json())
     .then(d => {
       if (d.auth_url) {
@@ -1372,6 +1182,7 @@ function verificarSessao() {
   const nome = params.get('nome');
 
   if (userId && nome) {
+    usuarioId = userId;
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appScreen').style.display = 'block';
     document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
@@ -1380,10 +1191,11 @@ function verificarSessao() {
     return;
   }
 
-  fetch('https://fportelada.pythonanywhere.com/sessao')
+  fetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
+        usuarioId = data.usuario_id;
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('appScreen').style.display = 'block';
         document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
@@ -1393,268 +1205,329 @@ function verificarSessao() {
     .catch(() => {});
 }
 
-// ========== CARREGAR DADOS ==========
+// ========== CARREGAR DADOS DA API ==========
 function carregarDados() {
-  renderGrid('grid-s', S, 'S', '#D6432F');
-  renderGrid('grid-a', A, 'A', '#E39A2E');
-  renderGrid('grid-b', B, 'B', '#4E7A8C');
-  renderGrid('grid-d', D, 'D', '#6B5B7B');
-  renderGrid('grid-e', E, 'E', '#5C6B7A');
-  renderGrid('grid-f', F, 'F', '#7A6B5C');
-  renderGrid('grid-g', G, 'G', '#5C7A6B');
-  renderGrid('grid-h', H, 'H', '#8A6B7B');
-  renderGrid('grid-i', I, 'I', '#6B7A8A');
-  renderGrid('grid-j', J, 'J', '#7A8A6B');
-  renderGrid('grid-k', K, 'K', '#8A7A6B');
-  renderGrid('grid-l', L, 'L', '#6B8A7A');
-  renderColecao();
+  if (!usuarioId) return;
+
+  // Recomendações
+  fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => {
+      renderRecomendacoes(data);
+    })
+    .catch(() => {});
+
+  // Descobertas
+  fetch(API_URL + '/descobertas?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => {
+      renderDescobertas(data);
+    })
+    .catch(() => {});
+
+  // Coleção
+  fetch(API_URL + '/colecao?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => {
+      renderColecao(data);
+    })
+    .catch(() => {});
+
+  // Extra (fixo)
   renderExtra();
 }
 
-// ========== LAST.FM API ==========
-const LASTFM_API_KEY = 'b25b959554ed76058ac220b7b2e0a026';
-const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
+// ========== RENDER ==========
+function renderRecomendacoes(dados) {
+  const tiers = { S: [], A: [], B: [], C: [] };
+  dados.forEach(item => {
+    if (tiers[item.tier]) tiers[item.tier].push(item);
+  });
 
+  ['S', 'A', 'B'].forEach(tier => {
+    const grid = document.getElementById('grid-' + tier.toLowerCase());
+    if (!grid) return;
+    const items = tiers[tier] || [];
+    
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
+      return;
+    }
+
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : '#4E7A8C';
+    grid.innerHTML = items.map((item, idx) => {
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `rec-${tier}-${idx}`;
+      return `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
+            <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || 'Álbum'}</h3>
+            <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+            </div>
+            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Busca capas
+    items.forEach((item, idx) => {
+      const id = `rec-${tier}-${idx}`;
+      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+    });
+  });
+}
+
+function renderDescobertas(dados) {
+  const grid = document.getElementById('grid-descobertas');
+  if (!grid) return;
+
+  if (!dados || dados.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p></div>`;
+    document.getElementById('descobertas-badge').textContent = '0';
+    return;
+  }
+
+  // Agrupa por ano
+  const anos = {};
+  dados.forEach(item => {
+    const ano = item.ano || 'Sem ano';
+    if (!anos[ano]) anos[ano] = [];
+    anos[ano].push(item);
+  });
+
+  const anosOrdenados = Object.keys(anos).sort((a, b) => {
+    if (a === 'Sem ano') return 1;
+    if (b === 'Sem ano') return -1;
+    return b - a;
+  });
+
+  let html = '';
+  anosOrdenados.forEach(ano => {
+    const items = anos[ano];
+    html += `<div class="ano-divider">${ano} <span>${items.length} descoberta${items.length > 1 ? 's' : ''}</span></div>`;
+    html += items.map((item, idx) => {
+      const id = `desc-${ano}-${idx}`;
+      return `
+        <div class="card" style="border-top-color: var(--d-color);" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background: var(--d-color); background-size: cover; background-position: center; min-height: 100px; height: auto; padding: 20px 0;">
+            <div class="spine-letter">${(item.album || '?').charAt(0)}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.8;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || '?'}</h3>
+            <div class="artist" style="color:var(--d-color);">${item.artista || 'Artista'}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.titulo || ''}</span></div>
+            </div>
+            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.descricao || ''}</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+
+  grid.innerHTML = html;
+  document.getElementById('descobertas-badge').textContent = dados.length;
+
+  // Busca capas
+  dados.forEach((item, idx) => {
+    const id = `desc-${item.ano}-${idx}`;
+    fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+  });
+}
+
+function renderColecao(dados) {
+  const gridVinil = document.getElementById('grid-vinil');
+  const gridCd = document.getElementById('grid-cd');
+  if (!gridVinil || !gridCd) return;
+
+  // Separa por tipo (formato contém "LP" ou "CD")
+  const vinil = dados.filter(item => item.formato && item.formato.includes('LP'));
+  const cd = dados.filter(item => item.formato && item.formato.includes('CD'));
+
+  // Renderiza Vinil
+  if (vinil.length === 0) {
+    gridVinil.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhum vinil na coleção.</p></div>`;
+  } else {
+    gridVinil.innerHTML = vinil.map((item, i) => {
+      const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+      const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `vinil-${i}`;
+      return `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background: var(--vinil-color); background-size: cover; background-position: center;">
+            <span class="priority-tag" style="background:var(--vinil-color);color:var(--ink);">🎵</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || '?'}</h3>
+            <div class="artist" style="color:var(--vinil-color);">${item.artista || 'Artista'}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+            </div>
+            <div class="meta-row">
+              <span class="label">Condição</span>
+              <span class="val">
+                ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
+                ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
+                ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+              </span>
+            </div>
+            ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Busca capas para vinil
+    vinil.forEach((item, i) => {
+      const id = `vinil-${i}`;
+      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+    });
+  }
+
+  // Renderiza CD
+  if (cd.length === 0) {
+    gridCd.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhum CD na coleção.</p></div>`;
+  } else {
+    gridCd.innerHTML = cd.map((item, i) => {
+      const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+      const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `cd-${i}`;
+      return `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background: var(--cd-color); background-size: cover; background-position: center;">
+            <span class="priority-tag" style="background:var(--cd-color);color:var(--ink);">💿</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || '?'}</h3>
+            <div class="artist" style="color:var(--cd-color);">${item.artista || 'Artista'}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+            </div>
+            <div class="meta-row">
+              <span class="label">Condição</span>
+              <span class="val">
+                ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
+                ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
+                ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+              </span>
+            </div>
+            ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Busca capas para CD
+    cd.forEach((item, i) => {
+      const id = `cd-${i}`;
+      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+    });
+  }
+
+  const total = (vinil.length || 0) + (cd.length || 0);
+  document.getElementById('colecao-badge').textContent = total;
+}
+
+// ========== LAST.FM ==========
+const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
 const MANUAL_COVERS = {
   'basttardz_brasil com z / auschwitz tropical': 'https://i.imgur.com/nlcvybH.jpeg',
   'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
 };
 
-async function getAlbumCoverFromLastFm(artist, album) {
-  const manualKey = `${artist.toLowerCase()}_${album.toLowerCase()}`;
-  if (MANUAL_COVERS[manualKey]) {
-    return MANUAL_COVERS[manualKey];
-  }
+async function getCoverUrl(artist, album) {
+  if (!artist || !album) return null;
+  const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
+  if (MANUAL_COVERS[key]) return MANUAL_COVERS[key];
 
-  const params = new URLSearchParams({
-    method: 'album.getinfo',
-    api_key: LASTFM_API_KEY,
-    artist: artist,
-    album: album,
-    format: 'json'
-  });
-
-  const url = `${LASTFM_API_URL}?${params.toString()}`;
-  
   try {
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(8000)
-    });
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const data = await response.json();
-    
-    if (data && data.album && data.album.image) {
-      const images = data.album.image;
-      const sizes = ['extralarge', 'large', 'medium', 'small'];
-      
-      for (const size of sizes) {
-        const img = images.find(i => i.size === size);
-        if (img && img['#text'] && img['#text'].trim() !== '') {
-          return img['#text'];
-        }
-      }
+    const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.album && data.album.image) {
+      const img = data.album.image.find(i => i.size === 'extralarge');
+      return img && img['#text'] ? img['#text'] : null;
     }
-    
     return null;
-  } catch (error) {
-    console.log(`Last.fm error for ${artist} - ${album}:`, error.message);
+  } catch {
     return null;
   }
 }
 
-async function fetchAlbumArt(artist, album, elementId, fallbackTextId) {
-  const artWrap = document.getElementById(elementId);
-  const fallbackText = document.getElementById(fallbackTextId);
-  
+async function fetchAlbumArt(artist, album, artId, fallbackId) {
+  const artWrap = document.getElementById(artId);
+  const fallback = document.getElementById(fallbackId);
   if (!artWrap) return;
-  
+
   try {
-    const coverUrl = await getAlbumCoverFromLastFm(artist, album);
-    
-    if (coverUrl) {
+    const url = await getCoverUrl(artist, album);
+    if (url) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('Timeout')), 10000);
-        
         img.onload = () => {
           clearTimeout(timeout);
-          artWrap.style.backgroundImage = `url('${coverUrl}')`;
+          artWrap.style.backgroundImage = `url('${url}')`;
           artWrap.style.backgroundSize = 'cover';
           artWrap.style.backgroundPosition = 'center';
           artWrap.classList.add('has-image');
-          if (fallbackText) fallbackText.style.opacity = '0';
+          if (fallback) fallback.style.opacity = '0';
           resolve();
         };
-        
         img.onerror = () => {
           clearTimeout(timeout);
-          reject(new Error('Failed to load image'));
+          reject(new Error('Failed to load'));
         };
-        
-        img.src = coverUrl;
+        img.src = url;
       });
-      return;
+    } else {
+      if (fallback) fallback.style.opacity = '0.8';
     }
-    
-    if (fallbackText) {
-      fallbackText.style.opacity = '0.8';
-    }
-    
-  } catch (error) {
-    console.log(`Erro ao buscar capa para ${artist} - ${album}:`, error.message);
-    if (fallbackText) {
-      fallbackText.style.opacity = '0.8';
-    }
+  } catch {
+    if (fallback) fallback.style.opacity = '0.8';
   }
 }
 
-// ========== DROPDOWN ==========
-function toggleDropdown() {
-  const content = document.getElementById('dropdownContent');
-  const arrow = document.getElementById('dropdownArrow');
-  content.classList.toggle('open');
-  arrow.classList.toggle('open');
-}
-
-// ========== TABS ==========
-function switchTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(el => {
-    el.classList.remove('active');
-  });
-  
-  document.querySelectorAll('.tab-btn').forEach(el => {
-    el.classList.remove('active');
-  });
-  
-  document.getElementById(tabId).classList.add('active');
-  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-  
-  updateHero(tabId);
-}
-
-// EXPORTA A FUNÇÃO PARA O ESCOPO GLOBAL
-window.switchTab = switchTab;
-
-// ========== CRIAÇÃO DOS CARDS ==========
-function makeCard(item, tag, tierHex, index){
-  const card = document.createElement('div');
-  card.className = 'card';
-  const letter = item.album.trim().charAt(0);
-  const elementId = `art-wrap-${tag}-${index}`;
-  const fallbackTextId = `fallback-${tag}-${index}`;
-  
-  card.innerHTML = `
-    <div class="art-wrap" id="${elementId}" style="background: #1a1815; background-size: cover; background-position: center;">
-      <span class="priority-tag">${tag}</span>
-      <div class="spine-letter">${letter}</div>
-      <div class="art-fallback" id="${fallbackTextId}">${item.artist}<br>${item.album}</div>
-    </div>
-    <div class="card-body">
-      <h3>${item.album}</h3>
-      <div class="artist">${item.artist}</div>
-      <div class="meta-block">
-        <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.strategy}</span></div>
-      </div>
-      <div class="meta-row"><span class="label">Nota</span><span class="val">${item.note}</span></div>
-    </div>
-  `;
-  
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      fetchAlbumArt(item.artist, item.album, elementId, fallbackTextId);
-    }, 100);
-  });
-  
-  return card;
-}
-
-function makeColecaoCard(item, index, section){
-  const card = document.createElement('div');
-  card.className = 'card';
-  const letter = item.album.trim().charAt(0);
-  const elementId = `art-wrap-colecao-${section}-${index}`;
-  const fallbackTextId = `fallback-colecao-${section}-${index}`;
-  
-  const condClass = item.condition ? `cond-${item.condition.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-  const sleeveClass = item.sleeve ? `cond-${item.sleeve.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-  
-  const tagIcon = section === 'vinil' ? '🎵' : '💿';
-  const tagColor = section === 'vinil' ? 'var(--vinil-color)' : 'var(--cd-color)';
-  
-  card.innerHTML = `
-    <div class="art-wrap" id="${elementId}" style="background: #1a1815; background-size: cover; background-position: center;">
-      <span class="priority-tag" style="background:${tagColor}; color:var(--ink);">${tagIcon}</span>
-      <div class="spine-letter">${letter}</div>
-      <div class="art-fallback" id="${fallbackTextId}">${item.artist}<br>${item.album}</div>
-    </div>
-    <div class="card-body">
-      <h3>${item.album}</h3>
-      <div class="artist" style="color:${tagColor};">${item.artist}</div>
-      <div class="meta-block">
-        <div class="meta-row"><span class="label">Formato</span><span class="val">${item.format}</span></div>
-      </div>
-      <div class="meta-row">
-        <span class="label">Condição</span>
-        <span class="val">
-          ${item.condition ? `<span class="cond-badge ${condClass}">${item.condition}</span>` : ''}
-          ${item.sleeve ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.sleeve}</span>` : ''}
-          ${!item.condition && !item.sleeve ? '—' : ''}
-        </span>
-      </div>
-      ${item.date ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.date}</span></div>` : ''}
-    </div>
-  `;
-  
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      fetchAlbumArt(item.artist, item.album, elementId, fallbackTextId);
-    }, 100);
-  });
-  
-  return card;
-}
-
-// ========== RENDERIZAÇÃO ==========
-function renderGrid(id, data, tag, tierHex){
-  const grid = document.getElementById(id);
-  if (!grid) return;
-  
-  data.forEach((item, index) => {
-    const card = makeCard(item, tag, tierHex, index);
-    grid.appendChild(card);
-  });
-}
-
-function renderColecao(){
-  const gridVinil = document.getElementById('grid-vinil');
-  if (gridVinil) {
-    VINIL.forEach((item, index) => {
-      const card = makeColecaoCard(item, index, 'vinil');
-      gridVinil.appendChild(card);
-    });
-  }
-
-  const gridCd = document.getElementById('grid-cd');
-  if (gridCd) {
-    CD.forEach((item, index) => {
-      const card = makeColecaoCard(item, index, 'cd');
-      gridCd.appendChild(card);
-    });
-  }
-  
-  const total = VINIL.length + CD.length;
-  document.getElementById('colecao-badge').textContent = total;
-}
-
-function renderExtra(){
+// ========== EXTRA (fixo) ==========
+function renderExtra() {
   const table = document.getElementById('extra-list');
   if (!table) return;
   
-  EXTRA.forEach((item, i) => {
+  const extras = [
+    { artist: 'Seether', album: 'Finding Beauty in Negative Spaces' },
+    { artist: 'Machine Head', album: 'The Blackening' },
+    { artist: 'Týr', album: 'By the Light of the Northern Star' },
+    { artist: 'Godsmack', album: 'Faceless' },
+    { artist: 'Dream Theater', album: 'Metropolis Pt. 2' },
+    { artist: 'Lamb of God', album: 'Ashes of the Wake' },
+    { artist: 'The Offspring', album: 'Smash' },
+    { artist: 'Disturbed', album: 'The Sickness' },
+    { artist: 'Tremonti', album: 'A Dying Machine' },
+    { artist: 'Bring Me The Horizon', album: 'Sempiternal' },
+    { artist: 'Amon Amarth', album: 'Twilight of the Thunder God' },
+    { artist: 'Devilskin', album: 'Be Like the River' },
+    { artist: 'Breed 77', album: 'In My Blood' },
+    { artist: 'Not Enough Space', album: 'Weaponized' },
+    { artist: 'Alter Bridge', album: 'Blackbird' },
+  ];
+
+  extras.forEach((item, i) => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td class="idx">${String(i+1).padStart(2,'0')}</td>
@@ -1664,6 +1537,56 @@ function renderExtra(){
     table.appendChild(row);
   });
 }
+
+// ========== TABS ==========
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+
+  const hero = document.getElementById('heroSection');
+  const eyebrow = document.getElementById('heroEyebrow');
+  const title = document.getElementById('heroTitle');
+  const sub = document.getElementById('heroSub');
+  const meter = document.getElementById('heroMeter');
+
+  if (tabId === 'tab-compras') {
+    hero.className = 'hero hero-state-compras';
+    eyebrow.textContent = 'Projeto Discoteca · Curadoria fportelada';
+    title.innerHTML = 'Lista de <span>Compras</span>';
+    sub.textContent = 'Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.';
+    meter.style.display = 'flex';
+  } else if (tabId === 'tab-descobertas') {
+    hero.className = 'hero hero-state-descobertas';
+    eyebrow.textContent = 'Projeto Discoteca · Descobertas';
+    title.innerHTML = 'Descobertas <span>2018-2026</span>';
+    sub.textContent = 'Todas as bandas que marcaram minhas descobertas através do Discovery Weekly ao longo dos anos.';
+    meter.style.display = 'none';
+  } else if (tabId === 'tab-colecao') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Coleção';
+    title.innerHTML = 'Minha <span>Coleção</span>';
+    sub.textContent = 'Registro de todos os discos que já fazem parte da Coleção Portelada.';
+    meter.style.display = 'none';
+  } else if (tabId === 'tab-importar') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Importar';
+    title.innerHTML = 'Importar <span>Dados</span>';
+    sub.textContent = 'Faça upload dos seus CSVs para gerar recomendações personalizadas.';
+    meter.style.display = 'none';
+  }
+}
+window.switchTab = switchTab;
+
+// ========== DROPDOWN ==========
+function toggleDropdown() {
+  const content = document.getElementById('dropdownContent');
+  const arrow = document.getElementById('dropdownArrow');
+  content.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+window.toggleDropdown = toggleDropdown;
 
 // ========== MODAL ==========
 const modal = document.getElementById('modalAdicionar');
@@ -1718,7 +1641,7 @@ document.getElementById('form-adicionar').addEventListener('submit', function(e)
     return;
   }
 
-  fetch('https://fportelada.pythonanywhere.com/adicionar_disco', {
+  fetch(API_URL + '/adicionar_disco?user_id=' + usuarioId, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dados)
@@ -1754,7 +1677,7 @@ document.getElementById('form-adicionar').addEventListener('submit', function(e)
 
 // ========== UPLOADS ==========
 function uploadPlaylist(tipo, input) {
-  const status = document.getElementById(`status-${tipo}`);
+  const status = document.getElementById('status-' + tipo);
   const file = input.files[0];
   if (!file) return;
   status.textContent = '⏳ Enviando...';
@@ -1762,7 +1685,7 @@ function uploadPlaylist(tipo, input) {
   const fd = new FormData();
   fd.append('tipo', tipo);
   fd.append('arquivo', file);
-  fetch('https://fportelada.pythonanywhere.com/importar_playlist', { method: 'POST', body: fd })
+  fetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: fd })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1787,7 +1710,7 @@ function uploadDiscogs(input) {
   status.className = 'upload-status';
   const fd = new FormData();
   fd.append('arquivo', file);
-  fetch('https://fportelada.pythonanywhere.com/importar_colecao', { method: 'POST', body: fd })
+  fetch(API_URL + '/importar_colecao?user_id=' + usuarioId, { method: 'POST', body: fd })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1812,7 +1735,7 @@ function gerarRecomendacoes() {
   btn.textContent = '⏳ Gerando...';
   status.textContent = '⏳ Processando...';
   status.className = 'upload-status';
-  fetch('https://fportelada.pythonanywhere.com/gerar_recomendacoes', { method: 'POST' })
+  fetch(API_URL + '/gerar_recomendacoes?user_id=' + usuarioId, { method: 'POST' })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1834,10 +1757,29 @@ function gerarRecomendacoes() {
     });
 }
 
-// ========== INICIALIZAÇÃO ==========
-document.addEventListener('DOMContentLoaded', () => {
-  verificarSessao();
+// ========== EVENTOS ==========
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    switchTab(this.dataset.tab);
+  });
 });
+
+document.getElementById('upload-top').addEventListener('change', function() {
+  uploadPlaylist('top', this);
+});
+document.getElementById('upload-desc').addEventListener('change', function() {
+  uploadPlaylist('descobertas', this);
+});
+document.getElementById('upload-fav').addEventListener('change', function() {
+  uploadPlaylist('favoritos', this);
+});
+document.getElementById('upload-discogs').addEventListener('change', function() {
+  uploadDiscogs(this);
+});
+document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
+
+// ========== INICIAR ==========
+document.addEventListener('DOMContentLoaded', verificarSessao);
 </script>
 </body>
 </html>

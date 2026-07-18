@@ -23,6 +23,7 @@
     --colecao-color:#B8A88A;
     --vinil-color:#E8C87A;
     --cd-color:#7AB8D8;
+    --cassete-color:#A78BFA;
     --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -993,11 +994,11 @@
           <label>Formato</label>
           <select id="campo-formato">
             <option value="">Selecione</option>
-            <option value="LP">LP</option>
-            <option value="2xLP">2xLP</option>
+            <option value="LP">LP (Vinil)</option>
+            <option value="2xLP">2xLP (Vinil)</option>
+            <option value="EP">EP (Vinil)</option>
             <option value="CD">CD</option>
             <option value="2xCD">2xCD</option>
-            <option value="EP">EP</option>
             <option value="Cassete">Cassete</option>
           </select>
         </div>
@@ -1293,7 +1294,7 @@ function renderRecomendacoes(dados) {
   });
 }
 
-// ========== RENDER COLEÇÃO ==========
+// ========== RENDER COLEÇÃO (COM CD, VINIL E CASSETE) ==========
 function renderColecao() {
   const grid = document.getElementById('grid-colecao');
   if (!grid) return;
@@ -1316,14 +1317,36 @@ function renderColecao() {
     const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
     const letter = item.album ? item.album.charAt(0) : '?';
     const id = `col-${i}`;
-    const isVinil = item.formato && item.formato.includes('LP');
-    const tagColor = isVinil ? 'var(--vinil-color)' : 'var(--cd-color)';
-    const tagIcon = isVinil ? '🎵' : '💿';
+    
+    // ===== DETECTA O FORMATO =====
+    const formato = item.formato || '';
+    const isVinil = formato.includes('LP') || formato.includes('EP') || formato.includes('Vinil');
+    const isCD = formato.includes('CD');
+    const isCassete = formato.includes('Cassete') || formato.toLowerCase().includes('cassette');
+    
+    let tagColor, tagIcon, tagLabel;
+    if (isVinil) {
+      tagColor = 'var(--vinil-color)';
+      tagIcon = '🎵';
+      tagLabel = 'Vinil';
+    } else if (isCD) {
+      tagColor = 'var(--cd-color)';
+      tagIcon = '💿';
+      tagLabel = 'CD';
+    } else if (isCassete) {
+      tagColor = 'var(--cassete-color)';
+      tagIcon = '📼';
+      tagLabel = 'Cassete';
+    } else {
+      tagColor = 'var(--colecao-color)';
+      tagIcon = '📀';
+      tagLabel = formato || 'Desconhecido';
+    }
     
     return `
       <div class="card" id="${id}">
         <div class="art-wrap" id="art-${id}" style="background: ${tagColor}; background-size: cover; background-position: center;">
-          <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon}</span>
+          <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon} ${tagLabel}</span>
           <div class="spine-letter">${letter}</div>
           <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
         </div>
@@ -1331,7 +1354,7 @@ function renderColecao() {
           <h3>${item.album || '?'}</h3>
           <div class="artist" style="color:${tagColor};">${item.artista || 'Artista'}</div>
           <div class="meta-block">
-            <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+            <div class="meta-row"><span class="label">Formato</span><span class="val">${tagLabel}</span></div>
           </div>
           <div class="meta-row">
             <span class="label">Condição</span>
@@ -1341,6 +1364,7 @@ function renderColecao() {
               ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
             </span>
           </div>
+          ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${item.preco}</span></div>` : ''}
           ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
         </div>
       </div>

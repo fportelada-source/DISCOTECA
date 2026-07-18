@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -328,51 +327,6 @@
     color:rgba(237,232,220,0.55);
     margin-top:6px;
   }
-
-  .dropdown-toggle {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    user-select: none;
-    transition: opacity 0.2s ease;
-  }
-  .dropdown-toggle:hover {
-    opacity: 0.8;
-  }
-  .dropdown-arrow {
-    display: inline-block;
-    transition: transform 0.3s ease;
-    font-size: 18px;
-    color: rgba(237,232,220,0.4);
-    line-height: 1;
-  }
-  .dropdown-arrow.open {
-    transform: rotate(180deg);
-  }
-  .dropdown-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
-    opacity: 0;
-    margin-top: 0;
-  }
-  .dropdown-content.open {
-    max-height: 2000px;
-    opacity: 1;
-    margin-top: 24px;
-  }
-  .dropdown-content .list-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  .dropdown-content .list-table tr { border-bottom: 1px solid var(--card-line); }
-  .dropdown-content .list-table td { padding: 14px 10px; }
-  .dropdown-content .list-table .idx { font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
-  .dropdown-content .list-table .band { font-weight:600; width:32%; }
-  .dropdown-content .list-table .disco { color:rgba(237,232,220,0.7); font-style:italic; }
-  .dropdown-content .list-table tr:hover { background:rgba(237,232,220,0.03); }
 
   .list-table{
     width:100%;
@@ -708,16 +662,17 @@
     width: 100%;
   }
   .btn:hover { opacity: 0.8; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .empty-state {
     text-align: center;
     padding: 80px 20px;
-    opacity: 0.4;
     grid-column: 1 / -1;
   }
   .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
   .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
-  .empty-state p { font-size: 14px; opacity: 0.7; }
+  .empty-state p { font-size: 14px; opacity: 0.7; max-width: 500px; margin: 0 auto; }
+  .empty-state .empty-hint { font-size: 13px; opacity: 0.4; margin-top: 12px; }
 
   /* ===== ESTATÍSTICAS ===== */
   .stat-grid {
@@ -786,6 +741,49 @@
     font-weight: 400;
     opacity: 0.4;
     margin-left: 8px;
+  }
+
+  /* ===== INSTRUÇÕES DA IMPORTAR ===== */
+  .import-instructions {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    border-left: 4px solid var(--colecao-color);
+  }
+  .import-instructions h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+    color: var(--colecao-color);
+  }
+  .import-instructions p {
+    font-size: 14px;
+    opacity: 0.7;
+    line-height: 1.6;
+    margin-bottom: 4px;
+  }
+  .import-instructions ul {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 20px;
+  }
+  .import-instructions ul li {
+    font-size: 13px;
+    opacity: 0.6;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .import-instructions ul li span { font-size: 16px; }
+  @media (max-width:600px) {
+    .import-instructions ul { grid-template-columns: 1fr; }
   }
 
   @media (max-width:600px){
@@ -894,35 +892,7 @@
           <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
         </div>
       </div>
-      <div class="wildcard">
-        <span class="chip">Slipknot</span>
-        <span class="chip">Korn</span>
-        <span class="chip">Limp Bizkit</span>
-        <span class="chip">Papa Roach</span>
-        <span class="chip">Bad Religion</span>
-        <span class="chip">Avenged Sevenfold</span>
-        <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
-      </div>
-    </section>
-
-    <!-- DROPDOWN: Oportunidades Extras -->
-    <section class="section">
-      <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4); border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
-        <div class="tier-info" style="width: 100%;">
-          <div class="dropdown-toggle" onclick="toggleDropdown()">
-            <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
-              Oportunidades Extras
-            </h2>
-            <span class="dropdown-arrow" id="dropdownArrow">▾</span>
-          </div>
-          <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
-            Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
-          </p>
-        </div>
-      </div>
-      <div class="dropdown-content" id="dropdownContent">
-        <table class="list-table" id="extra-list"></table>
-      </div>
+      <div class="grid" id="grid-c"></div>
     </section>
 
   </div>
@@ -934,12 +904,10 @@
         <div class="tier-stamp small">📊</div>
         <div class="tier-info">
           <h2 style="color:var(--e-color);">Estatísticas da Playlist</h2>
-          <p>Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.</p>
+          <p>Análise da sua playlist com base nos dados importados.</p>
         </div>
       </div>
-      <div id="estatisticas-container">
-        <div class="empty-state"><div class="icon">⏳</div><h3>Carregando estatísticas...</h3></div>
-      </div>
+      <div id="estatisticas-container"></div>
     </section>
   </div>
 
@@ -967,10 +935,26 @@
         <div class="tier-stamp small">📤</div>
         <div class="tier-info">
           <h2 style="color:var(--colecao-color);">Importar Dados</h2>
-          <p>Faça upload dos seus CSVs para gerar recomendações personalizadas.</p>
+          <p>Traga suas playlists e descubra quais discos você precisa comprar.</p>
         </div>
       </div>
       <div style="max-width:800px; margin:0 auto;">
+
+        <!-- INSTRUÇÕES -->
+        <div class="import-instructions">
+          <h3>📥 Primeiro passo: traga seus dados</h3>
+          <p>Faça upload dos CSVs das suas playlists para o sistema conhecer seu gosto musical.</p>
+          <ul>
+            <li><span>🏆</span> <strong>Top do Ano:</strong> Músicas que você mais ouviu</li>
+            <li><span>🔍</span> <strong>Descobertas:</strong> Novos artistas que você encontrou</li>
+            <li><span>⭐</span> <strong>Favoritos:</strong> Suas músicas preferidas</li>
+            <li><span>💿</span> <strong>Discogs:</strong> Sua coleção física de discos</li>
+          </ul>
+          <p style="margin-top:12px; font-size:13px; opacity:0.5;">
+            Depois de importar, clique em <strong>"⚡ Gerar Recomendações"</strong> e veja sua lista de compras aparecer!
+          </p>
+        </div>
+
         <div class="upload-grid">
           <div class="upload-area">
             <div class="icon">🏆</div>
@@ -1095,25 +1079,6 @@ const API_URL = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
 let colecao = [];
 
-// ========== EXTRA (fixo) ==========
-const EXTRAS = [
-  { artist: 'Seether', album: 'Finding Beauty in Negative Spaces' },
-  { artist: 'Machine Head', album: 'The Blackening' },
-  { artist: 'Týr', album: 'By the Light of the Northern Star' },
-  { artist: 'Godsmack', album: 'Faceless' },
-  { artist: 'Dream Theater', album: 'Metropolis Pt. 2' },
-  { artist: 'Lamb of God', album: 'Ashes of the Wake' },
-  { artist: 'The Offspring', album: 'Smash' },
-  { artist: 'Disturbed', album: 'The Sickness' },
-  { artist: 'Tremonti', album: 'A Dying Machine' },
-  { artist: 'Bring Me The Horizon', album: 'Sempiternal' },
-  { artist: 'Amon Amarth', album: 'Twilight of the Thunder God' },
-  { artist: 'Devilskin', album: 'Be Like the River' },
-  { artist: 'Breed 77', album: 'In My Blood' },
-  { artist: 'Not Enough Space', album: 'Weaponized' },
-  { artist: 'Alter Bridge', album: 'Blackbird' },
-];
-
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
   const btn = this;
@@ -1198,9 +1163,6 @@ function carregarDados() {
       renderEstatisticas(data);
     })
     .catch(() => {});
-
-  // Extra (dropdown)
-  renderExtra();
 }
 
 // ========== LAST.FM ==========
@@ -1266,22 +1228,47 @@ async function fetchAlbumArt(artist, album, artId, fallbackId) {
 
 // ========== RENDER ==========
 function renderRecomendacoes(dados) {
+  // Verifica se tem dados
+  if (!dados || dados.length === 0) {
+    // Mostra mensagem de vazio em todas as grids
+    ['grid-s', 'grid-a', 'grid-b', 'grid-c'].forEach(id => {
+      const grid = document.getElementById(id);
+      if (grid) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">💰</div>
+            <h3>Sua carteira está cheia... de expectativas!</h3>
+            <p>Faça upload da sua playlist para gerar recomendações personalizadas.</p>
+            <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
+          </div>
+        `;
+      }
+    });
+    return;
+  }
+
   const tiers = { S: [], A: [], B: [], C: [] };
   dados.forEach(item => {
     if (tiers[item.tier]) tiers[item.tier].push(item);
   });
 
-  ['S', 'A', 'B'].forEach(tier => {
+  ['S', 'A', 'B', 'C'].forEach(tier => {
     const grid = document.getElementById('grid-' + tier.toLowerCase());
     if (!grid) return;
     const items = tiers[tier] || [];
     
     if (items.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">📭</div>
+          <h3>Nenhum disco ${tier} ainda</h3>
+          <p>Importe mais playlists para gerar recomendações para este tier.</p>
+        </div>
+      `;
       return;
     }
 
-    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : '#4E7A8C';
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' : '#8A8378';
     grid.innerHTML = items.map((item, idx) => {
       const letter = item.album ? item.album.charAt(0) : '?';
       const id = `rec-${tier}-${idx}`;
@@ -1316,7 +1303,14 @@ function renderColecao() {
   if (!grid) return;
   
   if (!colecao || colecao.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🎵</div>
+        <h3>A música ainda não começou a tocar por aqui</h3>
+        <p>Importe sua coleção do Discogs ou adicione discos manualmente.</p>
+        <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
+      </div>
+    `;
     document.getElementById('colecao-badge').textContent = '0';
     return;
   }
@@ -1369,8 +1363,16 @@ function renderEstatisticas(dados) {
   const container = document.getElementById('estatisticas-container');
   if (!container) return;
 
-  if (dados.erro) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar estatísticas</h3><p>${dados.erro}</p></div>`;
+  // Verifica se tem erro ou está vazio
+  if (!dados || dados.erro || dados.total_musicas === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:60px 20px;">
+        <div class="icon">🎧</div>
+        <h3>Ainda não dividimos o fone</h3>
+        <p>Faça upload da sua playlist para começar a análise.</p>
+        <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
+      </div>
+    `;
     return;
   }
 
@@ -1429,21 +1431,6 @@ function renderEstatisticas(dados) {
   container.innerHTML = html;
 }
 
-function renderExtra() {
-  const table = document.getElementById('extra-list');
-  if (!table) return;
-  
-  EXTRAS.forEach((item, i) => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td class="idx">${String(i+1).padStart(2,'0')}</td>
-      <td class="band">${item.artist}</td>
-      <td class="disco">${item.album}</td>
-    `;
-    table.appendChild(row);
-  });
-}
-
 // ========== TABS ==========
 function switchTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -1467,7 +1454,7 @@ function switchTab(tabId) {
     hero.className = 'hero hero-state-estatisticas';
     eyebrow.textContent = 'Projeto Discoteca · Estatísticas';
     title.innerHTML = 'Estatísticas <span>da Playlist</span>';
-    sub.textContent = 'Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.';
+    sub.textContent = 'Análise da sua playlist com base nos dados importados.';
     meter.style.display = 'none';
   } else if (tabId === 'tab-colecao') {
     hero.className = 'hero hero-state-colecao';
@@ -1484,15 +1471,6 @@ function switchTab(tabId) {
   }
 }
 window.switchTab = switchTab;
-
-// ========== DROPDOWN ==========
-function toggleDropdown() {
-  const content = document.getElementById('dropdownContent');
-  const arrow = document.getElementById('dropdownArrow');
-  content.classList.toggle('open');
-  arrow.classList.toggle('open');
-}
-window.toggleDropdown = toggleDropdown;
 
 // ========== MODAL ==========
 const modal = document.getElementById('modalAdicionar');
@@ -1597,6 +1575,8 @@ function uploadPlaylist(tipo, input) {
       if (d.sucesso) {
         status.textContent = '✅ ' + d.mensagem;
         status.className = 'upload-status success';
+        // Habilita o botão de gerar
+        document.getElementById('btn-gerar').disabled = false;
       } else {
         status.textContent = '❌ ' + (d.erro || 'Erro');
         status.className = 'upload-status error';
@@ -1683,6 +1663,9 @@ document.getElementById('upload-discogs').addEventListener('change', function() 
   uploadDiscogs(this);
 });
 document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
+
+// Inicializa botão de gerar desabilitado até ter upload
+document.getElementById('btn-gerar').disabled = true;
 
 // ========== INICIAR ==========
 document.addEventListener('DOMContentLoaded', verificarSessao);

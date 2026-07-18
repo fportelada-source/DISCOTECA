@@ -861,13 +861,7 @@
 
   <!-- ===== TAB 1: COMPRAS ===== -->
   <div id="tab-compras" class="tab-content active">
-
-    <!-- Container único para estado vazio OU tiers -->
-    <div id="compras-container">
-      <!-- Se vazio, mostra mensagem única -->
-      <!-- Se tem dados, mostra os 4 tiers -->
-    </div>
-
+    <div id="compras-container"></div>
   </div>
 
   <!-- ===== TAB 2: ESTATÍSTICAS ===== -->
@@ -913,14 +907,13 @@
       </div>
       <div style="max-width:800px; margin:0 auto;">
 
-        <!-- INSTRUÇÕES -->
         <div class="import-instructions">
           <h3>📥 Primeiro passo: traga seus dados</h3>
           <p>Faça upload dos CSVs das suas playlists para o sistema conhecer seu gosto musical.</p>
           <ul>
-            <li><span>🏆</span> <strong>Top do Ano:</strong> Músicas que você mais ouviu</li>
-            <li><span>🔍</span> <strong>Descobertas:</strong> Novos artistas que você encontrou</li>
-            <li><span>⭐</span> <strong>Favoritos:</strong> Suas músicas preferidas</li>
+            <li><span>🏆</span> <strong>Top do Ano:</strong> Músicas que você mais ouviu (peso 3x)</li>
+            <li><span>🔍</span> <strong>Descobertas:</strong> Novos artistas que você encontrou (peso 2x)</li>
+            <li><span>⭐</span> <strong>Favoritos:</strong> Suas músicas preferidas (peso 1x)</li>
             <li><span>💿</span> <strong>Discogs:</strong> Sua coleção física de discos</li>
           </ul>
           <p style="margin-top:12px; font-size:13px; opacity:0.5;">
@@ -931,21 +924,21 @@
         <div class="upload-grid">
           <div class="upload-area">
             <div class="icon">🏆</div>
-            <p><strong>Top do Ano</strong></p>
+            <p><strong>Top do Ano</strong> <span style="opacity:0.4;font-size:12px;">(peso 3x)</span></p>
             <label for="upload-top">Escolher CSV</label>
             <input type="file" id="upload-top" accept=".csv">
             <div id="status-top" class="upload-status"></div>
           </div>
           <div class="upload-area">
             <div class="icon">🔍</div>
-            <p><strong>Descobertas</strong></p>
+            <p><strong>Descobertas</strong> <span style="opacity:0.4;font-size:12px;">(peso 2x)</span></p>
             <label for="upload-desc">Escolher CSV</label>
             <input type="file" id="upload-desc" accept=".csv">
             <div id="status-desc" class="upload-status"></div>
           </div>
           <div class="upload-area">
             <div class="icon">⭐</div>
-            <p><strong>Favoritos</strong></p>
+            <p><strong>Favoritos</strong> <span style="opacity:0.4;font-size:12px;">(peso 1x)</span></p>
             <label for="upload-fav">Escolher CSV</label>
             <input type="file" id="upload-fav" accept=".csv">
             <div id="status-fav" class="upload-status"></div>
@@ -1112,7 +1105,6 @@ function verificarSessao() {
 function carregarDados() {
   if (!usuarioId) return;
 
-  // Recomendações (S/A/B/C)
   fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
@@ -1120,7 +1112,6 @@ function carregarDados() {
     })
     .catch(() => {});
 
-  // Coleção
   fetch(API_URL + '/colecao?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
@@ -1129,7 +1120,6 @@ function carregarDados() {
     })
     .catch(() => {});
 
-  // Estatísticas
   fetch(API_URL + '/estatisticas?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
@@ -1203,9 +1193,7 @@ async function fetchAlbumArt(artist, album, artId, fallbackId) {
 function renderRecomendacoes(dados) {
   const container = document.getElementById('compras-container');
   
-  // Verifica se tem dados
   if (!dados || dados.length === 0) {
-    // Mostra UMA mensagem de vazio para a aba inteira
     container.innerHTML = `
       <div class="empty-state-full" style="padding:80px 20px;">
         <div class="icon">💰</div>
@@ -1217,7 +1205,6 @@ function renderRecomendacoes(dados) {
     return;
   }
 
-  // Tem dados - monta os 4 tiers
   const tiers = { S: [], A: [], B: [], C: [] };
   dados.forEach(item => {
     if (tiers[item.tier]) tiers[item.tier].push(item);
@@ -1283,7 +1270,6 @@ function renderRecomendacoes(dados) {
 
   container.innerHTML = html;
 
-  // Carrega as capas depois de montar o HTML
   ['S', 'A', 'B', 'C'].forEach(tier => {
     const items = tiers[tier] || [];
     items.forEach((item, idx) => {
@@ -1360,7 +1346,6 @@ function renderEstatisticas(dados) {
   const container = document.getElementById('estatisticas-container');
   if (!container) return;
 
-  // Verifica se tem erro ou está vazio
   if (!dados || dados.erro || dados.total_musicas === 0 || dados.total_musicas === undefined) {
     container.innerHTML = `
       <div class="empty-state" style="padding:60px 20px;">
@@ -1375,7 +1360,6 @@ function renderEstatisticas(dados) {
 
   let html = '';
 
-  // Cards de visão geral
   html += `<div class="stat-grid">`;
   html += `<div class="stat-card"><div class="stat-number">${dados.total_musicas || 0}</div><div class="stat-label">Total de Músicas</div></div>`;
   html += `<div class="stat-card"><div class="stat-number">${dados.artistas_unicos || 0}</div><div class="stat-label">Artistas Únicos</div></div>`;
@@ -1385,7 +1369,6 @@ function renderEstatisticas(dados) {
   html += `<div class="stat-card"><div class="stat-number">${dados.nao_explicitas || 0}</div><div class="stat-label">Não Explícitas</div></div>`;
   html += `</div>`;
 
-  // Top 10 Artistas
   if (dados.top_artistas && dados.top_artistas.length > 0) {
     html += `<div class="stat-subtitle">🎤 Top 10 Artistas <span>mais frequentes na playlist</span></div>`;
     html += `<div class="stat-list">`;
@@ -1395,7 +1378,6 @@ function renderEstatisticas(dados) {
     html += `</div>`;
   }
 
-  // Top 10 Álbuns
   if (dados.top_albuns && dados.top_albuns.length > 0) {
     html += `<div class="stat-subtitle">💿 Top 10 Álbuns <span>com mais músicas</span></div>`;
     html += `<div class="stat-list">`;
@@ -1405,7 +1387,6 @@ function renderEstatisticas(dados) {
     html += `</div>`;
   }
 
-  // Distribuição por Década
   if (dados.decadas && dados.decadas.length > 0) {
     html += `<div class="stat-subtitle">📅 Distribuição por Década</div>`;
     html += `<div class="stat-list">`;
@@ -1415,7 +1396,6 @@ function renderEstatisticas(dados) {
     html += `</div>`;
   }
 
-  // Top 10 Gêneros
   if (dados.top_generos && dados.top_generos.length > 0) {
     html += `<div class="stat-subtitle">🎸 Top 10 Gêneros <span>dominantes</span></div>`;
     html += `<div class="stat-list">`;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projeto Discoteca — Lista de Compras</title>
+<title>Discoteca — Sua coleção de discos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -809,6 +809,62 @@
     .import-instructions ul { grid-template-columns: 1fr; }
   }
 
+  /* ===== INSTRUÇÕES DO EXPORTIFY ===== */
+  .exportify-guide {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 12px;
+    padding: 28px 30px;
+    margin-bottom: 28px;
+    border-left: 4px solid var(--s-color);
+  }
+  .exportify-guide h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+    color: var(--s-color);
+  }
+  .exportify-guide p {
+    font-size: 14px;
+    opacity: 0.8;
+    line-height: 1.7;
+    margin-bottom: 6px;
+  }
+  .exportify-guide .link {
+    color: var(--s-color);
+    text-decoration: underline;
+    font-weight: 600;
+  }
+  .exportify-guide .link:hover { opacity: 0.7; }
+  .exportify-guide ul {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 20px;
+  }
+  .exportify-guide ul li {
+    font-size: 13px;
+    opacity: 0.7;
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .exportify-guide ul li span { font-size: 16px; }
+  .exportify-guide .dica {
+    margin-top: 12px;
+    font-size: 13px;
+    opacity: 0.5;
+    font-style: italic;
+  }
+  @media (max-width:600px) {
+    .exportify-guide ul { grid-template-columns: 1fr; }
+    .exportify-guide { padding: 20px; }
+  }
+
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
     .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
@@ -892,7 +948,7 @@
     </section>
   </div>
 
-  <!-- ===== TAB 3: COLEÇÃO ===== -->
+  <!-- ===== TAB 3: COLEÇÃO (DIVIDIDA POR MÍDIA) ===== -->
   <div id="tab-colecao" class="tab-content">
     <section class="section" style="--tier-color:var(--colecao-color)">
       <div class="tier-head">
@@ -905,7 +961,8 @@
           <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
         </div>
       </div>
-      <div class="grid" id="grid-colecao"></div>
+      <!-- Container para as seções -->
+      <div id="colecao-container"></div>
     </section>
   </div>
 
@@ -921,17 +978,23 @@
       </div>
       <div style="max-width:800px; margin:0 auto;">
 
-        <div class="import-instructions">
-          <h3>📥 Primeiro passo: traga seus dados</h3>
-          <p>Faça upload dos CSVs das suas playlists para o sistema conhecer seu gosto musical.</p>
+        <!-- ===== INSTRUÇÕES DO EXPORTIFY ===== -->
+        <div class="exportify-guide">
+          <h3>🎯 Antes de começar, você precisa dos seus CSVs</h3>
+          <p>
+            O Discoteca usa os dados das suas playlists do Spotify para gerar recomendações. 
+            Para isso, você precisa exportar suas playlists como CSV usando o 
+            <strong><a href="https://exportify.net/" target="_blank" class="link">Exportify</a></strong> 
+            (é gratuito e seguro).
+          </p>
           <ul>
-            <li><span>🏆</span> <strong>Top do Ano:</strong> Músicas que você mais ouviu (peso 3x)</li>
-            <li><span>🔍</span> <strong>Descobertas:</strong> Novos artistas que você encontrou (peso 2x)</li>
-            <li><span>⭐</span> <strong>Favoritos:</strong> Suas músicas preferidas (peso 1x)</li>
-            <li><span>💿</span> <strong>Discogs:</strong> Sua coleção física de discos</li>
+            <li><span>1.</span> Acesse <strong>Exportify</strong> e faça login com sua conta do Spotify</li>
+            <li><span>2.</span> Selecione as playlists que você quer exportar</li>
+            <li><span>3.</span> Clique em <strong>"Export"</strong> e baixe os 3 arquivos CSV</li>
+            <li><span>4.</span> Volte aqui e faça upload de cada um nos campos abaixo</li>
           </ul>
-          <p style="margin-top:12px; font-size:13px; opacity:0.5;">
-            Depois de importar, clique em <strong>"⚡ Gerar Recomendações"</strong> e veja sua lista de compras aparecer!
+          <p class="dica">
+            💡 Quanto mais dados, melhores as recomendações! Use playlists com pelo menos 50 músicas cada.
           </p>
         </div>
 
@@ -1050,7 +1113,7 @@
 </div>
 
 <footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
-  Projeto Discoteca — Sua coleção, suas recomendações.
+  Discoteca — Sua coleção, suas recomendações.
 </footer>
 
 <script>
@@ -1059,6 +1122,26 @@ const API_URL = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
 let colecao = [];
 let uploadCount = 0;
+
+// ========== LOGIN PERSISTENTE ==========
+function salvarSessao(userId, nome) {
+  localStorage.setItem('discoteca_user_id', userId);
+  localStorage.setItem('discoteca_user_nome', nome);
+}
+
+function carregarSessao() {
+  const userId = localStorage.getItem('discoteca_user_id');
+  const nome = localStorage.getItem('discoteca_user_nome');
+  if (userId && nome) {
+    return { userId, nome };
+  }
+  return null;
+}
+
+function limparSessao() {
+  localStorage.removeItem('discoteca_user_id');
+  localStorage.removeItem('discoteca_user_nome');
+}
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
@@ -1083,6 +1166,7 @@ document.getElementById('btnLogin').addEventListener('click', function() {
 
 // ========== LOGOUT ==========
 document.getElementById('btnLogout').addEventListener('click', function() {
+  limparSessao();
   window.location.href = window.location.pathname;
 });
 
@@ -1092,7 +1176,9 @@ function verificarSessao() {
   const userId = params.get('user_id');
   const nome = params.get('nome');
 
+  // Se veio da callback do Google, salva no localStorage
   if (userId && nome) {
+    salvarSessao(userId, nome);
     usuarioId = userId;
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appScreen').style.display = 'block';
@@ -1102,11 +1188,24 @@ function verificarSessao() {
     return;
   }
 
+  // Tenta carregar do localStorage
+  const sessao = carregarSessao();
+  if (sessao) {
+    usuarioId = sessao.userId;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('userNameDisplay').textContent = '👤 ' + sessao.nome;
+    carregarDados();
+    return;
+  }
+
+  // Último recurso: tentar sessão do servidor
   fetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
         usuarioId = data.usuario_id;
+        salvarSessao(data.usuario_id, data.nome || 'Usuário');
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('appScreen').style.display = 'block';
         document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
@@ -1294,13 +1393,13 @@ function renderRecomendacoes(dados) {
   });
 }
 
-// ========== RENDER COLEÇÃO (COM CD, VINIL E CASSETE) ==========
+// ========== RENDER COLEÇÃO (DIVIDIDA POR TIPO DE MÍDIA) ==========
 function renderColecao() {
-  const grid = document.getElementById('grid-colecao');
-  if (!grid) return;
+  const container = document.getElementById('colecao-container');
+  if (!container) return;
   
   if (!colecao || colecao.length === 0) {
-    grid.innerHTML = `
+    container.innerHTML = `
       <div class="empty-state">
         <div class="icon">🎵</div>
         <h3>A música ainda não começou a tocar por aqui</h3>
@@ -1312,67 +1411,104 @@ function renderColecao() {
     return;
   }
 
-  grid.innerHTML = colecao.map((item, i) => {
-    const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-    const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-    const letter = item.album ? item.album.charAt(0) : '?';
-    const id = `col-${i}`;
-    
-    // ===== DETECTA O FORMATO =====
+  // Classifica os discos por tipo de mídia
+  const vinil = [];
+  const cd = [];
+  const cassete = [];
+  const outros = [];
+
+  colecao.forEach(item => {
     const formato = item.formato || '';
     const isVinil = formato.includes('LP') || formato.includes('EP') || formato.includes('Vinil');
     const isCD = formato.includes('CD');
     const isCassete = formato.includes('Cassete') || formato.toLowerCase().includes('cassette');
     
-    let tagColor, tagIcon, tagLabel;
     if (isVinil) {
-      tagColor = 'var(--vinil-color)';
-      tagIcon = '🎵';
-      tagLabel = 'Vinil';
+      vinil.push(item);
     } else if (isCD) {
-      tagColor = 'var(--cd-color)';
-      tagIcon = '💿';
-      tagLabel = 'CD';
+      cd.push(item);
     } else if (isCassete) {
-      tagColor = 'var(--cassete-color)';
-      tagIcon = '📼';
-      tagLabel = 'Cassete';
+      cassete.push(item);
     } else {
-      tagColor = 'var(--colecao-color)';
-      tagIcon = '📀';
-      tagLabel = formato || 'Desconhecido';
+      outros.push(item);
     }
-    
-    return `
-      <div class="card" id="${id}">
-        <div class="art-wrap" id="art-${id}" style="background: ${tagColor}; background-size: cover; background-position: center;">
-          <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon} ${tagLabel}</span>
-          <div class="spine-letter">${letter}</div>
-          <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
-        </div>
-        <div class="card-body">
-          <h3>${item.album || '?'}</h3>
-          <div class="artist" style="color:${tagColor};">${item.artista || 'Artista'}</div>
-          <div class="meta-block">
-            <div class="meta-row"><span class="label">Formato</span><span class="val">${tagLabel}</span></div>
-          </div>
-          <div class="meta-row">
-            <span class="label">Condição</span>
-            <span class="val">
-              ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
-              ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
-              ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
-            </span>
-          </div>
-          ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${item.preco}</span></div>` : ''}
-          ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
+  });
 
+  const secoes = [
+    { nome: 'Vinil', cor: 'var(--vinil-color)', icone: '🎵', items: vinil },
+    { nome: 'CD', cor: 'var(--cd-color)', icone: '💿', items: cd },
+    { nome: 'Cassete', cor: 'var(--cassete-color)', icone: '📼', items: cassete },
+    { nome: 'Outros', cor: 'var(--colecao-color)', icone: '📀', items: outros }
+  ];
+
+  let html = '';
+
+  secoes.forEach(secao => {
+    if (secao.items.length === 0) return;
+
+    html += `
+      <div style="margin-bottom: 32px;">
+        <div class="tier-head" style="border-bottom: 1px solid var(--card-line); padding-bottom: 12px; margin-bottom: 18px; --tier-color: ${secao.cor};">
+          <div class="tier-stamp tiny" style="background: ${secao.cor}; color: var(--ink);">${secao.icone}</div>
+          <div class="tier-info">
+            <h2 style="color: ${secao.cor};">${secao.nome}</h2>
+            <p style="opacity:0.5; font-size:13px;">${secao.items.length} discos</p>
+          </div>
+        </div>
+        <div class="grid">
+    `;
+
+    secao.items.forEach((item, i) => {
+      const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+      const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `col-${secao.nome}-${i}`;
+      const tagColor = secao.cor;
+      const tagIcon = secao.icone;
+      const tagLabel = secao.nome;
+      
+      html += `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background: ${tagColor}; background-size: cover; background-position: center;">
+            <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon} ${tagLabel}</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || '?'}</h3>
+            <div class="artist" style="color:${tagColor};">${item.artista || 'Artista'}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Formato</span><span class="val">${tagLabel}</span></div>
+            </div>
+            <div class="meta-row">
+              <span class="label">Condição</span>
+              <span class="val">
+                ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
+                ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
+                ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+              </span>
+            </div>
+            ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${item.preco}</span></div>` : ''}
+            ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+
+  // Carrega as capas
   colecao.forEach((item, i) => {
-    const id = `col-${i}`;
+    const formato = item.formato || '';
+    let secaoNome = 'Outros';
+    if (formato.includes('LP') || formato.includes('EP') || formato.includes('Vinil')) secaoNome = 'Vinil';
+    else if (formato.includes('CD')) secaoNome = 'CD';
+    else if (formato.includes('Cassete') || formato.toLowerCase().includes('cassette')) secaoNome = 'Cassete';
+    
+    const id = `col-${secaoNome}-${i}`;
     fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
   });
 
@@ -1461,25 +1597,25 @@ function switchTab(tabId) {
 
   if (tabId === 'tab-compras') {
     hero.className = 'hero hero-state-compras';
-    eyebrow.textContent = 'Projeto Discoteca · Recomendações';
+    eyebrow.textContent = 'Discoteca · Recomendações';
     title.innerHTML = 'Lista de <span>Compras</span>';
     sub.textContent = 'Prioridade S → C, baseado nas suas playlists importadas.';
     meter.style.display = 'flex';
   } else if (tabId === 'tab-estatisticas') {
     hero.className = 'hero hero-state-estatisticas';
-    eyebrow.textContent = 'Projeto Discoteca · Estatísticas';
+    eyebrow.textContent = 'Discoteca · Estatísticas';
     title.innerHTML = 'Estatísticas <span>da Playlist</span>';
     sub.textContent = 'Análise da sua playlist com base nos dados importados.';
     meter.style.display = 'none';
   } else if (tabId === 'tab-colecao') {
     hero.className = 'hero hero-state-colecao';
-    eyebrow.textContent = 'Projeto Discoteca · Coleção';
+    eyebrow.textContent = 'Discoteca · Coleção';
     title.innerHTML = 'Minha <span>Coleção</span>';
     sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
     meter.style.display = 'none';
   } else if (tabId === 'tab-importar') {
     hero.className = 'hero hero-state-colecao';
-    eyebrow.textContent = 'Projeto Discoteca · Importar';
+    eyebrow.textContent = 'Discoteca · Importar';
     title.innerHTML = 'Importar <span>Dados</span>';
     sub.textContent = 'Faça upload dos seus CSVs para gerar recomendações personalizadas.';
     meter.style.display = 'none';

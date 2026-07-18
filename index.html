@@ -1044,6 +1044,7 @@
 const API_URL = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
 let colecao = [];
+let uploadCount = 0; // Contador de uploads bem-sucedidos
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
@@ -1536,58 +1537,90 @@ document.getElementById('form-adicionar').addEventListener('submit', function(e)
   });
 });
 
-// ========== UPLOADS ==========
+// ========== UPLOADS CORRIGIDOS ==========
 function uploadPlaylist(tipo, input) {
-  const status = document.getElementById('status-' + tipo);
+  const statusEl = document.getElementById('status-' + tipo);
+  if (!statusEl) {
+    console.error('❌ Elemento #status-' + tipo + ' não encontrado!');
+    return;
+  }
+  
   const file = input.files[0];
-  if (!file) return;
-  status.textContent = '⏳ Enviando...';
-  status.className = 'upload-status';
+  if (!file) {
+    statusEl.textContent = '❌ Nenhum arquivo selecionado';
+    statusEl.className = 'upload-status error';
+    return;
+  }
+  
+  statusEl.textContent = '⏳ Enviando...';
+  statusEl.className = 'upload-status';
+  
   const fd = new FormData();
   fd.append('tipo', tipo);
   fd.append('arquivo', file);
-  fetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: fd })
-    .then(r => r.json())
-    .then(d => {
-      if (d.sucesso) {
-        status.textContent = '✅ ' + d.mensagem;
-        status.className = 'upload-status success';
-        document.getElementById('btn-gerar').disabled = false;
-      } else {
-        status.textContent = '❌ ' + (d.erro || 'Erro');
-        status.className = 'upload-status error';
-      }
-    })
-    .catch(() => {
-      status.textContent = '❌ Erro de conexão';
-      status.className = 'upload-status error';
-    });
+  
+  fetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { 
+    method: 'POST', 
+    body: fd 
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.sucesso) {
+      statusEl.textContent = '✅ ' + d.mensagem;
+      statusEl.className = 'upload-status success';
+      uploadCount++;
+      // Habilita o botão de gerar se pelo menos 1 upload foi feito
+      document.getElementById('btn-gerar').disabled = false;
+    } else {
+      statusEl.textContent = '❌ ' + (d.erro || 'Erro no upload');
+      statusEl.className = 'upload-status error';
+    }
+  })
+  .catch(() => {
+    statusEl.textContent = '❌ Erro de conexão';
+    statusEl.className = 'upload-status error';
+  });
 }
 
 function uploadDiscogs(input) {
-  const status = document.getElementById('status-discogs');
+  const statusEl = document.getElementById('status-discogs');
+  if (!statusEl) {
+    console.error('❌ Elemento #status-discogs não encontrado!');
+    return;
+  }
+  
   const file = input.files[0];
-  if (!file) return;
-  status.textContent = '⏳ Enviando...';
-  status.className = 'upload-status';
+  if (!file) {
+    statusEl.textContent = '❌ Nenhum arquivo selecionado';
+    statusEl.className = 'upload-status error';
+    return;
+  }
+  
+  statusEl.textContent = '⏳ Enviando...';
+  statusEl.className = 'upload-status';
+  
   const fd = new FormData();
   fd.append('arquivo', file);
-  fetch(API_URL + '/importar_colecao?user_id=' + usuarioId, { method: 'POST', body: fd })
-    .then(r => r.json())
-    .then(d => {
-      if (d.sucesso) {
-        status.textContent = '✅ ' + d.mensagem;
-        status.className = 'upload-status success';
-        carregarDados();
-      } else {
-        status.textContent = '❌ ' + (d.erro || 'Erro');
-        status.className = 'upload-status error';
-      }
-    })
-    .catch(() => {
-      status.textContent = '❌ Erro de conexão';
-      status.className = 'upload-status error';
-    });
+  
+  fetch(API_URL + '/importar_colecao?user_id=' + usuarioId, { 
+    method: 'POST', 
+    body: fd 
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.sucesso) {
+      statusEl.textContent = '✅ ' + d.mensagem;
+      statusEl.className = 'upload-status success';
+      carregarDados();
+    } else {
+      statusEl.textContent = '❌ ' + (d.erro || 'Erro no upload');
+      statusEl.className = 'upload-status error';
+    }
+  })
+  .catch(() => {
+    statusEl.textContent = '❌ Erro de conexão';
+    statusEl.className = 'upload-status error';
+  });
 }
 
 function gerarRecomendacoes() {
@@ -1597,6 +1630,7 @@ function gerarRecomendacoes() {
   btn.textContent = '⏳ Gerando...';
   status.textContent = '⏳ Processando...';
   status.className = 'upload-status';
+  
   fetch(API_URL + '/gerar_recomendacoes?user_id=' + usuarioId, { method: 'POST' })
     .then(r => r.json())
     .then(d => {
@@ -1640,6 +1674,7 @@ document.getElementById('upload-discogs').addEventListener('change', function() 
 });
 document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
 
+// Botão inicia desabilitado
 document.getElementById('btn-gerar').disabled = true;
 
 // ========== INICIAR ==========

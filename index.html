@@ -1044,7 +1044,7 @@
 const API_URL = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
 let colecao = [];
-let uploadCount = 0; // Contador de uploads bem-sucedidos
+let uploadCount = 0;
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
@@ -1537,7 +1537,7 @@ document.getElementById('form-adicionar').addEventListener('submit', function(e)
   });
 });
 
-// ========== UPLOADS CORRIGIDOS ==========
+// ========== UPLOADS ==========
 function uploadPlaylist(tipo, input) {
   const statusEl = document.getElementById('status-' + tipo);
   if (!statusEl) {
@@ -1569,7 +1569,6 @@ function uploadPlaylist(tipo, input) {
       statusEl.textContent = '✅ ' + d.mensagem;
       statusEl.className = 'upload-status success';
       uploadCount++;
-      // Habilita o botão de gerar se pelo menos 1 upload foi feito
       document.getElementById('btn-gerar').disabled = false;
     } else {
       statusEl.textContent = '❌ ' + (d.erro || 'Erro no upload');
@@ -1663,18 +1662,21 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 document.getElementById('upload-top').addEventListener('change', function() {
   uploadPlaylist('top', this);
 });
+
 document.getElementById('upload-desc').addEventListener('change', function() {
   uploadPlaylist('descobertas', this);
 });
+
 document.getElementById('upload-fav').addEventListener('change', function() {
-  uploadPlaylist('favoritos', this);
+  uploadPlaylist('fav', this);  // <- AQUI ESTAVA O ERRO! Era 'favoritos' e agora é 'fav'
 });
+
 document.getElementById('upload-discogs').addEventListener('change', function() {
   uploadDiscogs(this);
 });
+
 document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
 
-// Botão inicia desabilitado
 document.getElementById('btn-gerar').disabled = true;
 
 // ========== INICIAR ==========

@@ -1664,11 +1664,11 @@ document.getElementById('upload-top').addEventListener('change', function() {
 });
 
 document.getElementById('upload-desc').addEventListener('change', function() {
-  uploadPlaylist('descobertas', this);
+  uploadPlaylist('desc', this);  // <- 'desc' em vez de 'descobertas'
 });
 
 document.getElementById('upload-fav').addEventListener('change', function() {
-  uploadPlaylist('fav', this);  // <- AQUI ESTAVA O ERRO! Era 'favoritos' e agora é 'fav'
+  uploadPlaylist('fav', this);   // <- 'fav' em vez de 'favoritos'
 });
 
 document.getElementById('upload-discogs').addEventListener('change', function() {

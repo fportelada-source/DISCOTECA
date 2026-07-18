@@ -20,13 +20,6 @@
     --c-color:#8A8378;
     --d-color:#6B5B7B;
     --e-color:#5C6B7A;
-    --f-color:#7A6B5C;
-    --g-color:#5C7A6B;
-    --h-color:#8A6B7B;
-    --i-color:#6B7A8A;
-    --j-color:#7A8A6B;
-    --k-color:#8A7A6B;
-    --l-color:#6B8A7A;
     --colecao-color:#B8A88A;
     --vinil-color:#E8C87A;
     --cd-color:#7AB8D8;
@@ -779,13 +772,6 @@
     color: var(--e-color);
     font-weight: 700;
   }
-  .stat-list-item .count.bar {
-    background: var(--e-color);
-    color: var(--ink);
-    padding: 2px 12px;
-    border-radius: 12px;
-    font-size: 11px;
-  }
   .stat-subtitle {
     font-family: 'Anton', sans-serif;
     font-size: 20px;
@@ -799,22 +785,6 @@
     font-weight: 400;
     opacity: 0.4;
     margin-left: 8px;
-  }
-  .ano-divider {
-    font-family: 'Anton', sans-serif;
-    font-size: 32px;
-    letter-spacing: 0.02em;
-    margin: 40px 0 16px 0;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--card-line);
-    color: var(--d-color);
-  }
-  .ano-divider span {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    opacity: 0.4;
-    margin-left: 12px;
   }
 
   @media (max-width:600px){
@@ -881,6 +851,7 @@
 
   <!-- ===== TAB 1: COMPRAS ===== -->
   <div id="tab-compras" class="tab-content active">
+
     <section class="section" style="--tier-color:var(--s-color)">
       <div class="tier-head">
         <div class="tier-stamp">S</div>
@@ -891,6 +862,7 @@
       </div>
       <div class="grid" id="grid-s"></div>
     </section>
+
     <section class="section" style="--tier-color:var(--a-color)">
       <div class="tier-head">
         <div class="tier-stamp">A</div>
@@ -901,6 +873,7 @@
       </div>
       <div class="grid" id="grid-a"></div>
     </section>
+
     <section class="section" style="--tier-color:var(--b-color)">
       <div class="tier-head">
         <div class="tier-stamp">B</div>
@@ -911,6 +884,7 @@
       </div>
       <div class="grid" id="grid-b"></div>
     </section>
+
     <section class="section" style="--tier-color:var(--c-color)">
       <div class="tier-head">
         <div class="tier-stamp">C</div>
@@ -929,6 +903,27 @@
         <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
       </div>
     </section>
+
+    <!-- DROPDOWN: Oportunidades Extras -->
+    <section class="section">
+      <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4); border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+        <div class="tier-info" style="width: 100%;">
+          <div class="dropdown-toggle" onclick="toggleDropdown()">
+            <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
+              Oportunidades Extras
+            </h2>
+            <span class="dropdown-arrow" id="dropdownArrow">▾</span>
+          </div>
+          <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
+            Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
+          </p>
+        </div>
+      </div>
+      <div class="dropdown-content" id="dropdownContent">
+        <table class="list-table" id="extra-list"></table>
+      </div>
+    </section>
+
   </div>
 
   <!-- ===== TAB 2: ESTATÍSTICAS ===== -->
@@ -1099,6 +1094,25 @@ const API_URL = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
 let colecao = [];
 
+// ========== EXTRA (fixo) ==========
+const EXTRAS = [
+  { artist: 'Seether', album: 'Finding Beauty in Negative Spaces' },
+  { artist: 'Machine Head', album: 'The Blackening' },
+  { artist: 'Týr', album: 'By the Light of the Northern Star' },
+  { artist: 'Godsmack', album: 'Faceless' },
+  { artist: 'Dream Theater', album: 'Metropolis Pt. 2' },
+  { artist: 'Lamb of God', album: 'Ashes of the Wake' },
+  { artist: 'The Offspring', album: 'Smash' },
+  { artist: 'Disturbed', album: 'The Sickness' },
+  { artist: 'Tremonti', album: 'A Dying Machine' },
+  { artist: 'Bring Me The Horizon', album: 'Sempiternal' },
+  { artist: 'Amon Amarth', album: 'Twilight of the Thunder God' },
+  { artist: 'Devilskin', album: 'Be Like the River' },
+  { artist: 'Breed 77', album: 'In My Blood' },
+  { artist: 'Not Enough Space', album: 'Weaponized' },
+  { artist: 'Alter Bridge', album: 'Blackbird' },
+];
+
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
   const btn = this;
@@ -1183,6 +1197,9 @@ function carregarDados() {
       renderEstatisticas(data);
     })
     .catch(() => {});
+
+  // Extra (dropdown)
+  renderExtra();
 }
 
 // ========== LAST.FM ==========
@@ -1409,6 +1426,21 @@ function renderEstatisticas(dados) {
   }
 
   container.innerHTML = html;
+}
+
+function renderExtra() {
+  const table = document.getElementById('extra-list');
+  if (!table) return;
+  
+  EXTRAS.forEach((item, i) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="idx">${String(i+1).padStart(2,'0')}</td>
+      <td class="band">${item.artist}</td>
+      <td class="disco">${item.album}</td>
+    `;
+    table.appendChild(row);
+  });
 }
 
 // ========== TABS ==========

@@ -99,7 +99,7 @@
   }
 
   .hero-state-compras .hero h1 span { color: var(--s-color); }
-  .hero-state-descobertas .hero h1 span { color: var(--d-color); }
+  .hero-state-estatisticas .hero h1 span { color: var(--e-color); }
   .hero-state-colecao .hero h1 span { color: var(--colecao-color); }
 
   .tabs-container{
@@ -147,11 +147,11 @@
     margin-left: 6px;
     font-weight: 700;
   }
-  .tab-btn[data-tab="tab-descobertas"].active{
-    border-bottom-color: var(--d-color);
+  .tab-btn[data-tab="tab-estatisticas"].active{
+    border-bottom-color: var(--e-color);
   }
-  .tab-btn[data-tab="tab-descobertas"].active .tab-badge{
-    background: var(--d-color);
+  .tab-btn[data-tab="tab-estatisticas"].active .tab-badge{
+    background: var(--e-color);
   }
   .tab-btn[data-tab="tab-colecao"].active{
     border-bottom-color: var(--colecao-color);
@@ -725,6 +725,81 @@
   .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
   .empty-state p { font-size: 14px; opacity: 0.7; }
 
+  /* ===== ESTATÍSTICAS ===== */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    padding: 20px 16px;
+    text-align: center;
+    border-top: 3px solid var(--e-color);
+  }
+  .stat-number {
+    font-family: 'Anton', sans-serif;
+    font-size: 36px;
+    line-height: 1.1;
+    color: var(--e-color);
+  }
+  .stat-label {
+    font-size: 12px;
+    opacity: 0.5;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .stat-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-list-item {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stat-list-item .name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .stat-list-item .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--e-color);
+    font-weight: 700;
+  }
+  .stat-list-item .count.bar {
+    background: var(--e-color);
+    color: var(--ink);
+    padding: 2px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+  .stat-subtitle {
+    font-family: 'Anton', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    margin: 28px 0 12px 0;
+    color: var(--e-color);
+  }
+  .stat-subtitle span {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.4;
+    margin-left: 8px;
+  }
   .ano-divider {
     font-family: 'Anton', sans-serif;
     font-size: 32px;
@@ -753,7 +828,7 @@
     .section{ padding: 32px 4vw 8px; }
     .login-box { padding: 32px 20px; }
     .user-bar { padding: 8px 4vw; }
-    .ano-divider { font-size:24px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -782,9 +857,9 @@
   </div>
 
   <section class="hero hero-state-compras" id="heroSection">
-    <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria fportelada</div>
+    <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria</div>
     <h1 id="heroTitle">Lista de <span id="heroHighlight">Compras</span></h1>
-    <p class="hero-sub" id="heroSub">Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.</p>
+    <p class="hero-sub" id="heroSub">Prioridade S → C, baseado nas suas playlists importadas.</p>
     <div class="hero-meter" id="heroMeter">
       <span style="background:var(--s-color)"></span>
       <span style="background:var(--s-color)"></span>
@@ -797,16 +872,15 @@
 
   <div class="tabs-container">
     <div class="tabs">
-      <button class="tab-btn active" data-tab="tab-compras" onclick="switchTab('tab-compras')">📋 Lista de Compras</button>
-      <button class="tab-btn" data-tab="tab-descobertas" onclick="switchTab('tab-descobertas')">🔍 Descobertas <span class="tab-badge" id="descobertas-badge">0</span></button>
+      <button class="tab-btn active" data-tab="tab-compras" onclick="switchTab('tab-compras')">📋 Compras</button>
+      <button class="tab-btn" data-tab="tab-estatisticas" onclick="switchTab('tab-estatisticas')">📊 Estatísticas</button>
       <button class="tab-btn" data-tab="tab-colecao" onclick="switchTab('tab-colecao')">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
       <button class="tab-btn" data-tab="tab-importar" onclick="switchTab('tab-importar')">📤 Importar</button>
     </div>
   </div>
 
-  <!-- ===== TAB 1: LISTA DE COMPRAS ===== -->
+  <!-- ===== TAB 1: COMPRAS ===== -->
   <div id="tab-compras" class="tab-content active">
-
     <section class="section" style="--tier-color:var(--s-color)">
       <div class="tier-head">
         <div class="tier-stamp">S</div>
@@ -817,7 +891,6 @@
       </div>
       <div class="grid" id="grid-s"></div>
     </section>
-
     <section class="section" style="--tier-color:var(--a-color)">
       <div class="tier-head">
         <div class="tier-stamp">A</div>
@@ -828,7 +901,6 @@
       </div>
       <div class="grid" id="grid-a"></div>
     </section>
-
     <section class="section" style="--tier-color:var(--b-color)">
       <div class="tier-head">
         <div class="tier-stamp">B</div>
@@ -839,7 +911,6 @@
       </div>
       <div class="grid" id="grid-b"></div>
     </section>
-
     <section class="section" style="--tier-color:var(--c-color)">
       <div class="tier-head">
         <div class="tier-stamp">C</div>
@@ -858,71 +929,39 @@
         <p class="note">Sem disco específico definido — avaliar caso a caso se surgir achado de garimpo.</p>
       </div>
     </section>
-
-    <!-- DROPDOWN: Oportunidades Extras -->
-    <section class="section">
-      <div class="tier-head" style="--tier-color:rgba(237,232,220,0.4); border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
-        <div class="tier-info" style="width: 100%;">
-          <div class="dropdown-toggle" onclick="toggleDropdown()">
-            <h2 style="color:rgba(237,232,220,0.55); font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; margin:0;">
-              Oportunidades Extras
-            </h2>
-            <span class="dropdown-arrow" id="dropdownArrow">▾</span>
-          </div>
-          <p style="font-size:14px; color:var(--paper); opacity:0.6; max-width:60ch; margin-top:6px;">
-            Descobertas fora da lista principal — sem prioridade definida, entram se cruzarem o caminho.
-          </p>
-        </div>
-      </div>
-      <div class="dropdown-content" id="dropdownContent">
-        <table class="list-table" id="extra-list"></table>
-      </div>
-    </section>
-
   </div>
 
-  <!-- ===== TAB 2: DESCOBERTAS ===== -->
-  <div id="tab-descobertas" class="tab-content">
-    <section class="section" style="--tier-color:var(--d-color)">
+  <!-- ===== TAB 2: ESTATÍSTICAS ===== -->
+  <div id="tab-estatisticas" class="tab-content">
+    <section class="section" style="--tier-color:var(--e-color)">
       <div class="tier-head">
-        <div class="tier-stamp small">🔍</div>
+        <div class="tier-stamp small">📊</div>
         <div class="tier-info">
-          <h2>Descobertas do Ano</h2>
-          <p>Bandas que marcaram suas descobertas através do Discovery Weekly.</p>
+          <h2 style="color:var(--e-color);">Estatísticas da Playlist</h2>
+          <p>Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.</p>
         </div>
       </div>
-      <div class="grid" id="grid-descobertas"></div>
+      <div id="estatisticas-container">
+        <div class="empty-state"><div class="icon">⏳</div><h3>Carregando estatísticas...</h3></div>
+      </div>
     </section>
   </div>
 
   <!-- ===== TAB 3: COLEÇÃO ===== -->
   <div id="tab-colecao" class="tab-content">
-
-    <section class="section" style="--tier-color:var(--vinil-color)">
+    <section class="section" style="--tier-color:var(--colecao-color)">
       <div class="tier-head">
-        <div class="tier-stamp small" style="background:var(--vinil-color);">🎵</div>
+        <div class="tier-stamp small">💿</div>
         <div class="tier-info">
-          <h2 style="color:var(--vinil-color);">Vinil</h2>
-          <p>Discos em formato LP, edições especiais e prensagens.</p>
+          <h2 style="color:var(--colecao-color);">Coleção</h2>
+          <p>Registro de todos os discos que já fazem parte da sua coleção física.</p>
         </div>
         <div class="add-btn-wrap">
           <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
         </div>
       </div>
-      <div class="grid" id="grid-vinil"></div>
+      <div class="grid" id="grid-colecao"></div>
     </section>
-
-    <section class="section" style="--tier-color:var(--cd-color)">
-      <div class="tier-head">
-        <div class="tier-stamp small" style="background:var(--cd-color);">💿</div>
-        <div class="tier-info">
-          <h2 style="color:var(--cd-color);">CD</h2>
-          <p>Compact discs, incluindo edições comuns, EP e compilações.</p>
-        </div>
-      </div>
-      <div class="grid" id="grid-cd"></div>
-    </section>
-
   </div>
 
   <!-- ===== TAB 4: IMPORTAR ===== -->
@@ -1051,13 +1090,14 @@
 </div>
 
 <footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
-  Gerado a partir da análise cruzada CSV Spotify × Pontuação Portelada™ · capas via Last.fm API · Coleção importada do Discogs
+  Projeto Discoteca — Sua coleção, suas recomendações.
 </footer>
 
 <script>
 // ========== API ==========
 const API_URL = 'https://fportelada.pythonanywhere.com';
 let usuarioId = null;
+let colecao = [];
 
 // ========== LOGIN ==========
 document.getElementById('btnLogin').addEventListener('click', function() {
@@ -1115,11 +1155,11 @@ function verificarSessao() {
     .catch(() => {});
 }
 
-// ========== CARREGAR DADOS DA API ==========
+// ========== CARREGAR DADOS ==========
 function carregarDados() {
   if (!usuarioId) return;
 
-  // Recomendações
+  // Recomendações (S/A/B/C)
   fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
@@ -1127,235 +1167,22 @@ function carregarDados() {
     })
     .catch(() => {});
 
-  // Descobertas
-  fetch(API_URL + '/descobertas?user_id=' + usuarioId)
-    .then(r => r.json())
-    .then(data => {
-      renderDescobertas(data);
-    })
-    .catch(() => {});
-
   // Coleção
   fetch(API_URL + '/colecao?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
-      renderColecao(data);
+      colecao = Array.isArray(data) ? data : [];
+      renderColecao();
     })
     .catch(() => {});
 
-  // Extra (fixo)
-  renderExtra();
-}
-
-// ========== RENDER ==========
-function renderRecomendacoes(dados) {
-  const tiers = { S: [], A: [], B: [], C: [] };
-  dados.forEach(item => {
-    if (tiers[item.tier]) tiers[item.tier].push(item);
-  });
-
-  ['S', 'A', 'B'].forEach(tier => {
-    const grid = document.getElementById('grid-' + tier.toLowerCase());
-    if (!grid) return;
-    const items = tiers[tier] || [];
-    
-    if (items.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
-      return;
-    }
-
-    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : '#4E7A8C';
-    grid.innerHTML = items.map((item, idx) => {
-      const letter = item.album ? item.album.charAt(0) : '?';
-      const id = `rec-${tier}-${idx}`;
-      return `
-        <div class="card" id="${id}">
-          <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
-            <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
-            <div class="spine-letter">${letter}</div>
-            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
-          </div>
-          <div class="card-body">
-            <h3>${item.album || 'Álbum'}</h3>
-            <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
-            <div class="meta-block">
-              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
-            </div>
-            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // Busca capas
-    items.forEach((item, idx) => {
-      const id = `rec-${tier}-${idx}`;
-      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
-    });
-  });
-}
-
-function renderDescobertas(dados) {
-  const grid = document.getElementById('grid-descobertas');
-  if (!grid) {
-    console.error('Elemento grid-descobertas não encontrado');
-    return;
-  }
-
-  if (!dados || dados.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma descoberta registrada ainda.</p></div>`;
-    document.getElementById('descobertas-badge').textContent = '0';
-    return;
-  }
-
-  // Agrupa por ano
-  const anos = {};
-  dados.forEach(item => {
-    const ano = item.ano || 'Sem ano';
-    if (!anos[ano]) anos[ano] = [];
-    anos[ano].push(item);
-  });
-
-  const anosOrdenados = Object.keys(anos).sort((a, b) => {
-    if (a === 'Sem ano') return 1;
-    if (b === 'Sem ano') return -1;
-    return b - a;
-  });
-
-  let html = '';
-  anosOrdenados.forEach(ano => {
-    const items = anos[ano];
-    // TÍTULO DO ANO (fora do grid)
-    html += `<div class="ano-divider" style="grid-column: 1 / -1; margin: 40px 0 16px 0;">${ano} <span>${items.length} descoberta${items.length > 1 ? 's' : ''}</span></div>`;
-    // CARDS DO ANO (dentro do grid)
-    html += items.map((item, idx) => {
-      const id = `desc-${ano}-${idx}`;
-      return `
-        <div class="card" style="border-top-color: var(--d-color);" id="${id}">
-          <div class="art-wrap" id="art-${id}" style="background: var(--d-color); background-size: cover; background-position: center; min-height: 100px; height: auto; padding: 20px 0;">
-            <div class="spine-letter">${(item.album || '?').charAt(0)}</div>
-            <div class="art-fallback" id="fallback-${id}" style="opacity:0.8;">${item.artista || '?'}<br>${item.album || '?'}</div>
-          </div>
-          <div class="card-body">
-            <h3>${item.album || '?'}</h3>
-            <div class="artist" style="color:var(--d-color);">${item.artista || 'Artista'}</div>
-            <div class="meta-block">
-              <div class="meta-row"><span class="label">Destaque</span><span class="val">${item.titulo || ''}</span></div>
-            </div>
-            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.descricao || ''}</span></div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  });
-
-  grid.innerHTML = html;
-  document.getElementById('descobertas-badge').textContent = dados.length;
-
-  // Busca capas
-  dados.forEach((item, idx) => {
-    const id = `desc-${item.ano}-${idx}`;
-    fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
-  });
-}
-
-function renderColecao(dados) {
-  const gridVinil = document.getElementById('grid-vinil');
-  const gridCd = document.getElementById('grid-cd');
-  if (!gridVinil || !gridCd) return;
-
-  // Separa por tipo (formato contém "LP" ou "CD")
-  const vinil = dados.filter(item => item.formato && item.formato.includes('LP'));
-  const cd = dados.filter(item => item.formato && item.formato.includes('CD'));
-
-  // Renderiza Vinil
-  if (vinil.length === 0) {
-    gridVinil.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhum vinil na coleção.</p></div>`;
-  } else {
-    gridVinil.innerHTML = vinil.map((item, i) => {
-      const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-      const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-      const letter = item.album ? item.album.charAt(0) : '?';
-      const id = `vinil-${i}`;
-      return `
-        <div class="card" id="${id}">
-          <div class="art-wrap" id="art-${id}" style="background: var(--vinil-color); background-size: cover; background-position: center;">
-            <span class="priority-tag" style="background:var(--vinil-color);color:var(--ink);">🎵</span>
-            <div class="spine-letter">${letter}</div>
-            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
-          </div>
-          <div class="card-body">
-            <h3>${item.album || '?'}</h3>
-            <div class="artist" style="color:var(--vinil-color);">${item.artista || 'Artista'}</div>
-            <div class="meta-block">
-              <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
-            </div>
-            <div class="meta-row">
-              <span class="label">Condição</span>
-              <span class="val">
-                ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
-                ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
-                ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
-              </span>
-            </div>
-            ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // Busca capas para vinil
-    vinil.forEach((item, i) => {
-      const id = `vinil-${i}`;
-      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
-    });
-  }
-
-  // Renderiza CD
-  if (cd.length === 0) {
-    gridCd.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhum CD na coleção.</p></div>`;
-  } else {
-    gridCd.innerHTML = cd.map((item, i) => {
-      const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-      const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
-      const letter = item.album ? item.album.charAt(0) : '?';
-      const id = `cd-${i}`;
-      return `
-        <div class="card" id="${id}">
-          <div class="art-wrap" id="art-${id}" style="background: var(--cd-color); background-size: cover; background-position: center;">
-            <span class="priority-tag" style="background:var(--cd-color);color:var(--ink);">💿</span>
-            <div class="spine-letter">${letter}</div>
-            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
-          </div>
-          <div class="card-body">
-            <h3>${item.album || '?'}</h3>
-            <div class="artist" style="color:var(--cd-color);">${item.artista || 'Artista'}</div>
-            <div class="meta-block">
-              <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
-            </div>
-            <div class="meta-row">
-              <span class="label">Condição</span>
-              <span class="val">
-                ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
-                ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
-                ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
-              </span>
-            </div>
-            ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // Busca capas para CD
-    cd.forEach((item, i) => {
-      const id = `cd-${i}`;
-      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
-    });
-  }
-
-  const total = (vinil.length || 0) + (cd.length || 0);
-  document.getElementById('colecao-badge').textContent = total;
+  // Estatísticas
+  fetch(API_URL + '/estatisticas?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => {
+      renderEstatisticas(data);
+    })
+    .catch(() => {});
 }
 
 // ========== LAST.FM ==========
@@ -1419,38 +1246,169 @@ async function fetchAlbumArt(artist, album, artId, fallbackId) {
   }
 }
 
-// ========== EXTRA (fixo) ==========
-function renderExtra() {
-  const table = document.getElementById('extra-list');
-  if (!table) return;
-  
-  const extras = [
-    { artist: 'Seether', album: 'Finding Beauty in Negative Spaces' },
-    { artist: 'Machine Head', album: 'The Blackening' },
-    { artist: 'Týr', album: 'By the Light of the Northern Star' },
-    { artist: 'Godsmack', album: 'Faceless' },
-    { artist: 'Dream Theater', album: 'Metropolis Pt. 2' },
-    { artist: 'Lamb of God', album: 'Ashes of the Wake' },
-    { artist: 'The Offspring', album: 'Smash' },
-    { artist: 'Disturbed', album: 'The Sickness' },
-    { artist: 'Tremonti', album: 'A Dying Machine' },
-    { artist: 'Bring Me The Horizon', album: 'Sempiternal' },
-    { artist: 'Amon Amarth', album: 'Twilight of the Thunder God' },
-    { artist: 'Devilskin', album: 'Be Like the River' },
-    { artist: 'Breed 77', album: 'In My Blood' },
-    { artist: 'Not Enough Space', album: 'Weaponized' },
-    { artist: 'Alter Bridge', album: 'Blackbird' },
-  ];
-
-  extras.forEach((item, i) => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td class="idx">${String(i+1).padStart(2,'0')}</td>
-      <td class="band">${item.artist}</td>
-      <td class="disco">${item.album}</td>
-    `;
-    table.appendChild(row);
+// ========== RENDER ==========
+function renderRecomendacoes(dados) {
+  const tiers = { S: [], A: [], B: [], C: [] };
+  dados.forEach(item => {
+    if (tiers[item.tier]) tiers[item.tier].push(item);
   });
+
+  ['S', 'A', 'B'].forEach(tier => {
+    const grid = document.getElementById('grid-' + tier.toLowerCase());
+    if (!grid) return;
+    const items = tiers[tier] || [];
+    
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
+      return;
+    }
+
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : '#4E7A8C';
+    grid.innerHTML = items.map((item, idx) => {
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `rec-${tier}-${idx}`;
+      return `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
+            <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || 'Álbum'}</h3>
+            <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+            </div>
+            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    items.forEach((item, idx) => {
+      const id = `rec-${tier}-${idx}`;
+      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+    });
+  });
+}
+
+function renderColecao() {
+  const grid = document.getElementById('grid-colecao');
+  if (!grid) return;
+  
+  if (!colecao || colecao.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
+    document.getElementById('colecao-badge').textContent = '0';
+    return;
+  }
+
+  grid.innerHTML = colecao.map((item, i) => {
+    const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const letter = item.album ? item.album.charAt(0) : '?';
+    const id = `col-${i}`;
+    const isVinil = item.formato && item.formato.includes('LP');
+    const tagColor = isVinil ? 'var(--vinil-color)' : 'var(--cd-color)';
+    const tagIcon = isVinil ? '🎵' : '💿';
+    
+    return `
+      <div class="card" id="${id}">
+        <div class="art-wrap" id="art-${id}" style="background: ${tagColor}; background-size: cover; background-position: center;">
+          <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon}</span>
+          <div class="spine-letter">${letter}</div>
+          <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+        </div>
+        <div class="card-body">
+          <h3>${item.album || '?'}</h3>
+          <div class="artist" style="color:${tagColor};">${item.artista || 'Artista'}</div>
+          <div class="meta-block">
+            <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+          </div>
+          <div class="meta-row">
+            <span class="label">Condição</span>
+            <span class="val">
+              ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
+              ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
+              ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+            </span>
+          </div>
+          ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  colecao.forEach((item, i) => {
+    const id = `col-${i}`;
+    fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+  });
+
+  document.getElementById('colecao-badge').textContent = colecao.length;
+}
+
+function renderEstatisticas(dados) {
+  const container = document.getElementById('estatisticas-container');
+  if (!container) return;
+
+  if (dados.erro) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar estatísticas</h3><p>${dados.erro}</p></div>`;
+    return;
+  }
+
+  let html = '';
+
+  // Cards de visão geral
+  html += `<div class="stat-grid">`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.total_musicas || 0}</div><div class="stat-label">Total de Músicas</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.artistas_unicos || 0}</div><div class="stat-label">Artistas Únicos</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.albuns_unicos || 0}</div><div class="stat-label">Álbuns Únicos</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.duracao_horas || 0}h</div><div class="stat-label">Duração Total</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.explicitas || 0}</div><div class="stat-label">Músicas Explícitas</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.nao_explicitas || 0}</div><div class="stat-label">Não Explícitas</div></div>`;
+  html += `</div>`;
+
+  // Top 10 Artistas
+  if (dados.top_artistas && dados.top_artistas.length > 0) {
+    html += `<div class="stat-subtitle">🎤 Top 10 Artistas <span>mais frequentes na playlist</span></div>`;
+    html += `<div class="stat-list">`;
+    dados.top_artistas.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Top 10 Álbuns
+  if (dados.top_albuns && dados.top_albuns.length > 0) {
+    html += `<div class="stat-subtitle">💿 Top 10 Álbuns <span>com mais músicas</span></div>`;
+    html += `<div class="stat-list">`;
+    dados.top_albuns.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Distribuição por Década
+  if (dados.decadas && dados.decadas.length > 0) {
+    html += `<div class="stat-subtitle">📅 Distribuição por Década</div>`;
+    html += `<div class="stat-list">`;
+    dados.decadas.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Top 10 Gêneros
+  if (dados.top_generos && dados.top_generos.length > 0) {
+    html += `<div class="stat-subtitle">🎸 Top 10 Gêneros <span>dominantes</span></div>`;
+    html += `<div class="stat-list">`;
+    dados.top_generos.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
 }
 
 // ========== TABS ==========
@@ -1468,21 +1426,21 @@ function switchTab(tabId) {
 
   if (tabId === 'tab-compras') {
     hero.className = 'hero hero-state-compras';
-    eyebrow.textContent = 'Projeto Discoteca · Curadoria fportelada';
+    eyebrow.textContent = 'Projeto Discoteca · Recomendações';
     title.innerHTML = 'Lista de <span>Compras</span>';
-    sub.textContent = 'Prioridade S → C, cruzando Pontuação Portelada™, cobertura da playlist e trajetória musical. Compre de cima pra baixo.';
+    sub.textContent = 'Prioridade S → C, baseado nas suas playlists importadas.';
     meter.style.display = 'flex';
-  } else if (tabId === 'tab-descobertas') {
-    hero.className = 'hero hero-state-descobertas';
-    eyebrow.textContent = 'Projeto Discoteca · Descobertas';
-    title.innerHTML = 'Descobertas <span>2018-2026</span>';
-    sub.textContent = 'Todas as bandas que marcaram minhas descobertas através do Discovery Weekly ao longo dos anos.';
+  } else if (tabId === 'tab-estatisticas') {
+    hero.className = 'hero hero-state-estatisticas';
+    eyebrow.textContent = 'Projeto Discoteca · Estatísticas';
+    title.innerHTML = 'Estatísticas <span>da Playlist</span>';
+    sub.textContent = 'Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.';
     meter.style.display = 'none';
   } else if (tabId === 'tab-colecao') {
     hero.className = 'hero hero-state-colecao';
     eyebrow.textContent = 'Projeto Discoteca · Coleção';
     title.innerHTML = 'Minha <span>Coleção</span>';
-    sub.textContent = 'Registro de todos os discos que já fazem parte da Coleção Portelada.';
+    sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
     meter.style.display = 'none';
   } else if (tabId === 'tab-importar') {
     hero.className = 'hero hero-state-colecao';

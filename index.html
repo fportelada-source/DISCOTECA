@@ -674,6 +674,15 @@
   .empty-state p { font-size: 14px; opacity: 0.7; max-width: 500px; margin: 0 auto; }
   .empty-state .empty-hint { font-size: 13px; opacity: 0.4; margin-top: 12px; }
 
+  .empty-state-full {
+    text-align: center;
+    padding: 100px 20px;
+  }
+  .empty-state-full .icon { font-size: 80px; margin-bottom: 20px; }
+  .empty-state-full h3 { font-family: 'Anton', sans-serif; font-size: 32px; letter-spacing: 0.02em; margin-bottom: 12px; }
+  .empty-state-full p { font-size: 16px; opacity: 0.6; max-width: 500px; margin: 0 auto; }
+  .empty-state-full .empty-hint { font-size: 14px; opacity: 0.4; margin-top: 16px; }
+
   /* ===== ESTATÍSTICAS ===== */
   .stat-grid {
     display: grid;
@@ -798,6 +807,8 @@
     .login-box { padding: 32px 20px; }
     .user-bar { padding: 8px 4vw; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
+    .empty-state-full h3 { font-size: 24px; }
+    .empty-state-full .icon { font-size: 60px; }
   }
 </style>
 </head>
@@ -851,49 +862,11 @@
   <!-- ===== TAB 1: COMPRAS ===== -->
   <div id="tab-compras" class="tab-content active">
 
-    <section class="section" style="--tier-color:var(--s-color)">
-      <div class="tier-head">
-        <div class="tier-stamp">S</div>
-        <div class="tier-info">
-          <h2>Prioridade Máxima</h2>
-          <p>Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.</p>
-        </div>
-      </div>
-      <div class="grid" id="grid-s"></div>
-    </section>
-
-    <section class="section" style="--tier-color:var(--a-color)">
-      <div class="tier-head">
-        <div class="tier-stamp">A</div>
-        <div class="tier-info">
-          <h2>Alta Prioridade</h2>
-          <p>Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.</p>
-        </div>
-      </div>
-      <div class="grid" id="grid-a"></div>
-    </section>
-
-    <section class="section" style="--tier-color:var(--b-color)">
-      <div class="tier-head">
-        <div class="tier-stamp">B</div>
-        <div class="tier-info">
-          <h2>Sem Urgência</h2>
-          <p>Pegar em promoção ou naturalmente, sem pressa de garimpo.</p>
-        </div>
-      </div>
-      <div class="grid" id="grid-b"></div>
-    </section>
-
-    <section class="section" style="--tier-color:var(--c-color)">
-      <div class="tier-head">
-        <div class="tier-stamp">C</div>
-        <div class="tier-info">
-          <h2>Baixa Prioridade</h2>
-          <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
-        </div>
-      </div>
-      <div class="grid" id="grid-c"></div>
-    </section>
+    <!-- Container único para estado vazio OU tiers -->
+    <div id="compras-container">
+      <!-- Se vazio, mostra mensagem única -->
+      <!-- Se tem dados, mostra os 4 tiers -->
+    </div>
 
   </div>
 
@@ -1226,71 +1199,93 @@ async function fetchAlbumArt(artist, album, artId, fallbackId) {
   }
 }
 
-// ========== RENDER ==========
+// ========== RENDER RECOMENDAÇÕES ==========
 function renderRecomendacoes(dados) {
+  const container = document.getElementById('compras-container');
+  
   // Verifica se tem dados
   if (!dados || dados.length === 0) {
-    // Mostra mensagem de vazio em todas as grids
-    ['grid-s', 'grid-a', 'grid-b', 'grid-c'].forEach(id => {
-      const grid = document.getElementById(id);
-      if (grid) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <div class="icon">💰</div>
-            <h3>Sua carteira está cheia... de expectativas!</h3>
-            <p>Faça upload da sua playlist para gerar recomendações personalizadas.</p>
-            <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
-          </div>
-        `;
-      }
-    });
+    // Mostra UMA mensagem de vazio para a aba inteira
+    container.innerHTML = `
+      <div class="empty-state-full" style="padding:80px 20px;">
+        <div class="icon">💰</div>
+        <h3>Sua carteira está cheia... de expectativas!</h3>
+        <p>Faça upload da sua playlist para gerar recomendações personalizadas.</p>
+        <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
+      </div>
+    `;
     return;
   }
 
+  // Tem dados - monta os 4 tiers
   const tiers = { S: [], A: [], B: [], C: [] };
   dados.forEach(item => {
     if (tiers[item.tier]) tiers[item.tier].push(item);
   });
 
+  let html = '';
+
   ['S', 'A', 'B', 'C'].forEach(tier => {
-    const grid = document.getElementById('grid-' + tier.toLowerCase());
-    if (!grid) return;
     const items = tiers[tier] || [];
-    
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' : '#8A8378';
+    const tierDesc = tier === 'S' ? 'Prioridade Máxima' : tier === 'A' ? 'Alta Prioridade' : tier === 'B' ? 'Sem Urgência' : 'Baixa Prioridade';
+    const tierDetail = tier === 'S' ? 'Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.' :
+                       tier === 'A' ? 'Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.' :
+                       tier === 'B' ? 'Pegar em promoção ou naturalmente, sem pressa de garimpo.' :
+                       'Só entram se aparecer oportunidade excepcional (preço/edição).';
+
+    html += `
+      <section class="section" style="--tier-color:${tierColor}">
+        <div class="tier-head">
+          <div class="tier-stamp">${tier}</div>
+          <div class="tier-info">
+            <h2>${tierDesc}</h2>
+            <p>${tierDetail}</p>
+          </div>
+        </div>
+        <div class="grid" id="grid-${tier.toLowerCase()}">
+    `;
+
     if (items.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <div class="icon">📭</div>
-          <h3>Nenhum disco ${tier} ainda</h3>
-          <p>Importe mais playlists para gerar recomendações para este tier.</p>
+      html += `
+        <div class="empty-state" style="padding:40px 20px;">
+          <div class="icon" style="font-size:32px;">📭</div>
+          <h3 style="font-size:18px;">Nenhum disco ${tier} ainda</h3>
+          <p style="font-size:13px;">Importe mais playlists para gerar recomendações para este tier.</p>
         </div>
       `;
-      return;
+    } else {
+      items.forEach((item, idx) => {
+        const letter = item.album ? item.album.charAt(0) : '?';
+        const id = `rec-${tier}-${idx}`;
+        html += `
+          <div class="card" id="${id}">
+            <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
+              <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
+              <div class="spine-letter">${letter}</div>
+              <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+            </div>
+            <div class="card-body">
+              <h3>${item.album || 'Álbum'}</h3>
+              <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
+              <div class="meta-block">
+                <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+              </div>
+              <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
+            </div>
+          </div>
+        `;
+      });
     }
 
-    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' : '#8A8378';
-    grid.innerHTML = items.map((item, idx) => {
-      const letter = item.album ? item.album.charAt(0) : '?';
-      const id = `rec-${tier}-${idx}`;
-      return `
-        <div class="card" id="${id}">
-          <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
-            <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
-            <div class="spine-letter">${letter}</div>
-            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
-          </div>
-          <div class="card-body">
-            <h3>${item.album || 'Álbum'}</h3>
-            <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
-            <div class="meta-block">
-              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
-            </div>
-            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
-          </div>
-        </div>
-      `;
-    }).join('');
+    html += `</div></section>`;
+  });
 
+  container.innerHTML = html;
+
+  // Carrega as capas depois de montar o HTML
+  ['S', 'A', 'B', 'C'].forEach(tier => {
+    const items = tiers[tier] || [];
     items.forEach((item, idx) => {
       const id = `rec-${tier}-${idx}`;
       fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
@@ -1298,6 +1293,7 @@ function renderRecomendacoes(dados) {
   });
 }
 
+// ========== RENDER COLEÇÃO ==========
 function renderColecao() {
   const grid = document.getElementById('grid-colecao');
   if (!grid) return;
@@ -1359,12 +1355,13 @@ function renderColecao() {
   document.getElementById('colecao-badge').textContent = colecao.length;
 }
 
+// ========== RENDER ESTATÍSTICAS ==========
 function renderEstatisticas(dados) {
   const container = document.getElementById('estatisticas-container');
   if (!container) return;
 
   // Verifica se tem erro ou está vazio
-  if (!dados || dados.erro || dados.total_musicas === 0) {
+  if (!dados || dados.erro || dados.total_musicas === 0 || dados.total_musicas === undefined) {
     container.innerHTML = `
       <div class="empty-state" style="padding:60px 20px;">
         <div class="icon">🎧</div>
@@ -1575,7 +1572,6 @@ function uploadPlaylist(tipo, input) {
       if (d.sucesso) {
         status.textContent = '✅ ' + d.mensagem;
         status.className = 'upload-status success';
-        // Habilita o botão de gerar
         document.getElementById('btn-gerar').disabled = false;
       } else {
         status.textContent = '❌ ' + (d.erro || 'Erro');
@@ -1664,7 +1660,6 @@ document.getElementById('upload-discogs').addEventListener('change', function() 
 });
 document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
 
-// Inicializa botão de gerar desabilitado até ter upload
 document.getElementById('btn-gerar').disabled = true;
 
 // ========== INICIAR ==========

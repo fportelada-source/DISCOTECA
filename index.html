@@ -1,323 +1,1616 @@
-from flask import Flask, request, jsonify, redirect, url_for, session
-from flask_cors import CORS
-import sqlite3
-import os
-import csv
-import io
-import json
-from datetime import datetime
-from collections import Counter
-import requests
-from functools import wraps
-import secrets
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projeto Discoteca — Lista de Compras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE8DC;
+    --ink:#1B1815;
+    --ink-soft:#4a453e;
+    --card:#242019;
+    --card-line: rgba(237,232,220,0.10);
+    --s-color:#D6432F;
+    --a-color:#E39A2E;
+    --b-color:#4E7A8C;
+    --c-color:#8A8378;
+    --d-color:#6B5B7B;
+    --e-color:#5C6B7A;
+    --colecao-color:#B8A88A;
+    --vinil-color:#E8C87A;
+    --cd-color:#7AB8D8;
+    --groove: repeating-radial-gradient(circle at center, rgba(237,232,220,0.035) 0px, rgba(237,232,220,0.035) 1px, transparent 1px, transparent 3px);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+  ::selection{ background:var(--s-color); color:var(--paper); }
 
-app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'dev-key-123456')
-CORS(app)
+  .hero{
+    position:relative;
+    padding:64px 6vw 48px;
+    border-bottom:1px solid var(--card-line);
+    overflow:hidden;
+    transition: all 0.4s ease;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:var(--groove);
+    pointer-events:none;
+  }
+  .hero-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--paper);
+    opacity:0.55;
+    margin-bottom:18px;
+    transition: opacity 0.3s ease;
+  }
+  .hero h1{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    font-size:clamp(42px, 7vw, 92px);
+    line-height:0.92;
+    letter-spacing:0.005em;
+    text-transform:uppercase;
+    max-width:14ch;
+    transition: all 0.4s ease;
+  }
+  .hero h1 span{ color:var(--s-color); }
+  .hero-sub{
+    margin-top:20px;
+    max-width:52ch;
+    font-size:16px;
+    color:var(--paper);
+    opacity:0.68;
+    line-height:1.6;
+    transition: all 0.4s ease;
+  }
+  .hero-meter{
+    margin-top:36px;
+    display:flex;
+    gap:2px;
+    max-width:520px;
+    transition: opacity 0.3s ease;
+  }
+  .hero-meter span{
+    flex:1;
+    height:6px;
+    border-radius:1px;
+  }
 
-# ========== CONFIG ==========
-DATABASE = '/home/fportelada/discoteca.db'
-GOOGLE_CLIENT_ID = 'seu-client-id-aqui'
-GOOGLE_CLIENT_SECRET = 'seu-client-secret-aqui'
+  .hero-state-compras .hero h1 span { color: var(--s-color); }
+  .hero-state-estatisticas .hero h1 span { color: var(--e-color); }
+  .hero-state-colecao .hero h1 span { color: var(--colecao-color); }
 
-# ========== BANCO ==========
-def get_db():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+  .tabs-container{
+    padding: 0 6vw;
+    border-bottom: 1px solid var(--card-line);
+    position: sticky;
+    top: 0;
+    background: var(--ink);
+    z-index: 100;
+  }
+  .tabs{
+    display: flex;
+    gap: 4px;
+    padding: 12px 0 0 0;
+  }
+  .tab-btn{
+    background: transparent;
+    border: none;
+    color: var(--paper);
+    opacity: 0.4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 24px 14px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+    position: relative;
+  }
+  .tab-btn:hover{
+    opacity: 0.7;
+  }
+  .tab-btn.active{
+    opacity: 1;
+    border-bottom-color: var(--s-color);
+  }
+  .tab-btn .tab-badge{
+    display: inline-block;
+    background: var(--s-color);
+    color: var(--ink);
+    font-size: 10px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 700;
+  }
+  .tab-btn[data-tab="tab-estatisticas"].active{
+    border-bottom-color: var(--e-color);
+  }
+  .tab-btn[data-tab="tab-estatisticas"].active .tab-badge{
+    background: var(--e-color);
+  }
+  .tab-btn[data-tab="tab-colecao"].active{
+    border-bottom-color: var(--colecao-color);
+  }
+  .tab-btn[data-tab="tab-colecao"].active .tab-badge{
+    background: var(--colecao-color);
+    color: var(--ink);
+  }
 
-def init_db():
-    conn = get_db()
-    c = conn.cursor()
-    
-    # Tabela de usuários
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            google_id TEXT UNIQUE,
-            nome TEXT,
-            email TEXT,
-            data_criacao TEXT
-        )
-    ''')
-    
-    # Tabela de recomendações
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS recomendacoes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            artista TEXT,
-            album TEXT,
-            tier TEXT,
-            estrategia TEXT,
-            nota TEXT,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
-    
-    # Tabela de coleção
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS colecao (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            artista TEXT,
-            album TEXT,
-            formato TEXT,
-            condicao_midia TEXT,
-            condicao_capa TEXT,
-            preco REAL,
-            data_aquisicao TEXT,
-            notas TEXT,
-            data_adicao TEXT,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
+  .tab-content{
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .tab-content.active{
+    display: block;
+  }
 
-# ========== ROTAS ==========
-@app.route('/login', methods=['GET'])
-def login():
-    # URL de autenticação do Google
-    auth_url = f'https://accounts.google.com/o/oauth2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri=https://fportelada.pythonanywhere.com/callback&response_type=code&scope=email%20profile'
-    return jsonify({'auth_url': auth_url})
+  @keyframes fadeIn{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
 
-@app.route('/callback', methods=['GET'])
-def callback():
-    code = request.args.get('code')
-    if not code:
-        return redirect('https://fportelada.pythonanywhere.com')
-    
-    # Trocar código por token
-    token_url = 'https://oauth2.googleapis.com/token'
-    data = {
-        'code': code,
-        'client_id': GOOGLE_CLIENT_ID,
-        'client_secret': GOOGLE_CLIENT_SECRET,
-        'redirect_uri': 'https://fportelada.pythonanywhere.com/callback',
-        'grant_type': 'authorization_code'
-    }
-    
-    try:
-        response = requests.post(token_url, data=data)
-        token_data = response.json()
-        access_token = token_data.get('access_token')
-        
-        # Pegar info do usuário
-        userinfo_response = requests.get('https://www.googleapis.com/oauth2/v1/userinfo', headers={'Authorization': f'Bearer {access_token}'})
-        userinfo = userinfo_response.json()
-        
-        google_id = userinfo.get('id')
-        nome = userinfo.get('name', 'Usuário')
-        email = userinfo.get('email')
-        
-        # Salvar no banco
-        conn = get_db()
-        c = conn.cursor()
-        
-        c.execute('SELECT id FROM usuarios WHERE google_id = ?', (google_id,))
-        user = c.fetchone()
-        
-        if user:
-            usuario_id = user['id']
-        else:
-            c.execute('INSERT INTO usuarios (google_id, nome, email, data_criacao) VALUES (?, ?, ?, ?)',
-                     (google_id, nome, email, datetime.now().isoformat()))
-            usuario_id = c.lastrowid
-            conn.commit()
-        
-        conn.close()
-        
-        # Redirecionar com user_id
-        return redirect(f'https://fportelada.pythonanywhere.com?user_id={usuario_id}&nome={nome}')
-        
-    except Exception as e:
-        print('Erro no callback:', e)
-        return redirect('https://fportelada.pythonanywhere.com')
+  .section{ padding: 40px 6vw 8px; }
+  .tier-head{
+    display:flex;
+    align-items:flex-end;
+    gap:18px;
+    margin-bottom:28px;
+    border-bottom:1px solid var(--card-line);
+    padding-bottom:18px;
+  }
+  .tier-stamp{
+    font-family:'Anton', sans-serif;
+    font-size:64px;
+    line-height:0.8;
+    color:var(--ink);
+    background:var(--tier-color);
+    padding:6px 16px 12px;
+    border-radius:6px;
+    transform:rotate(-3deg);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  }
+  .tier-stamp.small{
+    font-size:48px;
+    padding:6px 14px 10px;
+  }
+  .tier-stamp.tiny{
+    font-size:28px;
+    padding:4px 10px 6px;
+  }
+  .tier-info h2{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--tier-color);
+    margin-bottom:6px;
+  }
+  .tier-info p{
+    font-size:14px;
+    color:var(--paper);
+    opacity:0.6;
+    max-width:60ch;
+  }
 
-@app.route('/sessao', methods=['GET'])
-def sessao():
-    user_id = request.args.get('user_id')
-    if user_id:
-        conn = get_db()
-        c = conn.cursor()
-        c.execute('SELECT nome FROM usuarios WHERE id = ?', (user_id,))
-        user = c.fetchone()
-        conn.close()
-        if user:
-            return jsonify({'logado': True, 'usuario_id': user_id, 'nome': user['nome']})
-    return jsonify({'logado': False})
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:18px;
+    padding-bottom:8px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:10px;
+    overflow:hidden;
+    position:relative;
+    transition:transform 0.25s ease, border-color 0.25s ease;
+    border-top:3px solid var(--tier-color);
+  }
+  .card:hover{ transform:translateY(-4px); border-color:rgba(237,232,220,0.28); }
+  
+  .art-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    min-height:230px;
+    display:flex; 
+    align-items:center; 
+    justify-content:center;
+    overflow:hidden;
+    background-size: cover !important;
+    background-position: center !important;
+    background-color: #1a1815;
+  }
+  .art-wrap .spine-letter{
+    position:absolute;
+    font-family:'Anton', sans-serif;
+    font-size:130px;
+    line-height:1;
+    color:rgba(255,255,255,0.08);
+    text-transform:uppercase;
+    user-select:none;
+    right:-14px; bottom:-32px;
+    z-index: 1;
+    pointer-events:none;
+  }
+  .art-fallback{
+    position:relative;
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    text-align:center;
+    color:rgba(255,255,255,0.92);
+    letter-spacing:0.01em;
+    padding:0 20px;
+    text-transform:uppercase;
+    line-height:1.3;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  }
+  .priority-tag{
+    position:absolute; top:10px; left:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; font-weight:700;
+    letter-spacing:0.08em;
+    color:var(--ink);
+    background:var(--tier-color);
+    padding:3px 8px;
+    border-radius:4px;
+    z-index: 3;
+  }
+  .card-body{ padding:16px 16px 18px; }
+  .card-body h3{
+    font-family:'Inter', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    line-height:1.25;
+    margin-bottom:2px;
+  }
+  .card-body .artist{
+    font-size:13px;
+    color:var(--tier-color);
+    font-weight:600;
+    margin-bottom:12px;
+  }
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding-top:10px;
+    border-top:1px dashed var(--card-line);
+  }
+  .meta-row .label{ color:rgba(237,232,220,0.4); text-transform:uppercase; letter-spacing:0.05em; }
+  .meta-row .val{ color:var(--paper); opacity:0.85; text-align:right; max-width:60%; }
+  .meta-block{ margin-bottom:8px; }
 
-@app.route('/recomendacoes', methods=['GET'])
-def recomendacoes():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({'erro': 'Usuario ID necessario'}), 400
-    
-    conn = get_db()
-    c = conn.cursor()
-    c.execute('SELECT artista, album, tier, estrategia, nota FROM recomendacoes WHERE usuario_id = ? ORDER BY tier ASC', (user_id,))
-    rows = c.fetchall()
-    conn.close()
-    
-    return jsonify([dict(row) for row in rows])
+  .wildcard{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-left:4px solid var(--c-color);
+    border-radius:8px;
+    padding:20px 22px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+  }
+  .wildcard .chip{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:5px 10px;
+    background:rgba(237,232,220,0.06);
+    border:1px solid var(--card-line);
+    border-radius:20px;
+  }
+  .wildcard .note{
+    width:100%;
+    font-size:13px;
+    color:rgba(237,232,220,0.55);
+    margin-top:6px;
+  }
 
-@app.route('/colecao', methods=['GET'])
-def colecao():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({'erro': 'Usuario ID necessario'}), 400
-    
-    conn = get_db()
-    c = conn.cursor()
-    c.execute('SELECT id, artista, album, formato, condicao_midia, condicao_capa, preco, data_aquisicao, notas, data_adicao FROM colecao WHERE usuario_id = ? ORDER BY data_adicao DESC', (user_id,))
-    rows = c.fetchall()
-    conn.close()
-    
-    return jsonify([dict(row) for row in rows])
+  .dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    transition: opacity 0.2s ease;
+  }
+  .dropdown-toggle:hover {
+    opacity: 0.8;
+  }
+  .dropdown-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 18px;
+    color: rgba(237,232,220,0.4);
+    line-height: 1;
+  }
+  .dropdown-arrow.open {
+    transform: rotate(180deg);
+  }
+  .dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .dropdown-content.open {
+    max-height: 2000px;
+    opacity: 1;
+    margin-top: 24px;
+  }
+  .dropdown-content .list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .dropdown-content .list-table tr { border-bottom: 1px solid var(--card-line); }
+  .dropdown-content .list-table td { padding: 14px 10px; }
+  .dropdown-content .list-table .idx { font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .dropdown-content .list-table .band { font-weight:600; width:32%; }
+  .dropdown-content .list-table .disco { color:rgba(237,232,220,0.7); font-style:italic; }
+  .dropdown-content .list-table tr:hover { background:rgba(237,232,220,0.03); }
 
-@app.route('/adicionar_disco', methods=['POST'])
-def adicionar_disco():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({'erro': 'Usuario ID necessario'}), 400
-    
-    data = request.json
-    if not data:
-        return jsonify({'erro': 'Dados necessarios'}), 400
-    
-    conn = get_db()
-    c = conn.cursor()
-    c.execute('''
-        INSERT INTO colecao (usuario_id, artista, album, formato, condicao_midia, condicao_capa, preco, data_aquisicao, notas, data_adicao)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (user_id, data.get('artista'), data.get('album'), data.get('formato'), data.get('condicao_midia'), data.get('condicao_capa'), data.get('preco'), data.get('data_aquisicao'), data.get('notas'), datetime.now().isoformat()))
-    
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'sucesso': True, 'mensagem': 'Disco adicionado!'})
+  .list-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  .list-table tr{ border-bottom:1px solid var(--card-line); }
+  .list-table td{ padding:14px 10px; }
+  .list-table .idx{ font-family:'JetBrains Mono', monospace; color:rgba(237,232,220,0.3); width:36px; }
+  .list-table .band{ font-weight:600; width:32%; }
+  .list-table .disco{ color:rgba(237,232,220,0.7); font-style:italic; }
+  .list-table tr:hover{ background:rgba(237,232,220,0.03); }
 
-@app.route('/importar_playlist', methods=['POST'])
-def importar_playlist():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({'erro': 'Usuario ID necessario'}), 400
-    
-    if 'arquivo' not in request.files:
-        return jsonify({'erro': 'Arquivo necessario'}), 400
-    
-    file = request.files['arquivo']
-    tipo = request.form.get('tipo', 'desconhecido')
-    
-    if file.filename == '':
-        return jsonify({'erro': 'Nenhum arquivo selecionado'}), 400
-    
-    # Salvar o arquivo
-    filename = f'/home/fportelada/playlist_{tipo}_{user_id}.csv'
-    file.save(filename)
-    
-    return jsonify({'sucesso': True, 'mensagem': f'Playlist {tipo} importada!'})
+  .art-wrap.has-image .art-fallback {
+    opacity: 0 !important;
+  }
 
-@app.route('/importar_colecao', methods=['POST'])
-def importar_colecao():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({'erro': 'Usuario ID necessario'}), 400
-    
-    if 'arquivo' not in request.files:
-        return jsonify({'erro': 'Arquivo necessario'}), 400
-    
-    file = request.files['arquivo']
-    if file.filename == '':
-        return jsonify({'erro': 'Nenhum arquivo selecionado'}), 400
-    
-    # Ler CSV
-    content = file.read().decode('utf-8')
-    csv_reader = csv.DictReader(io.StringIO(content))
-    
-    conn = get_db()
-    c = conn.cursor()
-    
-    count = 0
-    for row in csv_reader:
-        artista = row.get('Artist', row.get('Artista', ''))
-        album = row.get('Album', row.get('Álbum', ''))
-        formato = row.get('Format', row.get('Formato', ''))
-        
-        if artista and album:
-            c.execute('''
-                INSERT INTO colecao (usuario_id, artista, album, formato, data_adicao)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (user_id, artista, album, formato, datetime.now().isoformat()))
-            count += 1
-    
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'sucesso': True, 'mensagem': f'{count} discos importados!'})
+  .format-badge{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: rgba(237,232,220,0.08);
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    opacity: 0.6;
+  }
 
-@app.route('/gerar_recomendacoes', methods=['POST'])
-def gerar_recomendacoes():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({'erro': 'Usuario ID necessario'}), 400
-    
-    # Exemplo simples: gerar recomendações baseado nas playlists
-    # Você precisa implementar sua lógica aqui
-    # Por enquanto, só limpa as recomendações existentes
-    conn = get_db()
-    c = conn.cursor()
-    
-    c.execute('DELETE FROM recomendacoes WHERE usuario_id = ?', (user_id,))
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'sucesso': True, 'mensagem': 'Recomendações geradas!'})
+  .cond-badge{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-line);
+    margin-right: 4px;
+  }
+  .cond-nm{ color: #4CAF50; border-color: #4CAF50; }
+  .cond-vgplus{ color: #8BC34A; border-color: #8BC34A; }
+  .cond-vg{ color: #FFC107; border-color: #FFC107; }
+  .cond-g{ color: #FF9800; border-color: #FF9800; }
+  .cond-f{ color: #FF5722; border-color: #FF5722; }
+  .cond-p{ color: #f44336; border-color: #f44336; }
+  .cond-m{ color: #00BCD4; border-color: #00BCD4; }
 
-@app.route('/estatisticas', methods=['GET'])
-def estatisticas():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({'erro': 'Usuario ID necessario'}), 400
-    
-    # Dados mock para demonstração
-    return jsonify({
-        'total_musicas': 1600,
-        'artistas_unicos': 350,
-        'albuns_unicos': 120,
-        'duracao_horas': 84,
-        'explicitas': 200,
-        'nao_explicitas': 1400,
-        'top_artistas': [
-            {'nome': 'Metallica', 'contagem': 45},
-            {'nome': 'Slipknot', 'contagem': 38},
-            {'nome': 'Iron Maiden', 'contagem': 32}
-        ],
-        'top_albuns': [
-            {'nome': 'Master of Puppets', 'contagem': 12},
-            {'nome': 'Ride the Lightning', 'contagem': 10}
-        ],
-        'decadas': [
-            {'nome': '1980', 'contagem': 300},
-            {'nome': '1990', 'contagem': 500},
-            {'nome': '2000', 'contagem': 600},
-            {'nome': '2010', 'contagem': 200}
-        ],
-        'top_generos': [
-            {'nome': 'Thrash Metal', 'contagem': 400},
-            {'nome': 'Heavy Metal', 'contagem': 350},
-            {'nome': 'Nu Metal', 'contagem': 250},
-            {'nome': 'Hard Rock', 'contagem': 200}
-        ]
+  .section-subtitle{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--paper);
+    opacity: 0.5;
+    margin-bottom: 24px;
+    padding-left: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  footer{
+    padding:40px 6vw 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:rgba(237,232,220,0.3);
+    text-align:center;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  /* ===== LOGIN ===== */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 40px 20px;
+  }
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-box .logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 48px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .login-box .logo span { color: var(--s-color); }
+  .login-box .sub {
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 32px;
+  }
+  .login-btn {
+    background: #ffffff;
+    color: #1a1815;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+  .login-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+  .login-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .login-error {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  /* ===== USER BAR ===== */
+  .user-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 6vw;
+    border-bottom: 1px solid var(--card-line);
+    background: var(--ink);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  .user-bar .user-name {
+    font-size: 13px;
+    opacity: 0.6;
+  }
+  .user-bar .logout-btn {
+    background: transparent;
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 4px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+  }
+  .user-bar .logout-btn:hover {
+    background: var(--s-color);
+    color: var(--ink);
+    border-color: var(--s-color);
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .modal-header h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.02em;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--paper);
+    font-size: 28px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: 0.2s;
+  }
+  .modal-close:hover { opacity: 1; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: var(--ink);
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--s-color);
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .form-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .form-btn:hover { opacity: 0.8; }
+  .form-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .form-msg { font-size: 13px; padding: 10px 0 0; text-align: center; }
+  .form-msg.success { color: #4CAF50; }
+  .form-msg.error { color: #f44336; }
+
+  .add-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .add-btn:hover { transform: scale(1.05); opacity: 0.85; }
+  .tier-head .add-btn-wrap {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Upload */
+  .upload-area {
+    background: var(--card);
+    border: 2px dashed var(--card-line);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: 0.3s;
+    margin-bottom: 16px;
+  }
+  .upload-area:hover { border-color: var(--s-color); }
+  .upload-area .icon { font-size: 28px; margin-bottom: 4px; }
+  .upload-area p { opacity: 0.5; font-size: 14px; }
+  .upload-area input { display: none; }
+  .upload-area label {
+    display: inline-block;
+    background: var(--s-color);
+    color: var(--ink);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+  }
+  .upload-area label:hover { opacity: 0.8; }
+  .upload-status {
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: 0.6;
+  }
+  .upload-status.success { color: #4CAF50; }
+  .upload-status.error { color: #f44336; }
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width:600px){ .upload-grid { grid-template-columns:1fr; } }
+
+  .btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+    width: 100%;
+  }
+  .btn:hover { opacity: 0.8; }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    opacity: 0.4;
+    grid-column: 1 / -1;
+  }
+  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; opacity: 0.7; }
+
+  /* ===== ESTATÍSTICAS ===== */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    padding: 20px 16px;
+    text-align: center;
+    border-top: 3px solid var(--e-color);
+  }
+  .stat-number {
+    font-family: 'Anton', sans-serif;
+    font-size: 36px;
+    line-height: 1.1;
+    color: var(--e-color);
+  }
+  .stat-label {
+    font-size: 12px;
+    opacity: 0.5;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .stat-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-list-item {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stat-list-item .name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .stat-list-item .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--e-color);
+    font-weight: 700;
+  }
+  .stat-subtitle {
+    font-family: 'Anton', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    margin: 28px 0 12px 0;
+    color: var(--e-color);
+  }
+  .stat-subtitle span {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.4;
+    margin-left: 8px;
+  }
+
+  @media (max-width:600px){
+    .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
+    .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
+    .tier-stamp.tiny{ font-size:22px; padding:4px 8px 5px; }
+    .hero h1{ font-size:clamp(34px,11vw,60px); }
+    .tab-btn{ font-size:11px; padding:10px 14px 12px; }
+    .tabs{ gap:2px; }
+    .tabs-container{ padding: 0 4vw; }
+    .section{ padding: 32px 4vw 8px; }
+    .login-box { padding: 32px 20px; }
+    .user-bar { padding: 8px 4vw; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen" class="login-container">
+  <div class="login-box">
+    <div class="logo">Discoteca<span>.</span></div>
+    <p class="sub">Sua coleção de discos, organizada com recomendações personalizadas.</p>
+    <button class="login-btn" id="btnLogin">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Entrar com Google
+    </button>
+    <div id="loginError" class="login-error">Erro ao fazer login. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="appScreen" style="display:none;">
+
+  <!-- BARRA DO USUÁRIO -->
+  <div class="user-bar">
+    <span class="user-name" id="userNameDisplay">👤 Carregando...</span>
+    <button class="logout-btn" id="btnLogout">Sair</button>
+  </div>
+
+  <section class="hero hero-state-compras" id="heroSection">
+    <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria</div>
+    <h1 id="heroTitle">Lista de <span id="heroHighlight">Compras</span></h1>
+    <p class="hero-sub" id="heroSub">Prioridade S → C, baseado nas suas playlists importadas.</p>
+    <div class="hero-meter" id="heroMeter">
+      <span style="background:var(--s-color)"></span>
+      <span style="background:var(--s-color)"></span>
+      <span style="background:var(--a-color)"></span>
+      <span style="background:var(--a-color)"></span>
+      <span style="background:var(--b-color)"></span>
+      <span style="background:var(--c-color)"></span>
+    </div>
+  </section>
+
+  <div class="tabs-container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-compras" onclick="switchTab('tab-compras')">📋 Compras</button>
+      <button class="tab-btn" data-tab="tab-estatisticas" onclick="switchTab('tab-estatisticas')">📊 Estatísticas</button>
+      <button class="tab-btn" data-tab="tab-colecao" onclick="switchTab('tab-colecao')">💿 Coleção <span class="tab-badge" id="colecao-badge">0</span></button>
+      <button class="tab-btn" data-tab="tab-importar" onclick="switchTab('tab-importar')">📤 Importar</button>
+    </div>
+  </div>
+
+  <!-- ===== TAB 1: COMPRAS ===== -->
+  <div id="tab-compras" class="tab-content active">
+
+    <section class="section" style="--tier-color:var(--s-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">S</div>
+        <div class="tier-info">
+          <h2>Prioridade Máxima</h2>
+          <p>Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-s"></div>
+    </section>
+
+    <section class="section" style="--tier-color:var(--a-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">A</div>
+        <div class="tier-info">
+          <h2>Alta Prioridade</h2>
+          <p>Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-a"></div>
+    </section>
+
+    <section class="section" style="--tier-color:var(--b-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">B</div>
+        <div class="tier-info">
+          <h2>Sem Urgência</h2>
+          <p>Pegar em promoção ou naturalmente, sem pressa de garimpo.</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-b"></div>
+    </section>
+
+    <section class="section" style="--tier-color:var(--c-color)">
+      <div class="tier-head">
+        <div class="tier-stamp">C</div>
+        <div class="tier-info">
+          <h2>Baixa Prioridade</h2>
+          <p>Só entram se aparecer oportunidade excepcional (preço/edição).</p>
+        </div>
+      </div>
+      <div class="grid" id="grid-c"></div>
+    </section>
+
+  </div>
+
+  <!-- ===== TAB 2: ESTATÍSTICAS ===== -->
+  <div id="tab-estatisticas" class="tab-content">
+    <section class="section" style="--tier-color:var(--e-color)">
+      <div class="tier-head">
+        <div class="tier-stamp small">📊</div>
+        <div class="tier-info">
+          <h2 style="color:var(--e-color);">Estatísticas da Playlist</h2>
+          <p>Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.</p>
+        </div>
+      </div>
+      <div id="estatisticas-container">
+        <div class="empty-state"><div class="icon">⏳</div><h3>Carregando estatísticas...</h3></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== TAB 3: COLEÇÃO ===== -->
+  <div id="tab-colecao" class="tab-content">
+    <section class="section" style="--tier-color:var(--colecao-color)">
+      <div class="tier-head">
+        <div class="tier-stamp small">💿</div>
+        <div class="tier-info">
+          <h2 style="color:var(--colecao-color);">Coleção</h2>
+          <p>Registro de todos os discos que já fazem parte da sua coleção física.</p>
+        </div>
+        <div class="add-btn-wrap">
+          <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
+        </div>
+      </div>
+      <div class="grid" id="grid-colecao"></div>
+    </section>
+  </div>
+
+  <!-- ===== TAB 4: IMPORTAR ===== -->
+  <div id="tab-importar" class="tab-content">
+    <section class="section" style="--tier-color:var(--colecao-color)">
+      <div class="tier-head">
+        <div class="tier-stamp small">📤</div>
+        <div class="tier-info">
+          <h2 style="color:var(--colecao-color);">Importar Dados</h2>
+          <p>Faça upload dos seus CSVs para gerar recomendações personalizadas.</p>
+        </div>
+      </div>
+      <div style="max-width:800px; margin:0 auto;">
+        <div class="upload-grid">
+          <div class="upload-area">
+            <div class="icon">🏆</div>
+            <p><strong>Top do Ano</strong></p>
+            <label for="upload-top">Escolher CSV</label>
+            <input type="file" id="upload-top" accept=".csv">
+            <div id="status-top" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">🔍</div>
+            <p><strong>Descobertas</strong></p>
+            <label for="upload-desc">Escolher CSV</label>
+            <input type="file" id="upload-desc" accept=".csv">
+            <div id="status-desc" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">⭐</div>
+            <p><strong>Favoritos</strong></p>
+            <label for="upload-fav">Escolher CSV</label>
+            <input type="file" id="upload-fav" accept=".csv">
+            <div id="status-fav" class="upload-status"></div>
+          </div>
+          <div class="upload-area">
+            <div class="icon">💿</div>
+            <p><strong>Discogs (Coleção)</strong></p>
+            <label for="upload-discogs">Escolher CSV</label>
+            <input type="file" id="upload-discogs" accept=".csv">
+            <div id="status-discogs" class="upload-status"></div>
+          </div>
+        </div>
+        <button class="btn" id="btn-gerar">⚡ Gerar Recomendações</button>
+        <div id="status-gerar" class="upload-status" style="text-align:center;margin-top:8px;"></div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalAdicionar">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>➕ Adicionar Disco</h2>
+      <button class="modal-close" id="btnFecharModal">✕</button>
+    </div>
+    <form id="form-adicionar">
+      <div class="form-group">
+        <label>Artista *</label>
+        <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
+      </div>
+      <div class="form-group">
+        <label>Álbum *</label>
+        <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Formato</label>
+          <select id="campo-formato">
+            <option value="">Selecione</option>
+            <option value="LP">LP</option>
+            <option value="2xLP">2xLP</option>
+            <option value="CD">CD</option>
+            <option value="2xCD">2xCD</option>
+            <option value="EP">EP</option>
+            <option value="Cassete">Cassete</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço (R$)</label>
+          <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Condição da Mídia</label>
+          <select id="campo-condicao-midia">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Condição da Capa</label>
+          <select id="campo-condicao-capa">
+            <option value="">Selecione</option>
+            <option value="M">M (Mint)</option>
+            <option value="NM">NM (Near Mint)</option>
+            <option value="VG+">VG+ (Very Good Plus)</option>
+            <option value="VG">VG (Very Good)</option>
+            <option value="G">G (Good)</option>
+            <option value="F">F (Fair)</option>
+            <option value="P">P (Poor)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Data de Aquisição</label>
+        <input type="date" id="campo-data">
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
+      </div>
+      <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
+      <div class="form-msg" id="form-msg"></div>
+    </form>
+  </div>
+</div>
+
+<footer style="padding:40px 6vw 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(237,232,220,0.3);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
+  Projeto Discoteca — Sua coleção, suas recomendações.
+</footer>
+
+<script>
+// ========== API ==========
+const API_URL = 'https://fportelada.pythonanywhere.com';
+let usuarioId = null;
+let colecao = [];
+
+// ========== LOGIN ==========
+document.getElementById('btnLogin').addEventListener('click', function() {
+  const btn = this;
+  const error = document.getElementById('loginError');
+  btn.disabled = true;
+  error.style.display = 'none';
+  fetch(API_URL + '/login')
+    .then(r => r.json())
+    .then(d => {
+      if (d.auth_url) {
+        window.location.href = d.auth_url;
+      } else {
+        throw new Error('URL não recebida');
+      }
     })
+    .catch(() => {
+      error.style.display = 'block';
+      btn.disabled = false;
+    });
+});
 
-@app.route('/')
-def index():
-    return app.send_static_file('index.html')
+// ========== LOGOUT ==========
+document.getElementById('btnLogout').addEventListener('click', function() {
+  window.location.href = window.location.pathname;
+});
 
-# ========== INICIAR ==========
-if __name__ == '__main__':
-    init_db()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+// ========== VERIFICAR SESSÃO ==========
+function verificarSessao() {
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('user_id');
+  const nome = params.get('nome');
+
+  if (userId && nome) {
+    usuarioId = userId;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('userNameDisplay').textContent = '👤 ' + nome;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    carregarDados();
+    return;
+  }
+
+  fetch(API_URL + '/sessao')
+    .then(r => r.json())
+    .then(data => {
+      if (data.logado) {
+        usuarioId = data.usuario_id;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('appScreen').style.display = 'block';
+        document.getElementById('userNameDisplay').textContent = '👤 ' + (data.nome || 'Usuário');
+        carregarDados();
+      }
+    })
+    .catch(() => {});
+}
+
+// ========== CARREGAR DADOS ==========
+function carregarDados() {
+  if (!usuarioId) return;
+
+  // Recomendações (S/A/B/C)
+  fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => {
+      renderRecomendacoes(data);
+    })
+    .catch(() => {});
+
+  // Coleção
+  fetch(API_URL + '/colecao?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => {
+      colecao = Array.isArray(data) ? data : [];
+      renderColecao();
+    })
+    .catch(() => {});
+
+  // Estatísticas
+  fetch(API_URL + '/estatisticas?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => {
+      renderEstatisticas(data);
+    })
+    .catch(() => {});
+}
+
+// ========== LAST.FM ==========
+const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
+const MANUAL_COVERS = {
+  'basttardz_brasil com z / auschwitz tropical': 'https://i.imgur.com/nlcvybH.jpeg',
+  'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
+};
+
+async function getCoverUrl(artist, album) {
+  if (!artist || !album) return null;
+  const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
+  if (MANUAL_COVERS[key]) return MANUAL_COVERS[key];
+
+  try {
+    const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.album && data.album.image) {
+      const img = data.album.image.find(i => i.size === 'extralarge');
+      return img && img['#text'] ? img['#text'] : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchAlbumArt(artist, album, artId, fallbackId) {
+  const artWrap = document.getElementById(artId);
+  const fallback = document.getElementById(fallbackId);
+  if (!artWrap) return;
+
+  try {
+    const url = await getCoverUrl(artist, album);
+    if (url) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Timeout')), 10000);
+        img.onload = () => {
+          clearTimeout(timeout);
+          artWrap.style.backgroundImage = `url('${url}')`;
+          artWrap.style.backgroundSize = 'cover';
+          artWrap.style.backgroundPosition = 'center';
+          artWrap.classList.add('has-image');
+          if (fallback) fallback.style.opacity = '0';
+          resolve();
+        };
+        img.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error('Failed to load'));
+        };
+        img.src = url;
+      });
+    } else {
+      if (fallback) fallback.style.opacity = '0.8';
+    }
+  } catch {
+    if (fallback) fallback.style.opacity = '0.8';
+  }
+}
+
+// ========== RENDER ==========
+function renderRecomendacoes(dados) {
+  const tiers = { S: [], A: [], B: [], C: [] };
+  dados.forEach(item => {
+    if (tiers[item.tier]) tiers[item.tier].push(item);
+  });
+
+  ['S', 'A', 'B', 'C'].forEach(tier => {
+    const grid = document.getElementById('grid-' + tier.toLowerCase());
+    if (!grid) return;
+    const items = tiers[tier] || [];
+    
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
+      return;
+    }
+
+    const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' : '#8A8378';
+    grid.innerHTML = items.map((item, idx) => {
+      const letter = item.album ? item.album.charAt(0) : '?';
+      const id = `rec-${tier}-${idx}`;
+      return `
+        <div class="card" id="${id}">
+          <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
+            <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier}</span>
+            <div class="spine-letter">${letter}</div>
+            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          </div>
+          <div class="card-body">
+            <h3>${item.album || 'Álbum'}</h3>
+            <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
+            <div class="meta-block">
+              <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+            </div>
+            <div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota || ''}</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    items.forEach((item, idx) => {
+      const id = `rec-${tier}-${idx}`;
+      fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+    });
+  });
+}
+
+function renderColecao() {
+  const grid = document.getElementById('grid-colecao');
+  if (!grid) return;
+  
+  if (!colecao || colecao.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
+    document.getElementById('colecao-badge').textContent = '0';
+    return;
+  }
+
+  grid.innerHTML = colecao.map((item, i) => {
+    const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
+    const letter = item.album ? item.album.charAt(0) : '?';
+    const id = `col-${i}`;
+    const isVinil = item.formato && item.formato.includes('LP');
+    const tagColor = isVinil ? 'var(--vinil-color)' : 'var(--cd-color)';
+    const tagIcon = isVinil ? '🎵' : '💿';
+    
+    return `
+      <div class="card" id="${id}">
+        <div class="art-wrap" id="art-${id}" style="background: ${tagColor}; background-size: cover; background-position: center;">
+          <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon}</span>
+          <div class="spine-letter">${letter}</div>
+          <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+        </div>
+        <div class="card-body">
+          <h3>${item.album || '?'}</h3>
+          <div class="artist" style="color:${tagColor};">${item.artista || 'Artista'}</div>
+          <div class="meta-block">
+            <div class="meta-row"><span class="label">Formato</span><span class="val">${item.formato || '—'}</span></div>
+          </div>
+          <div class="meta-row">
+            <span class="label">Condição</span>
+            <span class="val">
+              ${item.condicao_midia ? `<span class="cond-badge ${condClass}">${item.condicao_midia}</span>` : ''}
+              ${item.condicao_capa ? `<span class="cond-badge ${sleeveClass}">Capa: ${item.condicao_capa}</span>` : ''}
+              ${!item.condicao_midia && !item.condicao_capa ? '—' : ''}
+            </span>
+          </div>
+          ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  colecao.forEach((item, i) => {
+    const id = `col-${i}`;
+    fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+  });
+
+  document.getElementById('colecao-badge').textContent = colecao.length;
+}
+
+function renderEstatisticas(dados) {
+  const container = document.getElementById('estatisticas-container');
+  if (!container) return;
+
+  if (dados.erro) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar estatísticas</h3><p>${dados.erro}</p></div>`;
+    return;
+  }
+
+  let html = '';
+
+  // Cards de visão geral
+  html += `<div class="stat-grid">`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.total_musicas || 0}</div><div class="stat-label">Total de Músicas</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.artistas_unicos || 0}</div><div class="stat-label">Artistas Únicos</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.albuns_unicos || 0}</div><div class="stat-label">Álbuns Únicos</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.duracao_horas || 0}h</div><div class="stat-label">Duração Total</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.explicitas || 0}</div><div class="stat-label">Músicas Explícitas</div></div>`;
+  html += `<div class="stat-card"><div class="stat-number">${dados.nao_explicitas || 0}</div><div class="stat-label">Não Explícitas</div></div>`;
+  html += `</div>`;
+
+  // Top 10 Artistas
+  if (dados.top_artistas && dados.top_artistas.length > 0) {
+    html += `<div class="stat-subtitle">🎤 Top 10 Artistas <span>mais frequentes na playlist</span></div>`;
+    html += `<div class="stat-list">`;
+    dados.top_artistas.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Top 10 Álbuns
+  if (dados.top_albuns && dados.top_albuns.length > 0) {
+    html += `<div class="stat-subtitle">💿 Top 10 Álbuns <span>com mais músicas</span></div>`;
+    html += `<div class="stat-list">`;
+    dados.top_albuns.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Distribuição por Década
+  if (dados.decadas && dados.decadas.length > 0) {
+    html += `<div class="stat-subtitle">📅 Distribuição por Década</div>`;
+    html += `<div class="stat-list">`;
+    dados.decadas.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Top 10 Gêneros
+  if (dados.top_generos && dados.top_generos.length > 0) {
+    html += `<div class="stat-subtitle">🎸 Top 10 Gêneros <span>dominantes</span></div>`;
+    html += `<div class="stat-list">`;
+    dados.top_generos.forEach(item => {
+      html += `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ========== TABS ==========
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+
+  const hero = document.getElementById('heroSection');
+  const eyebrow = document.getElementById('heroEyebrow');
+  const title = document.getElementById('heroTitle');
+  const sub = document.getElementById('heroSub');
+  const meter = document.getElementById('heroMeter');
+
+  if (tabId === 'tab-compras') {
+    hero.className = 'hero hero-state-compras';
+    eyebrow.textContent = 'Projeto Discoteca · Recomendações';
+    title.innerHTML = 'Lista de <span>Compras</span>';
+    sub.textContent = 'Prioridade S → C, baseado nas suas playlists importadas.';
+    meter.style.display = 'flex';
+  } else if (tabId === 'tab-estatisticas') {
+    hero.className = 'hero hero-state-estatisticas';
+    eyebrow.textContent = 'Projeto Discoteca · Estatísticas';
+    title.innerHTML = 'Estatísticas <span>da Playlist</span>';
+    sub.textContent = 'Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.';
+    meter.style.display = 'none';
+  } else if (tabId === 'tab-colecao') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Coleção';
+    title.innerHTML = 'Minha <span>Coleção</span>';
+    sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
+    meter.style.display = 'none';
+  } else if (tabId === 'tab-importar') {
+    hero.className = 'hero hero-state-colecao';
+    eyebrow.textContent = 'Projeto Discoteca · Importar';
+    title.innerHTML = 'Importar <span>Dados</span>';
+    sub.textContent = 'Faça upload dos seus CSVs para gerar recomendações personalizadas.';
+    meter.style.display = 'none';
+  }
+}
+window.switchTab = switchTab;
+
+// ========== MODAL ==========
+const modal = document.getElementById('modalAdicionar');
+const btnAbrir = document.getElementById('btnAbrirModal');
+const btnFechar = document.getElementById('btnFecharModal');
+
+function abrirModal() {
+  modal.classList.add('open');
+  document.getElementById('form-msg').textContent = '';
+  document.getElementById('form-msg').className = 'form-msg';
+  document.getElementById('btn-submit').disabled = false;
+}
+
+function fecharModal() {
+  modal.classList.remove('open');
+}
+
+btnAbrir.addEventListener('click', abrirModal);
+btnFechar.addEventListener('click', fecharModal);
+modal.addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') fecharModal();
+});
+
+// ========== ADICIONAR DISCO ==========
+document.getElementById('form-adicionar').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById('btn-submit');
+  const msg = document.getElementById('form-msg');
+  btn.disabled = true;
+  msg.textContent = '⏳ Salvando...';
+  msg.className = 'form-msg';
+
+  const dados = {
+    artista: document.getElementById('campo-artista').value.trim(),
+    album: document.getElementById('campo-album').value.trim(),
+    formato: document.getElementById('campo-formato').value,
+    condicao_midia: document.getElementById('campo-condicao-midia').value,
+    condicao_capa: document.getElementById('campo-condicao-capa').value,
+    preco: parseFloat(document.getElementById('campo-preco').value) || null,
+    data_aquisicao: document.getElementById('campo-data').value || null,
+    notas: document.getElementById('campo-notas').value.trim()
+  };
+
+  if (!dados.artista || !dados.album) {
+    msg.textContent = '⚠️ Artista e álbum são obrigatórios!';
+    msg.className = 'form-msg error';
+    btn.disabled = false;
+    return;
+  }
+
+  fetch(API_URL + '/adicionar_disco?user_id=' + usuarioId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  })
+  .then(res => res.json())
+  .then(resultado => {
+    if (resultado.sucesso) {
+      msg.textContent = '✅ ' + resultado.mensagem;
+      msg.className = 'form-msg success';
+      document.getElementById('campo-artista').value = '';
+      document.getElementById('campo-album').value = '';
+      document.getElementById('campo-formato').value = '';
+      document.getElementById('campo-condicao-midia').value = '';
+      document.getElementById('campo-condicao-capa').value = '';
+      document.getElementById('campo-preco').value = '';
+      document.getElementById('campo-data').value = '';
+      document.getElementById('campo-notas').value = '';
+      carregarDados();
+      setTimeout(fecharModal, 1000);
+    } else {
+      msg.textContent = '❌ ' + (resultado.erro || 'Erro ao adicionar');
+      msg.className = 'form-msg error';
+    }
+  })
+  .catch(() => {
+    msg.textContent = '❌ Erro de conexão';
+    msg.className = 'form-msg error';
+  })
+  .finally(() => {
+    btn.disabled = false;
+  });
+});
+
+// ========== UPLOADS ==========
+function uploadPlaylist(tipo, input) {
+  const status = document.getElementById('status-' + tipo);
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('tipo', tipo);
+  fd.append('arquivo', file);
+  fetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function uploadDiscogs(input) {
+  const status = document.getElementById('status-discogs');
+  const file = input.files[0];
+  if (!file) return;
+  status.textContent = '⏳ Enviando...';
+  status.className = 'upload-status';
+  const fd = new FormData();
+  fd.append('arquivo', file);
+  fetch(API_URL + '/importar_colecao?user_id=' + usuarioId, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    });
+}
+
+function gerarRecomendacoes() {
+  const status = document.getElementById('status-gerar');
+  const btn = document.getElementById('btn-gerar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+  status.textContent = '⏳ Processando...';
+  status.className = 'upload-status';
+  fetch(API_URL + '/gerar_recomendacoes?user_id=' + usuarioId, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        status.textContent = '✅ ' + d.mensagem;
+        status.className = 'upload-status success';
+        carregarDados();
+      } else {
+        status.textContent = '❌ ' + (d.erro || 'Erro');
+        status.className = 'upload-status error';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Erro de conexão';
+      status.className = 'upload-status error';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = '⚡ Gerar Recomendações';
+    });
+}
+
+// ========== EVENTOS ==========
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    switchTab(this.dataset.tab);
+  });
+});
+
+document.getElementById('upload-top').addEventListener('change', function() {
+  uploadPlaylist('top', this);
+});
+document.getElementById('upload-desc').addEventListener('change', function() {
+  uploadPlaylist('descobertas', this);
+});
+document.getElementById('upload-fav').addEventListener('change', function() {
+  uploadPlaylist('favoritos', this);
+});
+document.getElementById('upload-discogs').addEventListener('change', function() {
+  uploadDiscogs(this);
+});
+document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
+
+// ========== INICIAR ==========
+document.addEventListener('DOMContentLoaded', verificarSessao);
+</script>
+</body>
+</html>

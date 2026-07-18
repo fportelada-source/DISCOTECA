@@ -710,13 +710,44 @@
 
   .empty-state {
     text-align: center;
-    padding: 80px 20px;
-    opacity: 0.4;
+    padding: 60px 20px;
+    opacity: 0.5;
     grid-column: 1 / -1;
   }
-  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
-  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 0.02em; margin-bottom: 8px; }
-  .empty-state p { font-size: 14px; opacity: 0.7; }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state h3 { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 0.02em; margin-bottom: 6px; }
+  .empty-state p { font-size: 14px; opacity: 0.7; max-width: 50ch; margin: 0 auto 16px; line-height: 1.5; }
+  .empty-state .empty-btn {
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 13px;
+    display: inline-block;
+  }
+  .empty-state .empty-btn:hover { opacity: 0.8; }
+
+  .empty-state.colecao .icon { color: var(--colecao-color); }
+  .empty-state.compras .icon { color: var(--s-color); }
+  .empty-state.estatisticas .icon { color: var(--e-color); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid var(--card-line);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 13px;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--s-color); color: var(--s-color); }
 
   /* ===== ESTATÍSTICAS ===== */
   .stat-grid {
@@ -787,6 +818,44 @@
     margin-left: 8px;
   }
 
+  /* ===== IMPORTAR ===== */
+  .import-intro {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .import-intro h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .import-intro p {
+    font-size: 14px;
+    opacity: 0.7;
+    line-height: 1.6;
+  }
+  .import-intro .highlight {
+    color: var(--s-color);
+    font-weight: 600;
+  }
+  .import-intro .note {
+    font-size: 13px;
+    opacity: 0.5;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--card-line);
+  }
+
+  .upload-area .upload-desc {
+    font-size: 12px;
+    opacity: 0.4;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
   @media (max-width:600px){
     .tier-stamp{ font-size:44px; padding:4px 12px 8px; }
     .tier-stamp.small{ font-size:34px; padding:4px 10px 6px; }
@@ -799,6 +868,9 @@
     .login-box { padding: 32px 20px; }
     .user-bar { padding: 8px 4vw; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
+    .import-intro { padding: 16px; }
+    .empty-state { padding: 40px 16px; }
+    .empty-state h3 { font-size: 18px; }
   }
 </style>
 </head>
@@ -933,11 +1005,16 @@
         <div class="tier-stamp small">📊</div>
         <div class="tier-info">
           <h2 style="color:var(--e-color);">Estatísticas da Playlist</h2>
-          <p>Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.</p>
+          <p>Análise da sua playlist com base nos dados importados.</p>
         </div>
       </div>
       <div id="estatisticas-container">
-        <div class="empty-state"><div class="icon">⏳</div><h3>Carregando estatísticas...</h3></div>
+        <div class="empty-state estatisticas">
+          <div class="icon">🎧</div>
+          <h3>Ainda não dividimos o fone.</h3>
+          <p>Faça upload da sua playlist para vermos juntos o que você anda ouvindo.</p>
+          <button class="empty-btn" onclick="switchTab('tab-importar')">Ir para Importar</button>
+        </div>
       </div>
     </section>
   </div>
@@ -970,36 +1047,63 @@
         </div>
       </div>
       <div style="max-width:800px; margin:0 auto;">
+
+        <!-- INTRODUÇÃO -->
+        <div class="import-intro">
+          <h3>🎯 Para começar, você precisa importar seus dados.</h3>
+          <p>
+            A Discoteca funciona com <span class="highlight">dois tipos de arquivo</span>:
+          </p>
+          <p style="margin-top:6px;">
+            <strong>📀 Spotify</strong> — Baixe sua playlist como CSV (use o <a href="https://exportify.app" target="_blank" style="color:var(--s-color);">exportify.app</a> ou o próprio Spotify) e faça upload.<br>
+            <strong>💿 Discogs</strong> — Exporte sua coleção física no Discogs (Settings → Export → Collection) e faça upload.
+          </p>
+          <p style="margin-top:6px; font-size:13px; opacity:0.6;">
+            ⚡ O ideal é subir <span class="highlight">3 playlists</span> (Top, Descobertas, Favoritos), mas o sistema funciona com <span class="highlight">1 ou 2</span> também.
+          </p>
+          <div class="note">
+            Depois de fazer o upload, clique em <strong>"Gerar Recomendações"</strong> para criar sua lista de compras personalizada.
+          </div>
+        </div>
+
         <div class="upload-grid">
           <div class="upload-area">
             <div class="icon">🏆</div>
             <p><strong>Top do Ano</strong></p>
+            <p class="upload-desc">Sua playlist mais ouvida do ano — gera recomendações prioritárias (Tier S e A)</p>
             <label for="upload-top">Escolher CSV</label>
             <input type="file" id="upload-top" accept=".csv">
             <div id="status-top" class="upload-status"></div>
           </div>
+
           <div class="upload-area">
             <div class="icon">🔍</div>
             <p><strong>Descobertas</strong></p>
+            <p class="upload-desc">Playlist com novas bandas que você descobriu — gera recomendações de novidades (Tier A e B)</p>
             <label for="upload-desc">Escolher CSV</label>
             <input type="file" id="upload-desc" accept=".csv">
             <div id="status-desc" class="upload-status"></div>
           </div>
+
           <div class="upload-area">
             <div class="icon">⭐</div>
             <p><strong>Favoritos</strong></p>
+            <p class="upload-desc">Suas músicas favoritas de sempre — gera recomendações de clássicos (Tier B e C)</p>
             <label for="upload-fav">Escolher CSV</label>
             <input type="file" id="upload-fav" accept=".csv">
             <div id="status-fav" class="upload-status"></div>
           </div>
+
           <div class="upload-area">
             <div class="icon">💿</div>
             <p><strong>Discogs (Coleção)</strong></p>
+            <p class="upload-desc">CSV exportado do Discogs — mostra os discos que você já tem na sua coleção</p>
             <label for="upload-discogs">Escolher CSV</label>
             <input type="file" id="upload-discogs" accept=".csv">
             <div id="status-discogs" class="upload-status"></div>
           </div>
         </div>
+
         <button class="btn" id="btn-gerar">⚡ Gerar Recomendações</button>
         <div id="status-gerar" class="upload-status" style="text-align:center;margin-top:8px;"></div>
       </div>
@@ -1173,7 +1277,6 @@ function verificarSessao() {
 function carregarDados() {
   if (!usuarioId) return;
 
-  // Recomendações (S/A/B/C)
   fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
@@ -1181,7 +1284,6 @@ function carregarDados() {
     })
     .catch(() => {});
 
-  // Coleção
   fetch(API_URL + '/colecao?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
@@ -1190,7 +1292,6 @@ function carregarDados() {
     })
     .catch(() => {});
 
-  // Estatísticas
   fetch(API_URL + '/estatisticas?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
@@ -1198,7 +1299,6 @@ function carregarDados() {
     })
     .catch(() => {});
 
-  // Extra (dropdown)
   renderExtra();
 }
 
@@ -1265,6 +1365,25 @@ async function fetchAlbumArt(artist, album, artId, fallbackId) {
 
 // ========== RENDER ==========
 function renderRecomendacoes(dados) {
+  const gridS = document.getElementById('grid-s');
+  const gridA = document.getElementById('grid-a');
+  const gridB = document.getElementById('grid-b');
+
+  if (!dados || dados.length === 0) {
+    const emptyHTML = `
+      <div class="empty-state compras">
+        <div class="icon">💳</div>
+        <h3>Sua carteira está cheia.</h3>
+        <p>Faça upload da sua playlist do Spotify para começarmos a recomendar discos para a sua coleção física.</p>
+        <button class="empty-btn" onclick="switchTab('tab-importar')">Ir para Importar</button>
+      </div>
+    `;
+    if (gridS) gridS.innerHTML = emptyHTML;
+    if (gridA) gridA.innerHTML = '';
+    if (gridB) gridB.innerHTML = '';
+    return;
+  }
+
   const tiers = { S: [], A: [], B: [], C: [] };
   dados.forEach(item => {
     if (tiers[item.tier]) tiers[item.tier].push(item);
@@ -1276,7 +1395,7 @@ function renderRecomendacoes(dados) {
     const items = tiers[tier] || [];
     
     if (items.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><p style="font-size:13px;">Nenhuma recomendação ${tier} ainda.</p></div>`;
+      grid.innerHTML = `<div class="empty-state" style="padding:20px;"><p style="font-size:13px; opacity:0.4;">Nenhuma recomendação ${tier} ainda.</p></div>`;
       return;
     }
 
@@ -1315,7 +1434,17 @@ function renderColecao() {
   if (!grid) return;
   
   if (!colecao || colecao.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">🎵</div><h3>A música ainda não começou a tocar</h3><p>Importe sua coleção do Discogs ou adicione discos manualmente.</p></div>`;
+    grid.innerHTML = `
+      <div class="empty-state colecao">
+        <div class="icon">🎵</div>
+        <h3>A música ainda não começou a tocar por aqui.</h3>
+        <p>Adicione seus discos manualmente ou importe sua coleção do Discogs.</p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <button class="empty-btn" onclick="abrirModal()">➕ Adicionar disco</button>
+          <button class="btn-secondary" onclick="switchTab('tab-importar')">📤 Importar do Discogs</button>
+        </div>
+      </div>
+    `;
     document.getElementById('colecao-badge').textContent = '0';
     return;
   }
@@ -1368,14 +1497,13 @@ function renderEstatisticas(dados) {
   const container = document.getElementById('estatisticas-container');
   if (!container) return;
 
-  if (dados.erro) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar estatísticas</h3><p>${dados.erro}</p></div>`;
+  if (!dados || dados.erro) {
+    // Mantém o empty state já renderizado no HTML
     return;
   }
 
   let html = '';
 
-  // Cards de visão geral
   html += `<div class="stat-grid">`;
   html += `<div class="stat-card"><div class="stat-number">${dados.total_musicas || 0}</div><div class="stat-label">Total de Músicas</div></div>`;
   html += `<div class="stat-card"><div class="stat-number">${dados.artistas_unicos || 0}</div><div class="stat-label">Artistas Únicos</div></div>`;
@@ -1385,7 +1513,6 @@ function renderEstatisticas(dados) {
   html += `<div class="stat-card"><div class="stat-number">${dados.nao_explicitas || 0}</div><div class="stat-label">Não Explícitas</div></div>`;
   html += `</div>`;
 
-  // Top 10 Artistas
   if (dados.top_artistas && dados.top_artistas.length > 0) {
     html += `<div class="stat-subtitle">🎤 Top 10 Artistas <span>mais frequentes na playlist</span></div>`;
     html += `<div class="stat-list">`;
@@ -1395,7 +1522,6 @@ function renderEstatisticas(dados) {
     html += `</div>`;
   }
 
-  // Top 10 Álbuns
   if (dados.top_albuns && dados.top_albuns.length > 0) {
     html += `<div class="stat-subtitle">💿 Top 10 Álbuns <span>com mais músicas</span></div>`;
     html += `<div class="stat-list">`;
@@ -1405,7 +1531,6 @@ function renderEstatisticas(dados) {
     html += `</div>`;
   }
 
-  // Distribuição por Década
   if (dados.decadas && dados.decadas.length > 0) {
     html += `<div class="stat-subtitle">📅 Distribuição por Década</div>`;
     html += `<div class="stat-list">`;
@@ -1415,7 +1540,6 @@ function renderEstatisticas(dados) {
     html += `</div>`;
   }
 
-  // Top 10 Gêneros
   if (dados.top_generos && dados.top_generos.length > 0) {
     html += `<div class="stat-subtitle">🎸 Top 10 Gêneros <span>dominantes</span></div>`;
     html += `<div class="stat-list">`;
@@ -1466,7 +1590,7 @@ function switchTab(tabId) {
     hero.className = 'hero hero-state-estatisticas';
     eyebrow.textContent = 'Projeto Discoteca · Estatísticas';
     title.innerHTML = 'Estatísticas <span>da Playlist</span>';
-    sub.textContent = 'Análise da sua playlist "Rock/Metal 2.0" com 1.6k músicas.';
+    sub.textContent = 'Análise da sua playlist com base nos dados importados.';
     meter.style.display = 'none';
   } else if (tabId === 'tab-colecao') {
     hero.className = 'hero hero-state-colecao';
@@ -1508,6 +1632,8 @@ function abrirModal() {
 function fecharModal() {
   modal.classList.remove('open');
 }
+window.abrirModal = abrirModal;
+window.fecharModal = fecharModal;
 
 btnAbrir.addEventListener('click', abrirModal);
 btnFechar.addEventListener('click', fecharModal);

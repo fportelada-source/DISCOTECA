@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Discoteca — v0.8.1</title>
+  <title>Discoteca — v0.8.2</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -772,6 +772,27 @@
       margin-left: 8px;
     }
 
+    .estatistica-secao {
+      margin-top: 40px;
+    }
+    .estatistica-secao:first-of-type {
+      margin-top: 0;
+    }
+    .estatistica-secao h3 {
+      font-family: 'Anton', sans-serif;
+      font-size: 24px;
+      letter-spacing: 0.02em;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-line);
+    }
+    .estatistica-secao.player h3 {
+      color: var(--e-color);
+    }
+    .estatistica-secao.estante h3 {
+      color: var(--colecao-color);
+    }
+
     /* ===== EXPORTIFY ===== */
     .exportify-guide {
       background: var(--card);
@@ -1395,23 +1416,29 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 2: ESTATÍSTICAS                                       -->
+    <!-- TAB 2: ESTATÍSTICAS (SEPARADAS)                           -->
     <!-- ========================================================== -->
     <div id="tab-estatisticas" class="tab-content">
       <section class="section" style="--tier-color:var(--e-color)">
         <div class="tier-head">
           <div class="tier-stamp small">📊</div>
           <div class="tier-info">
-            <h2 style="color:var(--e-color);">Estatísticas da Playlist</h2>
-            <p>Análise da sua playlist com base nos dados importados.</p>
+            <h2 style="color:var(--e-color);">Estatísticas</h2>
+            <p>O que você ouve e o que você tem.</p>
           </div>
         </div>
-        <div id="estatisticas-container"></div>
+
+        <!-- NO SEU PLAYER -->
+        <div id="estatisticas-player"></div>
+
+        <!-- NA SUA ESTANTE -->
+        <div id="estatisticas-estante"></div>
+
       </section>
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 3: COLEÇÃO (COM DASHBOARD, CONTROLES E TOGGLE)       -->
+    <!-- TAB 3: COLEÇÃO                                            -->
     <!-- ========================================================== -->
     <div id="tab-colecao" class="tab-content">
       <section class="section" style="--tier-color:var(--colecao-color)">
@@ -1429,7 +1456,7 @@
         <!-- DASHBOARD -->
         <div id="dashboard-container"></div>
 
-        <!-- CONTROLES: Busca + Ordenação + Toggle -->
+        <!-- CONTROLES -->
         <div class="colecao-controls" id="colecaoControls">
           <div class="search-box">
             <span class="icon">🔍</span>
@@ -1458,7 +1485,7 @@
           </div>
         </div>
 
-        <!-- COLEÇÃO (CARDS E LISTA) -->
+        <!-- COLEÇÃO -->
         <div id="colecao-container"></div>
         <div class="list-view" id="listView"></div>
       </section>
@@ -1531,7 +1558,7 @@
   </div><!-- /appScreen -->
 
   <!-- ============================================================ -->
-  <!-- MODAL: ADICIONAR / EDITAR DISCO                             -->
+  <!-- MODAIS                                                      -->
   <!-- ============================================================ -->
   <div class="modal-overlay" id="modalAdicionar">
     <div class="modal">
@@ -1620,9 +1647,6 @@
     </div>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- MODAL: ADICIONAR À LISTA DE COMPRAS (WISHLIST MANUAL)       -->
-  <!-- ============================================================ -->
   <div class="modal-overlay" id="modalAddWishlist">
     <div class="modal">
       <div class="modal-header">
@@ -1792,10 +1816,19 @@
         })
         .catch(() => {});
 
+      // Estatísticas do Player
       fetch(API_URL + '/estatisticas?user_id=' + usuarioId)
         .then(r => r.json())
         .then(data => {
-          renderEstatisticas(data);
+          renderEstatisticasPlayer(data);
+        })
+        .catch(() => {});
+
+      // Estatísticas da Estante
+      fetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId)
+        .then(r => r.json())
+        .then(data => {
+          renderEstatisticasEstante(data);
         })
         .catch(() => {});
     }
@@ -1858,7 +1891,6 @@
       const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
       const sortType = document.getElementById('sortSelect').value;
 
-      // Filtrar
       let filtrados = colecao.filter(item => {
         if (!searchTerm) return true;
         const artista = (item.artista || '').toLowerCase();
@@ -1866,7 +1898,6 @@
         return artista.includes(searchTerm) || album.includes(searchTerm);
       });
 
-      // Ordenar
       switch (sortType) {
         case 'data_mais_recente':
           filtrados.sort((a, b) => (b.data_adicao || '').localeCompare(a.data_adicao || ''));
@@ -1897,7 +1928,7 @@
     }
 
     // ================================================================
-    // TOGGLE VIEW (CARDS / LISTA)
+    // TOGGLE VIEW
     // ================================================================
     function setView(view) {
       viewPreference = view;
@@ -1905,7 +1936,6 @@
       document.querySelectorAll('#viewToggle button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === view);
       });
-      // Mostrar/esconder controles de agrupamento
       const groupControls = document.getElementById('groupControls');
       if (view === 'list') {
         groupControls.style.display = 'flex';
@@ -1942,7 +1972,7 @@
     }
 
     // ================================================================
-    // RENDER: COLEÇÃO (MODO CARDS)
+    // RENDER: COLEÇÃO (CARDS)
     // ================================================================
     function renderColecao() {
       const container = document.getElementById('colecao-container');
@@ -1959,7 +1989,6 @@
         return;
       }
 
-      // Classificar por tipo
       const vinil = [];
       const cd = [];
       const cassete = [];
@@ -2036,7 +2065,6 @@
 
       container.innerHTML = html;
 
-      // Carregar capas
       const cards = container.querySelectorAll('.card');
       cards.forEach(card => {
         const artista = card.dataset.artista;
@@ -2052,7 +2080,7 @@
     }
 
     // ================================================================
-    // RENDER: LISTA (COM AGRUPAMENTO)
+    // RENDER: LISTA
     // ================================================================
     function renderLista() {
       const container = document.getElementById('listView');
@@ -2064,11 +2092,9 @@
       }
 
       const group = groupPreference;
-
       let html = '';
 
       if (group === 'separado') {
-        // Separar por tipo
         const vinil = [];
         const cd = [];
         const cassete = [];
@@ -2094,7 +2120,6 @@
           html += gerarTabelaLista(secao.items);
         });
       } else {
-        // Juntar tudo
         html += `<div class="secao-header">📀 Todos os discos (${colecaoFiltrada.length})</div>`;
         html += gerarTabelaLista(colecaoFiltrada);
       }
@@ -2144,7 +2169,7 @@
     }
 
     // ================================================================
-    // LAST.FM (CAPAS)
+    // LAST.FM
     // ================================================================
     const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
     const MANUAL_COVERS = {
@@ -2206,7 +2231,161 @@
     }
 
     // ================================================================
-    // RENDER: RECOMENDAÇÕES
+    // ESTATÍSTICAS DO PLAYER
+    // ================================================================
+    function renderEstatisticasPlayer(dados) {
+      const container = document.getElementById('estatisticas-player');
+      if (!container) return;
+
+      if (!dados || dados.erro || dados.total_musicas === 0) {
+        container.innerHTML = `
+          <div class="estatistica-secao player">
+            <h3>🎧 No seu player</h3>
+            <div class="empty-state" style="padding:40px 20px;">
+              <div class="icon" style="font-size:40px;">🎧</div>
+              <h3 style="font-size:20px;">Ainda não dividimos o fone</h3>
+              <p style="font-size:13px;">Faça upload da sua playlist para começar a análise.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `
+        <div class="estatistica-secao player">
+          <h3>🎧 No seu player</h3>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-number">${dados.total_musicas || 0}</div>
+              <div class="stat-label">Total de Músicas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${dados.artistas_unicos || 0}</div>
+              <div class="stat-label">Artistas Únicos</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${dados.albuns_unicos || 0}</div>
+              <div class="stat-label">Álbuns Únicos</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${dados.duracao_horas || 0}h</div>
+              <div class="stat-label">Duração Total</div>
+            </div>
+          </div>
+      `;
+
+      if (dados.top_artistas && dados.top_artistas.length > 0) {
+        html += `<div class="stat-subtitle">🎤 Top 10 Artistas</div><div class="stat-list">`;
+        dados.top_artistas.forEach(item => {
+          html +=
+            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+        });
+        html += `</div>`;
+      }
+
+      if (dados.top_albuns && dados.top_albuns.length > 0) {
+        html += `<div class="stat-subtitle">💿 Top 10 Álbuns</div><div class="stat-list">`;
+        dados.top_albuns.forEach(item => {
+          html +=
+            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+        });
+        html += `</div>`;
+      }
+
+      if (dados.decadas && dados.decadas.length > 0) {
+        html += `<div class="stat-subtitle">📅 Distribuição por Década</div><div class="stat-list">`;
+        dados.decadas.forEach(item => {
+          html +=
+            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+        });
+        html += `</div>`;
+      }
+
+      if (dados.top_generos && dados.top_generos.length > 0) {
+        html += `<div class="stat-subtitle">🎸 Top 10 Gêneros</div><div class="stat-list">`;
+        dados.top_generos.forEach(item => {
+          html +=
+            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+        });
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    // ================================================================
+    // ESTATÍSTICAS DA ESTANTE
+    // ================================================================
+    function renderEstatisticasEstante(dados) {
+      const container = document.getElementById('estatisticas-estante');
+      if (!container) return;
+
+      if (!dados || dados.erro || dados.total_discos === 0) {
+        container.innerHTML = `
+          <div class="estatistica-secao estante">
+            <h3>📀 Na sua estante</h3>
+            <div class="empty-state" style="padding:40px 20px;">
+              <div class="icon" style="font-size:40px;">📀</div>
+              <h3 style="font-size:20px;">Sua estante está vazia</h3>
+              <p style="font-size:13px;">Adicione discos à sua coleção para ver as estatísticas.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `
+        <div class="estatistica-secao estante">
+          <h3>📀 Na sua estante</h3>
+          <div class="stat-grid">
+            <div class="stat-card" style="border-top-color: var(--colecao-color);">
+              <div class="stat-number">${dados.total_discos || 0}</div>
+              <div class="stat-label">Total de Discos</div>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--vinil-color);">
+              <div class="stat-number">${dados.lps || 0}</div>
+              <div class="stat-label">🎵 LPs</div>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--cd-color);">
+              <div class="stat-number">${dados.cds || 0}</div>
+              <div class="stat-label">💿 CDs</div>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--cassete-color);">
+              <div class="stat-number">${dados.cassetes || 0}</div>
+              <div class="stat-label">📼 Cassetes</div>
+            </div>
+            ${dados.valor_total ? `<div class="stat-card" style="border-top-color: #4CAF50;">
+              <div class="stat-number">R$ ${dados.valor_total}</div>
+              <div class="stat-label">Valor Total Estimado</div>
+            </div>` : ''}
+          </div>
+      `;
+
+      if (dados.top_artistas && dados.top_artistas.length > 0) {
+        html += `<div class="stat-subtitle" style="color: var(--colecao-color);">🎤 Top 5 Artistas na Estante</div><div class="stat-list">`;
+        dados.top_artistas.forEach(item => {
+          html +=
+            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+        });
+        html += `</div>`;
+      }
+
+      if (dados.decadas && dados.decadas.length > 0) {
+        html += `<div class="stat-subtitle" style="color: var(--colecao-color);">📅 Distribuição por Década</div><div class="stat-list">`;
+        dados.decadas.forEach(item => {
+          html +=
+            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
+        });
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    // ================================================================
+    // RECOMENDAÇÕES
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
@@ -2231,7 +2410,7 @@
       ['S', 'A', 'B', 'C'].forEach(tier => {
         const items = tiers[tier] || [];
         const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' :
-        '#8A8378';
+          '#8A8378';
         const tierDesc = tier === 'S' ? 'Prioridade Máxima' : tier === 'A' ? 'Alta Prioridade' : tier === 'B' ?
           'Sem Urgência' : 'Baixa Prioridade';
         const tierDetail = tier === 'S' ?
@@ -2268,7 +2447,6 @@
             const letter = item.album ? item.album.charAt(0) : '?';
             const id = `rec-${tier}-${idx}`;
             const origem = item.origem || 'algoritmo';
-            const comprado = item.comprado || 0;
             html += `
               <div class="card" id="${id}" data-id="${item.id || ''}">
                 <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
@@ -2308,72 +2486,6 @@
     }
 
     // ================================================================
-    // RENDER: ESTATÍSTICAS
-    // ================================================================
-    function renderEstatisticas(dados) {
-      const container = document.getElementById('estatisticas-container');
-      if (!container) return;
-
-      if (!dados || dados.erro || dados.total_musicas === 0 || dados.total_musicas === undefined) {
-        container.innerHTML = `
-          <div class="empty-state" style="padding:60px 20px;">
-            <div class="icon">🎧</div>
-            <h3>Ainda não dividimos o fone</h3>
-            <p>Faça upload da sua playlist para começar a análise.</p>
-            <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
-          </div>
-        `;
-        return;
-      }
-
-      let html = '';
-      html += `<div class="stat-grid">`;
-      html += `<div class="stat-card"><div class="stat-number">${dados.total_musicas || 0}</div><div class="stat-label">Total de Músicas</div></div>`;
-      html += `<div class="stat-card"><div class="stat-number">${dados.artistas_unicos || 0}</div><div class="stat-label">Artistas Únicos</div></div>`;
-      html += `<div class="stat-card"><div class="stat-number">${dados.albuns_unicos || 0}</div><div class="stat-label">Álbuns Únicos</div></div>`;
-      html += `<div class="stat-card"><div class="stat-number">${dados.duracao_horas || 0}h</div><div class="stat-label">Duração Total</div></div>`;
-      html += `</div>`;
-
-      if (dados.top_artistas && dados.top_artistas.length > 0) {
-        html += `<div class="stat-subtitle">🎤 Top 10 Artistas</div><div class="stat-list">`;
-        dados.top_artistas.forEach(item => {
-          html +=
-            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
-        });
-        html += `</div>`;
-      }
-
-      if (dados.top_albuns && dados.top_albuns.length > 0) {
-        html += `<div class="stat-subtitle">💿 Top 10 Álbuns</div><div class="stat-list">`;
-        dados.top_albuns.forEach(item => {
-          html +=
-            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
-        });
-        html += `</div>`;
-      }
-
-      if (dados.decadas && dados.decadas.length > 0) {
-        html += `<div class="stat-subtitle">📅 Distribuição por Década</div><div class="stat-list">`;
-        dados.decadas.forEach(item => {
-          html +=
-            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
-        });
-        html += `</div>`;
-      }
-
-      if (dados.top_generos && dados.top_generos.length > 0) {
-        html += `<div class="stat-subtitle">🎸 Top 10 Gêneros</div><div class="stat-list">`;
-        dados.top_generos.forEach(item => {
-          html +=
-            `<div class="stat-list-item"><span class="name">${item.nome}</span><span class="count">${item.contagem}</span></div>`;
-        });
-        html += `</div>`;
-      }
-
-      container.innerHTML = html;
-    }
-
-    // ================================================================
     // SWITCH TABS
     // ================================================================
     function switchTab(tabId) {
@@ -2398,7 +2510,7 @@
         hero.className = 'hero hero-state-estatisticas';
         eyebrow.textContent = 'Discoteca · Estatísticas';
         title.innerHTML = 'Estatísticas <span>da Playlist</span>';
-        sub.textContent = 'Análise da sua playlist com base nos dados importados.';
+        sub.textContent = 'O que você ouve e o que você tem.';
         meter.style.display = 'none';
       } else if (tabId === 'tab-colecao') {
         hero.className = 'hero hero-state-colecao';
@@ -2406,9 +2518,7 @@
         title.innerHTML = 'Minha <span>Coleção</span>';
         sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
         meter.style.display = 'none';
-        // Reaplicar filtros e views
         aplicarFiltros();
-        // Garantir que os controles de grupo apareçam se estiver em lista
         const groupControls = document.getElementById('groupControls');
         if (viewPreference === 'list') {
           groupControls.style.display = 'flex';
@@ -2889,7 +2999,6 @@
     // INICIAR
     // ================================================================
     document.addEventListener('DOMContentLoaded', function() {
-      // Restaurar preferências visuais
       setView(viewPreference);
       setGroup(groupPreference);
       verificarSessao();

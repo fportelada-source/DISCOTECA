@@ -877,41 +877,37 @@
     .exportify-guide { padding: 20px; }
   }
 
-  /* ===== CALENDÁRIO VISÍVEL E VERMELHO ===== */
+  /* ===== CALENDÁRIO - SÓ ÍCONE VERMELHO ===== */
   input[type="date"] {
     color-scheme: dark;
-    background: var(--s-color);
-    color: var(--ink);
-    border: none;
+    background: var(--ink);
+    border: 1px solid var(--card-line);
+    color: var(--paper);
     padding: 10px 14px;
     border-radius: 6px;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    font-weight: 600;
     width: 100%;
     transition: 0.2s;
     cursor: pointer;
   }
   input[type="date"]:focus {
     outline: none;
-    opacity: 0.8;
+    border-color: var(--s-color);
   }
   input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(340deg);
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
-    background: rgba(0,0,0,0.2);
+    background: rgba(214, 67, 47, 0.2);
   }
   input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    background: rgba(0,0,0,0.4);
+    background: rgba(214, 67, 47, 0.4);
   }
   input[type="date"]::-moz-calendar-picker-indicator {
-    filter: invert(1);
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(340deg);
     cursor: pointer;
-  }
-  input[type="date"]:hover {
-    opacity: 0.85;
   }
 
   @media (max-width:600px){
@@ -1438,7 +1434,7 @@ function renderRecomendacoes(dados) {
   });
 }
 
-// ========== RENDER COLEÇÃO (COM CAPAS CORRIGIDAS) ==========
+// ========== RENDER COLEÇÃO (DIVIDIDA POR TIPO DE MÍDIA) ==========
 function renderColecao() {
   const container = document.getElementById('colecao-container');
   if (!container) return;
@@ -1547,7 +1543,6 @@ function renderColecao() {
   document.getElementById('colecao-badge').textContent = colecao.length;
 
   // ===== CARREGA AS CAPAS =====
-  // Pega todos os cards da coleção
   const cards = container.querySelectorAll('.card');
   cards.forEach(card => {
     const artista = card.dataset.artista;
@@ -1558,7 +1553,6 @@ function renderColecao() {
     if (artista && album && artWrap && fallback) {
       const artId = artWrap.id;
       const fallbackId = fallback.id;
-      // Carrega a capa com delay para não sobrecarregar
       setTimeout(() => {
         fetchAlbumArt(artista, album, artId, fallbackId);
       }, 100);

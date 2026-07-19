@@ -877,37 +877,41 @@
     .exportify-guide { padding: 20px; }
   }
 
-  /* ===== CALENDÁRIO VISÍVEL ===== */
+  /* ===== CALENDÁRIO VISÍVEL E VERMELHO ===== */
   input[type="date"] {
     color-scheme: dark;
-    background: var(--ink);
-    border: 1px solid var(--card-line);
-    color: var(--paper);
+    background: var(--s-color);
+    color: var(--ink);
+    border: none;
     padding: 10px 14px;
     border-radius: 6px;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
+    font-weight: 600;
     width: 100%;
     transition: 0.2s;
     cursor: pointer;
   }
   input[type="date"]:focus {
     outline: none;
-    border-color: var(--s-color);
+    opacity: 0.8;
   }
   input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
   }
   input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    background: rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.4);
   }
   input[type="date"]::-moz-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
+  }
+  input[type="date"]:hover {
+    opacity: 0.85;
   }
 
   @media (max-width:600px){
@@ -1434,7 +1438,7 @@ function renderRecomendacoes(dados) {
   });
 }
 
-// ========== RENDER COLEÇÃO (DIVIDIDA POR TIPO DE MÍDIA) ==========
+// ========== RENDER COLEÇÃO (COM CAPAS CORRIGIDAS) ==========
 function renderColecao() {
   const container = document.getElementById('colecao-container');
   if (!container) return;
@@ -1452,6 +1456,7 @@ function renderColecao() {
     return;
   }
 
+  // Classifica por tipo
   const vinil = [];
   const cd = [];
   const cassete = [];
@@ -1482,14 +1487,12 @@ function renderColecao() {
   ];
 
   let html = '';
-  let totalDiscos = 0;
 
   secoes.forEach(secao => {
     if (secao.items.length === 0) return;
-    totalDiscos += secao.items.length;
 
     html += `
-      <div style="margin-bottom: 32px;">
+      <div style="margin-bottom: 32px;" data-secao="${secao.nome}">
         <div class="tier-head" style="border-bottom: 1px solid var(--card-line); padding-bottom: 12px; margin-bottom: 18px; --tier-color: ${secao.cor};">
           <div class="tier-stamp tiny" style="background: ${secao.cor}; color: var(--ink);">${secao.icone}</div>
           <div class="tier-info">
@@ -1497,20 +1500,20 @@ function renderColecao() {
             <p style="opacity:0.5; font-size:13px;">${secao.items.length} discos</p>
           </div>
         </div>
-        <div class="grid">
+        <div class="grid" data-grid="${secao.nome}">
     `;
 
     secao.items.forEach((item, i) => {
       const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
       const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
       const letter = item.album ? item.album.charAt(0) : '?';
-      const uniqueId = `col-${secao.nome}-${i}-${Date.now()}-${Math.random()}`;
+      const uniqueId = `col-${secao.nome}-${i}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
       const tagColor = secao.cor;
       const tagIcon = secao.icone;
       const tagLabel = secao.nome;
       
       html += `
-        <div class="card" id="${uniqueId}">
+        <div class="card" data-artista="${item.artista || ''}" data-album="${item.album || ''}" data-id="${uniqueId}">
           <div class="art-wrap" id="art-${uniqueId}" style="background: ${tagColor}; background-size: cover; background-position: center;">
             <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon} ${tagLabel}</span>
             <div class="spine-letter">${letter}</div>
@@ -1543,46 +1546,24 @@ function renderColecao() {
   container.innerHTML = html;
   document.getElementById('colecao-badge').textContent = colecao.length;
 
-  // Carrega as capas
-  setTimeout(() => {
-    colecao.forEach((item, idx) => {
-      const formato = item.formato || '';
-      let secaoNome = 'Outros';
-      if (formato.includes('LP') || formato.includes('EP') || formato.includes('Vinil')) secaoNome = 'Vinil';
-      else if (formato.includes('CD')) secaoNome = 'CD';
-      else if (formato.includes('Cassete') || formato.toLowerCase().includes('cassette')) secaoNome = 'Cassete';
-      
-      // Procura o card com o ID correto (usando o seletor)
-      const cards = document.querySelectorAll('.card');
-      // Como não temos um ID fixo, vamos buscar pelo índice + seção
-      // Vamos usar um seletor mais específico
-      const secoesMap = {
-        'Vinil': vinil,
-        'CD': cd,
-        'Cassete': cassete,
-        'Outros': outros
-      };
-      const items = secoesMap[secaoNome] || [];
-      if (idx < items.length) {
-        // Pega o índice do item na seção
-        const indexInSection = items.indexOf(item);
-        if (indexInSection !== -1) {
-          // Procura o card pelo índice visual
-          const grid = document.querySelector(`[style*="margin-bottom: 32px;"]:nth-child(${Object.keys(secoesMap).indexOf(secaoNome) + 1}) .grid`);
-          if (grid) {
-            const card = grid.children[indexInSection];
-            if (card) {
-              const artId = card.querySelector('.art-wrap')?.id;
-              const fallbackId = card.querySelector('.art-fallback')?.id;
-              if (artId && fallbackId) {
-                fetchAlbumArt(item.artista, item.album, artId, fallbackId);
-              }
-            }
-          }
-        }
-      }
-    });
-  }, 100);
+  // ===== CARREGA AS CAPAS =====
+  // Pega todos os cards da coleção
+  const cards = container.querySelectorAll('.card');
+  cards.forEach(card => {
+    const artista = card.dataset.artista;
+    const album = card.dataset.album;
+    const artWrap = card.querySelector('.art-wrap');
+    const fallback = card.querySelector('.art-fallback');
+    
+    if (artista && album && artWrap && fallback) {
+      const artId = artWrap.id;
+      const fallbackId = fallback.id;
+      // Carrega a capa com delay para não sobrecarregar
+      setTimeout(() => {
+        fetchAlbumArt(artista, album, artId, fallbackId);
+      }, 100);
+    }
+  });
 }
 
 // ========== RENDER ESTATÍSTICAS ==========

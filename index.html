@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Discoteca — v0.7</title>
+  <title>Discoteca — v0.8</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -879,6 +879,155 @@
       cursor: pointer;
     }
 
+    /* ===== DASHBOARD ===== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .dashboard-card {
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: 10px;
+      padding: 16px 12px;
+      text-align: center;
+      border-top: 3px solid var(--s-color);
+    }
+    .dashboard-card .number {
+      font-family: 'Anton', sans-serif;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--paper);
+    }
+    .dashboard-card .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-top: 4px;
+    }
+    .dashboard-card .sub {
+      font-size: 12px;
+      opacity: 0.4;
+      margin-top: 2px;
+    }
+    .dashboard-card.economia {
+      border-top-color: #4CAF50;
+    }
+    .dashboard-card.wishlist {
+      border-top-color: var(--a-color);
+    }
+
+    /* ===== TOGGLE VIEW ===== */
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: 6px;
+      padding: 3px;
+      margin-left: 12px;
+    }
+    .view-toggle button {
+      background: transparent;
+      border: none;
+      color: var(--paper);
+      opacity: 0.4;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .view-toggle button.active {
+      opacity: 1;
+      background: var(--s-color);
+      color: var(--ink);
+    }
+    .view-toggle button:hover:not(.active) {
+      opacity: 0.7;
+    }
+
+    /* ===== MODO LISTA ===== */
+    .list-view {
+      display: none;
+      width: 100%;
+      overflow-x: auto;
+    }
+    .list-view.active {
+      display: block;
+    }
+    .list-view table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .list-view th {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--card-line);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+    .list-view td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--card-line);
+      vertical-align: middle;
+    }
+    .list-view tr:hover td {
+      background: rgba(237, 232, 220, 0.03);
+    }
+    .list-view .list-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .list-view .list-actions button {
+      background: transparent;
+      border: 1px solid var(--card-line);
+      color: var(--paper);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .list-view .list-actions .edit:hover {
+      background: var(--a-color);
+      border-color: var(--a-color);
+      color: var(--ink);
+    }
+    .list-view .list-actions .remove:hover {
+      background: #f44336;
+      border-color: #f44336;
+      color: #fff;
+    }
+    .list-view .format-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--card-line);
+      opacity: 0.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .list-view .format-badge.vinil {
+      color: var(--vinil-color);
+      border-color: var(--vinil-color);
+    }
+    .list-view .format-badge.cd {
+      color: var(--cd-color);
+      border-color: var(--cd-color);
+    }
+    .list-view .format-badge.cassete {
+      color: var(--cassete-color);
+      border-color: var(--cassete-color);
+    }
+
     /* ===== USER BAR ===== */
     .user-bar {
       display: flex;
@@ -984,6 +1133,33 @@
       display: none;
     }
 
+    .add-btn-wrap {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .add-btn {
+      background: var(--s-color);
+      color: var(--ink);
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 28px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .add-btn:hover {
+      transform: scale(1.05);
+      opacity: 0.85;
+    }
+
     /* ===== RESPONSIVO ===== */
     @media (max-width:600px) {
       .tier-stamp {
@@ -1029,33 +1205,16 @@
       .empty-state-full .icon {
         font-size: 60px;
       }
-    }
-
-    .add-btn-wrap {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .add-btn {
-      background: var(--s-color);
-      color: var(--ink);
-      border: none;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      font-size: 28px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .add-btn:hover {
-      transform: scale(1.05);
-      opacity: 0.85;
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .list-view table {
+        font-size: 12px;
+      }
+      .list-view th,
+      .list-view td {
+        padding: 6px 8px;
+      }
     }
   </style>
 </head>
@@ -1136,7 +1295,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 3: COLEÇÃO                                            -->
+    <!-- TAB 3: COLEÇÃO (COM DASHBOARD E TOGGLE)                  -->
     <!-- ========================================================== -->
     <div id="tab-colecao" class="tab-content">
       <section class="section" style="--tier-color:var(--colecao-color)">
@@ -1147,10 +1306,18 @@
             <p>Registro de todos os discos que já fazem parte da sua coleção física.</p>
           </div>
           <div class="add-btn-wrap">
+            <div class="view-toggle" id="viewToggle">
+              <button class="active" data-view="cards" onclick="setView('cards')">🎴 Cards</button>
+              <button data-view="list" onclick="setView('list')">📋 Lista</button>
+            </div>
             <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
           </div>
         </div>
+        <!-- DASHBOARD -->
+        <div id="dashboard-container"></div>
+        <!-- COLEÇÃO (CARDS E LISTA) -->
         <div id="colecao-container"></div>
+        <div class="list-view" id="listView"></div>
       </section>
     </div>
 
@@ -1230,9 +1397,7 @@
         <button class="modal-close" id="btnFecharModal">✕</button>
       </div>
       <form id="form-adicionar">
-        <!-- hidden para edição -->
         <input type="hidden" id="campo-id" value="">
-
         <div class="form-group">
           <label>Artista *</label>
           <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
@@ -1295,8 +1460,6 @@
           <label>Notas</label>
           <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
         </div>
-
-        <!-- CÓDIGO DE BARRAS -->
         <div class="form-group">
           <label>Código de Barras</label>
           <div style="display:flex; gap:8px; align-items:center;">
@@ -1308,7 +1471,6 @@
             <button type="button" class="btn" style="margin-top:8px; background:var(--card-line); color:var(--paper);" id="btnBarcodeCancel">Cancelar</button>
           </div>
         </div>
-
         <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
         <div class="form-msg" id="form-msg"></div>
       </form>
@@ -1369,6 +1531,7 @@
     let recomendacoes = [];
     let editandoId = null;
     let barcodeScanner = null;
+    let viewPreference = localStorage.getItem('discoteca_view') || 'cards';
 
     // ================================================================
     // LOGIN PERSISTENTE
@@ -1477,7 +1640,11 @@
         .then(r => r.json())
         .then(data => {
           colecao = Array.isArray(data) ? data : [];
+          renderDashboard();
           renderColecao();
+          renderLista();
+          aplicarView();
+          document.getElementById('colecao-badge').textContent = colecao.length;
         })
         .catch(() => {});
 
@@ -1490,173 +1657,92 @@
     }
 
     // ================================================================
-    // LAST.FM (CAPAS)
+    // DASHBOARD
     // ================================================================
-    const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
-    const MANUAL_COVERS = {
-      'basttardz_brasil com z / auschwitz tropical': 'https://i.imgur.com/nlcvybH.jpeg',
-      'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
-    };
+    function renderDashboard() {
+      const container = document.getElementById('dashboard-container');
+      if (!container) return;
 
-    async function getCoverUrl(artist, album) {
-      if (!artist || !album) return null;
-      const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
-      if (MANUAL_COVERS[key]) return MANUAL_COVERS[key];
-      try {
-        const url =
-          `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.album && data.album.image) {
-          const img = data.album.image.find(i => i.size === 'extralarge');
-          return img && img['#text'] ? img['#text'] : null;
-        }
-        return null;
-      } catch {
-        return null;
-      }
-    }
+      // Calcular dados
+      const lps = colecao.filter(d => {
+        const f = d.formato || '';
+        return f.includes('LP') || f.includes('EP') || f.includes('Vinil');
+      }).length;
 
-    async function fetchAlbumArt(artist, album, artId, fallbackId) {
-      const artWrap = document.getElementById(artId);
-      const fallback = document.getElementById(fallbackId);
-      if (!artWrap) return;
-      try {
-        const url = await getCoverUrl(artist, album);
-        if (url) {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          await new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => reject(new Error('Timeout')), 10000);
-            img.onload = () => {
-              clearTimeout(timeout);
-              artWrap.style.backgroundImage = `url('${url}')`;
-              artWrap.style.backgroundSize = 'cover';
-              artWrap.style.backgroundPosition = 'center';
-              artWrap.classList.add('has-image');
-              if (fallback) fallback.style.opacity = '0';
-              resolve();
-            };
-            img.onerror = () => {
-              clearTimeout(timeout);
-              reject(new Error('Failed to load'));
-            };
-            img.src = url;
-          });
-        } else {
-          if (fallback) fallback.style.opacity = '0.8';
-        }
-      } catch {
-        if (fallback) fallback.style.opacity = '0.8';
-      }
-    }
+      const cds = colecao.filter(d => {
+        const f = d.formato || '';
+        return f.includes('CD');
+      }).length;
 
-    // ================================================================
-    // RENDER: RECOMENDAÇÕES (COM BOTÃO "JÁ TENHO")
-    // ================================================================
-    function renderRecomendacoes(dados) {
-      const container = document.getElementById('compras-container');
-      if (!dados || dados.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state-full" style="padding:80px 20px;">
-            <div class="icon">💰</div>
-            <h3>Sua carteira está cheia... de expectativas!</h3>
-            <p>Faça upload da sua playlist para gerar recomendações personalizadas.</p>
-            <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
+      const cassetes = colecao.filter(d => {
+        const f = d.formato || '';
+        return f.includes('Cassete') || f.toLowerCase().includes('cassette');
+      }).length;
+
+      const wishlist = recomendacoes.filter(r => r.comprado === 0).length;
+
+      // Economia (mockado por enquanto - depois vamos calcular de verdade com preços)
+      const economia = 48;
+
+      container.innerHTML = `
+        <div class="dashboard-grid">
+          <div class="dashboard-card">
+            <div class="number">${lps}</div>
+            <div class="label">🎵 LPs</div>
           </div>
-        `;
-        return;
-      }
-
-      // Separar por tier
-      const tiers = { S: [], A: [], B: [], C: [] };
-      dados.forEach(item => {
-        if (tiers[item.tier]) tiers[item.tier].push(item);
-      });
-
-      let html = '';
-      ['S', 'A', 'B', 'C'].forEach(tier => {
-        const items = tiers[tier] || [];
-        const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' :
-        '#8A8378';
-        const tierDesc = tier === 'S' ? 'Prioridade Máxima' : tier === 'A' ? 'Alta Prioridade' : tier === 'B' ?
-          'Sem Urgência' : 'Baixa Prioridade';
-        const tierDetail = tier === 'S' ?
-          'Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.' :
-          tier === 'A' ?
-          'Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.' :
-          tier === 'B' ?
-          'Pegar em promoção ou naturalmente, sem pressa de garimpo.' :
-          'Só entram se aparecer oportunidade excepcional (preço/edição).';
-
-        html += `
-          <section class="section" style="--tier-color:${tierColor}">
-            <div class="tier-head">
-              <div class="tier-stamp">${tier}</div>
-              <div class="tier-info">
-                <h2>${tierDesc}</h2>
-                <p>${tierDetail}</p>
-              </div>
-              ${tier === 'S' ? `<div class="add-btn-wrap"><button class="add-btn" onclick="abrirWishlist()" title="Adicionar manual à lista">+</button></div>` : ''}
-            </div>
-            <div class="grid">
-        `;
-
-        if (items.length === 0) {
-          html += `
-            <div class="empty-state" style="padding:40px 20px;">
-              <div class="icon" style="font-size:32px;">📭</div>
-              <h3 style="font-size:18px;">Nenhum disco ${tier} ainda</h3>
-              <p style="font-size:13px;">Importe mais playlists ou adicione manualmente.</p>
-            </div>
-          `;
-        } else {
-          items.forEach((item, idx) => {
-            const letter = item.album ? item.album.charAt(0) : '?';
-            const id = `rec-${tier}-${idx}`;
-            const origem = item.origem || 'algoritmo';
-            const comprado = item.comprado || 0;
-            html += `
-              <div class="card" id="${id}" data-id="${item.id || ''}">
-                <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
-                  <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier} ${origem === 'manual' ? '✏️' : ''}</span>
-                  <div class="spine-letter">${letter}</div>
-                  <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
-                </div>
-                <div class="card-body">
-                  <h3>${item.album || 'Álbum'}</h3>
-                  <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
-                  <div class="meta-block">
-                    <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
-                    ${item.nota ? `<div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota}</span></div>` : ''}
-                    ${item.origem === 'manual' ? `<div class="meta-row"><span class="label">Origem</span><span class="val">Adicionado manualmente</span></div>` : ''}
-                  </div>
-                  <div class="card-actions">
-                    <button class="btn-buy" onclick="marcarComoTenho('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')">✅ Já tenho</button>
-                  </div>
-                </div>
-              </div>
-            `;
-          });
-        }
-
-        html += `</div></section>`;
-      });
-
-      container.innerHTML = html;
-
-      // Carregar capas
-      ['S', 'A', 'B', 'C'].forEach(tier => {
-        const items = tiers[tier] || [];
-        items.forEach((item, idx) => {
-          const id = `rec-${tier}-${idx}`;
-          fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
-        });
-      });
+          <div class="dashboard-card">
+            <div class="number">${cds}</div>
+            <div class="label">💿 CDs</div>
+          </div>
+          <div class="dashboard-card">
+            <div class="number">${cassetes}</div>
+            <div class="label">📼 Cassetes</div>
+          </div>
+          <div class="dashboard-card wishlist">
+            <div class="number">${wishlist}</div>
+            <div class="label">⭐ Wishlist</div>
+          </div>
+          <div class="dashboard-card economia">
+            <div class="number">R$ ${economia}</div>
+            <div class="label">💰 Economia</div>
+            <div class="sub">em promoções</div>
+          </div>
+        </div>
+      `;
     }
 
     // ================================================================
-    // RENDER: COLEÇÃO (COM BOTÕES EDITAR / REMOVER)
+    // TOGGLE VIEW (CARDS / LISTA)
+    // ================================================================
+    function setView(view) {
+      viewPreference = view;
+      localStorage.setItem('discoteca_view', view);
+      aplicarView();
+      // Atualizar botões
+      document.querySelectorAll('.view-toggle button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+    }
+    window.setView = setView;
+
+    function aplicarView() {
+      const cardsContainer = document.getElementById('colecao-container');
+      const listContainer = document.getElementById('listView');
+      if (!cardsContainer || !listContainer) return;
+
+      if (viewPreference === 'cards') {
+        cardsContainer.style.display = 'block';
+        listContainer.classList.remove('active');
+        listContainer.style.display = 'none';
+      } else {
+        cardsContainer.style.display = 'none';
+        listContainer.style.display = 'block';
+        listContainer.classList.add('active');
+      }
+    }
+
+    // ================================================================
+    // RENDER: COLEÇÃO (MODO CARDS)
     // ================================================================
     function renderColecao() {
       const container = document.getElementById('colecao-container');
@@ -1671,7 +1757,6 @@
             <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
           </div>
         `;
-        document.getElementById('colecao-badge').textContent = '0';
         return;
       }
 
@@ -1751,7 +1836,6 @@
       });
 
       container.innerHTML = html;
-      document.getElementById('colecao-badge').textContent = colecao.length;
 
       // Carregar capas
       const cards = container.querySelectorAll('.card');
@@ -1769,7 +1853,223 @@
     }
 
     // ================================================================
-    // RENDER: ESTATÍSTICAS (SIMPLIFICADA)
+    // RENDER: LISTA (MODO LISTA)
+    // ================================================================
+    function renderLista() {
+      const container = document.getElementById('listView');
+      if (!container) return;
+
+      if (!colecao || colecao.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Artista</th>
+              <th>Álbum</th>
+              <th>Formato</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      colecao.forEach(item => {
+        const f = item.formato || '';
+        let formatClass = '';
+        if (f.includes('LP') || f.includes('EP') || f.includes('Vinil')) formatClass = 'vinil';
+        else if (f.includes('CD')) formatClass = 'cd';
+        else if (f.includes('Cassete') || f.toLowerCase().includes('cassette')) formatClass = 'cassete';
+        else formatClass = '';
+
+        html += `
+          <tr>
+            <td><strong>${item.artista || '?'}</strong></td>
+            <td>${item.album || '?'}</td>
+            <td><span class="format-badge ${formatClass}">${formatClass ? formatClass.charAt(0).toUpperCase() + formatClass.slice(1) : '—'}</span></td>
+            <td>
+              <div class="list-actions">
+                <button class="edit" onclick="editarDisco('${item.id || ''}')">✏️</button>
+                <button class="remove" onclick="removerDisco('${item.id || ''}')">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    // ================================================================
+    // LAST.FM (CAPAS)
+    // ================================================================
+    const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
+    const MANUAL_COVERS = {
+      'basttardz_brasil com z / auschwitz tropical': 'https://i.imgur.com/nlcvybH.jpeg',
+      'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
+    };
+
+    async function getCoverUrl(artist, album) {
+      if (!artist || !album) return null;
+      const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
+      if (MANUAL_COVERS[key]) return MANUAL_COVERS[key];
+      try {
+        const url =
+          `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.album && data.album.image) {
+          const img = data.album.image.find(i => i.size === 'extralarge');
+          return img && img['#text'] ? img['#text'] : null;
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    }
+
+    async function fetchAlbumArt(artist, album, artId, fallbackId) {
+      const artWrap = document.getElementById(artId);
+      const fallback = document.getElementById(fallbackId);
+      if (!artWrap) return;
+      try {
+        const url = await getCoverUrl(artist, album);
+        if (url) {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Timeout')), 10000);
+            img.onload = () => {
+              clearTimeout(timeout);
+              artWrap.style.backgroundImage = `url('${url}')`;
+              artWrap.style.backgroundSize = 'cover';
+              artWrap.style.backgroundPosition = 'center';
+              artWrap.classList.add('has-image');
+              if (fallback) fallback.style.opacity = '0';
+              resolve();
+            };
+            img.onerror = () => {
+              clearTimeout(timeout);
+              reject(new Error('Failed to load'));
+            };
+            img.src = url;
+          });
+        } else {
+          if (fallback) fallback.style.opacity = '0.8';
+        }
+      } catch {
+        if (fallback) fallback.style.opacity = '0.8';
+      }
+    }
+
+    // ================================================================
+    // RENDER: RECOMENDAÇÕES
+    // ================================================================
+    function renderRecomendacoes(dados) {
+      const container = document.getElementById('compras-container');
+      if (!dados || dados.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-full" style="padding:80px 20px;">
+            <div class="icon">💰</div>
+            <h3>Sua carteira está cheia... de expectativas!</h3>
+            <p>Faça upload da sua playlist para gerar recomendações personalizadas.</p>
+            <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
+          </div>
+        `;
+        return;
+      }
+
+      const tiers = { S: [], A: [], B: [], C: [] };
+      dados.forEach(item => {
+        if (tiers[item.tier]) tiers[item.tier].push(item);
+      });
+
+      let html = '';
+      ['S', 'A', 'B', 'C'].forEach(tier => {
+        const items = tiers[tier] || [];
+        const tierColor = tier === 'S' ? '#D6432F' : tier === 'A' ? '#E39A2E' : tier === 'B' ? '#4E7A8C' :
+        '#8A8378';
+        const tierDesc = tier === 'S' ? 'Prioridade Máxima' : tier === 'A' ? 'Alta Prioridade' : tier === 'B' ?
+          'Sem Urgência' : 'Baixa Prioridade';
+        const tierDetail = tier === 'S' ?
+          'Comprar assim que aparecer. Fecham trilogias, completam tríades e representam o auge da coleção.' :
+          tier === 'A' ?
+          'Comprar na sequência — bons preços, boas edições, ou entrada de banda importante na coleção.' :
+          tier === 'B' ?
+          'Pegar em promoção ou naturalmente, sem pressa de garimpo.' :
+          'Só entram se aparecer oportunidade excepcional (preço/edição).';
+
+        html += `
+          <section class="section" style="--tier-color:${tierColor}">
+            <div class="tier-head">
+              <div class="tier-stamp">${tier}</div>
+              <div class="tier-info">
+                <h2>${tierDesc}</h2>
+                <p>${tierDetail}</p>
+              </div>
+              ${tier === 'S' ? `<div class="add-btn-wrap"><button class="add-btn" onclick="abrirWishlist()" title="Adicionar manual à lista">+</button></div>` : ''}
+            </div>
+            <div class="grid">
+        `;
+
+        if (items.length === 0) {
+          html += `
+            <div class="empty-state" style="padding:40px 20px;">
+              <div class="icon" style="font-size:32px;">📭</div>
+              <h3 style="font-size:18px;">Nenhum disco ${tier} ainda</h3>
+              <p style="font-size:13px;">Importe mais playlists ou adicione manualmente.</p>
+            </div>
+          `;
+        } else {
+          items.forEach((item, idx) => {
+            const letter = item.album ? item.album.charAt(0) : '?';
+            const id = `rec-${tier}-${idx}`;
+            const origem = item.origem || 'algoritmo';
+            const comprado = item.comprado || 0;
+            html += `
+              <div class="card" id="${id}" data-id="${item.id || ''}">
+                <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
+                  <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier} ${origem === 'manual' ? '✏️' : ''}</span>
+                  <div class="spine-letter">${letter}</div>
+                  <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+                </div>
+                <div class="card-body">
+                  <h3>${item.album || 'Álbum'}</h3>
+                  <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
+                  <div class="meta-block">
+                    <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+                    ${item.nota ? `<div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota}</span></div>` : ''}
+                    ${item.origem === 'manual' ? `<div class="meta-row"><span class="label">Origem</span><span class="val">Adicionado manualmente</span></div>` : ''}
+                  </div>
+                  <div class="card-actions">
+                    <button class="btn-buy" onclick="marcarComoTenho('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')">✅ Já tenho</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        html += `</div></section>`;
+      });
+
+      container.innerHTML = html;
+
+      ['S', 'A', 'B', 'C'].forEach(tier => {
+        const items = tiers[tier] || [];
+        items.forEach((item, idx) => {
+          const id = `rec-${tier}-${idx}`;
+          fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
+        });
+      });
+    }
+
+    // ================================================================
+    // RENDER: ESTATÍSTICAS (SIMPLIFICADA — VAI SER MELHORADA NA V0.8)
     // ================================================================
     function renderEstatisticas(dados) {
       const container = document.getElementById('estatisticas-container');
@@ -1867,6 +2167,9 @@
         title.innerHTML = 'Minha <span>Coleção</span>';
         sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
         meter.style.display = 'none';
+        // Renderiza a lista novamente se estiver no modo lista
+        renderLista();
+        aplicarView();
       } else if (tabId === 'tab-importar') {
         hero.className = 'hero hero-state-colecao';
         eyebrow.textContent = 'Discoteca · Importar';
@@ -1878,7 +2181,7 @@
     window.switchTab = switchTab;
 
     // ================================================================
-    // MODAL: ADICIONAR / EDITAR DISCO (COLEÇÃO)
+    // MODAL: ADICIONAR / EDITAR DISCO
     // ================================================================
     const modal = document.getElementById('modalAdicionar');
     const btnAbrirModal = document.getElementById('btnAbrirModal');
@@ -1894,7 +2197,6 @@
       btnSubmit.disabled = false;
 
       if (discoId) {
-        // Modo edição: buscar dados do disco
         document.getElementById('modalTitle').textContent = '✏️ Editar Disco';
         btnSubmit.textContent = 'Atualizar Disco';
         const disco = colecao.find(d => d.id == discoId);
@@ -1906,7 +2208,7 @@
           document.getElementById('campo-condicao-capa').value = disco.condicao_capa || '';
           document.getElementById('campo-preco').value = disco.preco || '';
           document.getElementById('campo-data').value = disco.data_adicao || '';
-          document.getElementById('campo-notas').value = ''; // notas não estão vindo
+          document.getElementById('campo-notas').value = '';
           document.getElementById('campo-codigo-barras').value = '';
         }
       } else {
@@ -1924,7 +2226,6 @@
       }
 
       modal.classList.add('open');
-      // Fechar leitor de código se estiver aberto
       document.getElementById('barcode-reader-container').classList.remove('active');
       if (barcodeScanner) {
         barcodeScanner.stop().catch(() => {});
@@ -2055,7 +2356,7 @@
     window.marcarComoTenho = marcarComoTenho;
 
     // ================================================================
-    // MODAL: ADICIONAR À LISTA DE COMPRAS (WISHLIST MANUAL)
+    // MODAL: ADICIONAR À LISTA DE COMPRAS
     // ================================================================
     const modalWish = document.getElementById('modalAddWishlist');
     const btnFecharWish = document.getElementById('btnFecharWishlist');
@@ -2131,7 +2432,6 @@
 
     btnBarcode.addEventListener('click', function() {
       if (barcodeContainer.classList.contains('active')) {
-        // Se já está aberto, fecha
         barcodeContainer.classList.remove('active');
         if (barcodeScanner) {
           barcodeScanner.stop().catch(() => {});
@@ -2140,7 +2440,6 @@
         return;
       }
 
-      // Verifica se o navegador suporta câmera
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         alert('❌ Seu navegador não suporta acesso à câmera.');
         return;
@@ -2172,17 +2471,13 @@
       html5QrCode.start({ facingMode: "environment" },
         config,
         (decodedText, decodedResult) => {
-          // Sucesso: código lido
           document.getElementById('campo-codigo-barras').value = decodedText;
           barcodeContainer.classList.remove('active');
           html5QrCode.stop().catch(() => {});
           barcodeScanner = null;
-          // Buscar dados do disco na API
           buscarDiscoPorCodigo(decodedText);
         },
-        (errorMessage) => {
-          // Erro de leitura (ignorar)
-        }
+        (errorMessage) => {}
       ).catch(err => {
         alert('❌ Erro ao acessar a câmera: ' + err.message);
         barcodeContainer.classList.remove('active');

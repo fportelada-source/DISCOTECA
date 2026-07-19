@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Discoteca — v0.8.4</title>
+  <title>Discoteca — v0.8.5</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
+    /* ===== RESET E VARIÁVEIS ===== */
     * {
       margin: 0;
       padding: 0;
@@ -46,6 +47,8 @@
       color: inherit;
       text-decoration: none;
     }
+
+    /* ===== HERO ===== */
     .hero {
       position: relative;
       padding: 64px 6vw 48px;
@@ -109,6 +112,8 @@
     .hero-state-colecao .hero h1 span {
       color: var(--colecao-color);
     }
+
+    /* ===== TABS ===== */
     .tabs-container {
       padding: 0 6vw;
       border-bottom: 1px solid var(--card-line);
@@ -167,6 +172,8 @@
       background: var(--colecao-color);
       color: var(--ink);
     }
+
+    /* ===== CONTEÚDO ===== */
     .tab-content {
       display: none;
       animation: fadeIn 0.4s ease;
@@ -228,6 +235,8 @@
       opacity: 0.6;
       max-width: 60ch;
     }
+
+    /* ===== CARDS ===== */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -340,6 +349,8 @@
     .meta-block {
       margin-bottom: 8px;
     }
+
+    /* ===== BOTÕES ===== */
     .card-actions {
       display: flex;
       gap: 6px;
@@ -380,6 +391,7 @@
       border-color: #4CAF50;
       color: #fff;
     }
+
     .barcode-btn {
       background: var(--s-color);
       color: var(--ink);
@@ -421,6 +433,8 @@
       border-radius: 8px;
       width: 100%;
     }
+
+    /* ===== MODAL ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -540,6 +554,8 @@
     .form-msg.error {
       color: #f44336;
     }
+
+    /* ===== UPLOAD ===== */
     .upload-area {
       background: var(--card);
       border: 2px dashed var(--card-line);
@@ -609,6 +625,7 @@
         grid-template-columns: 1fr;
       }
     }
+
     .btn {
       background: var(--s-color);
       color: var(--ink);
@@ -635,6 +652,8 @@
     .btn-danger:hover {
       opacity: 0.8;
     }
+
+    /* ===== EMPTY STATE ===== */
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -686,6 +705,8 @@
       opacity: 0.4;
       margin-top: 16px;
     }
+
+    /* ===== ESTATÍSTICAS ===== */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -753,6 +774,8 @@
       opacity: 0.4;
       margin-left: 8px;
     }
+
+    /* ===== SEÇÃO DE ESTATÍSTICAS COM COLLAPSE ===== */
     .estatistica-secao {
       margin-top: 40px;
     }
@@ -831,6 +854,12 @@
       padding-top: 0;
       margin-top: 0;
     }
+    /* Quando expandido, esconde os cards de resumo */
+    .estatistica-secao .secao-content:not(.fechada) .resumo-cards {
+      display: none;
+    }
+
+    /* ===== EXPORTIFY ===== */
     .exportify-guide {
       background: var(--card);
       border: 1px solid var(--card-line);
@@ -903,6 +932,8 @@
         padding: 20px;
       }
     }
+
+    /* ===== CALENDÁRIO ===== */
     input[type="date"] {
       color-scheme: dark;
       background: var(--ink);
@@ -934,6 +965,8 @@
       filter: invert(1) sepia(1) saturate(5) hue-rotate(340deg);
       cursor: pointer;
     }
+
+    /* ===== DASHBOARD ===== */
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -973,6 +1006,8 @@
     .dashboard-card.wishlist {
       border-top-color: var(--a-color);
     }
+
+    /* ===== CONTROLES DA COLEÇÃO ===== */
     .colecao-controls {
       display: flex;
       flex-wrap: wrap;
@@ -1093,6 +1128,8 @@
     .group-toggle button:hover:not(.active) {
       opacity: 0.7;
     }
+
+    /* ===== MODO LISTA ===== */
     .list-view {
       display: none;
       width: 100%;
@@ -1179,6 +1216,8 @@
     .list-view .secao-header:first-of-type {
       margin-top: 0;
     }
+
+    /* ===== USER BAR ===== */
     .user-bar {
       display: flex;
       justify-content: space-between;
@@ -1209,6 +1248,8 @@
       color: var(--ink);
       border-color: var(--s-color);
     }
+
+    /* ===== FOOTER ===== */
     footer {
       padding: 40px 6vw 0;
       font-family: 'JetBrains Mono', monospace;
@@ -1218,6 +1259,8 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
+
+    /* ===== LOGIN ===== */
     .login-container {
       display: flex;
       justify-content: center;
@@ -1278,6 +1321,7 @@
       margin-top: 16px;
       display: none;
     }
+
     .add-btn-wrap {
       margin-left: auto;
       display: flex;
@@ -1314,6 +1358,8 @@
       flex: 1;
       min-width: 120px;
     }
+
+    /* ===== RESPONSIVO ===== */
     @media (max-width:600px) {
       .tier-stamp {
         font-size: 44px;
@@ -2285,7 +2331,6 @@
 
       const estado = localStorage.getItem('secao_player') || 'aberta';
 
-      // Resumo (cards compactos)
       let resumoHtml = '';
       if (dados && !dados.erro && dados.total_musicas > 0) {
         resumoHtml = `
@@ -2510,7 +2555,7 @@
     }
 
     // ================================================================
-    // COLLAPSE DAS ESTATÍSTICAS
+    // COLLAPSE
     // ================================================================
     function toggleSecao(secao) {
       const content = document.getElementById('secao-' + secao + '-content');
@@ -2529,11 +2574,15 @@
     }
 
     // ================================================================
-    // RECOMENDAÇÕES (COM JUSTIFICATIVA)
+    // RECOMENDAÇÕES (COM JUSTIFICATIVA E MENSAGEM DE VAZIO)
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
-      if (!dados || dados.length === 0) {
+      
+      // Verifica se não tem dados ou se todos os itens estão comprados
+      const hasActiveRecommendations = dados && dados.some(item => item.comprado === 0);
+      
+      if (!dados || dados.length === 0 || !hasActiveRecommendations) {
         container.innerHTML = `
           <div class="empty-state-full" style="padding:80px 20px;">
             <div class="icon">💰</div>
@@ -2547,7 +2596,9 @@
 
       const tiers = { S: [], A: [], B: [], C: [] };
       dados.forEach(item => {
-        if (tiers[item.tier]) tiers[item.tier].push(item);
+        if (item.comprado === 0 && tiers[item.tier]) {
+          tiers[item.tier].push(item);
+        }
       });
 
       let html = '';

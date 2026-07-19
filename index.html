@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Discoteca — v0.8.3</title>
+  <title>Discoteca — v0.8.4</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -766,10 +766,11 @@
       cursor: pointer;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--card-line);
+      margin-bottom: 12px;
     }
     .estatistica-secao .secao-header h3 {
       font-family: 'Anton', sans-serif;
-      font-size: 24px;
+      font-size: 22px;
       letter-spacing: 0.02em;
       margin: 0;
     }
@@ -785,6 +786,39 @@
       color: var(--e-color);
     }
     .estatistica-secao.estante .secao-header h3 {
+      color: var(--colecao-color);
+    }
+    .estatistica-secao .resumo-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .estatistica-secao .resumo-cards .resumo-item {
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      border-top: 2px solid var(--e-color);
+    }
+    .estatistica-secao .resumo-cards .resumo-item .num {
+      font-family: 'Anton', sans-serif;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--e-color);
+    }
+    .estatistica-secao .resumo-cards .resumo-item .label {
+      opacity: 0.6;
+      font-size: 12px;
+    }
+    .estatistica-secao.estante .resumo-cards .resumo-item {
+      border-top-color: var(--colecao-color);
+    }
+    .estatistica-secao.estante .resumo-cards .resumo-item .num {
       color: var(--colecao-color);
     }
     .estatistica-secao .secao-content {
@@ -1349,6 +1383,13 @@
       }
       .btn-group .btn {
         min-width: 100%;
+      }
+      .estatistica-secao .resumo-cards .resumo-item {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+      .estatistica-secao .resumo-cards .resumo-item .num {
+        font-size: 16px;
       }
     }
   </style>
@@ -2236,14 +2277,38 @@
     }
 
     // ================================================================
-    // ESTATÍSTICAS DO PLAYER
+    // ESTATÍSTICAS DO PLAYER (COM RESUMO)
     // ================================================================
     function renderEstatisticasPlayer(dados) {
       const container = document.getElementById('estatisticas-player');
       if (!container) return;
 
-      // Verifica estado salvo
       const estado = localStorage.getItem('secao_player') || 'aberta';
+
+      // Resumo (cards compactos)
+      let resumoHtml = '';
+      if (dados && !dados.erro && dados.total_musicas > 0) {
+        resumoHtml = `
+          <div class="resumo-cards">
+            <div class="resumo-item">
+              <span class="num">${dados.total_musicas || 0}</span>
+              <span class="label">Músicas</span>
+            </div>
+            <div class="resumo-item">
+              <span class="num">${dados.artistas_unicos || 0}</span>
+              <span class="label">Artistas</span>
+            </div>
+            <div class="resumo-item">
+              <span class="num">${dados.albuns_unicos || 0}</span>
+              <span class="label">Álbuns</span>
+            </div>
+            <div class="resumo-item">
+              <span class="num">${dados.duracao_horas || 0}h</span>
+              <span class="label">Duração</span>
+            </div>
+          </div>
+        `;
+      }
 
       if (!dados || dados.erro || dados.total_musicas === 0) {
         container.innerHTML = `
@@ -2252,6 +2317,7 @@
               <h3>🎧 No seu player</h3>
               <span class="toggle-icon" id="secao-player-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
             </div>
+            ${resumoHtml}
             <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-player-content">
               <div class="empty-state" style="padding:40px 20px;">
                 <div class="icon" style="font-size:40px;">🎧</div>
@@ -2270,6 +2336,7 @@
             <h3>🎧 No seu player</h3>
             <span class="toggle-icon" id="secao-player-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
           </div>
+          ${resumoHtml}
           <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-player-content">
             <div class="stat-grid">
               <div class="stat-card">
@@ -2332,13 +2399,41 @@
     }
 
     // ================================================================
-    // ESTATÍSTICAS DA ESTANTE
+    // ESTATÍSTICAS DA ESTANTE (COM RESUMO)
     // ================================================================
     function renderEstatisticasEstante(dados) {
       const container = document.getElementById('estatisticas-estante');
       if (!container) return;
 
       const estado = localStorage.getItem('secao_estante') || 'aberta';
+
+      let resumoHtml = '';
+      if (dados && !dados.erro && dados.total_discos > 0) {
+        resumoHtml = `
+          <div class="resumo-cards">
+            <div class="resumo-item">
+              <span class="num">${dados.total_discos || 0}</span>
+              <span class="label">Discos</span>
+            </div>
+            <div class="resumo-item">
+              <span class="num">${dados.lps || 0}</span>
+              <span class="label">🎵 LPs</span>
+            </div>
+            <div class="resumo-item">
+              <span class="num">${dados.cds || 0}</span>
+              <span class="label">💿 CDs</span>
+            </div>
+            <div class="resumo-item">
+              <span class="num">${dados.cassetes || 0}</span>
+              <span class="label">📼 Cassetes</span>
+            </div>
+            ${dados.valor_total ? `<div class="resumo-item">
+              <span class="num">R$ ${dados.valor_total}</span>
+              <span class="label">Valor</span>
+            </div>` : ''}
+          </div>
+        `;
+      }
 
       if (!dados || dados.erro || dados.total_discos === 0) {
         container.innerHTML = `
@@ -2347,6 +2442,7 @@
               <h3>📀 Na sua estante</h3>
               <span class="toggle-icon" id="secao-estante-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
             </div>
+            ${resumoHtml}
             <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-estante-content">
               <div class="empty-state" style="padding:40px 20px;">
                 <div class="icon" style="font-size:40px;">📀</div>
@@ -2365,6 +2461,7 @@
             <h3>📀 Na sua estante</h3>
             <span class="toggle-icon" id="secao-estante-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
           </div>
+          ${resumoHtml}
           <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-estante-content">
             <div class="stat-grid">
               <div class="stat-card" style="border-top-color: var(--colecao-color);">
@@ -2432,7 +2529,7 @@
     }
 
     // ================================================================
-    // RECOMENDAÇÕES
+    // RECOMENDAÇÕES (COM JUSTIFICATIVA)
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
@@ -2506,6 +2603,7 @@
                   <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
                   <div class="meta-block">
                     <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+                    ${item.justificativa ? `<div class="meta-row" style="flex-wrap:wrap;"><span class="label">Justificativa</span><span class="val" style="text-align:left; max-width:100%; font-size:11px; opacity:0.7; margin-top:4px;">${item.justificativa}</span></div>` : ''}
                     ${item.nota ? `<div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota}</span></div>` : ''}
                     ${item.origem === 'manual' ? `<div class="meta-row"><span class="label">Origem</span><span class="val">Adicionado manualmente</span></div>` : ''}
                   </div>

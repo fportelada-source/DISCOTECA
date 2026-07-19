@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Discoteca — v0.8.2</title>
-  <!-- Google Fonts -->
+  <title>Discoteca — v0.8.3</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <!-- Html5-QRCode (leitor de código de barras) -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
-    /* ===== RESET E VARIÁVEIS ===== */
     * {
       margin: 0;
       padding: 0;
@@ -49,8 +46,6 @@
       color: inherit;
       text-decoration: none;
     }
-
-    /* ===== HERO ===== */
     .hero {
       position: relative;
       padding: 64px 6vw 48px;
@@ -114,8 +109,6 @@
     .hero-state-colecao .hero h1 span {
       color: var(--colecao-color);
     }
-
-    /* ===== TABS ===== */
     .tabs-container {
       padding: 0 6vw;
       border-bottom: 1px solid var(--card-line);
@@ -174,8 +167,6 @@
       background: var(--colecao-color);
       color: var(--ink);
     }
-
-    /* ===== CONTEÚDO DAS TABS ===== */
     .tab-content {
       display: none;
       animation: fadeIn 0.4s ease;
@@ -193,7 +184,6 @@
         transform: translateY(0);
       }
     }
-
     .section {
       padding: 40px 6vw 8px;
     }
@@ -238,8 +228,6 @@
       opacity: 0.6;
       max-width: 60ch;
     }
-
-    /* ===== CARDS ===== */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -352,8 +340,6 @@
     .meta-block {
       margin-bottom: 8px;
     }
-
-    /* ===== BOTÕES DE AÇÃO DOS CARDS ===== */
     .card-actions {
       display: flex;
       gap: 6px;
@@ -394,8 +380,6 @@
       border-color: #4CAF50;
       color: #fff;
     }
-
-    /* ===== BOTÃO DE LEITOR DE CÓDIGO ===== */
     .barcode-btn {
       background: var(--s-color);
       color: var(--ink);
@@ -437,8 +421,6 @@
       border-radius: 8px;
       width: 100%;
     }
-
-    /* ===== MODAL ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -558,8 +540,6 @@
     .form-msg.error {
       color: #f44336;
     }
-
-    /* ===== UPLOAD ===== */
     .upload-area {
       background: var(--card);
       border: 2px dashed var(--card-line);
@@ -629,7 +609,6 @@
         grid-template-columns: 1fr;
       }
     }
-
     .btn {
       background: var(--s-color);
       color: var(--ink);
@@ -649,8 +628,13 @@
       opacity: 0.4;
       cursor: not-allowed;
     }
-
-    /* ===== EMPTY STATE ===== */
+    .btn-danger {
+      background: #f44336;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      opacity: 0.8;
+    }
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -702,8 +686,6 @@
       opacity: 0.4;
       margin-top: 16px;
     }
-
-    /* ===== ESTATÍSTICAS ===== */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -771,29 +753,50 @@
       opacity: 0.4;
       margin-left: 8px;
     }
-
     .estatistica-secao {
       margin-top: 40px;
     }
     .estatistica-secao:first-of-type {
       margin-top: 0;
     }
-    .estatistica-secao h3 {
-      font-family: 'Anton', sans-serif;
-      font-size: 24px;
-      letter-spacing: 0.02em;
-      margin-bottom: 16px;
+    .estatistica-secao .secao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--card-line);
     }
-    .estatistica-secao.player h3 {
+    .estatistica-secao .secao-header h3 {
+      font-family: 'Anton', sans-serif;
+      font-size: 24px;
+      letter-spacing: 0.02em;
+      margin: 0;
+    }
+    .estatistica-secao .secao-header .toggle-icon {
+      font-size: 18px;
+      opacity: 0.5;
+      transition: 0.2s;
+    }
+    .estatistica-secao .secao-header:hover .toggle-icon {
+      opacity: 1;
+    }
+    .estatistica-secao.player .secao-header h3 {
       color: var(--e-color);
     }
-    .estatistica-secao.estante h3 {
+    .estatistica-secao.estante .secao-header h3 {
       color: var(--colecao-color);
     }
-
-    /* ===== EXPORTIFY ===== */
+    .estatistica-secao .secao-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      max-height: 9999px;
+    }
+    .estatistica-secao .secao-content.fechada {
+      max-height: 0;
+      padding-top: 0;
+      margin-top: 0;
+    }
     .exportify-guide {
       background: var(--card);
       border: 1px solid var(--card-line);
@@ -866,8 +869,6 @@
         padding: 20px;
       }
     }
-
-    /* ===== CALENDÁRIO ===== */
     input[type="date"] {
       color-scheme: dark;
       background: var(--ink);
@@ -899,8 +900,6 @@
       filter: invert(1) sepia(1) saturate(5) hue-rotate(340deg);
       cursor: pointer;
     }
-
-    /* ===== DASHBOARD ===== */
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -940,8 +939,6 @@
     .dashboard-card.wishlist {
       border-top-color: var(--a-color);
     }
-
-    /* ===== CONTROLES DA COLEÇÃO ===== */
     .colecao-controls {
       display: flex;
       flex-wrap: wrap;
@@ -1034,7 +1031,6 @@
     .colecao-controls .view-toggle button:hover:not(.active) {
       opacity: 0.7;
     }
-
     .group-toggle {
       display: flex;
       gap: 4px;
@@ -1063,8 +1059,6 @@
     .group-toggle button:hover:not(.active) {
       opacity: 0.7;
     }
-
-    /* ===== MODO LISTA ===== */
     .list-view {
       display: none;
       width: 100%;
@@ -1151,8 +1145,6 @@
     .list-view .secao-header:first-of-type {
       margin-top: 0;
     }
-
-    /* ===== USER BAR ===== */
     .user-bar {
       display: flex;
       justify-content: space-between;
@@ -1183,8 +1175,6 @@
       color: var(--ink);
       border-color: var(--s-color);
     }
-
-    /* ===== FOOTER ===== */
     footer {
       padding: 40px 6vw 0;
       font-family: 'JetBrains Mono', monospace;
@@ -1194,8 +1184,6 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
-
-    /* ===== LOGIN ===== */
     .login-container {
       display: flex;
       justify-content: center;
@@ -1256,7 +1244,6 @@
       margin-top: 16px;
       display: none;
     }
-
     .add-btn-wrap {
       margin-left: auto;
       display: flex;
@@ -1283,8 +1270,16 @@
       transform: scale(1.05);
       opacity: 0.85;
     }
-
-    /* ===== RESPONSIVO ===== */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .btn-group .btn {
+      flex: 1;
+      min-width: 120px;
+    }
     @media (max-width:600px) {
       .tier-stamp {
         font-size: 44px;
@@ -1352,13 +1347,16 @@
       .colecao-controls .search-box {
         min-width: 100%;
       }
+      .btn-group .btn {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
   <!-- ============================================================ -->
-  <!-- TELA DE LOGIN                                               -->
+  <!-- LOGIN -->
   <!-- ============================================================ -->
   <div id="loginScreen" class="login-container">
     <div class="login-box">
@@ -1373,7 +1371,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- APP                                                         -->
+  <!-- APP -->
   <!-- ============================================================ -->
   <div id="appScreen" style="display:none;">
 
@@ -1409,14 +1407,14 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 1: COMPRAS                                            -->
+    <!-- TAB 1: COMPRAS -->
     <!-- ========================================================== -->
     <div id="tab-compras" class="tab-content active">
       <div id="compras-container"></div>
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 2: ESTATÍSTICAS (SEPARADAS)                           -->
+    <!-- TAB 2: ESTATÍSTICAS -->
     <!-- ========================================================== -->
     <div id="tab-estatisticas" class="tab-content">
       <section class="section" style="--tier-color:var(--e-color)">
@@ -1428,17 +1426,17 @@
           </div>
         </div>
 
-        <!-- NO SEU PLAYER -->
+        <!-- PLAYER -->
         <div id="estatisticas-player"></div>
 
-        <!-- NA SUA ESTANTE -->
+        <!-- ESTANTE -->
         <div id="estatisticas-estante"></div>
 
       </section>
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 3: COLEÇÃO                                            -->
+    <!-- TAB 3: COLEÇÃO -->
     <!-- ========================================================== -->
     <div id="tab-colecao" class="tab-content">
       <section class="section" style="--tier-color:var(--colecao-color)">
@@ -1476,7 +1474,7 @@
           </div>
         </div>
 
-        <!-- CONTROLE DE AGRUPAMENTO (LISTA) -->
+        <!-- AGRUPAMENTO -->
         <div class="colecao-controls" id="groupControls" style="margin-top:-12px; display:none;">
           <span style="opacity:0.5; font-size:13px; font-family:'JetBrains Mono', monospace;">Agrupar:</span>
           <div class="group-toggle" id="groupToggle">
@@ -1492,7 +1490,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 4: IMPORTAR                                           -->
+    <!-- TAB 4: IMPORTAR -->
     <!-- ========================================================== -->
     <div id="tab-importar" class="tab-content">
       <section class="section" style="--tier-color:var(--colecao-color)">
@@ -1551,6 +1549,18 @@
           </div>
           <button class="btn" id="btn-gerar">⚡ Gerar Recomendações</button>
           <div id="status-gerar" class="upload-status" style="text-align:center;margin-top:8px;"></div>
+
+          <!-- BOTÕES DE ZERAR -->
+          <div style="margin-top: 32px; border-top: 1px solid var(--card-line); padding-top: 24px;">
+            <p style="opacity:0.5; font-size:13px; margin-bottom:12px; font-family:'JetBrains Mono', monospace;">⚠️ CUIDADO: Essas ações são permanentes.</p>
+            <div class="btn-group">
+              <button class="btn btn-danger" onclick="zerarPlaylists()">🧹 Zerar Playlists</button>
+              <button class="btn btn-danger" onclick="zerarColecao()">🧹 Zerar Coleção</button>
+              <button class="btn btn-danger" onclick="zerarWishlist()">🧹 Zerar Wishlist</button>
+              <button class="btn btn-danger" onclick="zerarTudo()">🔥 Zerar Tudo</button>
+            </div>
+          </div>
+
         </div>
       </section>
     </div>
@@ -1558,7 +1568,7 @@
   </div><!-- /appScreen -->
 
   <!-- ============================================================ -->
-  <!-- MODAIS                                                      -->
+  <!-- MODAIS -->
   <!-- ============================================================ -->
   <div class="modal-overlay" id="modalAdicionar">
     <div class="modal">
@@ -1686,7 +1696,7 @@
   <footer>Discoteca — Sua coleção, suas recomendações.</footer>
 
   <!-- ============================================================ -->
-  <!-- JAVASCRIPT                                                  -->
+  <!-- JAVASCRIPT -->
   <!-- ============================================================ -->
   <script>
     // ================================================================
@@ -1703,7 +1713,7 @@
     let colecaoFiltrada = [];
 
     // ================================================================
-    // LOGIN PERSISTENTE
+    // LOGIN
     // ================================================================
     function salvarSessao(userId, nome) {
       localStorage.setItem('discoteca_user_id', userId);
@@ -1722,9 +1732,6 @@
       localStorage.removeItem('discoteca_user_nome');
     }
 
-    // ================================================================
-    // LOGIN / LOGOUT
-    // ================================================================
     document.getElementById('btnLogin').addEventListener('click', function() {
       const btn = this;
       const error = document.getElementById('loginError');
@@ -1816,7 +1823,6 @@
         })
         .catch(() => {});
 
-      // Estatísticas do Player
       fetch(API_URL + '/estatisticas?user_id=' + usuarioId)
         .then(r => r.json())
         .then(data => {
@@ -1824,7 +1830,6 @@
         })
         .catch(() => {});
 
-      // Estatísticas da Estante
       fetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId)
         .then(r => r.json())
         .then(data => {
@@ -1885,7 +1890,7 @@
     }
 
     // ================================================================
-    // FILTROS E ORDENAÇÃO
+    // FILTROS
     // ================================================================
     function aplicarFiltros() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -2237,14 +2242,22 @@
       const container = document.getElementById('estatisticas-player');
       if (!container) return;
 
+      // Verifica estado salvo
+      const estado = localStorage.getItem('secao_player') || 'aberta';
+
       if (!dados || dados.erro || dados.total_musicas === 0) {
         container.innerHTML = `
           <div class="estatistica-secao player">
-            <h3>🎧 No seu player</h3>
-            <div class="empty-state" style="padding:40px 20px;">
-              <div class="icon" style="font-size:40px;">🎧</div>
-              <h3 style="font-size:20px;">Ainda não dividimos o fone</h3>
-              <p style="font-size:13px;">Faça upload da sua playlist para começar a análise.</p>
+            <div class="secao-header" onclick="toggleSecao('player')">
+              <h3>🎧 No seu player</h3>
+              <span class="toggle-icon" id="secao-player-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
+            </div>
+            <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-player-content">
+              <div class="empty-state" style="padding:40px 20px;">
+                <div class="icon" style="font-size:40px;">🎧</div>
+                <h3 style="font-size:20px;">Ainda não dividimos o fone</h3>
+                <p style="font-size:13px;">Faça upload da sua playlist para começar a análise.</p>
+              </div>
             </div>
           </div>
         `;
@@ -2253,25 +2266,29 @@
 
       let html = `
         <div class="estatistica-secao player">
-          <h3>🎧 No seu player</h3>
-          <div class="stat-grid">
-            <div class="stat-card">
-              <div class="stat-number">${dados.total_musicas || 0}</div>
-              <div class="stat-label">Total de Músicas</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-number">${dados.artistas_unicos || 0}</div>
-              <div class="stat-label">Artistas Únicos</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-number">${dados.albuns_unicos || 0}</div>
-              <div class="stat-label">Álbuns Únicos</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-number">${dados.duracao_horas || 0}h</div>
-              <div class="stat-label">Duração Total</div>
-            </div>
+          <div class="secao-header" onclick="toggleSecao('player')">
+            <h3>🎧 No seu player</h3>
+            <span class="toggle-icon" id="secao-player-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
           </div>
+          <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-player-content">
+            <div class="stat-grid">
+              <div class="stat-card">
+                <div class="stat-number">${dados.total_musicas || 0}</div>
+                <div class="stat-label">Total de Músicas</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">${dados.artistas_unicos || 0}</div>
+                <div class="stat-label">Artistas Únicos</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">${dados.albuns_unicos || 0}</div>
+                <div class="stat-label">Álbuns Únicos</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">${dados.duracao_horas || 0}h</div>
+                <div class="stat-label">Duração Total</div>
+              </div>
+            </div>
       `;
 
       if (dados.top_artistas && dados.top_artistas.length > 0) {
@@ -2310,7 +2327,7 @@
         html += `</div>`;
       }
 
-      html += `</div>`;
+      html += `</div></div>`;
       container.innerHTML = html;
     }
 
@@ -2321,14 +2338,21 @@
       const container = document.getElementById('estatisticas-estante');
       if (!container) return;
 
+      const estado = localStorage.getItem('secao_estante') || 'aberta';
+
       if (!dados || dados.erro || dados.total_discos === 0) {
         container.innerHTML = `
           <div class="estatistica-secao estante">
-            <h3>📀 Na sua estante</h3>
-            <div class="empty-state" style="padding:40px 20px;">
-              <div class="icon" style="font-size:40px;">📀</div>
-              <h3 style="font-size:20px;">Sua estante está vazia</h3>
-              <p style="font-size:13px;">Adicione discos à sua coleção para ver as estatísticas.</p>
+            <div class="secao-header" onclick="toggleSecao('estante')">
+              <h3>📀 Na sua estante</h3>
+              <span class="toggle-icon" id="secao-estante-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
+            </div>
+            <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-estante-content">
+              <div class="empty-state" style="padding:40px 20px;">
+                <div class="icon" style="font-size:40px;">📀</div>
+                <h3 style="font-size:20px;">Sua estante está vazia</h3>
+                <p style="font-size:13px;">Adicione discos à sua coleção para ver as estatísticas.</p>
+              </div>
             </div>
           </div>
         `;
@@ -2337,29 +2361,33 @@
 
       let html = `
         <div class="estatistica-secao estante">
-          <h3>📀 Na sua estante</h3>
-          <div class="stat-grid">
-            <div class="stat-card" style="border-top-color: var(--colecao-color);">
-              <div class="stat-number">${dados.total_discos || 0}</div>
-              <div class="stat-label">Total de Discos</div>
-            </div>
-            <div class="stat-card" style="border-top-color: var(--vinil-color);">
-              <div class="stat-number">${dados.lps || 0}</div>
-              <div class="stat-label">🎵 LPs</div>
-            </div>
-            <div class="stat-card" style="border-top-color: var(--cd-color);">
-              <div class="stat-number">${dados.cds || 0}</div>
-              <div class="stat-label">💿 CDs</div>
-            </div>
-            <div class="stat-card" style="border-top-color: var(--cassete-color);">
-              <div class="stat-number">${dados.cassetes || 0}</div>
-              <div class="stat-label">📼 Cassetes</div>
-            </div>
-            ${dados.valor_total ? `<div class="stat-card" style="border-top-color: #4CAF50;">
-              <div class="stat-number">R$ ${dados.valor_total}</div>
-              <div class="stat-label">Valor Total Estimado</div>
-            </div>` : ''}
+          <div class="secao-header" onclick="toggleSecao('estante')">
+            <h3>📀 Na sua estante</h3>
+            <span class="toggle-icon" id="secao-estante-toggle">${estado === 'aberta' ? '▼' : '▶'}</span>
           </div>
+          <div class="secao-content ${estado === 'aberta' ? '' : 'fechada'}" id="secao-estante-content">
+            <div class="stat-grid">
+              <div class="stat-card" style="border-top-color: var(--colecao-color);">
+                <div class="stat-number">${dados.total_discos || 0}</div>
+                <div class="stat-label">Total de Discos</div>
+              </div>
+              <div class="stat-card" style="border-top-color: var(--vinil-color);">
+                <div class="stat-number">${dados.lps || 0}</div>
+                <div class="stat-label">🎵 LPs</div>
+              </div>
+              <div class="stat-card" style="border-top-color: var(--cd-color);">
+                <div class="stat-number">${dados.cds || 0}</div>
+                <div class="stat-label">💿 CDs</div>
+              </div>
+              <div class="stat-card" style="border-top-color: var(--cassete-color);">
+                <div class="stat-number">${dados.cassetes || 0}</div>
+                <div class="stat-label">📼 Cassetes</div>
+              </div>
+              ${dados.valor_total ? `<div class="stat-card" style="border-top-color: #4CAF50;">
+                <div class="stat-number">R$ ${dados.valor_total}</div>
+                <div class="stat-label">Valor Total Estimado</div>
+              </div>` : ''}
+            </div>
       `;
 
       if (dados.top_artistas && dados.top_artistas.length > 0) {
@@ -2380,8 +2408,27 @@
         html += `</div>`;
       }
 
-      html += `</div>`;
+      html += `</div></div>`;
       container.innerHTML = html;
+    }
+
+    // ================================================================
+    // COLLAPSE DAS ESTATÍSTICAS
+    // ================================================================
+    function toggleSecao(secao) {
+      const content = document.getElementById('secao-' + secao + '-content');
+      const toggle = document.getElementById('secao-' + secao + '-toggle');
+      if (!content || !toggle) return;
+
+      if (content.classList.contains('fechada')) {
+        content.classList.remove('fechada');
+        toggle.textContent = '▼';
+        localStorage.setItem('secao_' + secao, 'aberta');
+      } else {
+        content.classList.add('fechada');
+        toggle.textContent = '▶';
+        localStorage.setItem('secao_' + secao, 'fechada');
+      }
     }
 
     // ================================================================
@@ -2711,7 +2758,7 @@
     window.marcarComoTenho = marcarComoTenho;
 
     // ================================================================
-    // MODAL: ADICIONAR À LISTA DE COMPRAS
+    // MODAL: WISHLIST
     // ================================================================
     const modalWish = document.getElementById('modalAddWishlist');
     const btnFecharWish = document.getElementById('btnFecharWishlist');
@@ -2884,6 +2931,54 @@
     }
 
     // ================================================================
+    // ZERAR DADOS
+    // ================================================================
+    function zerarPlaylists() {
+      if (!confirm('⚠️ Tem certeza? Isso vai apagar TODAS as playlists importadas e as recomendações geradas. Essa ação é permanente.')) return;
+      fetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+          alert(data.mensagem);
+          carregarDados();
+        })
+        .catch(() => alert('❌ Erro ao zerar playlists'));
+    }
+
+    function zerarColecao() {
+      if (!confirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua coleção. Essa ação é permanente.')) return;
+      fetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+          alert(data.mensagem);
+          carregarDados();
+        })
+        .catch(() => alert('❌ Erro ao zerar coleção'));
+    }
+
+    function zerarWishlist() {
+      if (!confirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua lista de compras (wishlist). Essa ação é permanente.')) return;
+      fetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+          alert(data.mensagem);
+          carregarDados();
+        })
+        .catch(() => alert('❌ Erro ao zerar wishlist'));
+    }
+
+    function zerarTudo() {
+      if (!confirm('🔥 Tem certeza ABSOLUTA? Isso vai apagar TODOS os seus dados: playlists, coleção, wishlist, estatísticas. Tudo. Essa ação é permanente e não pode ser desfeita.')) return;
+      if (!confirm('Última chance: tem certeza?')) return;
+      fetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+          alert(data.mensagem);
+          carregarDados();
+        })
+        .catch(() => alert('❌ Erro ao zerar tudo'));
+    }
+
+    // ================================================================
     // UPLOADS
     // ================================================================
     function uploadPlaylist(tipo, input) {
@@ -2979,7 +3074,7 @@
     }
 
     // ================================================================
-    // EVENTOS DE UPLOAD
+    // EVENTOS
     // ================================================================
     document.getElementById('upload-top').addEventListener('change', function() { uploadPlaylist('top', this); });
     document.getElementById('upload-desc').addEventListener('change', function() { uploadPlaylist('desc', this); });
@@ -2988,9 +3083,6 @@
     document.getElementById('btn-gerar').addEventListener('click', gerarRecomendacoes);
     document.getElementById('btn-gerar').disabled = true;
 
-    // ================================================================
-    // TABS CLICK
-    // ================================================================
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
     });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Discoteca — v0.8</title>
+  <title>Discoteca — v0.8.1</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -920,17 +920,80 @@
       border-top-color: var(--a-color);
     }
 
-    /* ===== TOGGLE VIEW ===== */
-    .view-toggle {
+    /* ===== CONTROLES DA COLEÇÃO ===== */
+    .colecao-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+      align-items: center;
+      background: var(--card);
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--card-line);
+    }
+    .colecao-controls .search-box {
+      flex: 1;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--ink);
+      border: 1px solid var(--card-line);
+      border-radius: 6px;
+      padding: 0 12px;
+      transition: 0.2s;
+    }
+    .colecao-controls .search-box:focus-within {
+      border-color: var(--s-color);
+    }
+    .colecao-controls .search-box input {
+      background: transparent;
+      border: none;
+      color: var(--paper);
+      padding: 8px 4px;
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+    }
+    .colecao-controls .search-box .icon {
+      opacity: 0.4;
+      font-size: 16px;
+    }
+    .colecao-controls select {
+      background: var(--ink);
+      border: 1px solid var(--card-line);
+      color: var(--paper);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+      min-width: 130px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23EDE8DC' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .colecao-controls select:focus {
+      border-color: var(--s-color);
+    }
+    .colecao-controls select option {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .colecao-controls .view-toggle {
       display: flex;
       gap: 4px;
-      background: var(--card);
+      background: var(--ink);
       border: 1px solid var(--card-line);
       border-radius: 6px;
       padding: 3px;
-      margin-left: 12px;
+      margin-left: auto;
     }
-    .view-toggle button {
+    .colecao-controls .view-toggle button {
       background: transparent;
       border: none;
       color: var(--paper);
@@ -942,12 +1005,41 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .view-toggle button.active {
+    .colecao-controls .view-toggle button.active {
       opacity: 1;
       background: var(--s-color);
       color: var(--ink);
     }
-    .view-toggle button:hover:not(.active) {
+    .colecao-controls .view-toggle button:hover:not(.active) {
+      opacity: 0.7;
+    }
+
+    .group-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--ink);
+      border: 1px solid var(--card-line);
+      border-radius: 6px;
+      padding: 3px;
+    }
+    .group-toggle button {
+      background: transparent;
+      border: none;
+      color: var(--paper);
+      opacity: 0.4;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .group-toggle button.active {
+      opacity: 1;
+      background: var(--colecao-color);
+      color: var(--ink);
+    }
+    .group-toggle button:hover:not(.active) {
       opacity: 0.7;
     }
 
@@ -1026,6 +1118,17 @@
     .list-view .format-badge.cassete {
       color: var(--cassete-color);
       border-color: var(--cassete-color);
+    }
+    .list-view .secao-header {
+      padding: 12px 0 8px 0;
+      font-family: 'Anton', sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+      border-bottom: 1px solid var(--card-line);
+      margin-top: 16px;
+    }
+    .list-view .secao-header:first-of-type {
+      margin-top: 0;
     }
 
     /* ===== USER BAR ===== */
@@ -1215,6 +1318,19 @@
       .list-view td {
         padding: 6px 8px;
       }
+      .colecao-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .colecao-controls .view-toggle {
+        margin-left: 0;
+      }
+      .colecao-controls select {
+        min-width: 100%;
+      }
+      .colecao-controls .search-box {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
@@ -1295,7 +1411,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAB 3: COLEÇÃO (COM DASHBOARD E TOGGLE)                  -->
+    <!-- TAB 3: COLEÇÃO (COM DASHBOARD, CONTROLES E TOGGLE)       -->
     <!-- ========================================================== -->
     <div id="tab-colecao" class="tab-content">
       <section class="section" style="--tier-color:var(--colecao-color)">
@@ -1306,15 +1422,42 @@
             <p>Registro de todos os discos que já fazem parte da sua coleção física.</p>
           </div>
           <div class="add-btn-wrap">
-            <div class="view-toggle" id="viewToggle">
-              <button class="active" data-view="cards" onclick="setView('cards')">🎴 Cards</button>
-              <button data-view="list" onclick="setView('list')">📋 Lista</button>
-            </div>
             <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
           </div>
         </div>
+
         <!-- DASHBOARD -->
         <div id="dashboard-container"></div>
+
+        <!-- CONTROLES: Busca + Ordenação + Toggle -->
+        <div class="colecao-controls" id="colecaoControls">
+          <div class="search-box">
+            <span class="icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Buscar por artista ou álbum..." oninput="aplicarFiltros()">
+          </div>
+          <select id="sortSelect" onchange="aplicarFiltros()">
+            <option value="data_mais_recente">📅 Mais recente</option>
+            <option value="data_mais_antiga">📅 Mais antigo</option>
+            <option value="preco_maior">💰 Maior preço</option>
+            <option value="preco_menor">💰 Menor preço</option>
+            <option value="alfabetica_a-z">🔤 A–Z (artista)</option>
+            <option value="alfabetica_z-a">🔤 Z–A (artista)</option>
+          </select>
+          <div class="view-toggle" id="viewToggle">
+            <button class="active" data-view="cards" onclick="setView('cards')">🎴 Cards</button>
+            <button data-view="list" onclick="setView('list')">📋 Lista</button>
+          </div>
+        </div>
+
+        <!-- CONTROLE DE AGRUPAMENTO (LISTA) -->
+        <div class="colecao-controls" id="groupControls" style="margin-top:-12px; display:none;">
+          <span style="opacity:0.5; font-size:13px; font-family:'JetBrains Mono', monospace;">Agrupar:</span>
+          <div class="group-toggle" id="groupToggle">
+            <button class="active" data-group="separado" onclick="setGroup('separado')">📂 Separado</button>
+            <button data-group="junto" onclick="setGroup('junto')">📚 Juntar tudo</button>
+          </div>
+        </div>
+
         <!-- COLEÇÃO (CARDS E LISTA) -->
         <div id="colecao-container"></div>
         <div class="list-view" id="listView"></div>
@@ -1532,6 +1675,8 @@
     let editandoId = null;
     let barcodeScanner = null;
     let viewPreference = localStorage.getItem('discoteca_view') || 'cards';
+    let groupPreference = localStorage.getItem('discoteca_group') || 'separado';
+    let colecaoFiltrada = [];
 
     // ================================================================
     // LOGIN PERSISTENTE
@@ -1640,10 +1785,9 @@
         .then(r => r.json())
         .then(data => {
           colecao = Array.isArray(data) ? data : [];
+          colecaoFiltrada = [...colecao];
           renderDashboard();
-          renderColecao();
-          renderLista();
-          aplicarView();
+          aplicarFiltros();
           document.getElementById('colecao-badge').textContent = colecao.length;
         })
         .catch(() => {});
@@ -1663,7 +1807,6 @@
       const container = document.getElementById('dashboard-container');
       if (!container) return;
 
-      // Calcular dados
       const lps = colecao.filter(d => {
         const f = d.formato || '';
         return f.includes('LP') || f.includes('EP') || f.includes('Vinil');
@@ -1680,9 +1823,6 @@
       }).length;
 
       const wishlist = recomendacoes.filter(r => r.comprado === 0).length;
-
-      // Economia (mockado por enquanto - depois vamos calcular de verdade com preços)
-      const economia = 48;
 
       container.innerHTML = `
         <div class="dashboard-grid">
@@ -1703,7 +1843,7 @@
             <div class="label">⭐ Wishlist</div>
           </div>
           <div class="dashboard-card economia">
-            <div class="number">R$ ${economia}</div>
+            <div class="number">—</div>
             <div class="label">💰 Economia</div>
             <div class="sub">em promoções</div>
           </div>
@@ -1712,18 +1852,78 @@
     }
 
     // ================================================================
+    // FILTROS E ORDENAÇÃO
+    // ================================================================
+    function aplicarFiltros() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      const sortType = document.getElementById('sortSelect').value;
+
+      // Filtrar
+      let filtrados = colecao.filter(item => {
+        if (!searchTerm) return true;
+        const artista = (item.artista || '').toLowerCase();
+        const album = (item.album || '').toLowerCase();
+        return artista.includes(searchTerm) || album.includes(searchTerm);
+      });
+
+      // Ordenar
+      switch (sortType) {
+        case 'data_mais_recente':
+          filtrados.sort((a, b) => (b.data_adicao || '').localeCompare(a.data_adicao || ''));
+          break;
+        case 'data_mais_antiga':
+          filtrados.sort((a, b) => (a.data_adicao || '').localeCompare(b.data_adicao || ''));
+          break;
+        case 'preco_maior':
+          filtrados.sort((a, b) => (b.preco || 0) - (a.preco || 0));
+          break;
+        case 'preco_menor':
+          filtrados.sort((a, b) => (a.preco || 0) - (b.preco || 0));
+          break;
+        case 'alfabetica_a-z':
+          filtrados.sort((a, b) => (a.artista || '').localeCompare(b.artista || ''));
+          break;
+        case 'alfabetica_z-a':
+          filtrados.sort((a, b) => (b.artista || '').localeCompare(a.artista || ''));
+          break;
+        default:
+          break;
+      }
+
+      colecaoFiltrada = filtrados;
+      renderColecao();
+      renderLista();
+      aplicarView();
+    }
+
+    // ================================================================
     // TOGGLE VIEW (CARDS / LISTA)
     // ================================================================
     function setView(view) {
       viewPreference = view;
       localStorage.setItem('discoteca_view', view);
-      aplicarView();
-      // Atualizar botões
-      document.querySelectorAll('.view-toggle button').forEach(btn => {
+      document.querySelectorAll('#viewToggle button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === view);
       });
+      // Mostrar/esconder controles de agrupamento
+      const groupControls = document.getElementById('groupControls');
+      if (view === 'list') {
+        groupControls.style.display = 'flex';
+      } else {
+        groupControls.style.display = 'none';
+      }
+      aplicarView();
     }
-    window.setView = setView;
+
+    function setGroup(group) {
+      groupPreference = group;
+      localStorage.setItem('discoteca_group', group);
+      document.querySelectorAll('#groupToggle button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.group === group);
+      });
+      renderLista();
+      aplicarView();
+    }
 
     function aplicarView() {
       const cardsContainer = document.getElementById('colecao-container');
@@ -1748,13 +1948,12 @@
       const container = document.getElementById('colecao-container');
       if (!container) return;
 
-      if (!colecao || colecao.length === 0) {
+      if (!colecaoFiltrada || colecaoFiltrada.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="icon">🎵</div>
-            <h3>A música ainda não começou a tocar por aqui</h3>
-            <p>Importe sua coleção do Discogs ou adicione discos manualmente.</p>
-            <p class="empty-hint">Vá para a aba "Importar" e comece agora 🚀</p>
+            <h3>Nenhum disco encontrado</h3>
+            <p>Tente ajustar os filtros ou adicione discos manualmente.</p>
           </div>
         `;
         return;
@@ -1765,7 +1964,7 @@
       const cd = [];
       const cassete = [];
       const outros = [];
-      colecao.forEach(item => {
+      colecaoFiltrada.forEach(item => {
         const f = item.formato || '';
         if (f.includes('LP') || f.includes('EP') || f.includes('Vinil')) vinil.push(item);
         else if (f.includes('CD')) cd.push(item);
@@ -1853,17 +2052,57 @@
     }
 
     // ================================================================
-    // RENDER: LISTA (MODO LISTA)
+    // RENDER: LISTA (COM AGRUPAMENTO)
     // ================================================================
     function renderLista() {
       const container = document.getElementById('listView');
       if (!container) return;
 
-      if (!colecao || colecao.length === 0) {
+      if (!colecaoFiltrada || colecaoFiltrada.length === 0) {
         container.innerHTML = '';
         return;
       }
 
+      const group = groupPreference;
+
+      let html = '';
+
+      if (group === 'separado') {
+        // Separar por tipo
+        const vinil = [];
+        const cd = [];
+        const cassete = [];
+        const outros = [];
+        colecaoFiltrada.forEach(item => {
+          const f = item.formato || '';
+          if (f.includes('LP') || f.includes('EP') || f.includes('Vinil')) vinil.push(item);
+          else if (f.includes('CD')) cd.push(item);
+          else if (f.includes('Cassete') || f.toLowerCase().includes('cassette')) cassete.push(item);
+          else outros.push(item);
+        });
+
+        const secoes = [
+          { nome: 'Vinil', icone: '🎵', items: vinil, cls: 'vinil' },
+          { nome: 'CD', icone: '💿', items: cd, cls: 'cd' },
+          { nome: 'Cassete', icone: '📼', items: cassete, cls: 'cassete' },
+          { nome: 'Outros', icone: '📀', items: outros, cls: '' }
+        ];
+
+        secoes.forEach(secao => {
+          if (secao.items.length === 0) return;
+          html += `<div class="secao-header">${secao.icone} ${secao.nome} (${secao.items.length})</div>`;
+          html += gerarTabelaLista(secao.items);
+        });
+      } else {
+        // Juntar tudo
+        html += `<div class="secao-header">📀 Todos os discos (${colecaoFiltrada.length})</div>`;
+        html += gerarTabelaLista(colecaoFiltrada);
+      }
+
+      container.innerHTML = html;
+    }
+
+    function gerarTabelaLista(items) {
       let html = `
         <table>
           <thead>
@@ -1877,7 +2116,7 @@
           <tbody>
       `;
 
-      colecao.forEach(item => {
+      items.forEach(item => {
         const f = item.formato || '';
         let formatClass = '';
         if (f.includes('LP') || f.includes('EP') || f.includes('Vinil')) formatClass = 'vinil';
@@ -1901,7 +2140,7 @@
       });
 
       html += `</tbody></table>`;
-      container.innerHTML = html;
+      return html;
     }
 
     // ================================================================
@@ -2069,7 +2308,7 @@
     }
 
     // ================================================================
-    // RENDER: ESTATÍSTICAS (SIMPLIFICADA — VAI SER MELHORADA NA V0.8)
+    // RENDER: ESTATÍSTICAS
     // ================================================================
     function renderEstatisticas(dados) {
       const container = document.getElementById('estatisticas-container');
@@ -2167,9 +2406,15 @@
         title.innerHTML = 'Minha <span>Coleção</span>';
         sub.textContent = 'Gerencie todos os discos que fazem parte da sua coleção física.';
         meter.style.display = 'none';
-        // Renderiza a lista novamente se estiver no modo lista
-        renderLista();
-        aplicarView();
+        // Reaplicar filtros e views
+        aplicarFiltros();
+        // Garantir que os controles de grupo apareçam se estiver em lista
+        const groupControls = document.getElementById('groupControls');
+        if (viewPreference === 'list') {
+          groupControls.style.display = 'flex';
+        } else {
+          groupControls.style.display = 'none';
+        }
       } else if (tabId === 'tab-importar') {
         hero.className = 'hero hero-state-colecao';
         eyebrow.textContent = 'Discoteca · Importar';
@@ -2643,7 +2888,12 @@
     // ================================================================
     // INICIAR
     // ================================================================
-    document.addEventListener('DOMContentLoaded', verificarSessao);
+    document.addEventListener('DOMContentLoaded', function() {
+      // Restaurar preferências visuais
+      setView(viewPreference);
+      setGroup(groupPreference);
+      verificarSessao();
+    });
   </script>
 </body>
 </html>

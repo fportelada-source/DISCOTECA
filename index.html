@@ -847,13 +847,25 @@
   }
   .exportify-guide ul li {
     font-size: 13px;
-    opacity: 0.7;
+    opacity: 0.8;
     padding: 3px 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
+    line-height: 1.4;
   }
-  .exportify-guide ul li span { font-size: 16px; }
+  .exportify-guide ul li .num {
+    color: var(--s-color);
+    font-weight: 700;
+    min-width: 18px;
+  }
+  .exportify-guide ul li .text {
+    opacity: 0.8;
+  }
+  .exportify-guide ul li .text strong {
+    color: var(--paper);
+    opacity: 1;
+  }
   .exportify-guide .dica {
     margin-top: 12px;
     font-size: 13px;
@@ -863,6 +875,39 @@
   @media (max-width:600px) {
     .exportify-guide ul { grid-template-columns: 1fr; }
     .exportify-guide { padding: 20px; }
+  }
+
+  /* ===== CALENDÁRIO VISÍVEL ===== */
+  input[type="date"] {
+    color-scheme: dark;
+    background: var(--ink);
+    border: 1px solid var(--card-line);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    width: 100%;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  input[type="date"]:focus {
+    outline: none;
+    border-color: var(--s-color);
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    background: rgba(255,255,255,0.2);
+  }
+  input[type="date"]::-moz-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
   }
 
   @media (max-width:600px){
@@ -907,7 +952,7 @@
   </div>
 
   <section class="hero hero-state-compras" id="heroSection">
-    <div class="hero-eyebrow" id="heroEyebrow">Projeto Discoteca · Curadoria</div>
+    <div class="hero-eyebrow" id="heroEyebrow">Discoteca · Curadoria</div>
     <h1 id="heroTitle">Lista de <span id="heroHighlight">Compras</span></h1>
     <p class="hero-sub" id="heroSub">Prioridade S → C, baseado nas suas playlists importadas.</p>
     <div class="hero-meter" id="heroMeter">
@@ -948,7 +993,7 @@
     </section>
   </div>
 
-  <!-- ===== TAB 3: COLEÇÃO (DIVIDIDA POR MÍDIA) ===== -->
+  <!-- ===== TAB 3: COLEÇÃO ===== -->
   <div id="tab-colecao" class="tab-content">
     <section class="section" style="--tier-color:var(--colecao-color)">
       <div class="tier-head">
@@ -961,7 +1006,6 @@
           <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
         </div>
       </div>
-      <!-- Container para as seções -->
       <div id="colecao-container"></div>
     </section>
   </div>
@@ -988,10 +1032,10 @@
             (é gratuito e seguro).
           </p>
           <ul>
-            <li><span>1.</span> Acesse <strong>Exportify</strong> e faça login com sua conta do Spotify</li>
-            <li><span>2.</span> Selecione as playlists que você quer exportar</li>
-            <li><span>3.</span> Clique em <strong>"Export"</strong> e baixe os 3 arquivos CSV</li>
-            <li><span>4.</span> Volte aqui e faça upload de cada um nos campos abaixo</li>
+            <li><span class="num">1.</span> <span class="text">Acesse o <strong>Exportify</strong> e faça login com sua conta do Spotify</span></li>
+            <li><span class="num">2.</span> <span class="text">Selecione as playlists que você quer exportar</span></li>
+            <li><span class="num">3.</span> <span class="text">Clique em <strong>"Export"</strong> e baixe os 3 arquivos CSV</span></li>
+            <li><span class="num">4.</span> <span class="text">Volte aqui e faça upload de cada um nos campos abaixo</span></li>
           </ul>
           <p class="dica">
             💡 Quanto mais dados, melhores as recomendações! Use playlists com pelo menos 50 músicas cada.
@@ -1176,7 +1220,6 @@ function verificarSessao() {
   const userId = params.get('user_id');
   const nome = params.get('nome');
 
-  // Se veio da callback do Google, salva no localStorage
   if (userId && nome) {
     salvarSessao(userId, nome);
     usuarioId = userId;
@@ -1188,7 +1231,6 @@ function verificarSessao() {
     return;
   }
 
-  // Tenta carregar do localStorage
   const sessao = carregarSessao();
   if (sessao) {
     usuarioId = sessao.userId;
@@ -1199,7 +1241,6 @@ function verificarSessao() {
     return;
   }
 
-  // Último recurso: tentar sessão do servidor
   fetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
@@ -1411,7 +1452,6 @@ function renderColecao() {
     return;
   }
 
-  // Classifica os discos por tipo de mídia
   const vinil = [];
   const cd = [];
   const cassete = [];
@@ -1442,9 +1482,11 @@ function renderColecao() {
   ];
 
   let html = '';
+  let totalDiscos = 0;
 
   secoes.forEach(secao => {
     if (secao.items.length === 0) return;
+    totalDiscos += secao.items.length;
 
     html += `
       <div style="margin-bottom: 32px;">
@@ -1462,17 +1504,17 @@ function renderColecao() {
       const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` : '';
       const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` : '';
       const letter = item.album ? item.album.charAt(0) : '?';
-      const id = `col-${secao.nome}-${i}`;
+      const uniqueId = `col-${secao.nome}-${i}-${Date.now()}-${Math.random()}`;
       const tagColor = secao.cor;
       const tagIcon = secao.icone;
       const tagLabel = secao.nome;
       
       html += `
-        <div class="card" id="${id}">
-          <div class="art-wrap" id="art-${id}" style="background: ${tagColor}; background-size: cover; background-position: center;">
+        <div class="card" id="${uniqueId}">
+          <div class="art-wrap" id="art-${uniqueId}" style="background: ${tagColor}; background-size: cover; background-position: center;">
             <span class="priority-tag" style="background:${tagColor};color:var(--ink);">${tagIcon} ${tagLabel}</span>
             <div class="spine-letter">${letter}</div>
-            <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
+            <div class="art-fallback" id="fallback-${uniqueId}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
           </div>
           <div class="card-body">
             <h3>${item.album || '?'}</h3>
@@ -1499,20 +1541,48 @@ function renderColecao() {
   });
 
   container.innerHTML = html;
+  document.getElementById('colecao-badge').textContent = colecao.length;
 
   // Carrega as capas
-  colecao.forEach((item, i) => {
-    const formato = item.formato || '';
-    let secaoNome = 'Outros';
-    if (formato.includes('LP') || formato.includes('EP') || formato.includes('Vinil')) secaoNome = 'Vinil';
-    else if (formato.includes('CD')) secaoNome = 'CD';
-    else if (formato.includes('Cassete') || formato.toLowerCase().includes('cassette')) secaoNome = 'Cassete';
-    
-    const id = `col-${secaoNome}-${i}`;
-    fetchAlbumArt(item.artista, item.album, 'art-' + id, 'fallback-' + id);
-  });
-
-  document.getElementById('colecao-badge').textContent = colecao.length;
+  setTimeout(() => {
+    colecao.forEach((item, idx) => {
+      const formato = item.formato || '';
+      let secaoNome = 'Outros';
+      if (formato.includes('LP') || formato.includes('EP') || formato.includes('Vinil')) secaoNome = 'Vinil';
+      else if (formato.includes('CD')) secaoNome = 'CD';
+      else if (formato.includes('Cassete') || formato.toLowerCase().includes('cassette')) secaoNome = 'Cassete';
+      
+      // Procura o card com o ID correto (usando o seletor)
+      const cards = document.querySelectorAll('.card');
+      // Como não temos um ID fixo, vamos buscar pelo índice + seção
+      // Vamos usar um seletor mais específico
+      const secoesMap = {
+        'Vinil': vinil,
+        'CD': cd,
+        'Cassete': cassete,
+        'Outros': outros
+      };
+      const items = secoesMap[secaoNome] || [];
+      if (idx < items.length) {
+        // Pega o índice do item na seção
+        const indexInSection = items.indexOf(item);
+        if (indexInSection !== -1) {
+          // Procura o card pelo índice visual
+          const grid = document.querySelector(`[style*="margin-bottom: 32px;"]:nth-child(${Object.keys(secoesMap).indexOf(secaoNome) + 1}) .grid`);
+          if (grid) {
+            const card = grid.children[indexInSection];
+            if (card) {
+              const artId = card.querySelector('.art-wrap')?.id;
+              const fallbackId = card.querySelector('.art-fallback')?.id;
+              if (artId && fallbackId) {
+                fetchAlbumArt(item.artista, item.album, artId, fallbackId);
+              }
+            }
+          }
+        }
+      }
+    });
+  }, 100);
 }
 
 // ========== RENDER ESTATÍSTICAS ==========

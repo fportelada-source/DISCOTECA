@@ -2242,6 +2242,7 @@
                   ${item.condicao_capa ? `<div class="meta-row"><span class="label">Capa</span><span class="val">${item.condicao_capa}</span></div>` : ''}
                   ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${item.preco}</span></div>` : ''}
                   ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
+                  ${item.data_lancamento ? `<div class="meta-row"><span class="label">Lançamento</span><span class="val">${item.data_lancamento}</span></div>` : ''}
                 </div>
                 <div class="card-actions">
                   <button class="btn-icon btn-edit" onclick="editarDisco('${item.id || ''}')" title="Editar">✎</button>

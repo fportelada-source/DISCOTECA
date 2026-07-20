@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Discoteca — v0.8.8</title>
+  <title>Discoteca — v0.8.9</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -346,39 +346,57 @@
       margin-top: 10px;
       flex-wrap: wrap;
     }
-    .card-actions button {
+    /* ===== BOTÕES EM ÍCONE ===== */
+    .btn-icon {
       background: transparent;
       border: 1px solid var(--card-line);
       color: var(--paper);
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      font-size: 14px;
+      line-height: 1;
+      font-family: 'Inter', sans-serif;
     }
-    .card-actions button:hover {
-      background: var(--s-color);
-      color: var(--ink);
-      border-color: var(--s-color);
+    .btn-icon:hover {
+      background: var(--card-line);
+      border-color: rgba(237, 232, 220, 0.3);
     }
-    .card-actions .btn-remove:hover {
-      background: #f44336;
-      border-color: #f44336;
-      color: #fff;
-    }
-    .card-actions .btn-edit:hover {
-      background: var(--a-color);
+    .btn-icon.btn-edit:hover {
       border-color: var(--a-color);
-      color: var(--ink);
+      color: var(--a-color);
+      background: rgba(227, 154, 46, 0.1);
     }
-    .card-actions .btn-buy:hover {
-      background: #4CAF50;
+    .btn-icon.btn-remove:hover {
+      border-color: #f44336;
+      color: #f44336;
+      background: rgba(244, 67, 54, 0.1);
+    }
+    .btn-icon.btn-move:hover {
       border-color: #4CAF50;
-      color: #fff;
+      color: #4CAF50;
+      background: rgba(76, 175, 80, 0.1);
+    }
+    .btn-icon.btn-tier:hover {
+      border-color: var(--s-color);
+      color: var(--s-color);
+      background: rgba(214, 67, 47, 0.1);
+    }
+    /* ===== FRASE WISHLIST PADRÃO 5 ===== */
+    .wishlist-phrase {
+      font-size: 12px;
+      color: var(--paper);
+      opacity: 0.6;
+      padding: 6px 0 0 0;
+      font-style: italic;
+      border-top: 1px dashed var(--card-line);
+      margin-top: 8px;
+      padding-top: 8px;
     }
     .barcode-btn {
       background: var(--s-color);
@@ -1132,11 +1150,15 @@
       background: transparent;
       border: 1px solid var(--card-line);
       color: var(--paper);
-      padding: 2px 8px;
+      width: 28px;
+      height: 28px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 12px;
       cursor: pointer;
       transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .list-view .list-actions .edit:hover {
       background: var(--a-color);
@@ -1313,6 +1335,48 @@
     .btn-group .btn {
       flex: 1;
       min-width: 120px;
+    }
+    /* ===== MODAL DE CONFIRMAÇÃO ===== */
+    .modal-confirm-text {
+      color: var(--paper);
+      opacity: 0.8;
+      font-size: 16px;
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+    .modal-confirm-text strong {
+      color: var(--paper);
+      opacity: 1;
+    }
+    .btn-confirm-danger {
+      background: #f44336;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      flex: 1;
+    }
+    .btn-confirm-danger:hover {
+      opacity: 0.8;
+    }
+    .btn-confirm-cancel {
+      background: var(--card-line);
+      color: var(--paper);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      flex: 1;
+    }
+    .btn-confirm-cancel:hover {
+      opacity: 0.8;
     }
     @media (max-width:600px) {
       .tier-stamp {
@@ -1595,7 +1659,7 @@
 
   </div><!-- /appScreen -->
 
-  <!-- ===== MODAIS ===== -->
+  <!-- ===== MODAL: ADICIONAR/EDITAR DISCO ===== -->
   <div class="modal-overlay" id="modalAdicionar">
     <div class="modal">
       <div class="modal-header">
@@ -1683,6 +1747,7 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: ADICIONAR À WISHLIST ===== -->
   <div class="modal-overlay" id="modalAddWishlist">
     <div class="modal">
       <div class="modal-header">
@@ -1719,6 +1784,53 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: EDITAR TIER ===== -->
+  <div class="modal-overlay" id="modalEditTier">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>✎ Editar Tier</h2>
+        <button class="modal-close" id="btnFecharEditTier">✕</button>
+      </div>
+      <form id="form-edit-tier">
+        <input type="hidden" id="edit-tier-id" value="">
+        <div class="form-group">
+          <label>Artista</label>
+          <input type="text" id="edit-tier-artista" disabled style="opacity:0.6;">
+        </div>
+        <div class="form-group">
+          <label>Álbum</label>
+          <input type="text" id="edit-tier-album" disabled style="opacity:0.6;">
+        </div>
+        <div class="form-group">
+          <label>Nova Prioridade</label>
+          <select id="edit-tier-select">
+            <option value="S">S (Prioridade Máxima)</option>
+            <option value="A">A (Alta)</option>
+            <option value="B">B (Média)</option>
+            <option value="C">C (Baixa)</option>
+          </select>
+        </div>
+        <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar Tier</button>
+        <div class="form-msg" id="edit-tier-msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: CONFIRMAÇÃO ===== -->
+  <div class="modal-overlay" id="modalConfirm">
+    <div class="modal" style="max-width:450px;">
+      <div class="modal-header">
+        <h2>⚠️ Confirmar</h2>
+        <button class="modal-close" id="btnFecharConfirm">✕</button>
+      </div>
+      <div class="modal-confirm-text" id="confirmMessage">Tem certeza que deseja fazer isso?</div>
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button class="btn-confirm-cancel" id="btnConfirmCancel">Cancelar</button>
+        <button class="btn-confirm-danger" id="btnConfirmAction">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <footer>Discoteca — Sua coleção, suas recomendações.</footer>
 
   <!-- ===== JAVASCRIPT ===== -->
@@ -1735,6 +1847,7 @@
     let viewPreference = localStorage.getItem('discoteca_view') || 'cards';
     let groupPreference = localStorage.getItem('discoteca_group') || 'separado';
     let colecaoFiltrada = [];
+    let confirmCallback = null;
 
     // ================================================================
     // LOGIN
@@ -2001,7 +2114,7 @@
     }
 
     // ================================================================
-    // RENDER: COLEÇÃO (CARDS)
+    // RENDER: COLEÇÃO (CARDS) - BOTÕES EM ÍCONE
     // ================================================================
     function renderColecao() {
       const container = document.getElementById('colecao-container');
@@ -2053,10 +2166,6 @@
         `;
 
         secao.items.forEach((item, i) => {
-          const condClass = item.condicao_midia ? `cond-${item.condicao_midia.toLowerCase().replace(/[^a-z]/g, '')}` :
-            '';
-          const sleeveClass = item.condicao_capa ? `cond-${item.condicao_capa.toLowerCase().replace(/[^a-z]/g, '')}` :
-            '';
           const letter = item.album ? item.album.charAt(0) : '?';
           const uniqueId = `col-${secao.nome}-${i}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
           const tagColor = secao.cor;
@@ -2075,14 +2184,14 @@
                 <div class="artist" style="color:${tagColor};">${item.artista || 'Artista'}</div>
                 <div class="meta-block">
                   <div class="meta-row"><span class="label">Formato</span><span class="val">${tagLabel}</span></div>
-                  ${item.condicao_midia ? `<div class="meta-row"><span class="label">Mídia</span><span class="val"><span class="cond-badge ${condClass}">${item.condicao_midia}</span></span></div>` : ''}
-                  ${item.condicao_capa ? `<div class="meta-row"><span class="label">Capa</span><span class="val"><span class="cond-badge ${sleeveClass}">${item.condicao_capa}</span></span></div>` : ''}
+                  ${item.condicao_midia ? `<div class="meta-row"><span class="label">Mídia</span><span class="val">${item.condicao_midia}</span></div>` : ''}
+                  ${item.condicao_capa ? `<div class="meta-row"><span class="label">Capa</span><span class="val">${item.condicao_capa}</span></div>` : ''}
                   ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${item.preco}</span></div>` : ''}
                   ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
                 </div>
                 <div class="card-actions">
-                  <button class="btn-edit" onclick="editarDisco('${item.id || ''}')">✏️ Editar</button>
-                  <button class="btn-remove" onclick="removerDisco('${item.id || ''}')">🗑️ Remover</button>
+                  <button class="btn-icon btn-edit" onclick="editarDisco('${item.id || ''}')" title="Editar">✎</button>
+                  <button class="btn-icon btn-remove" onclick="removerDisco('${item.id || ''}')" title="Remover">✕</button>
                 </div>
               </div>
             </div>
@@ -2185,8 +2294,8 @@
             <td><span class="format-badge ${formatClass}">${formatClass ? formatClass.charAt(0).toUpperCase() + formatClass.slice(1) : '—'}</span></td>
             <td>
               <div class="list-actions">
-                <button class="edit" onclick="editarDisco('${item.id || ''}')">✏️</button>
-                <button class="remove" onclick="removerDisco('${item.id || ''}')">🗑️</button>
+                <button class="edit" onclick="editarDisco('${item.id || ''}')" title="Editar">✎</button>
+                <button class="remove" onclick="removerDisco('${item.id || ''}')" title="Remover">✕</button>
               </div>
             </td>
           </tr>
@@ -2260,12 +2369,11 @@
     }
 
     // ================================================================
-    // ESTATÍSTICAS DO PLAYER
+    // ESTATÍSTICAS
     // ================================================================
     function renderEstatisticasPlayer(dados) {
       const container = document.getElementById('estatisticas-player');
       if (!container) return;
-
       const estado = localStorage.getItem('secao_player') || 'aberta';
 
       let resumoHtml = '';
@@ -2382,13 +2490,9 @@
       aplicarEstadoSecao('player', estado);
     }
 
-    // ================================================================
-    // ESTATÍSTICAS DA ESTANTE (NOVOS CAMPOS)
-    // ================================================================
     function renderEstatisticasEstante(dados) {
       const container = document.getElementById('estatisticas-estante');
       if (!container) return;
-
       const estado = localStorage.getItem('secao_estante') || 'aberta';
 
       let resumoHtml = '';
@@ -2440,7 +2544,6 @@
         return;
       }
 
-      // Monta detalhes adicionais
       let detalhesHtml = '';
       if (dados.album_mais_antigo) {
         detalhesHtml +=
@@ -2461,10 +2564,6 @@
       if (dados.disco_mais_barato) {
         detalhesHtml +=
           `<div class="stat-list-item"><span class="name">🤑 Disco mais barato</span><span class="count">${dados.disco_mais_barato}</span></div>`;
-      }
-      if (dados.condicoes_registradas !== undefined) {
-        detalhesHtml +=
-          `<div class="stat-list-item"><span class="name">📝 Condições registradas</span><span class="count">${dados.condicoes_registradas}/${dados.total_discos}</span></div>`;
       }
 
       let html = `
@@ -2531,9 +2630,6 @@
       aplicarEstadoSecao('estante', estado);
     }
 
-    // ================================================================
-    // FUNÇÃO PARA APLICAR O ESTADO VIA JS
-    // ================================================================
     function aplicarEstadoSecao(secao, estado) {
       const content = document.getElementById('secao-' + secao + '-content');
       const toggle = document.getElementById('secao-' + secao + '-toggle');
@@ -2552,9 +2648,6 @@
       }
     }
 
-    // ================================================================
-    // COLLAPSE
-    // ================================================================
     function toggleSecao(secao) {
       const content = document.getElementById('secao-' + secao + '-content');
       const toggle = document.getElementById('secao-' + secao + '-toggle');
@@ -2575,7 +2668,7 @@
     }
 
     // ================================================================
-    // RECOMENDAÇÕES
+    // RECOMENDAÇÕES - COM BOTÕES EM ÍCONE E FRASE PADRÃO 5
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
@@ -2642,6 +2735,8 @@
             const letter = item.album ? item.album.charAt(0) : '?';
             const id = `rec-${tier}-${idx}`;
             const origem = item.origem || 'algoritmo';
+            const frase = item.frase || `${item.album}: Álbum em destaque na sua coleção`;
+
             html += `
               <div class="card" id="${id}" data-id="${item.id || ''}">
                 <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
@@ -2652,6 +2747,7 @@
                 <div class="card-body">
                   <h3>${item.album || 'Álbum'}</h3>
                   <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
+                  <div class="wishlist-phrase">${frase}</div>
                   <div class="meta-block">
                     <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
                     ${item.justificativa ? `<div class="meta-row" style="flex-wrap:wrap;"><span class="label">Justificativa</span><span class="val" style="text-align:left; max-width:100%; font-size:11px; opacity:0.7; margin-top:4px;">${item.justificativa}</span></div>` : ''}
@@ -2659,7 +2755,9 @@
                     ${item.origem === 'manual' ? `<div class="meta-row"><span class="label">Origem</span><span class="val">Adicionado manualmente</span></div>` : ''}
                   </div>
                   <div class="card-actions">
-                    <button class="btn-buy" onclick="marcarComoTenho('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')">✅ Já tenho</button>
+                    <button class="btn-icon btn-tier" onclick="abrirEditTier('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}', '${item.tier || 'A'}')" title="Editar Tier">✎</button>
+                    <button class="btn-icon btn-move" onclick="marcarComoTenho('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')" title="Já tenho">✓</button>
+                    <button class="btn-icon btn-remove" onclick="removerDaWishlist('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')" title="Remover">✕</button>
                   </div>
                 </div>
               </div>
@@ -2730,6 +2828,33 @@
       }
     }
     window.switchTab = switchTab;
+
+    // ================================================================
+    // MODAL: CONFIRMAÇÃO
+    // ================================================================
+    function abrirConfirm(mensagem, callback) {
+      document.getElementById('confirmMessage').textContent = mensagem;
+      confirmCallback = callback;
+      document.getElementById('modalConfirm').classList.add('open');
+    }
+
+    document.getElementById('btnFecharConfirm').addEventListener('click', function() {
+      document.getElementById('modalConfirm').classList.remove('open');
+      confirmCallback = null;
+    });
+
+    document.getElementById('btnConfirmCancel').addEventListener('click', function() {
+      document.getElementById('modalConfirm').classList.remove('open');
+      confirmCallback = null;
+    });
+
+    document.getElementById('btnConfirmAction').addEventListener('click', function() {
+      if (confirmCallback) {
+        confirmCallback();
+        confirmCallback = null;
+      }
+      document.getElementById('modalConfirm').classList.remove('open');
+    });
 
     // ================================================================
     // MODAL: ADICIONAR / EDITAR DISCO
@@ -2850,6 +2975,8 @@
             msg.textContent = '✅ ' + resultado.mensagem;
             msg.className = 'form-msg success';
             carregarDados();
+            // Reset do formulário após sucesso
+            formAdicionar.reset();
             setTimeout(fecharModal, 1000);
           } else {
             msg.textContent = '❌ ' + (resultado.erro || 'Erro ao salvar');
@@ -2865,7 +2992,7 @@
     });
 
     // ================================================================
-    // FUNÇÕES: EDITAR / REMOVER / MARCAR COMO TENHO
+    // FUNÇÕES: EDITAR / REMOVER DA COLEÇÃO
     // ================================================================
     function editarDisco(id) {
       abrirModal(id);
@@ -2873,38 +3000,124 @@
     window.editarDisco = editarDisco;
 
     function removerDisco(id) {
-      if (!confirm('Tem certeza que deseja remover este disco da coleção?')) return;
-      fetch(API_URL + `/remover_disco/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
-        .then(r => r.json())
-        .then(data => {
-          if (data.sucesso) {
-            carregarDados();
-          } else {
-            alert('❌ ' + (data.erro || 'Erro ao remover'));
-          }
-        })
-        .catch(() => alert('❌ Erro de conexão'));
+      abrirConfirm('Tem certeza que deseja remover este disco da coleção?', function() {
+        fetch(API_URL + `/remover_disco/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+            if (data.sucesso) {
+              carregarDados();
+            } else {
+              alert('❌ ' + (data.erro || 'Erro ao remover'));
+            }
+          })
+          .catch(() => alert('❌ Erro de conexão'));
+      });
     }
     window.removerDisco = removerDisco;
 
+    // ================================================================
+    // FUNÇÕES: WISHLIST
+    // ================================================================
     function marcarComoTenho(id, artista, album) {
       if (!id) {
         alert('❌ ID da recomendação não encontrado.');
         return;
       }
-      if (!confirm(`Marcar "${artista} - ${album}" como JÁ TENHO?`)) return;
-      fetch(API_URL + `/marcar_como_tenho/${id}?user_id=${usuarioId}`, { method: 'POST' })
+      abrirConfirm(`Marcar "${artista} - ${album}" como JÁ TENHO?`, function() {
+        fetch(API_URL + `/marcar_como_tenho/${id}?user_id=${usuarioId}`, { method: 'POST' })
+          .then(r => r.json())
+          .then(data => {
+            if (data.sucesso) {
+              carregarDados();
+            } else {
+              alert('❌ ' + (data.erro || 'Erro ao marcar'));
+            }
+          })
+          .catch(() => alert('❌ Erro de conexão'));
+      });
+    }
+    window.marcarComoTenho = marcarComoTenho;
+
+    function removerDaWishlist(id, artista, album) {
+      if (!id) {
+        alert('❌ ID não encontrado.');
+        return;
+      }
+      abrirConfirm(`Remover "${artista} - ${album}" da lista de compras?`, function() {
+        fetch(API_URL + `/wishlist/remove/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+            if (data.sucesso) {
+              carregarDados();
+            } else {
+              alert('❌ ' + (data.erro || 'Erro ao remover'));
+            }
+          })
+          .catch(() => alert('❌ Erro de conexão'));
+      });
+    }
+    window.removerDaWishlist = removerDaWishlist;
+
+    // ================================================================
+    // MODAL: EDITAR TIER
+    // ================================================================
+    const modalEditTier = document.getElementById('modalEditTier');
+    const btnFecharEditTier = document.getElementById('btnFecharEditTier');
+    const formEditTier = document.getElementById('form-edit-tier');
+
+    function abrirEditTier(id, artista, album, tierAtual) {
+      document.getElementById('edit-tier-id').value = id;
+      document.getElementById('edit-tier-artista').value = artista;
+      document.getElementById('edit-tier-album').value = album;
+      document.getElementById('edit-tier-select').value = tierAtual || 'A';
+      document.getElementById('edit-tier-msg').textContent = '';
+      document.getElementById('edit-tier-msg').className = 'form-msg';
+      modalEditTier.classList.add('open');
+    }
+    window.abrirEditTier = abrirEditTier;
+
+    btnFecharEditTier.addEventListener('click', function() {
+      modalEditTier.classList.remove('open');
+    });
+    modalEditTier.addEventListener('click', function(e) {
+      if (e.target === this) modalEditTier.classList.remove('open');
+    });
+
+    formEditTier.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-edit-tier-submit');
+      const msg = document.getElementById('edit-tier-msg');
+      const id = document.getElementById('edit-tier-id').value;
+      const novoTier = document.getElementById('edit-tier-select').value;
+
+      btn.disabled = true;
+      msg.textContent = '⏳ Salvando...';
+      msg.className = 'form-msg';
+
+      fetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tier: novoTier })
+        })
         .then(r => r.json())
         .then(data => {
           if (data.sucesso) {
+            msg.textContent = '✅ ' + data.mensagem;
+            msg.className = 'form-msg success';
             carregarDados();
+            setTimeout(() => modalEditTier.classList.remove('open'), 800);
           } else {
-            alert('❌ ' + (data.erro || 'Erro ao marcar'));
+            msg.textContent = '❌ ' + (data.erro || 'Erro ao atualizar');
+            msg.className = 'form-msg error';
+            btn.disabled = false;
           }
         })
-        .catch(() => alert('❌ Erro de conexão'));
-    }
-    window.marcarComoTenho = marcarComoTenho;
+        .catch(() => {
+          msg.textContent = '❌ Erro de conexão';
+          msg.className = 'form-msg error';
+          btn.disabled = false;
+        });
+    });
 
     // ================================================================
     // MODAL: WISHLIST
@@ -2960,6 +3173,7 @@
             msg.textContent = '✅ ' + resultado.mensagem;
             msg.className = 'form-msg success';
             carregarDados();
+            formWish.reset();
             setTimeout(() => modalWish.classList.remove('open'), 1000);
           } else {
             msg.textContent = '❌ ' + (resultado.erro || 'Erro ao adicionar');
@@ -3083,48 +3297,51 @@
     // ZERAR DADOS
     // ================================================================
     function zerarPlaylists() {
-      if (!confirm('⚠️ Tem certeza? Isso vai apagar TODAS as playlists importadas e as recomendações geradas. Essa ação é permanente.')) return;
-      fetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
-        .then(r => r.json())
-        .then(data => {
-          alert(data.mensagem);
-          carregarDados();
-        })
-        .catch(() => alert('❌ Erro ao zerar playlists'));
+      abrirConfirm('⚠️ Tem certeza? Isso vai apagar TODAS as playlists importadas e as recomendações geradas. Essa ação é permanente.', function() {
+        fetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+            alert(data.mensagem);
+            carregarDados();
+          })
+          .catch(() => alert('❌ Erro ao zerar playlists'));
+      });
     }
 
     function zerarColecao() {
-      if (!confirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua coleção. Essa ação é permanente.')) return;
-      fetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
-        .then(r => r.json())
-        .then(data => {
-          alert(data.mensagem);
-          carregarDados();
-        })
-        .catch(() => alert('❌ Erro ao zerar coleção'));
+      abrirConfirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua coleção. Essa ação é permanente.', function() {
+        fetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+            alert(data.mensagem);
+            carregarDados();
+          })
+          .catch(() => alert('❌ Erro ao zerar coleção'));
+      });
     }
 
     function zerarWishlist() {
-      if (!confirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua lista de compras (wishlist). Essa ação é permanente.')) return;
-      fetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
-        .then(r => r.json())
-        .then(data => {
-          alert(data.mensagem);
-          carregarDados();
-        })
-        .catch(() => alert('❌ Erro ao zerar wishlist'));
+      abrirConfirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua lista de compras (wishlist). Essa ação é permanente.', function() {
+        fetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+            alert(data.mensagem);
+            carregarDados();
+          })
+          .catch(() => alert('❌ Erro ao zerar wishlist'));
+      });
     }
 
     function zerarTudo() {
-      if (!confirm('🔥 Tem certeza ABSOLUTA? Isso vai apagar TODOS os seus dados: playlists, coleção, wishlist, estatísticas. Tudo. Essa ação é permanente e não pode ser desfeita.')) return;
-      if (!confirm('Última chance: tem certeza?')) return;
-      fetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
-        .then(r => r.json())
-        .then(data => {
-          alert(data.mensagem);
-          carregarDados();
-        })
-        .catch(() => alert('❌ Erro ao zerar tudo'));
+      abrirConfirm('🔥 Tem certeza ABSOLUTA? Isso vai apagar TODOS os seus dados: playlists, coleção, wishlist, estatísticas. Tudo. Essa ação é permanente e não pode ser desfeita.', function() {
+        fetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+            alert(data.mensagem);
+            carregarDados();
+          })
+          .catch(() => alert('❌ Erro ao zerar tudo'));
+      });
     }
 
     // ================================================================

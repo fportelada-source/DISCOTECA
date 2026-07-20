@@ -32,11 +32,6 @@
       --dvd-color: #9B59B6;
       --groove: repeating-radial-gradient(circle at center, rgba(237, 232, 220, 0.035) 0px, rgba(237, 232, 220, 0.035) 1px, transparent 1px, transparent 3px);
     }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
     body {
       background: var(--ink);
       color: var(--paper);
@@ -423,7 +418,6 @@
       opacity: 0.4;
       cursor: not-allowed;
     }
-    /* ===== SCANNER TELA CHEIA ===== */
     .scanner-fullscreen {
       display: none;
       position: fixed;
@@ -474,7 +468,6 @@
       text-align: center;
       font-family: 'Inter', sans-serif;
     }
-    /* ===== MODAL ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -1417,93 +1410,17 @@
     .btn-confirm-cancel:hover {
       opacity: 0.8;
     }
-    .ajuste-fino-container {
-      background: var(--card);
-      border: 1px solid var(--card-line);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
-      border-left: 4px solid var(--s-color);
+    /* Estilos do ajuste fino */
+    .pergunta-ajuste .btn-opcao-ajuste.selecionado {
+      border-color: var(--s-color) !important;
+      background: rgba(214, 67, 47, 0.15) !important;
     }
-    .ajuste-fino-container h3 {
-      font-family: 'Anton', sans-serif;
-      font-size: 24px;
-      letter-spacing: 0.02em;
-      margin-bottom: 8px;
-    }
-    .ajuste-fino-container .sub {
-      font-size: 14px;
-      opacity: 0.6;
-      margin-bottom: 20px;
-    }
-    .ajuste-fino-container .pergunta {
-      margin-bottom: 16px;
-      padding: 12px;
-      background: var(--ink);
-      border-radius: 8px;
-      border: 1px solid var(--card-line);
-    }
-    .ajuste-fino-container .pergunta .texto {
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 8px;
-    }
-    .ajuste-fino-container .pergunta .botoes {
-      display: flex;
-      gap: 8px;
-    }
-    .ajuste-fino-container .pergunta .botoes button {
-      background: transparent;
-      border: 1px solid var(--card-line);
-      color: var(--paper);
-      padding: 6px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-      font-size: 13px;
-    }
-    .ajuste-fino-container .pergunta .botoes button:hover {
-      background: var(--card-line);
-    }
-    .ajuste-fino-container .pergunta .botoes button.selecionado {
-      background: var(--s-color);
-      color: var(--ink);
-      border-color: var(--s-color);
-    }
-    .ajuste-fino-container .btn-ajuste {
-      background: var(--s-color);
-      color: var(--ink);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-      width: 100%;
-      font-size: 16px;
-      margin-top: 8px;
-    }
-    .ajuste-fino-container .btn-ajuste:hover {
-      opacity: 0.8;
-    }
-    .ajuste-fino-container .btn-ajuste:disabled {
+    .btn-ajuste-salvar:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
-    .ajuste-fino-container .btn-pular {
-      background: transparent;
-      border: 1px solid var(--card-line);
-      color: var(--paper);
-      padding: 12px 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-      width: 100%;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-    .ajuste-fino-container .btn-pular:hover {
-      background: var(--card-line);
+    .btn-ajuste-salvar:not(:disabled) {
+      opacity: 1;
     }
     @media (max-width:600px) {
       .tier-stamp {
@@ -1850,7 +1767,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Data de Compra</label>
+          <label>Data de Aquisição</label>
           <input type="date" id="campo-data">
         </div>
         <div class="form-group">
@@ -1956,6 +1873,7 @@
 
   <footer>Discoteca — Sua coleção, suas recomendações.</footer>
 
+  <!-- ===== JAVASCRIPT ===== -->
   <script>
     // ================================================================
     // CONFIGURAÇÕES
@@ -2815,7 +2733,7 @@
     }
 
     // ================================================================
-    // RECOMENDAÇÕES
+    // RECOMENDAÇÕES (COM FRASE SIMPLIFICADA)
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
@@ -2897,9 +2815,6 @@
                   <div class="wishlist-phrase">${frase}</div>
                   <div class="meta-block">
                     <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
-                    ${item.justificativa ? `<div class="meta-row" style="flex-wrap:wrap;"><span class="label">Justificativa</span><span class="val" style="text-align:left; max-width:100%; font-size:11px; opacity:0.7; margin-top:4px;">${item.justificativa}</span></div>` : ''}
-                    ${item.nota ? `<div class="meta-row"><span class="label">Nota</span><span class="val">${item.nota}</span></div>` : ''}
-                    ${item.origem === 'manual' ? `<div class="meta-row"><span class="label">Origem</span><span class="val">Adicionado manualmente</span></div>` : ''}
                   </div>
                   <div class="card-actions">
                     <button class="btn-icon btn-tier" onclick="abrirEditTier('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}', '${item.tier || 'A'}')" title="Editar Tier">✎</button>
@@ -3031,8 +2946,8 @@
           document.getElementById('campo-condicao-capa').value = disco.condicao_capa || '';
           document.getElementById('campo-preco').value = disco.preco || '';
           document.getElementById('campo-data').value = disco.data_adicao || '';
-          document.getElementById('campo-notas').value = '';
-          document.getElementById('campo-codigo-barras').value = '';
+          document.getElementById('campo-notas').value = disco.notas || '';
+          document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
         }
       } else {
         document.getElementById('modalTitle').textContent = '➕ Adicionar Disco';
@@ -3416,6 +3331,7 @@
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.opcoes && data.opcoes.length > 0) {
+            // Se tiver múltiplas opções, mostra a primeira (a mais relevante)
             const d = data.opcoes[0];
             document.getElementById('campo-artista').value = d.artista || '';
             document.getElementById('campo-album').value = d.album || '';
@@ -3431,7 +3347,7 @@
             if (d.ano) {
               document.getElementById('campo-data').value = d.ano + '-01-01';
             }
-            document.getElementById('campo-notas').value = (d.gravadora ? 'Gravadora: ' + d.gravadora : '');
+            document.getElementById('campo-notas').value = (d.gravadora ? 'Gravadora: ' + d.gravadora : '') + (d.edicao ? ' | Edição: ' + d.edicao : '');
             document.getElementById('form-msg').textContent = '✅ Dados preenchidos automaticamente!';
             document.getElementById('form-msg').className = 'form-msg success';
           } else {
@@ -3446,7 +3362,7 @@
     }
 
     // ================================================================
-    // AJUSTE FINO
+    // AJUSTE FINO (POPUP MODAL)
     // ================================================================
     function mostrarAjusteFino(artistas) {
       const container = document.getElementById('ajusteFinoContainer');
@@ -3456,65 +3372,121 @@
       }
 
       container.style.display = 'block';
-      
+
       const perguntas = [
-        `"Notei que ${artistas[0]} vive aparecendo nas suas playlists. Eles são uma das suas bandas favoritas ou só curte algumas músicas?"`,
-        `"Você tem várias músicas de ${artistas[1] || artistas[0]} por aqui. Ainda ouve eles com frequência ou já foi fase?"`,
-        `"${artistas[2] || artistas[1] || artistas[0]} apareceu bastante nos seus últimos meses. Continua no seu radar ou já saturou?"`
+        {
+          texto: `${artistas[0]} vive aparecendo nas suas playlists. O que você acha deles?`,
+          opcoes: ['Curto muito', 'Gosto normal', 'Tanto faz']
+        },
+        {
+          texto: `Você tem várias músicas de ${artistas[1] || artistas[0]}. Ainda ouve eles hoje em dia?`,
+          opcoes: ['Sim, ainda ouço', 'Mais ou menos', 'Já foi fase']
+        },
+        {
+          texto: `${artistas[2] || artistas[1] || artistas[0]} apareceu bastante recentemente. O que você sente sobre isso?`,
+          opcoes: ['Faz sentido, ainda curto', 'Tá bom, mas não é prioridade', 'Podia parar de aparecer']
+        }
       ];
 
       let html = `
-        <div class="ajuste-fino-container">
-          <h3>🎵 Quase lá. Preparando suas recomendações...</h3>
-          <p class="sub">Só mais 3 perguntinhas para eu te conhecer melhor:</p>
+        <div class="modal-overlay open" id="modalAjusteFino">
+          <div class="modal" style="max-width:550px;">
+            <div class="modal-header">
+              <h2>🎵 Quase lá</h2>
+              <button class="modal-close" id="btnFecharAjuste">✕</button>
+            </div>
+            <p style="opacity:0.6; margin-bottom:20px;">Só mais algumas perguntas para ajustar suas recomendações:</p>
       `;
 
       artistas.forEach((artista, index) => {
-        const pergunta = perguntas[index] || `"O que você acha de ${artista}?"`;
+        const pergunta = perguntas[index] || perguntas[0];
         html += `
-          <div class="pergunta" data-artista="${artista}">
-            <div class="texto">${pergunta}</div>
-            <div class="botoes">
-              <button class="btn-sim" data-artista="${artista}" data-tipo="preferido">Sim</button>
-              <button class="btn-nao" data-artista="${artista}" data-tipo="preferido">Não</button>
+          <div class="pergunta-ajuste" data-artista="${artista}" style="margin-bottom:20px; padding:12px; background:var(--ink); border-radius:8px; border:1px solid var(--card-line);">
+            <div style="font-size:14px; font-weight:500; margin-bottom:10px;">${pergunta.texto}</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        `;
+        pergunta.opcoes.forEach(opcao => {
+          html += `
+            <button class="btn-opcao-ajuste" data-artista="${artista}" data-valor="${opcao}" style="background:transparent; border:1px solid var(--card-line); color:var(--paper); padding:6px 16px; border-radius:6px; cursor:pointer; transition:0.2s; font-size:13px;">
+              ${opcao}
+            </button>
+          `;
+        });
+        html += `
             </div>
           </div>
         `;
       });
 
       html += `
-        <button class="btn-ajuste" id="btnSalvarAjuste" disabled>Salvar e ver recomendações</button>
-        <button class="btn-pular" id="btnPularAjuste">Pular (usar cálculo padrão)</button>
-      </div>`;
+            <div style="display:flex; gap:12px; margin-top:8px;">
+              <button class="btn-ajuste-pular" id="btnPularAjuste" style="flex:1; background:transparent; border:1px solid var(--card-line); color:var(--paper); padding:12px; border-radius:6px; cursor:pointer; font-size:14px;">Agora não</button>
+              <button class="btn-ajuste-salvar" id="btnSalvarAjuste" disabled style="flex:1; background:var(--s-color); color:var(--ink); border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:14px; opacity:0.4;">Salvar</button>
+            </div>
+          </div>
+        </div>
+      `;
 
       container.innerHTML = html;
 
       const respostas = {};
 
-      container.querySelectorAll('.pergunta .botoes button').forEach(btn => {
+      container.querySelectorAll('.btn-opcao-ajuste').forEach(btn => {
         btn.addEventListener('click', function() {
           const artista = this.dataset.artista;
-          const tipo = this.dataset.tipo;
-          const valor = this.classList.contains('btn-sim') ? 1 : 0;
-          
-          this.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selecionado'));
+          const valor = this.dataset.valor;
+
+          this.parentElement.querySelectorAll('.btn-opcao-ajuste').forEach(b => {
+            b.classList.remove('selecionado');
+            b.style.borderColor = 'var(--card-line)';
+            b.style.background = 'transparent';
+          });
           this.classList.add('selecionado');
-          
-          respostas[artista] = respostas[artista] || {};
-          respostas[artista][tipo] = valor;
-          
-          const todasRespondidas = container.querySelectorAll('.pergunta').length === Object.keys(respostas).length;
-          document.getElementById('btnSalvarAjuste').disabled = !todasRespondidas;
+          this.style.borderColor = 'var(--s-color)';
+          this.style.background = 'rgba(214, 67, 47, 0.15)';
+
+          respostas[artista] = valor;
+
+          const todasRespondidas = container.querySelectorAll('.pergunta-ajuste').length === Object.keys(respostas).length;
+          const btnSalvar = document.getElementById('btnSalvarAjuste');
+          if (todasRespondidas) {
+            btnSalvar.disabled = false;
+            btnSalvar.style.opacity = '1';
+          }
         });
       });
 
+      document.getElementById('btnFecharAjuste').addEventListener('click', function() {
+        container.style.display = 'none';
+        carregarDados();
+      });
+
+      document.getElementById('btnPularAjuste').addEventListener('click', function() {
+        container.style.display = 'none';
+        carregarDados();
+      });
+
       document.getElementById('btnSalvarAjuste').addEventListener('click', function() {
-        const respostasArray = Object.keys(respostas).map(artista => ({
-          artista: artista,
-          preferido: respostas[artista].preferido || 0,
-          ainda_ouve: 1
-        }));
-        
+        const respostasArray = Object.keys(respostas).map(artista => {
+          const valor = respostas[artista];
+          let preferido = 0;
+          let ainda_ouve = 1;
+
+          if (valor.includes('Curto muito') || valor.includes('Sim') || valor.includes('Faz sentido')) {
+            preferido = 1;
+          }
+          if (valor.includes('Mais ou menos') || valor.includes('Tá bom')) {
+            preferido = 0;
+            ainda_ouve = 1;
+          }
+          if (valor.includes('Tanto faz') || valor.includes('Já foi fase') || valor.includes('Podia parar')) {
+            preferido = 0;
+            ainda_ouve = 0;
+          }
+
+          return { artista, preferido, ainda_ouve };
+        });
+
         fetch(API_URL + '/ajuste_fino?user_id=' + usuarioId, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -3532,11 +3504,6 @@
         .catch(err => {
           alert('Erro de conexão: ' + err.message);
         });
-      });
-
-      document.getElementById('btnPularAjuste').addEventListener('click', function() {
-        container.style.display = 'none';
-        carregarDados();
       });
     }
 

@@ -32,6 +32,11 @@
       --dvd-color: #9B59B6;
       --groove: repeating-radial-gradient(circle at center, rgba(237, 232, 220, 0.035) 0px, rgba(237, 232, 220, 0.035) 1px, transparent 1px, transparent 3px);
     }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       background: var(--ink);
       color: var(--paper);
@@ -387,11 +392,6 @@
       color: var(--s-color);
       background: rgba(214, 67, 47, 0.1);
     }
-    .btn-icon.btn-repressagem:hover {
-      border-color: var(--a-color);
-      color: var(--a-color);
-      background: rgba(227, 154, 46, 0.1);
-    }
     .wishlist-phrase {
       font-size: 12px;
       color: var(--paper);
@@ -422,26 +422,6 @@
     .barcode-btn:disabled {
       opacity: 0.4;
       cursor: not-allowed;
-    }
-    .barcode-reader-container {
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--card);
-      border: 1px solid var(--card-line);
-      border-radius: 8px;
-      display: none;
-    }
-    .barcode-reader-container.active {
-      display: block;
-    }
-    #barcode-reader {
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto;
-    }
-    #barcode-reader video {
-      border-radius: 8px;
-      width: 100%;
     }
     /* ===== SCANNER TELA CHEIA ===== */
     .scanner-fullscreen {
@@ -1437,134 +1417,6 @@
     .btn-confirm-cancel:hover {
       opacity: 0.8;
     }
-    /* ===== BUSCA EM MASSA ===== */
-    .busca-massa-container {
-      background: var(--card);
-      border: 1px solid var(--card-line);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 24px;
-    }
-    .busca-massa-container .busca-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .busca-massa-container .busca-row input {
-      flex: 1;
-      min-width: 200px;
-      background: var(--ink);
-      border: 1px solid var(--card-line);
-      color: var(--paper);
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-    }
-    .busca-massa-container .busca-row input:focus {
-      outline: none;
-      border-color: var(--s-color);
-    }
-    .busca-massa-container .busca-row .btn-buscar {
-      background: var(--s-color);
-      color: var(--ink);
-      border: none;
-      padding: 10px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .busca-massa-container .busca-row .btn-buscar:hover {
-      opacity: 0.8;
-    }
-    .busca-resultados {
-      margin-top: 16px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .busca-resultados .resultado-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--card-line);
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .busca-resultados .resultado-item:hover {
-      background: rgba(237, 232, 220, 0.05);
-    }
-    .busca-resultados .resultado-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--s-color);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .busca-resultados .resultado-item .info {
-      flex: 1;
-    }
-    .busca-resultados .resultado-item .info .titulo {
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .busca-resultados .resultado-item .info .ano {
-      font-size: 12px;
-      opacity: 0.5;
-    }
-    .busca-resultados .resultado-item .capa-mini {
-      width: 40px;
-      height: 40px;
-      border-radius: 4px;
-      object-fit: cover;
-      background: var(--ink);
-      flex-shrink: 0;
-    }
-    .busca-massa-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    .busca-massa-actions .btn-salvar {
-      background: var(--s-color);
-      color: var(--ink);
-      border: none;
-      padding: 10px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      flex: 1;
-      min-width: 120px;
-    }
-    .busca-massa-actions .btn-salvar:hover {
-      opacity: 0.8;
-    }
-    .busca-massa-actions .btn-salvar-wish {
-      background: var(--a-color);
-      color: var(--ink);
-      border: none;
-      padding: 10px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      flex: 1;
-      min-width: 120px;
-    }
-    .busca-massa-actions .btn-salvar-wish:hover {
-      opacity: 0.8;
-    }
-    .busca-status {
-      font-size: 13px;
-      margin-top: 8px;
-      opacity: 0.6;
-      text-align: center;
-    }
-    /* ===== AJUSTE FINO ===== */
     .ajuste-fino-container {
       background: var(--card);
       border: 1px solid var(--card-line);
@@ -1653,16 +1505,6 @@
     .ajuste-fino-container .btn-pular:hover {
       background: var(--card-line);
     }
-    .repressagem-badge {
-      display: inline-block;
-      background: var(--a-color);
-      color: var(--ink);
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 700;
-      margin-left: 6px;
-    }
     @media (max-width:600px) {
       .tier-stamp {
         font-size: 44px;
@@ -1740,13 +1582,6 @@
       .estatistica-secao .resumo-cards .resumo-item .num {
         font-size: 16px;
       }
-      .busca-massa-container .busca-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .busca-massa-actions {
-        flex-direction: column;
-      }
     }
   </style>
 </head>
@@ -1797,9 +1632,9 @@
         <button class="tab-btn" data-tab="tab-importar" onclick="switchTab('tab-importar')">📤 Importar</button>
       </div>
     </div>
-        <!-- ===== TAB 1: COMPRAS ===== -->
+
+    <!-- ===== TAB 1: COMPRAS ===== -->
     <div id="tab-compras" class="tab-content active">
-      <!-- AJUSTE FINO (aparece quando necessário) -->
       <div id="ajusteFinoContainer" style="display:none;"></div>
       <div id="compras-container"></div>
     </div>
@@ -1814,13 +1649,8 @@
             <p>O que você ouve e o que você tem.</p>
           </div>
         </div>
-
-        <!-- PLAYER -->
         <div id="estatisticas-player"></div>
-
-        <!-- ESTANTE -->
         <div id="estatisticas-estante"></div>
-
       </section>
     </div>
 
@@ -1835,20 +1665,6 @@
           </div>
           <div class="add-btn-wrap">
             <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
-          </div>
-        </div>
-
-        <!-- BUSCA EM MASSA -->
-        <div class="busca-massa-container">
-          <div class="busca-row">
-            <input type="text" id="buscaArtistaInput" placeholder="Digite o nome do artista (ex: Metallica)" />
-            <button class="btn-buscar" id="btnBuscarArtista">🔍 Buscar</button>
-          </div>
-          <div id="buscaResultados" class="busca-resultados" style="display:none;"></div>
-          <div id="buscaStatus" class="busca-status"></div>
-          <div class="busca-massa-actions" id="buscaActions" style="display:none;">
-            <button class="btn-salvar" id="btnSalvarMassa">📀 Salvar na Coleção</button>
-            <button class="btn-salvar-wish" id="btnSalvarMassaWish">⭐ Salvar na Wishlist</button>
           </div>
         </div>
 
@@ -1901,7 +1717,6 @@
         </div>
         <div style="max-width:800px; margin:0 auto;">
 
-          <!-- EXPORTIFY GUIDE -->
           <div class="exportify-guide">
             <h3>🎯 Antes de começar, você precisa dos seus CSVs</h3>
             <p>O Discoteca usa os dados das suas playlists do Spotify para gerar recomendações. Para isso, você precisa exportar suas playlists como CSV usando o <strong><a href="https://exportify.net/" target="_blank" class="link">Exportify</a></strong> (é gratuito e seguro).</p>
@@ -1914,7 +1729,6 @@
             <p class="dica">💡 Quanto mais dados, melhores as recomendações! Use playlists com pelo menos 50 músicas cada.</p>
           </div>
 
-          <!-- UPLOADS -->
           <div class="upload-grid">
             <div class="upload-area">
               <div class="icon">🏆</div>
@@ -1948,7 +1762,6 @@
           <button class="btn" id="btn-gerar">⚡ Gerar Recomendações</button>
           <div id="status-gerar" class="upload-status" style="text-align:center;margin-top:8px;"></div>
 
-          <!-- BOTÕES DE ZERAR -->
           <div style="margin-top: 32px; border-top: 1px solid var(--card-line); padding-top: 24px;">
             <p style="opacity:0.5; font-size:13px; margin-bottom:12px; font-family:'JetBrains Mono', monospace;">⚠️ CUIDADO: Essas ações são permanentes.</p>
             <div class="btn-group">
@@ -1963,7 +1776,7 @@
       </section>
     </div>
 
-  </div><!-- /appScreen -->
+  </div>
 
   <!-- ===== SCANNER TELA CHEIA ===== -->
   <div class="scanner-fullscreen" id="scannerFullscreen">
@@ -2036,15 +1849,9 @@
             </select>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Data de Compra</label>
-            <input type="date" id="campo-data-compra">
-          </div>
-          <div class="form-group">
-            <label>Data de Lançamento</label>
-            <input type="date" id="campo-data-lancamento">
-          </div>
+        <div class="form-group">
+          <label>Data de Compra</label>
+          <input type="date" id="campo-data">
         </div>
         <div class="form-group">
           <label>Notas</label>
@@ -2056,7 +1863,6 @@
             <input type="text" id="campo-codigo-barras" placeholder="Ex: 042284834181" style="flex:1;">
             <button type="button" class="barcode-btn" id="btnBarcode">📷 Ler</button>
           </div>
-          <!-- Scanner em tela cheia agora -->
         </div>
         <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
         <div class="form-msg" id="form-msg"></div>
@@ -2127,11 +1933,6 @@
             <option value="C">C (Baixa)</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="edit-tier-repressagem"> Aguardando Repressagem
-          </label>
-        </div>
         <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar Tier</button>
         <div class="form-msg" id="edit-tier-msg"></div>
       </form>
@@ -2155,7 +1956,6 @@
 
   <footer>Discoteca — Sua coleção, suas recomendações.</footer>
 
-  <!-- ===== JAVASCRIPT ===== -->
   <script>
     // ================================================================
     // CONFIGURAÇÕES
@@ -2171,7 +1971,6 @@
     let colecaoFiltrada = [];
     let confirmCallback = null;
     let ajusteFinoData = null;
-    let buscaMassaResultados = [];
 
     // ================================================================
     // LOGIN
@@ -2375,10 +2174,10 @@
 
       switch (sortType) {
         case 'data_mais_recente':
-          filtrados.sort((a, b) => (b.data_compra || '').localeCompare(a.data_compra || ''));
+          filtrados.sort((a, b) => (b.data_adicao || '').localeCompare(a.data_adicao || ''));
           break;
         case 'data_mais_antiga':
-          filtrados.sort((a, b) => (a.data_compra || '').localeCompare(b.data_compra || ''));
+          filtrados.sort((a, b) => (a.data_adicao || '').localeCompare(b.data_adicao || ''));
           break;
         case 'preco_maior':
           filtrados.sort((a, b) => (b.preco || 0) - (a.preco || 0));
@@ -2523,8 +2322,7 @@
                   ${item.condicao_midia ? `<div class="meta-row"><span class="label">Mídia</span><span class="val">${item.condicao_midia}</span></div>` : ''}
                   ${item.condicao_capa ? `<div class="meta-row"><span class="label">Capa</span><span class="val">${item.condicao_capa}</span></div>` : ''}
                   ${item.preco ? `<div class="meta-row"><span class="label">Preço</span><span class="val">R$ ${item.preco}</span></div>` : ''}
-                  ${item.data_compra ? `<div class="meta-row"><span class="label">Compra</span><span class="val">${item.data_compra}</span></div>` : ''}
-                  ${item.data_lancamento ? `<div class="meta-row"><span class="label">Lançamento</span><span class="val">${item.data_lancamento}</span></div>` : ''}
+                  ${item.data_adicao ? `<div class="meta-row"><span class="label">Adicionado</span><span class="val">${item.data_adicao}</span></div>` : ''}
                 </div>
                 <div class="card-actions">
                   <button class="btn-icon btn-edit" onclick="editarDisco('${item.id || ''}')" title="Editar">✎</button>
@@ -3085,13 +2883,11 @@
             const id = `rec-${tier}-${idx}`;
             const origem = item.origem || 'algoritmo';
             const frase = item.frase || `${item.album}: Álbum em destaque na sua coleção`;
-            const repressagem = item.aguardando_repressagem || 0;
 
             html += `
               <div class="card" id="${id}" data-id="${item.id || ''}">
                 <div class="art-wrap" id="art-${id}" style="background: ${tierColor}; background-size: cover; background-position: center;">
                   <span class="priority-tag" style="background:${tierColor};color:var(--ink);">${tier} ${origem === 'manual' ? '✏️' : ''}</span>
-                  ${repressagem ? `<span class="repressagem-badge">⏳ Repressagem</span>` : ''}
                   <div class="spine-letter">${letter}</div>
                   <div class="art-fallback" id="fallback-${id}" style="opacity:0.6;">${item.artista || '?'}<br>${item.album || '?'}</div>
                 </div>
@@ -3106,7 +2902,7 @@
                     ${item.origem === 'manual' ? `<div class="meta-row"><span class="label">Origem</span><span class="val">Adicionado manualmente</span></div>` : ''}
                   </div>
                   <div class="card-actions">
-                    <button class="btn-icon btn-tier" onclick="abrirEditTier('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}', '${item.tier || 'A'}', ${repressagem})" title="Editar Tier">✎</button>
+                    <button class="btn-icon btn-tier" onclick="abrirEditTier('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}', '${item.tier || 'A'}')" title="Editar Tier">✎</button>
                     <button class="btn-icon btn-move" onclick="marcarComoTenho('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')" title="Já tenho">✓</button>
                     <button class="btn-icon btn-remove" onclick="removerDaWishlist('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')" title="Remover">✕</button>
                   </div>
@@ -3234,10 +3030,9 @@
           document.getElementById('campo-condicao-midia').value = disco.condicao_midia || '';
           document.getElementById('campo-condicao-capa').value = disco.condicao_capa || '';
           document.getElementById('campo-preco').value = disco.preco || '';
-          document.getElementById('campo-data-compra').value = disco.data_compra || '';
-          document.getElementById('campo-data-lancamento').value = disco.data_lancamento || '';
-          document.getElementById('campo-notas').value = disco.notas || '';
-          document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
+          document.getElementById('campo-data').value = disco.data_adicao || '';
+          document.getElementById('campo-notas').value = '';
+          document.getElementById('campo-codigo-barras').value = '';
         }
       } else {
         document.getElementById('modalTitle').textContent = '➕ Adicionar Disco';
@@ -3248,8 +3043,7 @@
         document.getElementById('campo-condicao-midia').value = '';
         document.getElementById('campo-condicao-capa').value = '';
         document.getElementById('campo-preco').value = '';
-        document.getElementById('campo-data-compra').value = '';
-        document.getElementById('campo-data-lancamento').value = '';
+        document.getElementById('campo-data').value = '';
         document.getElementById('campo-notas').value = '';
         document.getElementById('campo-codigo-barras').value = '';
       }
@@ -3294,8 +3088,7 @@
         condicao_midia: document.getElementById('campo-condicao-midia').value,
         condicao_capa: document.getElementById('campo-condicao-capa').value,
         preco: parseFloat(document.getElementById('campo-preco').value) || null,
-        data_compra: document.getElementById('campo-data-compra').value || null,
-        data_lancamento: document.getElementById('campo-data-lancamento').value || null,
+        data_adicao: document.getElementById('campo-data').value || null,
         notas: document.getElementById('campo-notas').value.trim(),
         codigo_barras: document.getElementById('campo-codigo-barras').value.trim()
       };
@@ -3410,18 +3203,17 @@
     window.removerDaWishlist = removerDaWishlist;
 
     // ================================================================
-    // MODAL: EDITAR TIER (COM REPRESSAGEM)
+    // MODAL: EDITAR TIER
     // ================================================================
     const modalEditTier = document.getElementById('modalEditTier');
     const btnFecharEditTier = document.getElementById('btnFecharEditTier');
     const formEditTier = document.getElementById('form-edit-tier');
 
-    function abrirEditTier(id, artista, album, tierAtual, repressagem) {
+    function abrirEditTier(id, artista, album, tierAtual) {
       document.getElementById('edit-tier-id').value = '';
       document.getElementById('edit-tier-artista').value = '';
       document.getElementById('edit-tier-album').value = '';
       document.getElementById('edit-tier-select').value = 'A';
-      document.getElementById('edit-tier-repressagem').checked = false;
       document.getElementById('edit-tier-msg').textContent = '';
       document.getElementById('edit-tier-msg').className = 'form-msg';
       document.getElementById('btn-edit-tier-submit').disabled = false;
@@ -3430,7 +3222,6 @@
       document.getElementById('edit-tier-artista').value = artista;
       document.getElementById('edit-tier-album').value = album;
       document.getElementById('edit-tier-select').value = tierAtual || 'A';
-      document.getElementById('edit-tier-repressagem').checked = repressagem || false;
       
       modalEditTier.classList.add('open');
     }
@@ -3449,13 +3240,11 @@
       const msg = document.getElementById('edit-tier-msg');
       const id = document.getElementById('edit-tier-id').value;
       const novoTier = document.getElementById('edit-tier-select').value;
-      const repressagem = document.getElementById('edit-tier-repressagem').checked ? 1 : 0;
 
       btn.disabled = true;
       msg.textContent = '⏳ Salvando...';
       msg.className = 'form-msg';
 
-      // Atualiza tier
       fetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -3464,32 +3253,19 @@
         .then(r => r.json())
         .then(data => {
           if (data.sucesso) {
-            // Atualiza repressagem
-            return fetch(API_URL + `/wishlist/toggle_repressagem/${id}?user_id=${usuarioId}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ repressagem: repressagem })
-            });
-          } else {
-            throw new Error(data.erro || 'Erro ao atualizar tier');
-          }
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (data.sucesso) {
-            msg.textContent = '✅ Tier e status atualizados!';
+            msg.textContent = '✅ ' + data.mensagem;
             msg.className = 'form-msg success';
             carregarDados();
             formEditTier.reset();
             setTimeout(() => modalEditTier.classList.remove('open'), 800);
           } else {
-            msg.textContent = '❌ ' + (data.erro || 'Erro ao atualizar repressagem');
+            msg.textContent = '❌ ' + (data.erro || 'Erro ao atualizar');
             msg.className = 'form-msg error';
             btn.disabled = false;
           }
         })
-        .catch(err => {
-          msg.textContent = '❌ ' + err.message;
+        .catch(() => {
+          msg.textContent = '❌ Erro de conexão';
           msg.className = 'form-msg error';
           btn.disabled = false;
         });
@@ -3573,7 +3349,6 @@
     const scannerClose = document.getElementById('scannerClose');
 
     function abrirScannerFullscreen() {
-      // Fecha o modal se estiver aberto
       if (modal.classList.contains('open')) {
         modal.classList.remove('open');
       }
@@ -3608,7 +3383,6 @@
           document.getElementById('campo-codigo-barras').value = decodedText;
           fecharScannerFullscreen();
           buscarDiscoPorCodigo(decodedText);
-          // Reabre o modal
           abrirModal(null);
         },
         (errorMessage) => {}
@@ -3642,8 +3416,6 @@
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.opcoes && data.opcoes.length > 0) {
-            // Se tiver múltiplas opções, mostra a primeira por enquanto
-            // TODO: Mostrar todas as opções para o usuário escolher
             const d = data.opcoes[0];
             document.getElementById('campo-artista').value = d.artista || '';
             document.getElementById('campo-album').value = d.album || '';
@@ -3657,7 +3429,7 @@
               }
             }
             if (d.ano) {
-              document.getElementById('campo-data-lancamento').value = d.ano + '-01-01';
+              document.getElementById('campo-data').value = d.ano + '-01-01';
             }
             document.getElementById('campo-notas').value = (d.gravadora ? 'Gravadora: ' + d.gravadora : '');
             document.getElementById('form-msg').textContent = '✅ Dados preenchidos automaticamente!';
@@ -3671,129 +3443,6 @@
           document.getElementById('form-msg').textContent = '⚠️ Erro ao buscar dados. Preencha manualmente.';
           document.getElementById('form-msg').className = 'form-msg error';
         });
-    }
-
-    // ================================================================
-    // BUSCA EM MASSA - DISCOGS
-    // ================================================================
-    document.getElementById('btnBuscarArtista').addEventListener('click', function() {
-      const artista = document.getElementById('buscaArtistaInput').value.trim();
-      if (!artista) {
-        alert('Digite o nome do artista');
-        return;
-      }
-
-      const resultadosDiv = document.getElementById('buscaResultados');
-      const statusDiv = document.getElementById('buscaStatus');
-      const actionsDiv = document.getElementById('buscaActions');
-      
-      resultadosDiv.style.display = 'none';
-      statusDiv.textContent = '⏳ Buscando...';
-      actionsDiv.style.display = 'none';
-
-      fetch(API_URL + `/buscar_artista?q=${encodeURIComponent(artista)}&user_id=${usuarioId}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data.erro) {
-            statusDiv.textContent = '❌ ' + data.erro;
-            return;
-          }
-
-          if (data.sucesso && data.albuns && data.albuns.length > 0) {
-            buscaMassaResultados = data.albuns;
-            statusDiv.textContent = `✅ ${data.albuns.length} álbuns encontrados para ${data.artista}`;
-            
-            let html = `<div style="margin-top:8px;font-size:12px;opacity:0.5;margin-bottom:8px;">Marque os que você tem:</div>`;
-            data.albuns.forEach(album => {
-              const jaTem = colecao.some(d => 
-                d.artista && d.album && 
-                d.artista.toLowerCase().trim() === album.artista.toLowerCase().trim() &&
-                d.album.toLowerCase().trim() === album.titulo.toLowerCase().trim()
-              );
-              html += `
-                <div class="resultado-item">
-                  <input type="checkbox" class="massa-checkbox" data-artista="${album.artista}" data-titulo="${album.titulo}" data-ano="${album.ano}" data-formato="${album.formato}" ${jaTem ? 'disabled' : ''}>
-                  ${jaTem ? '<span style="color:#4CAF50;font-size:12px;">✅</span>' : ''}
-                  <div class="info">
-                    <div class="titulo">${album.titulo}</div>
-                    <div class="ano">${album.ano || 'Ano desconhecido'} • ${album.formato || 'Formato desconhecido'}</div>
-                  </div>
-                  ${album.capa ? `<img src="${album.capa}" class="capa-mini" alt="Capa">` : ''}
-                </div>
-              `;
-            });
-            resultadosDiv.innerHTML = html;
-            resultadosDiv.style.display = 'block';
-            actionsDiv.style.display = 'flex';
-
-            // Conta quantos checkboxes estão disponíveis (não desabilitados)
-            const checkboxes = document.querySelectorAll('.massa-checkbox:not(:disabled)');
-            if (checkboxes.length === 0) {
-              statusDiv.textContent = '✅ Todos os álbuns já estão na sua coleção!';
-              actionsDiv.style.display = 'none';
-            }
-          } else {
-            statusDiv.textContent = '❌ Nenhum álbum encontrado para este artista.';
-          }
-        })
-        .catch(err => {
-          statusDiv.textContent = '❌ Erro ao buscar: ' + err.message;
-        });
-    });
-
-    document.getElementById('btnSalvarMassa').addEventListener('click', function() {
-      salvarMassa('colecao');
-    });
-
-    document.getElementById('btnSalvarMassaWish').addEventListener('click', function() {
-      salvarMassa('wishlist');
-    });
-
-    function salvarMassa(destino) {
-      const checkboxes = document.querySelectorAll('.massa-checkbox:checked');
-      if (checkboxes.length === 0) {
-        alert('Selecione pelo menos um álbum.');
-        return;
-      }
-
-      const albuns = [];
-      checkboxes.forEach(cb => {
-        albuns.push({
-          artista: cb.dataset.artista,
-          titulo: cb.dataset.titulo,
-          ano: cb.dataset.ano,
-          formato: cb.dataset.formato
-        });
-      });
-
-      const statusDiv = document.getElementById('buscaStatus');
-      statusDiv.textContent = '⏳ Salvando...';
-
-      fetch(API_URL + '/adicionar_massa?user_id=' + usuarioId, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ albuns: albuns, destino: destino })
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.sucesso) {
-          statusDiv.textContent = '✅ ' + data.mensagem;
-          carregarDados();
-          // Desabilita os checkboxes salvos
-          checkboxes.forEach(cb => {
-            cb.disabled = true;
-            cb.checked = false;
-            cb.parentElement.querySelector('.massa-checkbox')?.remove();
-          });
-          // Recarrega a busca para atualizar os status
-          document.getElementById('btnBuscarArtista').click();
-        } else {
-          statusDiv.textContent = '❌ ' + (data.erro || 'Erro ao salvar');
-        }
-      })
-      .catch(err => {
-        statusDiv.textContent = '❌ Erro ao salvar: ' + err.message;
-      });
     }
 
     // ================================================================
@@ -3840,24 +3489,20 @@
 
       container.innerHTML = html;
 
-      // Armazena respostas
       const respostas = {};
 
-      // Event listeners para os botões Sim/Não
       container.querySelectorAll('.pergunta .botoes button').forEach(btn => {
         btn.addEventListener('click', function() {
           const artista = this.dataset.artista;
           const tipo = this.dataset.tipo;
           const valor = this.classList.contains('btn-sim') ? 1 : 0;
           
-          // Remove seleção anterior
           this.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selecionado'));
           this.classList.add('selecionado');
           
           respostas[artista] = respostas[artista] || {};
           respostas[artista][tipo] = valor;
           
-          // Verifica se todas as perguntas foram respondidas
           const todasRespondidas = container.querySelectorAll('.pergunta').length === Object.keys(respostas).length;
           document.getElementById('btnSalvarAjuste').disabled = !todasRespondidas;
         });
@@ -3867,7 +3512,7 @@
         const respostasArray = Object.keys(respostas).map(artista => ({
           artista: artista,
           preferido: respostas[artista].preferido || 0,
-          ainda_ouve: 1 // Por enquanto, assume que ainda ouve
+          ainda_ouve: 1
         }));
         
         fetch(API_URL + '/ajuste_fino?user_id=' + usuarioId, {
@@ -4027,7 +3672,6 @@
             status.textContent = '✅ ' + d.mensagem;
             status.className = 'upload-status success';
             
-            // Verifica se precisa de ajuste fino
             if (d.ajuste_necessario && d.artistas_para_ajuste) {
               mostrarAjusteFino(d.artistas_para_ajuste);
             } else {
@@ -4060,13 +3704,6 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
-    });
-
-    // Enter na busca de artista
-    document.getElementById('buscaArtistaInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('btnBuscarArtista').click();
-      }
     });
 
     // ================================================================

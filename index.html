@@ -2966,7 +2966,26 @@
           return;
         }
         
-        // Se for array de objetos com informações das edições
+        // Só mostra dropdown se tiver MAIS DE 1 edição
+        if (edicoes.length <= 1) {
+          return;
+        }
+        
+        // Verifica se as edições são realmente diferentes
+        const unicas = [];
+        const seen = new Set();
+        edicoes.forEach(ed => {
+          const key = `${ed.artista || ''}|${ed.album || ''}|${ed.formato || ''}|${ed.ano || ''}|${ed.edicao || ''}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            unicas.push(ed);
+          }
+        });
+        
+        if (unicas.length <= 1) {
+          return;
+        }
+        
         let html = `
           <div class="form-group">
             <label>📀 Edição</label>
@@ -2974,11 +2993,12 @@
               <option value="">Selecione uma edição...</option>
         `;
         
-        edicoes.forEach((ed, index) => {
+        unicas.forEach((ed, index) => {
           const label = ed.edicao || ed.titulo_original || `Edição ${index + 1}`;
           const detalhes = [];
           if (ed.formato) detalhes.push(ed.formato);
           if (ed.ano) detalhes.push(ed.ano);
+          if (ed.pais) detalhes.push(ed.pais);
           const descricao = detalhes.length > 0 ? ` (${detalhes.join(', ')})` : '';
           html += `<option value="${index}">${label}${descricao}</option>`;
         });
@@ -2989,15 +3009,6 @@
           `;
         
         container.innerHTML = html;
-        
-        // Se tiver opções globais e for a primeira vez, seleciona a primeira
-        if (opcoesGlobais && opcoesGlobais.length > 0) {
-          const select = document.getElementById('campo-edicao');
-          if (select) {
-            select.value = '0';
-            selecionarEdicao('0');
-          }
-        }
         
       } catch (e) {
         console.warn('Erro ao carregar edições:', e);
@@ -3121,7 +3132,17 @@
       let edicoesJson = '';
       
       if (opcoesGlobais && opcoesGlobais.length > 0) {
-        edicoesJson = JSON.stringify(opcoesGlobais);
+        // Filtra edições únicas
+        const unicas = [];
+        const seen = new Set();
+        opcoesGlobais.forEach(ed => {
+          const key = `${ed.artista || ''}|${ed.album || ''}|${ed.formato || ''}|${ed.ano || ''}|${ed.edicao || ''}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            unicas.push(ed);
+          }
+        });
+        edicoesJson = JSON.stringify(unicas);
       }
       
       const dados = {
@@ -3485,10 +3506,22 @@
             document.getElementById('campo-notas').value = d.titulo_original || '';
             document.getElementById('campo-capa-url').value = d.capa || '';
             
-            // CARREGA AS EDIÇÕES ENCONTRADAS
-            if (data.opcoes.length > 1) {
-              carregarEdicoes(JSON.stringify(data.opcoes));
-              document.getElementById('form-msg').textContent = `✅ ${data.opcoes.length} edições encontradas. Escolha no dropdown.`;
+            // === SÓ MOSTRA DROPDOWN SE TIVER MAIS DE 1 EDIÇÃO ÚNICA ===
+            // Filtra edições únicas
+            const unicas = [];
+            const seen = new Set();
+            data.opcoes.forEach(ed => {
+              const key = `${ed.artista || ''}|${ed.album || ''}|${ed.formato || ''}|${ed.ano || ''}|${ed.edicao || ''}`;
+              if (!seen.has(key)) {
+                seen.add(key);
+                unicas.push(ed);
+              }
+            });
+            
+            if (unicas.length > 1) {
+              opcoesGlobais = unicas;
+              carregarEdicoes(JSON.stringify(unicas));
+              document.getElementById('form-msg').textContent = `✅ ${unicas.length} edições encontradas. Escolha no dropdown.`;
               document.getElementById('form-msg').className = 'form-msg success';
             } else {
               // Limpa o container se só tem uma edição

@@ -1794,6 +1794,10 @@
           </div>
           <input type="hidden" id="campo-capa-url" value="">
         </div>
+
+        <!-- ===== CONTAINER DE EDIÇÕES - CORRIGIDO ===== -->
+        <div id="edicoes-container" style="margin-top: 8px;"></div>
+
         <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
         <div class="form-msg" id="form-msg"></div>
       </form>
@@ -2931,7 +2935,7 @@
     });
 
     // ================================================================
-    // MODAL: ADICIONAR / EDITAR DISCO (COM DROPDOWN DE EDIÇÕES)
+    // MODAL: ADICIONAR / EDITAR DISCO (COM DROPDOWN DE EDIÇÕES - CORRIGIDO)
     // ================================================================
     const modal = document.getElementById('modalAdicionar');
     const btnAbrirModal = document.getElementById('btnAbrirModal');
@@ -2939,12 +2943,108 @@
     const formAdicionar = document.getElementById('form-adicionar');
     const btnSubmit = document.getElementById('btn-submit');
 
+    // ================================================================
+    // CARREGAR EDIÇÕES - FUNÇÃO CORRIGIDA
+    // ================================================================
+    function carregarEdicoes(edicoesJson) {
+      const container = document.getElementById('edicoes-container');
+      if (!container) {
+        console.warn('Container edicoes-container não encontrado');
+        return;
+      }
+      
+      // Limpa o container
+      container.innerHTML = '';
+      
+      if (!edicoesJson) {
+        return;
+      }
+      
+      try {
+        const edicoes = JSON.parse(edicoesJson);
+        if (!edicoes || edicoes.length === 0) {
+          return;
+        }
+        
+        // Se for array de objetos com informações das edições
+        let html = `
+          <div class="form-group">
+            <label>📀 Edição</label>
+            <select id="campo-edicao" onchange="selecionarEdicao(this.value)">
+              <option value="">Selecione uma edição...</option>
+        `;
+        
+        edicoes.forEach((ed, index) => {
+          const label = ed.edicao || ed.titulo_original || `Edição ${index + 1}`;
+          const detalhes = [];
+          if (ed.formato) detalhes.push(ed.formato);
+          if (ed.ano) detalhes.push(ed.ano);
+          const descricao = detalhes.length > 0 ? ` (${detalhes.join(', ')})` : '';
+          html += `<option value="${index}">${label}${descricao}</option>`;
+        });
+        
+        html += `
+              </select>
+            </div>
+          `;
+        
+        container.innerHTML = html;
+        
+        // Se tiver opções globais e for a primeira vez, seleciona a primeira
+        if (opcoesGlobais && opcoesGlobais.length > 0) {
+          const select = document.getElementById('campo-edicao');
+          if (select) {
+            select.value = '0';
+            selecionarEdicao('0');
+          }
+        }
+        
+      } catch (e) {
+        console.warn('Erro ao carregar edições:', e);
+        container.innerHTML = '';
+      }
+    }
+
+    // ================================================================
+    // SELECIONAR EDIÇÃO
+    // ================================================================
+    function selecionarEdicao(index) {
+      if (!opcoesGlobais || !opcoesGlobais[index]) return;
+      
+      const d = opcoesGlobais[index];
+      document.getElementById('campo-artista').value = d.artista || '';
+      document.getElementById('campo-album').value = d.album || '';
+      if (d.formato) {
+        const opts = document.getElementById('campo-formato').options;
+        for (let opt of opts) {
+          if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
+            document.getElementById('campo-formato').value = opt.value;
+            break;
+          }
+        }
+      }
+      if (d.ano) {
+        document.getElementById('campo-data').value = d.ano + '-01-01';
+      }
+      document.getElementById('campo-notas').value = d.titulo_original || '';
+      document.getElementById('campo-capa-url').value = d.capa || '';
+      document.getElementById('form-msg').textContent = '✅ Edição selecionada!';
+      document.getElementById('form-msg').className = 'form-msg success';
+    }
+
+    // ================================================================
+    // ABRIR MODAL - CORRIGIDO
+    // ================================================================
     function abrirModal(discoId = null) {
       editandoId = discoId;
       document.getElementById('campo-id').value = discoId || '';
       document.getElementById('form-msg').textContent = '';
       document.getElementById('form-msg').className = 'form-msg';
       btnSubmit.disabled = false;
+
+      // Limpa o container de edições
+      const container = document.getElementById('edicoes-container');
+      if (container) container.innerHTML = '';
 
       if (discoId) {
         document.getElementById('modalTitle').textContent = '✏️ Editar Disco';
@@ -2961,7 +3061,11 @@
           document.getElementById('campo-notas').value = disco.notas || '';
           document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
           document.getElementById('campo-capa-url').value = disco.capa_url || '';
-          carregarEdicoes(disco.edicoes || '');
+          
+          // CARREGA AS EDIÇÕES
+          if (disco.edicoes) {
+            carregarEdicoes(disco.edicoes);
+          }
         }
       } else {
         document.getElementById('modalTitle').textContent = '➕ Adicionar Disco';
@@ -2987,69 +3091,6 @@
     }
     window.abrirModal = abrirModal;
 
-    function carregarEdicoes(edicoesJson) {
-      const container = document.getElementById('edicoes-container');
-      if (!container) return;
-      
-      if (!edicoesJson) {
-        container.innerHTML = '';
-        return;
-      }
-      
-      try {
-        const edicoes = JSON.parse(edicoesJson);
-        if (!edicoes || edicoes.length === 0) {
-          container.innerHTML = '';
-          return;
-        }
-        
-        let html = `
-          <div class="form-group">
-            <label>Edição</label>
-            <select id="campo-edicao" onchange="selecionarEdicao(this.value)">
-              <option value="">Selecione uma edição</option>
-        `;
-        
-        edicoes.forEach((ed, index) => {
-          const label = ed.edicao || ed.titulo_original || `Edição ${index + 1}`;
-          html += `<option value="${index}">${label}</option>`;
-        });
-        
-        html += `
-            </select>
-          </div>
-        `;
-        
-        container.innerHTML = html;
-      } catch (e) {
-        container.innerHTML = '';
-      }
-    }
-
-    function selecionarEdicao(index) {
-      if (!opcoesGlobais || !opcoesGlobais[index]) return;
-      
-      const d = opcoesGlobais[index];
-      document.getElementById('campo-artista').value = d.artista || '';
-      document.getElementById('campo-album').value = d.album || '';
-      if (d.formato) {
-        const opts = document.getElementById('campo-formato').options;
-        for (let opt of opts) {
-          if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
-            document.getElementById('campo-formato').value = opt.value;
-            break;
-          }
-        }
-      }
-      if (d.ano) {
-        document.getElementById('campo-data').value = d.ano + '-01-01';
-      }
-      document.getElementById('campo-notas').value = d.titulo_original || '';
-      document.getElementById('campo-capa-url').value = d.capa || '';
-      document.getElementById('form-msg').textContent = '✅ Edição selecionada!';
-      document.getElementById('form-msg').className = 'form-msg success';
-    }
-
     function fecharModal() {
       modal.classList.remove('open');
       if (barcodeScanner) {
@@ -3064,7 +3105,7 @@
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharModal(); });
 
     // ================================================================
-    // FORM: ADICIONAR / EDITAR DISCO (COM EDIÇÕES)
+    // FORM: ADICIONAR / EDITAR DISCO
     // ================================================================
     formAdicionar.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -3346,7 +3387,7 @@
     });
 
     // ================================================================
-    // SCANNER EM TELA CHEIA + SELETOR DE CAPAS (SALVA EDIÇÕES)
+    // SCANNER EM TELA CHEIA
     // ================================================================
     let scannerFullscreenInstance = null;
     const scannerFullscreen = document.getElementById('scannerFullscreen');
@@ -3416,7 +3457,7 @@
     });
 
     // ================================================================
-    // BUSCAR DISCO POR CÓDIGO DE BARRAS (SALVA EDIÇÕES)
+    // BUSCAR DISCO POR CÓDIGO DE BARRAS - CORRIGIDO
     // ================================================================
     function buscarDiscoPorCodigo(codigo) {
       if (!codigo || codigo.length < 8) return;
@@ -3444,11 +3485,15 @@
             document.getElementById('campo-notas').value = d.titulo_original || '';
             document.getElementById('campo-capa-url').value = d.capa || '';
             
+            // CARREGA AS EDIÇÕES ENCONTRADAS
             if (data.opcoes.length > 1) {
               carregarEdicoes(JSON.stringify(data.opcoes));
               document.getElementById('form-msg').textContent = `✅ ${data.opcoes.length} edições encontradas. Escolha no dropdown.`;
               document.getElementById('form-msg').className = 'form-msg success';
             } else {
+              // Limpa o container se só tem uma edição
+              const container = document.getElementById('edicoes-container');
+              if (container) container.innerHTML = '';
               document.getElementById('form-msg').textContent = '✅ Dados preenchidos!';
               document.getElementById('form-msg').className = 'form-msg success';
             }

@@ -1514,6 +1514,7 @@
   </style>
 </head>
 <body>
+  <body>
   <!-- ===== LOGIN ===== -->
   <div id="loginScreen" class="login-container">
     <div class="login-box">
@@ -2930,7 +2931,7 @@
     });
 
     // ================================================================
-    // MODAL: ADICIONAR / EDITAR DISCO
+    // MODAL: ADICIONAR / EDITAR DISCO (COM DROPDOWN DE EDIÇÕES)
     // ================================================================
     const modal = document.getElementById('modalAdicionar');
     const btnAbrirModal = document.getElementById('btnAbrirModal');
@@ -2960,6 +2961,7 @@
           document.getElementById('campo-notas').value = disco.notas || '';
           document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
           document.getElementById('campo-capa-url').value = disco.capa_url || '';
+          carregarEdicoes(disco.edicoes || '');
         }
       } else {
         document.getElementById('modalTitle').textContent = '➕ Adicionar Disco';
@@ -2974,6 +2976,7 @@
         document.getElementById('campo-notas').value = '';
         document.getElementById('campo-codigo-barras').value = '';
         document.getElementById('campo-capa-url').value = '';
+        carregarEdicoes('');
       }
 
       modal.classList.add('open');
@@ -2983,6 +2986,69 @@
       }
     }
     window.abrirModal = abrirModal;
+
+    function carregarEdicoes(edicoesJson) {
+      const container = document.getElementById('edicoes-container');
+      if (!container) return;
+      
+      if (!edicoesJson) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      try {
+        const edicoes = JSON.parse(edicoesJson);
+        if (!edicoes || edicoes.length === 0) {
+          container.innerHTML = '';
+          return;
+        }
+        
+        let html = `
+          <div class="form-group">
+            <label>Edição</label>
+            <select id="campo-edicao" onchange="selecionarEdicao(this.value)">
+              <option value="">Selecione uma edição</option>
+        `;
+        
+        edicoes.forEach((ed, index) => {
+          const label = ed.edicao || ed.titulo_original || `Edição ${index + 1}`;
+          html += `<option value="${index}">${label}</option>`;
+        });
+        
+        html += `
+            </select>
+          </div>
+        `;
+        
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = '';
+      }
+    }
+
+    function selecionarEdicao(index) {
+      if (!opcoesGlobais || !opcoesGlobais[index]) return;
+      
+      const d = opcoesGlobais[index];
+      document.getElementById('campo-artista').value = d.artista || '';
+      document.getElementById('campo-album').value = d.album || '';
+      if (d.formato) {
+        const opts = document.getElementById('campo-formato').options;
+        for (let opt of opts) {
+          if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
+            document.getElementById('campo-formato').value = opt.value;
+            break;
+          }
+        }
+      }
+      if (d.ano) {
+        document.getElementById('campo-data').value = d.ano + '-01-01';
+      }
+      document.getElementById('campo-notas').value = d.titulo_original || '';
+      document.getElementById('campo-capa-url').value = d.capa || '';
+      document.getElementById('form-msg').textContent = '✅ Edição selecionada!';
+      document.getElementById('form-msg').className = 'form-msg success';
+    }
 
     function fecharModal() {
       modal.classList.remove('open');
@@ -2998,7 +3064,7 @@
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharModal(); });
 
     // ================================================================
-    // FORM: ADICIONAR / EDITAR DISCO
+    // FORM: ADICIONAR / EDITAR DISCO (COM EDIÇÕES)
     // ================================================================
     formAdicionar.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -3009,6 +3075,14 @@
       msg.className = 'form-msg';
 
       const id = document.getElementById('campo-id').value;
+      const edicaoSelect = document.getElementById('campo-edicao');
+      const edicaoIndex = edicaoSelect ? parseInt(edicaoSelect.value) : -1;
+      let edicoesJson = '';
+      
+      if (opcoesGlobais && opcoesGlobais.length > 0) {
+        edicoesJson = JSON.stringify(opcoesGlobais);
+      }
+      
       const dados = {
         artista: document.getElementById('campo-artista').value.trim(),
         album: document.getElementById('campo-album').value.trim(),
@@ -3019,7 +3093,8 @@
         data_adicao: document.getElementById('campo-data').value || null,
         notas: document.getElementById('campo-notas').value.trim(),
         codigo_barras: document.getElementById('campo-codigo-barras').value.trim(),
-        capa_url: document.getElementById('campo-capa-url').value.trim()
+        capa_url: document.getElementById('campo-capa-url').value.trim(),
+        edicoes: edicoesJson
       };
 
       if (!dados.artista || !dados.album) {
@@ -3050,6 +3125,7 @@
             msg.className = 'form-msg success';
             carregarDados();
             formAdicionar.reset();
+            opcoesGlobais = [];
             setTimeout(fecharModal, 1000);
           } else {
             msg.textContent = '❌ ' + (resultado.erro || 'Erro ao salvar');
@@ -3270,7 +3346,7 @@
     });
 
     // ================================================================
-    // SCANNER EM TELA CHEIA + SELETOR DE CAPAS
+    // SCANNER EM TELA CHEIA + SELETOR DE CAPAS (SALVA EDIÇÕES)
     // ================================================================
     let scannerFullscreenInstance = null;
     const scannerFullscreen = document.getElementById('scannerFullscreen');
@@ -3340,7 +3416,7 @@
     });
 
     // ================================================================
-    // BUSCAR DISCO POR CÓDIGO DE BARRAS + SELETOR DE CAPAS (CORRIGIDO)
+    // BUSCAR DISCO POR CÓDIGO DE BARRAS (SALVA EDIÇÕES)
     // ================================================================
     function buscarDiscoPorCodigo(codigo) {
       if (!codigo || codigo.length < 8) return;
@@ -3350,10 +3426,31 @@
         .then(data => {
           if (data.sucesso && data.opcoes && data.opcoes.length > 0) {
             opcoesGlobais = data.opcoes;
-            if (data.opcoes.length === 1) {
-              preencherDadosDisco(data.opcoes[0]);
+            const d = data.opcoes[0];
+            document.getElementById('campo-artista').value = d.artista || '';
+            document.getElementById('campo-album').value = d.album || '';
+            if (d.formato) {
+              const opts = document.getElementById('campo-formato').options;
+              for (let opt of opts) {
+                if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
+                  document.getElementById('campo-formato').value = opt.value;
+                  break;
+                }
+              }
+            }
+            if (d.ano) {
+              document.getElementById('campo-data').value = d.ano + '-01-01';
+            }
+            document.getElementById('campo-notas').value = d.titulo_original || '';
+            document.getElementById('campo-capa-url').value = d.capa || '';
+            
+            if (data.opcoes.length > 1) {
+              carregarEdicoes(JSON.stringify(data.opcoes));
+              document.getElementById('form-msg').textContent = `✅ ${data.opcoes.length} edições encontradas. Escolha no dropdown.`;
+              document.getElementById('form-msg').className = 'form-msg success';
             } else {
-              mostrarOpcoesCapas(data.opcoes);
+              document.getElementById('form-msg').textContent = '✅ Dados preenchidos!';
+              document.getElementById('form-msg').className = 'form-msg success';
             }
           } else {
             document.getElementById('form-msg').textContent = '⚠️ Código lido, mas não encontramos dados. Preencha manualmente.';
@@ -3364,90 +3461,6 @@
           document.getElementById('form-msg').textContent = '⚠️ Erro ao buscar dados. Preencha manualmente.';
           document.getElementById('form-msg').className = 'form-msg error';
         });
-    }
-
-    function preencherDadosDisco(d) {
-      document.getElementById('campo-artista').value = d.artista || '';
-      document.getElementById('campo-album').value = d.album || '';
-      if (d.formato) {
-        const opts = document.getElementById('campo-formato').options;
-        for (let opt of opts) {
-          if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
-            document.getElementById('campo-formato').value = opt.value;
-            break;
-          }
-        }
-      }
-      if (d.ano) {
-        document.getElementById('campo-data').value = d.ano + '-01-01';
-      }
-      document.getElementById('campo-notas').value = d.titulo_original || '';
-      document.getElementById('campo-capa-url').value = d.capa || '';
-      document.getElementById('form-msg').textContent = '✅ Dados preenchidos!';
-      document.getElementById('form-msg').className = 'form-msg success';
-    }
-
-    function mostrarOpcoesCapas(opcoes) {
-      if (!opcoes || opcoes.length === 0) return;
-      
-      let html = `
-        <div class="modal-overlay open" id="modalCapas">
-          <div class="modal" style="max-width:600px;">
-            <div class="modal-header">
-              <h2>🎨 Escolha a edição</h2>
-              <button class="modal-close" onclick="fecharModalCapas()">✕</button>
-            </div>
-            <p style="opacity:0.6; margin-bottom:16px;">Encontramos ${opcoes.length} edições para este código de barras:</p>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-height:400px; overflow-y:auto;">
-      `;
-      
-      opcoes.forEach((opcao, index) => {
-        const capaUrl = opcao.capa || '';
-        html += `
-          <div onclick="selecionarCapa(${index})" style="
-            background: var(--card);
-            border: 2px solid var(--card-line);
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-          " onmouseover="this.style.borderColor='var(--s-color)'" onmouseout="this.style.borderColor='var(--card-line)'">
-            ${capaUrl ? `<img src="${capaUrl}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:8px;" onerror="this.style.display='none'" />` : `<div style="width:100%; height:150px; background:var(--ink); border-radius:4px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; color:var(--paper); opacity:0.4;">Sem capa</div>`}
-            <div style="font-size:12px; font-weight:600;">${opcao.album || 'Álbum'}</div>
-            <div style="font-size:11px; opacity:0.5;">${opcao.artista || 'Artista'}</div>
-            ${opcao.edicao ? `<div style="font-size:10px; opacity:0.4; margin-top:4px;">${opcao.edicao}</div>` : ''}
-            ${opcao.ano ? `<div style="font-size:10px; opacity:0.3; margin-top:2px;">${opcao.ano}</div>` : ''}
-          </div>
-        `;
-      });
-      
-      html += `
-            </div>
-            <div style="display:flex; gap:12px; margin-top:16px;">
-              <button class="btn-confirm-cancel" onclick="fecharModalCapas()" style="flex:1;">Cancelar</button>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      const oldModal = document.getElementById('modalCapas');
-      if (oldModal) oldModal.remove();
-      document.body.insertAdjacentHTML('beforeend', html);
-    }
-
-    function fecharModalCapas() {
-      const modal = document.getElementById('modalCapas');
-      if (modal) modal.remove();
-    }
-
-    function selecionarCapa(index) {
-      if (opcoesGlobais && opcoesGlobais[index]) {
-        preencherDadosDisco(opcoesGlobais[index]);
-        fecharModalCapas();
-      } else {
-        alert('Erro: dados não encontrados. Tente ler o código novamente.');
-      }
     }
 
     // ================================================================

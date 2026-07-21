@@ -398,6 +398,17 @@
       white-space: normal;
       line-height: 1.4;
     }
+    .estrategia-text {
+      font-size: 13px;
+      color: var(--paper);
+      opacity: 0.85;
+      padding: 6px 0 0 0;
+      margin-top: 4px;
+      border-top: 1px dashed var(--card-line);
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.4;
+    }
     .barcode-btn {
       background: var(--s-color);
       color: var(--ink);
@@ -2733,7 +2744,7 @@
     }
 
     // ================================================================
-    // RECOMENDAÇÕES (COM FRASE SIMPLIFICADA E SEM LABEL ESTRATÉGIA)
+    // RECOMENDAÇÕES - CORRIGIDO COM ESTRATÉGIA ALINHADA
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
@@ -2813,9 +2824,7 @@
                   <h3>${item.album || 'Álbum'}</h3>
                   <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
                   <div class="wishlist-phrase">${frase}</div>
-                  <div class="meta-row">
-                    <span class="val">${item.estrategia || ''}</span>
-                  </div>
+                  <div class="estrategia-text">${item.estrategia || ''}</div>
                   <div class="card-actions">
                     <button class="btn-icon btn-tier" onclick="abrirEditTier('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}', '${item.tier || 'A'}')" title="Editar Tier">✎</button>
                     <button class="btn-icon btn-move" onclick="marcarComoTenho('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')" title="Já tenho">✓</button>

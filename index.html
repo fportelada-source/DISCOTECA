@@ -1791,6 +1791,7 @@
             <input type="text" id="campo-codigo-barras" placeholder="Ex: 042284834181" style="flex:1;">
             <button type="button" class="barcode-btn" id="btnBarcode">📷 Ler</button>
           </div>
+          <input type="hidden" id="campo-capa-url" value="">
         </div>
         <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
         <div class="form-msg" id="form-msg"></div>
@@ -2744,7 +2745,7 @@
     }
 
     // ================================================================
-    // RECOMENDAÇÕES - CORRIGIDO COM ESTRATÉGIA ALINHADA
+    // RECOMENDAÇÕES
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
@@ -2957,6 +2958,7 @@
           document.getElementById('campo-data').value = disco.data_adicao || '';
           document.getElementById('campo-notas').value = disco.notas || '';
           document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
+          document.getElementById('campo-capa-url').value = disco.capa_url || '';
         }
       } else {
         document.getElementById('modalTitle').textContent = '➕ Adicionar Disco';
@@ -2970,6 +2972,7 @@
         document.getElementById('campo-data').value = '';
         document.getElementById('campo-notas').value = '';
         document.getElementById('campo-codigo-barras').value = '';
+        document.getElementById('campo-capa-url').value = '';
       }
 
       modal.classList.add('open');
@@ -3014,7 +3017,8 @@
         preco: parseFloat(document.getElementById('campo-preco').value) || null,
         data_adicao: document.getElementById('campo-data').value || null,
         notas: document.getElementById('campo-notas').value.trim(),
-        codigo_barras: document.getElementById('campo-codigo-barras').value.trim()
+        codigo_barras: document.getElementById('campo-codigo-barras').value.trim(),
+        capa_url: document.getElementById('campo-capa-url').value.trim()
       };
 
       if (!dados.artista || !dados.album) {
@@ -3334,13 +3338,110 @@
       abrirScannerFullscreen();
     });
 
+    // ================================================================
+    // BUSCAR DISCO POR CÓDIGO DE BARRAS + SELETOR DE CAPAS
+    // ================================================================
     function buscarDiscoPorCodigo(codigo) {
       if (!codigo || codigo.length < 8) return;
+      
       fetch(API_URL + `/buscar_por_codigo_barras?codigo=${codigo}&user_id=${usuarioId}`)
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.opcoes && data.opcoes.length > 0) {
-            const d = data.opcoes[0];
+            if (data.opcoes.length === 1) {
+              const d = data.opcoes[0];
+              document.getElementById('campo-artista').value = d.artista || '';
+              document.getElementById('campo-album').value = d.album || '';
+              if (d.formato) {
+                const opts = document.getElementById('campo-formato').options;
+                for (let opt of opts) {
+                  if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
+                    document.getElementById('campo-formato').value = opt.value;
+                    break;
+                  }
+                }
+              }
+              if (d.ano) {
+                document.getElementById('campo-data').value = d.ano + '-01-01';
+              }
+              document.getElementById('campo-notas').value = d.titulo_original || '';
+              document.getElementById('campo-capa-url').value = d.capa || '';
+              document.getElementById('form-msg').textContent = '✅ Dados preenchidos automaticamente!';
+              document.getElementById('form-msg').className = 'form-msg success';
+            } else {
+              mostrarOpcoesCapas(data.opcoes);
+            }
+          } else {
+            document.getElementById('form-msg').textContent = '⚠️ Código lido, mas não encontramos dados. Preencha manualmente.';
+            document.getElementById('form-msg').className = 'form-msg error';
+          }
+        })
+        .catch(() => {
+          document.getElementById('form-msg').textContent = '⚠️ Erro ao buscar dados. Preencha manualmente.';
+          document.getElementById('form-msg').className = 'form-msg error';
+        });
+    }
+
+    function mostrarOpcoesCapas(opcoes) {
+      if (!opcoes || opcoes.length === 0) return;
+      
+      let html = `
+        <div class="modal-overlay open" id="modalCapas">
+          <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+              <h2>🎨 Escolha a edição</h2>
+              <button class="modal-close" onclick="fecharModalCapas()">✕</button>
+            </div>
+            <p style="opacity:0.6; margin-bottom:16px;">Encontramos ${opcoes.length} edições para este código de barras:</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-height:400px; overflow-y:auto;">
+      `;
+      
+      opcoes.forEach((opcao, index) => {
+        html += `
+          <div onclick="selecionarCapa(${index})" style="
+            background: var(--card);
+            border: 2px solid var(--card-line);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+          " onmouseover="this.style.borderColor='var(--s-color)'" onmouseout="this.style.borderColor='var(--card-line)'">
+            ${opcao.capa ? `<img src="${opcao.capa}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:8px;" />` : `<div style="width:100%; height:150px; background:var(--ink); border-radius:4px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; color:var(--paper); opacity:0.4;">Sem capa</div>`}
+            <div style="font-size:12px; font-weight:600;">${opcao.album || 'Álbum'}</div>
+            <div style="font-size:11px; opacity:0.5;">${opcao.artista || 'Artista'}</div>
+            ${opcao.edicao ? `<div style="font-size:10px; opacity:0.4; margin-top:4px;">${opcao.edicao}</div>` : ''}
+            ${opcao.ano ? `<div style="font-size:10px; opacity:0.3; margin-top:2px;">${opcao.ano}</div>` : ''}
+          </div>
+        `;
+      });
+      
+      html += `
+            </div>
+            <div style="display:flex; gap:12px; margin-top:16px;">
+              <button class="btn-confirm-cancel" onclick="fecharModalCapas()" style="flex:1;">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      const oldModal = document.getElementById('modalCapas');
+      if (oldModal) oldModal.remove();
+      document.body.insertAdjacentHTML('beforeend', html);
+    }
+
+    function fecharModalCapas() {
+      const modal = document.getElementById('modalCapas');
+      if (modal) modal.remove();
+    }
+
+    function selecionarCapa(index) {
+      const codigo = document.getElementById('campo-codigo-barras').value;
+      fetch(API_URL + `/buscar_por_codigo_barras?codigo=${codigo}&user_id=${usuarioId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.sucesso && data.opcoes && data.opcoes[index]) {
+            const d = data.opcoes[index];
             document.getElementById('campo-artista').value = d.artista || '';
             document.getElementById('campo-album').value = d.album || '';
             if (d.formato) {
@@ -3356,16 +3457,15 @@
               document.getElementById('campo-data').value = d.ano + '-01-01';
             }
             document.getElementById('campo-notas').value = d.titulo_original || '';
-            document.getElementById('form-msg').textContent = '✅ Dados preenchidos automaticamente!';
+            document.getElementById('campo-capa-url').value = d.capa || '';
+            document.getElementById('form-msg').textContent = '✅ Edição selecionada!';
             document.getElementById('form-msg').className = 'form-msg success';
-          } else {
-            document.getElementById('form-msg').textContent = '⚠️ Código lido, mas não encontramos dados. Preencha manualmente.';
-            document.getElementById('form-msg').className = 'form-msg error';
           }
+          fecharModalCapas();
         })
         .catch(() => {
-          document.getElementById('form-msg').textContent = '⚠️ Erro ao buscar dados. Preencha manualmente.';
-          document.getElementById('form-msg').className = 'form-msg error';
+          fecharModalCapas();
+          alert('Erro ao selecionar a edição. Tente novamente.');
         });
     }
 

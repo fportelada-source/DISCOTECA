@@ -1888,7 +1888,6 @@
     let groupPreference = localStorage.getItem('discoteca_group') || 'separado';
     let colecaoFiltrada = [];
     let confirmCallback = null;
-    let ajusteFinoData = null;
 
     // ================================================================
     // LOGIN
@@ -3332,6 +3331,7 @@
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.opcoes && data.opcoes.length > 0) {
+            // Mostra a primeira opção (a mais relevante)
             const d = data.opcoes[0];
             document.getElementById('campo-artista').value = d.artista || '';
             document.getElementById('campo-album').value = d.album || '';
@@ -3347,7 +3347,7 @@
             if (d.ano) {
               document.getElementById('campo-data').value = d.ano + '-01-01';
             }
-            document.getElementById('campo-notas').value = (d.gravadora ? 'Gravadora: ' + d.gravadora : '') + (d.edicao ? ' | Edição: ' + d.edicao : '');
+            document.getElementById('campo-notas').value = d.titulo_original || '';
             document.getElementById('form-msg').textContent = '✅ Dados preenchidos automaticamente!';
             document.getElementById('form-msg').className = 'form-msg success';
           } else {

@@ -1900,6 +1900,7 @@
     let groupPreference = localStorage.getItem('discoteca_group') || 'separado';
     let colecaoFiltrada = [];
     let confirmCallback = null;
+    let opcoesGlobais = [];
 
     // ================================================================
     // LOGIN
@@ -3269,7 +3270,7 @@
     });
 
     // ================================================================
-    // SCANNER EM TELA CHEIA
+    // SCANNER EM TELA CHEIA + SELETOR DE CAPAS
     // ================================================================
     let scannerFullscreenInstance = null;
     const scannerFullscreen = document.getElementById('scannerFullscreen');
@@ -3339,7 +3340,7 @@
     });
 
     // ================================================================
-    // BUSCAR DISCO POR CÓDIGO DE BARRAS + SELETOR DE CAPAS
+    // BUSCAR DISCO POR CÓDIGO DE BARRAS + SELETOR DE CAPAS (CORRIGIDO)
     // ================================================================
     function buscarDiscoPorCodigo(codigo) {
       if (!codigo || codigo.length < 8) return;
@@ -3348,26 +3349,9 @@
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.opcoes && data.opcoes.length > 0) {
+            opcoesGlobais = data.opcoes;
             if (data.opcoes.length === 1) {
-              const d = data.opcoes[0];
-              document.getElementById('campo-artista').value = d.artista || '';
-              document.getElementById('campo-album').value = d.album || '';
-              if (d.formato) {
-                const opts = document.getElementById('campo-formato').options;
-                for (let opt of opts) {
-                  if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
-                    document.getElementById('campo-formato').value = opt.value;
-                    break;
-                  }
-                }
-              }
-              if (d.ano) {
-                document.getElementById('campo-data').value = d.ano + '-01-01';
-              }
-              document.getElementById('campo-notas').value = d.titulo_original || '';
-              document.getElementById('campo-capa-url').value = d.capa || '';
-              document.getElementById('form-msg').textContent = '✅ Dados preenchidos automaticamente!';
-              document.getElementById('form-msg').className = 'form-msg success';
+              preencherDadosDisco(data.opcoes[0]);
             } else {
               mostrarOpcoesCapas(data.opcoes);
             }
@@ -3380,6 +3364,27 @@
           document.getElementById('form-msg').textContent = '⚠️ Erro ao buscar dados. Preencha manualmente.';
           document.getElementById('form-msg').className = 'form-msg error';
         });
+    }
+
+    function preencherDadosDisco(d) {
+      document.getElementById('campo-artista').value = d.artista || '';
+      document.getElementById('campo-album').value = d.album || '';
+      if (d.formato) {
+        const opts = document.getElementById('campo-formato').options;
+        for (let opt of opts) {
+          if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
+            document.getElementById('campo-formato').value = opt.value;
+            break;
+          }
+        }
+      }
+      if (d.ano) {
+        document.getElementById('campo-data').value = d.ano + '-01-01';
+      }
+      document.getElementById('campo-notas').value = d.titulo_original || '';
+      document.getElementById('campo-capa-url').value = d.capa || '';
+      document.getElementById('form-msg').textContent = '✅ Dados preenchidos!';
+      document.getElementById('form-msg').className = 'form-msg success';
     }
 
     function mostrarOpcoesCapas(opcoes) {
@@ -3397,6 +3402,7 @@
       `;
       
       opcoes.forEach((opcao, index) => {
+        const capaUrl = opcao.capa || '';
         html += `
           <div onclick="selecionarCapa(${index})" style="
             background: var(--card);
@@ -3407,7 +3413,7 @@
             transition: 0.2s;
             text-align: center;
           " onmouseover="this.style.borderColor='var(--s-color)'" onmouseout="this.style.borderColor='var(--card-line)'">
-            ${opcao.capa ? `<img src="${opcao.capa}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:8px;" />` : `<div style="width:100%; height:150px; background:var(--ink); border-radius:4px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; color:var(--paper); opacity:0.4;">Sem capa</div>`}
+            ${capaUrl ? `<img src="${capaUrl}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:8px;" onerror="this.style.display='none'" />` : `<div style="width:100%; height:150px; background:var(--ink); border-radius:4px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; color:var(--paper); opacity:0.4;">Sem capa</div>`}
             <div style="font-size:12px; font-weight:600;">${opcao.album || 'Álbum'}</div>
             <div style="font-size:11px; opacity:0.5;">${opcao.artista || 'Artista'}</div>
             ${opcao.edicao ? `<div style="font-size:10px; opacity:0.4; margin-top:4px;">${opcao.edicao}</div>` : ''}
@@ -3436,37 +3442,12 @@
     }
 
     function selecionarCapa(index) {
-      const codigo = document.getElementById('campo-codigo-barras').value;
-      fetch(API_URL + `/buscar_por_codigo_barras?codigo=${codigo}&user_id=${usuarioId}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data.sucesso && data.opcoes && data.opcoes[index]) {
-            const d = data.opcoes[index];
-            document.getElementById('campo-artista').value = d.artista || '';
-            document.getElementById('campo-album').value = d.album || '';
-            if (d.formato) {
-              const opts = document.getElementById('campo-formato').options;
-              for (let opt of opts) {
-                if (opt.value && d.formato.toLowerCase().includes(opt.value.toLowerCase())) {
-                  document.getElementById('campo-formato').value = opt.value;
-                  break;
-                }
-              }
-            }
-            if (d.ano) {
-              document.getElementById('campo-data').value = d.ano + '-01-01';
-            }
-            document.getElementById('campo-notas').value = d.titulo_original || '';
-            document.getElementById('campo-capa-url').value = d.capa || '';
-            document.getElementById('form-msg').textContent = '✅ Edição selecionada!';
-            document.getElementById('form-msg').className = 'form-msg success';
-          }
-          fecharModalCapas();
-        })
-        .catch(() => {
-          fecharModalCapas();
-          alert('Erro ao selecionar a edição. Tente novamente.');
-        });
+      if (opcoesGlobais && opcoesGlobais[index]) {
+        preencherDadosDisco(opcoesGlobais[index]);
+        fecharModalCapas();
+      } else {
+        alert('Erro: dados não encontrados. Tente ler o código novamente.');
+      }
     }
 
     // ================================================================

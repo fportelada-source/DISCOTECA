@@ -2733,7 +2733,7 @@
     }
 
     // ================================================================
-    // RECOMENDAÇÕES (COM FRASE SIMPLIFICADA)
+    // RECOMENDAÇÕES (COM FRASE SIMPLIFICADA E SEM LABEL ESTRATÉGIA)
     // ================================================================
     function renderRecomendacoes(dados) {
       const container = document.getElementById('compras-container');
@@ -2813,8 +2813,8 @@
                   <h3>${item.album || 'Álbum'}</h3>
                   <div class="artist" style="color:${tierColor};">${item.artista || 'Artista'}</div>
                   <div class="wishlist-phrase">${frase}</div>
-                  <div class="meta-block">
-                    <div class="meta-row"><span class="label">Estratégia</span><span class="val">${item.estrategia || ''}</span></div>
+                  <div class="meta-row">
+                    <span class="val">${item.estrategia || ''}</span>
                   </div>
                   <div class="card-actions">
                     <button class="btn-icon btn-tier" onclick="abrirEditTier('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}', '${item.tier || 'A'}')" title="Editar Tier">✎</button>
@@ -3331,7 +3331,6 @@
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.opcoes && data.opcoes.length > 0) {
-            // Mostra a primeira opção (a mais relevante)
             const d = data.opcoes[0];
             document.getElementById('campo-artista').value = d.artista || '';
             document.getElementById('campo-album').value = d.album || '';

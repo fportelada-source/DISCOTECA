@@ -1177,6 +1177,7 @@ function carregarDados() {
             msg.className = 'form-msg success';
             carregarDados();
             formAdicionar.reset();
+            btn.disabled = false;
             setTimeout(fecharModal, 1000);
           } else {
             msg.textContent = '❌ ' + (resultado.erro || 'Erro ao salvar');

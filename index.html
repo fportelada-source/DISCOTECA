@@ -1,2173 +1,522 @@
-from flask import Flask, request, jsonify, session, redirect, make_response
-from flask_cors import CORS
-import sqlite3
-import requests
-from urllib.parse import urlencode
-from datetime import datetime
-import csv
-from collections import Counter, defaultdict
-import io
-import os
-import re
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Discoteca — Início</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=3" />
+</head>
+<body>
 
-app = Flask(__name__)
-CORS(app, supports_credentials=True)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'f254589b22b0773daaf1f76f951212558ecbee2c8f0d5003c95219861c52f671')
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-container">
+    <div class="login-box">
+      <div class="logo">Discoteca<span>.</span></div>
+      <p class="sub">Sua coleção de discos, organizada com recomendações personalizadas.</p>
+      <button class="login-btn" id="btnLogin">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Entrar com Google
+      </button>
+      <div id="loginError" class="login-error">Erro ao fazer login. Tente novamente.</div>
+    </div>
+  </div>
 
-# ========== AMBIENTE DE TESTE (BYPASS DE LOGIN) ==========
-# DEV_MODE = True SOMENTE no ambiente de teste (fporteladaTEST).
-# Quando ligado, get_usuario_id() sempre devolve DEV_USER_ID e
-# ignora sessao/cookie/Google inteiramente. NUNCA deixar True em
-# producao (fportelada).
-DEV_MODE = os.getenv('DEV_MODE', 'false').lower() == 'true'
-DEV_USER_ID = int(os.getenv('DEV_USER_ID', '1'))  # Teste ID 1
+  <!-- ===== APP ===== -->
+  <div id="appScreen" style="display:none;">
+    <div class="app-shell">
 
-# ========== CONFIGURAÇÕES DO GOOGLE (VIA .ENV) ==========
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'https://fportelada.pythonanywhere.com/callback')
+      <!-- SIDEBAR -->
+      <aside class="app-sidebar">
+        <a href="index.html" class="logo">D<span>.</span></a>
+        <nav class="nav-icons">
+          <a href="index.html" class="active" title="Início">🏠</a>
+          <a href="wishlist.html" title="Wishlist">📋<span class="badge-count" id="navWishlistCount" style="display:none;">0</span></a>
+          <a href="colecao.html" title="Coleção">💿</a>
+          <a href="estatisticas.html" title="Estatísticas">📊</a>
+          <a href="importar.html" title="Importar">📤</a>
+        </nav>
+      </aside>
 
-if not DEV_MODE and (not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET):
-    raise ValueError("⚠️ Credenciais do Google não encontradas! Verifique o arquivo .env")
+      <!-- MAIN -->
+      <div class="app-main">
 
-# Caminho do banco no ambiente de teste. Ajustar para a conta
-# fporteladaTEST no PythonAnywhere.
-DB_PATH = os.getenv('DB_PATH', '/home/fportelada/discoteca.db')
+        <!-- TOP BAR -->
+        <div class="app-topbar">
+          <div class="search" style="position:relative;">
+            <span>⌕</span>
+            <input type="text" id="dashSearch" placeholder="Buscar álbuns, artistas, coleção...">
+            <div id="dashSearchResults" class="dash-search-results"></div>
+          </div>
+          <a href="perfil.html" class="user">
+            <span class="name" id="userNameDisplay">Carregando...</span>
+            <div class="avatar" id="userAvatar">?</div>
+          </a>
+        </div>
 
-# ========== BANCO DE DADOS ==========
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
+        <!-- DASHBOARD -->
+        <div class="dash" id="dashContent">
+          <div style="opacity:0.4; font-size:13px;">Carregando seu painel...</div>
+        </div>
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            google_id TEXT UNIQUE,
-            nome TEXT,
-            email TEXT,
-            data_criacao TEXT,
-            foto_url TEXT,
-            bio TEXT,
-            spotify_url TEXT,
-            discogs_url TEXT,
-            instagram_url TEXT,
-            nome_exibicao TEXT,
-            localizacao TEXT,
-            formato_preferido TEXT DEFAULT 'Vinil',
-            moeda_preferida TEXT DEFAULT 'BRL',
-            marketplace_preferido TEXT DEFAULT 'Discogs',
-            visualizacao_padrao TEXT DEFAULT 'cards',
-            notif_price_drop INTEGER DEFAULT 1,
-            notif_wishlist INTEGER DEFAULT 1,
-            notif_novidades INTEGER DEFAULT 0,
-            notif_discografia INTEGER DEFAULT 1,
-            notif_email INTEGER DEFAULT 1,
-            privacidade_perfil_publico INTEGER DEFAULT 1,
-            privacidade_busca INTEGER DEFAULT 0,
-            privacidade_valor INTEGER DEFAULT 1,
-            privacidade_wishlist INTEGER DEFAULT 1,
-            tema TEXT DEFAULT 'dark',
-            idioma TEXT DEFAULT 'pt-BR'
-        )
-    ''')
+      </div>
+    </div>
+  </div><!-- /appScreen -->
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS colecao (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            artista TEXT,
-            album TEXT,
-            formato TEXT,
-            ano_lancamento INTEGER,
-            genero TEXT,
-            capa_url TEXT,
-            condicao_midia TEXT,
-            condicao_capa TEXT,
-            preco REAL,
-            data_adicao TEXT,
-            notas TEXT,
-            codigo_barras TEXT,
-            favorito INTEGER DEFAULT 0,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
+  <footer>Discoteca — Sua coleção, suas recomendações.</footer>
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS recomendacoes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            artista TEXT,
-            album TEXT,
-            tier TEXT,
-            estrategia TEXT,
-            nota TEXT,
-            justificativa TEXT,
-            capa_url TEXT,
-            data_adicao TEXT,
-            origem TEXT DEFAULT 'algoritmo',
-            comprado INTEGER DEFAULT 0,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
+  <script>
+// ================================================================
+// CONFIGURAÇÕES
+// ================================================================
+const API_URL = 'https://fportelada.pythonanywhere.com';
+const DEV_MODE = false;
+const DEV_USER_ID = 1;
+const DEV_USER_NOME = 'Teste ID 1';
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS descobertas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            artista TEXT,
-            album TEXT,
-            ano INTEGER,
-            titulo TEXT,
-            descricao TEXT,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
+let usuarioId = null;
+let confirmCallback = null;
+let dashColecao = [];
+let dashWishlist = [];
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS playlists (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            tipo TEXT,
-            artista TEXT,
-            album TEXT,
-            data_importacao TEXT,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
+// ================================================================
+// LOGIN
+// ================================================================
+function salvarSessao(userId, nome) {
+  localStorage.setItem('discoteca_user_id', userId);
+  localStorage.setItem('discoteca_user_nome', nome);
+}
+function carregarSessao() {
+  const userId = localStorage.getItem('discoteca_user_id');
+  const nome = localStorage.getItem('discoteca_user_nome');
+  if (userId && nome) return { userId, nome };
+  return null;
+}
+function limparSessao() {
+  localStorage.removeItem('discoteca_user_id');
+  localStorage.removeItem('discoteca_user_nome');
+}
+function ativarTelaApp(nome) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('userNameDisplay').textContent = nome;
+}
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS musicas_usuario (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            artista TEXT,
-            album TEXT,
-            genero TEXT,
-            ano INTEGER,
-            explicita INTEGER,
-            duracao_ms INTEGER,
-            data_importacao TEXT,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
-
-    # Guarda a resposta do "ajuste fino" (relação do usuário com um
-    # artista) para não perguntar de novo e para reordenar os tiers.
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS artista_ajuste (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            artista TEXT,
-            relacao TEXT,
-            data_ajuste TEXT,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-        )
-    ''')
-
-    conn.commit()
-    conn.close()
-
-def migrar_colunas_novas():
-    """Adiciona colunas novas em bancos que já existiam antes delas (ex: banco de teste já criado)."""
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    colunas_novas = [
-        ('colecao', 'ano_lancamento', 'INTEGER'),
-        ('colecao', 'genero', 'TEXT'),
-        ('colecao', 'capa_url', 'TEXT'),
-        ('colecao', 'favorito', 'INTEGER DEFAULT 0'),
-        ('recomendacoes', 'capa_url', 'TEXT'),
-        ('recomendacoes', 'data_adicao', 'TEXT'),
-        ('usuarios', 'foto_url', 'TEXT'),
-        ('usuarios', 'bio', 'TEXT'),
-        ('usuarios', 'spotify_url', 'TEXT'),
-        ('usuarios', 'discogs_url', 'TEXT'),
-        ('usuarios', 'instagram_url', 'TEXT'),
-        ('usuarios', 'nome_exibicao', 'TEXT'),
-        ('usuarios', 'localizacao', 'TEXT'),
-        ('usuarios', 'formato_preferido', "TEXT DEFAULT 'Vinil'"),
-        ('usuarios', 'moeda_preferida', "TEXT DEFAULT 'BRL'"),
-        ('usuarios', 'marketplace_preferido', "TEXT DEFAULT 'Discogs'"),
-        ('usuarios', 'visualizacao_padrao', "TEXT DEFAULT 'cards'"),
-        ('usuarios', 'notif_price_drop', 'INTEGER DEFAULT 1'),
-        ('usuarios', 'notif_wishlist', 'INTEGER DEFAULT 1'),
-        ('usuarios', 'notif_novidades', 'INTEGER DEFAULT 0'),
-        ('usuarios', 'notif_discografia', 'INTEGER DEFAULT 1'),
-        ('usuarios', 'notif_email', 'INTEGER DEFAULT 1'),
-        ('usuarios', 'privacidade_perfil_publico', 'INTEGER DEFAULT 1'),
-        ('usuarios', 'privacidade_busca', 'INTEGER DEFAULT 0'),
-        ('usuarios', 'privacidade_valor', 'INTEGER DEFAULT 1'),
-        ('usuarios', 'privacidade_wishlist', 'INTEGER DEFAULT 1'),
-        ('usuarios', 'tema', "TEXT DEFAULT 'dark'"),
-        ('usuarios', 'idioma', "TEXT DEFAULT 'pt-BR'"),
-    ]
-    for tabela, coluna, tipo in colunas_novas:
-        try:
-            c.execute(f'ALTER TABLE {tabela} ADD COLUMN {coluna} {tipo}')
-            conn.commit()
-        except sqlite3.OperationalError:
-            pass  # coluna já existe
-    conn.close()
-
-init_db()
-migrar_colunas_novas()
-
-def seed_dev_user():
-    """Garante que o usuário de teste (Teste ID 1) exista na tabela usuarios."""
-    if not DEV_MODE:
-        return
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('SELECT id FROM usuarios WHERE id = ?', (DEV_USER_ID,))
-    if not c.fetchone():
-        c.execute('''
-            INSERT INTO usuarios (id, google_id, nome, email, data_criacao)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (DEV_USER_ID, 'dev-bypass', 'Teste ID 1', 'teste@discoteca.dev',
-              datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-        conn.commit()
-    conn.close()
-
-seed_dev_user()
-
-# ========== FUNÇÃO PARA PEGAR USUARIO_ID ==========
-def get_usuario_id():
-    # Bypass do ambiente de teste: sempre retorna o usuario de teste,
-    # sem depender de sessao, cookie ou login do Google.
-    if DEV_MODE:
-        return DEV_USER_ID
-    if 'usuario_id' in session:
-        return session['usuario_id']
-    user_id = request.args.get('user_id')
-    if user_id:
-        try:
-            return int(user_id)
-        except:
-            pass
-    user_id_header = request.headers.get('X-User-ID')
-    if user_id_header:
-        try:
-            return int(user_id_header)
-        except:
-            pass
-    return None
-
-# ========== ROTAS ==========
-@app.route('/')
-def home():
-    return '✅ API da Discoteca v0.8.9 está funcionando!'
-
-@app.route('/login')
-def login():
-    params = {
-        'client_id': GOOGLE_CLIENT_ID,
-        'redirect_uri': GOOGLE_REDIRECT_URI,
-        'response_type': 'code',
-        'scope': 'email profile',
-        'access_type': 'online'
-    }
-    auth_url = 'https://accounts.google.com/o/oauth2/auth?' + urlencode(params)
-    return jsonify({'auth_url': auth_url})
-
-@app.route('/callback')
-def callback():
-    code = request.args.get('code')
-    if not code:
-        return 'Erro: código não recebido', 400
-
-    token_data = {
-        'client_id': GOOGLE_CLIENT_ID,
-        'client_secret': GOOGLE_CLIENT_SECRET,
-        'code': code,
-        'redirect_uri': GOOGLE_REDIRECT_URI,
-        'grant_type': 'authorization_code'
-    }
-    token_resp = requests.post('https://oauth2.googleapis.com/token', data=token_data)
-    if token_resp.status_code != 200:
-        return 'Erro ao obter token', 400
-    token_json = token_resp.json()
-    access_token = token_json.get('access_token')
-
-    user_resp = requests.get(
-        'https://www.googleapis.com/oauth2/v2/userinfo',
-        headers={'Authorization': f'Bearer {access_token}'}
-    )
-    if user_resp.status_code != 200:
-        return 'Erro ao obter dados do usuário', 400
-    user_data = user_resp.json()
-    google_id = user_data.get('id')
-    nome = user_data.get('name')
-    email = user_data.get('email')
-    foto_url = user_data.get('picture')
-    if not google_id:
-        return 'Erro: ID do Google não encontrado', 400
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('SELECT id FROM usuarios WHERE google_id = ?', (google_id,))
-    usuario = c.fetchone()
-    if not usuario:
-        c.execute('''
-            INSERT INTO usuarios (google_id, nome, email, data_criacao, foto_url)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (google_id, nome, email, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), foto_url))
-        conn.commit()
-        usuario_id = c.lastrowid
-    else:
-        usuario_id = usuario[0]
-        # Mantém nome e foto sincronizados com o Google a cada login
-        c.execute('UPDATE usuarios SET nome = ?, foto_url = ? WHERE id = ?', (nome, foto_url, usuario_id))
-        conn.commit()
-    conn.close()
-
-    session['usuario_id'] = usuario_id
-    session['nome'] = nome
-    redirect_url = f'https://fportelada-source.github.io/DISCOTECA/?user_id={usuario_id}&nome={nome}'
-    return redirect(redirect_url)
-
-@app.route('/sessao')
-def sessao():
-    usuario_id = get_usuario_id()
-    if usuario_id:
-        return jsonify({
-            'logado': True,
-            'usuario_id': usuario_id,
-            'nome': session.get('nome', 'Usuário')
+document.addEventListener('DOMContentLoaded', function() {
+  const btnLogin = document.getElementById('btnLogin');
+  if (btnLogin) {
+    btnLogin.addEventListener('click', function() {
+      const btn = this;
+      const error = document.getElementById('loginError');
+      btn.disabled = true;
+      if (error) error.style.display = 'none';
+      fetch(API_URL + '/login')
+        .then(r => r.json())
+        .then(d => {
+          if (d.auth_url) window.location.href = d.auth_url;
+          else throw new Error('URL não recebida');
         })
-    return jsonify({'logado': False})
+        .catch(() => {
+          if (error) error.style.display = 'block';
+          btn.disabled = false;
+        });
+    });
+  }
+});
 
-@app.route('/logout', methods=['POST'])
-def logout():
-    session.clear()
-    return jsonify({'sucesso': True})
+// ================================================================
+// VERIFICAR SESSÃO
+// ================================================================
+function verificarSessao() {
+  if (DEV_MODE) {
+    usuarioId = DEV_USER_ID;
+    salvarSessao(DEV_USER_ID, DEV_USER_NOME);
+    ativarTelaApp(DEV_USER_NOME);
+    carregarDashboard();
+    return;
+  }
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('user_id');
+  const nome = params.get('nome');
+  if (userId && nome) {
+    salvarSessao(userId, nome);
+    usuarioId = userId;
+    ativarTelaApp(nome);
+    window.history.replaceState({}, document.title, window.location.pathname);
+    carregarDashboard();
+    return;
+  }
+  const sessao = carregarSessao();
+  if (sessao) {
+    usuarioId = sessao.userId;
+    ativarTelaApp(sessao.nome);
+    carregarDashboard();
+    return;
+  }
+  fetch(API_URL + '/sessao')
+    .then(r => r.json())
+    .then(data => {
+      if (data.logado) {
+        usuarioId = data.usuario_id;
+        salvarSessao(data.usuario_id, data.nome || 'Usuário');
+        ativarTelaApp(data.nome || 'Usuário');
+        carregarDashboard();
+      }
+    })
+    .catch(() => {});
+}
 
-# ================================================================
-# PERFIL PÚBLICO
-# ================================================================
-@app.route('/perfil/<int:user_id>')
-def perfil_publico(user_id):
-    """Rota pública (sem login) — usada pela página compartilhável perfil-publico.html
-    E também usada por todas as páginas internas pra carregar o avatar/nome do topo.
-    Por isso a privacidade só se aplica a VISITANTES — o dono vendo o próprio perfil
-    (autenticado como esse mesmo usuário) sempre recebe os dados completos."""
-    eh_o_proprio_dono = get_usuario_id() == user_id
+// ================================================================
+// SEÇÕES AINDA SEM DADOS REAIS (arquitetura pronta pra V0.11+)
+// Trocar o corpo destas duas funções quando as features existirem
+// (scraper de preços, motor de descoberta) — o resto do dashboard
+// não precisa mudar.
+// ================================================================
+function buscarOportunidadesMercado() {
+  return Promise.resolve([
+    { tag: 'em breve', nome: 'Monitoramento de preços', sub: 'Chega na V0.11', preco: null, precoAntigo: null }
+  ]);
+}
+function buscarDescobertas() {
+  return Promise.resolve([]);
+}
 
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        SELECT id, nome, nome_exibicao, email, data_criacao, foto_url, bio, spotify_url, discogs_url, instagram_url, localizacao,
-               privacidade_perfil_publico, privacidade_valor, privacidade_wishlist
-        FROM usuarios WHERE id = ?
-    ''', (user_id,))
-    usuario = c.fetchone()
-    if not usuario:
-        conn.close()
-        return jsonify({'erro': 'Usuário não encontrado'}), 404
+// ================================================================
+// CARREGAR DASHBOARD
+// ================================================================
+function carregarDashboard() {
+  Promise.all([
+    fetch(API_URL + '/colecao?user_id=' + usuarioId).then(r => r.json()),
+    fetch(API_URL + '/recomendacoes?user_id=' + usuarioId).then(r => r.json()),
+    fetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId).then(r => r.json()),
+    fetch(API_URL + '/perfil/' + usuarioId).then(r => r.json())
+  ]).then(([colecao, wishlist, stats, perfil]) => {
+    dashColecao = Array.isArray(colecao) ? colecao : [];
+    dashWishlist = Array.isArray(wishlist) ? wishlist : [];
+    renderDashboard(
+      dashColecao,
+      dashWishlist,
+      stats && !stats.erro ? stats : {},
+      perfil && !perfil.erro ? perfil : {}
+    );
+    configurarBuscaDashboard();
+  }).catch(() => {
+    document.getElementById('dashContent').innerHTML =
+      '<div style="opacity:0.5; font-size:13px;">Não consegui carregar o dashboard. Tenta recarregar a página.</div>';
+  });
+}
 
-    if not eh_o_proprio_dono and usuario[11] == 0:
-        conn.close()
-        return jsonify({'erro': 'Este perfil é privado.', 'privado': True}), 403
+function corTier(tier) {
+  return { S: 'var(--s-color)', A: 'var(--a-color)', B: 'var(--b-color)', C: 'var(--c-color)' }[tier] || 'var(--c-color)';
+}
 
-    c.execute('SELECT COUNT(*) FROM colecao WHERE usuario_id = ?', (user_id,))
-    total_discos = c.fetchone()[0]
+// Last.fm como último recurso, igual às outras páginas (Discogs é a fonte
+// principal, mas o Dashboard não tinha rede de segurança nenhuma até agora).
+const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
+async function getCoverUrlLastfm(artist, album) {
+  if (!artist || !album) return null;
+  try {
+    const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.album && data.album.image) {
+      const img = data.album.image.find(i => i.size === 'extralarge');
+      return img && img['#text'] ? img['#text'] : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
-    c.execute('SELECT COUNT(*) FROM recomendacoes WHERE usuario_id = ? AND comprado = 0', (user_id,))
-    total_wishlist = c.fetchone()[0]
+// O dashboard só mostra ~7 itens no máximo (hero + 3 compras + 3 wishlist),
+// então buscar a capa que ainda não veio salva é seguro aqui — diferente
+// da geração em massa de recomendações, que evita isso de propósito.
+function carregarCapasFaltantesDashboard() {
+  document.querySelectorAll('.dash-hero .cover[data-artista], .dash-purchase-card .thumb[data-artista], .dash-wishlist-item .cover[data-artista]').forEach(el => {
+    if (el.dataset.hasCapa) return; // já tem capa
+    const artista = el.dataset.artista;
+    const album = el.dataset.album;
+    if (!artista || !album) return;
 
-    c.execute('''
-        SELECT artista, album, formato, ano_lancamento, capa_url, data_adicao, genero, preco, favorito FROM colecao
-        WHERE usuario_id = ? ORDER BY data_adicao DESC, id DESC
-    ''', (user_id,))
-    todos_colecao = c.fetchall()
+    function aplicar(url) {
+      el.style.backgroundImage = `url('${url}')`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+      const icone = el.querySelector('.fallback-icon');
+      if (icone) icone.style.display = 'none';
+      else el.textContent = '';
+    }
 
-    def bucket_formato(formato):
-        f = (formato or '')
-        if 'LP' in f or 'EP' in f or 'Vinil' in f:
-            return 'vinil'
-        if 'CD' in f:
-            return 'cd'
-        if 'Cassete' in f or 'cassette' in f.lower():
-            return 'cassete'
-        if 'DVD' in f or 'Blu-ray' in f or 'Bluray' in f:
-            return 'dvd_bluray'
-        return 'vinil'  # sem formato definido, assume vinil (mais comum na coleção)
-
-    colecao_por_formato = {'vinil': [], 'cd': [], 'cassete': [], 'dvd_bluray': []}
-    recentes = []
-    favoritos_marcados = []
-    artistas = []
-    generos = []
-    anos = []
-    valor_total = 0
-    formatos_com_disco = set()
-
-    for artista, album, formato, ano_lancamento, capa_url, data_adicao, genero, preco, favorito in todos_colecao:
-        item = {
-            'artista': artista, 'album': album, 'formato': formato,
-            'ano_lancamento': ano_lancamento, 'capa_url': capa_url, 'data_adicao': data_adicao
+    fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.sucesso && d.capa_url) {
+          aplicar(d.capa_url);
+        } else {
+          console.warn('[Dashboard] Discogs sem capa para', artista, '-', album, '— tentando Last.fm');
+          getCoverUrlLastfm(artista, album).then(url => {
+            if (url) aplicar(url);
+            else console.warn('[Dashboard] Last.fm também sem capa para', artista, '-', album);
+          });
         }
-        chave = bucket_formato(formato)
-        colecao_por_formato[chave].append(item)
-        formatos_com_disco.add(chave)
-        if len(recentes) < 12:
-            recentes.append(item)
-        if favorito:
-            favoritos_marcados.append(item)
-        if artista:
-            artistas.append(artista.strip())
-        if genero:
-            generos.append(genero.strip())
-        if ano_lancamento:
-            anos.append(int(ano_lancamento))
-        if preco:
-            valor_total += preco
+      })
+      .catch(err => {
+        console.warn('[Dashboard] /buscar_capa falhou para', artista, '-', album, err, '— tentando Last.fm');
+        getCoverUrlLastfm(artista, album).then(url => { if (url) aplicar(url); });
+      });
+  });
+}
 
-    # Favoritos: usa os marcados de verdade; se ninguém marcou nada ainda,
-    # cai pros mais recentes (mesmo dado, uso provisório, sem inventar nada).
-    favoritos = favoritos_marcados[:4] if favoritos_marcados else recentes[:4]
-    usando_fallback_favoritos = len(favoritos_marcados) == 0
+function renderDashboard(colecao, wishlist, stats, perfil) {
+  const avatarEl = document.getElementById('userAvatar');
+  const nomeExibicao = perfil.nome_exibicao || perfil.nome || DEV_USER_NOME;
+  document.getElementById('userNameDisplay').textContent = nomeExibicao;
+  if (perfil.foto_url) {
+    avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nomeExibicao}">`;
+  } else {
+    avatarEl.textContent = nomeExibicao.charAt(0).toUpperCase();
+  }
 
-    c.execute('''
-        SELECT artista, album, tier, capa_url FROM recomendacoes
-        WHERE usuario_id = ? AND comprado = 0
-        ORDER BY CASE tier WHEN 'S' THEN 1 WHEN 'A' THEN 2 WHEN 'B' THEN 3 ELSE 4 END, id DESC
-        LIMIT 50
-    ''', (user_id,))
-    wishlist = [{'artista': r[0], 'album': r[1], 'tier': r[2], 'capa_url': r[3]} for r in c.fetchall()]
-    conn.close()
+  const badge = document.getElementById('navWishlistCount');
+  if (wishlist.length > 0) {
+    badge.textContent = wishlist.length;
+    badge.style.display = 'flex';
+  }
 
-    genero_predominante = None
-    genero_predominante_pct = None
-    generos_favoritos = []
-    banda_mais_presente = None
-    disco_mais_antigo = None
-    disco_mais_recente = None
-    decada_favorita = None
+  const artistasUnicos = new Set(colecao.map(d => d.artista).filter(Boolean));
+  const hero = wishlist[0]; // já vem ordenado S → C do back-end
 
-    if generos:
-        contagem_generos = Counter(generos)
-        genero_predominante, qtd = contagem_generos.most_common(1)[0]
-        genero_predominante_pct = round(qtd / len(generos) * 100)
-        generos_favoritos = [g for g, _ in contagem_generos.most_common(5)]
+  let html = '';
 
-    if artistas:
-        banda_mais_presente = Counter(artistas).most_common(1)[0][0]
+  // ===== HERO RECOMMENDATION =====
+  if (hero) {
+    const capaHero = hero.capa_url ? `style="background-image:url('${hero.capa_url}'); background-size:cover; background-position:center;"` : '';
+    html += `
+      <div class="dash-hero">
+        <div class="cover" id="dashHeroCover" data-artista="${hero.artista || ''}" data-album="${hero.album || ''}"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '♬'}</div>
+        <div class="info">
+          <div class="badge">★ Prioridade ${hero.tier}</div>
+          <h2>${hero.album || 'Álbum'}</h2>
+          <div class="artist">${hero.artista || 'Artista'}</div>
+          <div class="desc">${hero.nota || hero.estrategia || 'Complementa bem sua coleção atual.'}</div>
+          <a href="wishlist.html" class="btn">Ver na Wishlist →</a>
+        </div>
+      </div>
+    `;
+  }
 
-    if anos:
-        com_ano = [d for d in todos_colecao if d[3]]
-        mais_antigo = min(com_ano, key=lambda d: d[3])
-        mais_recente = max(com_ano, key=lambda d: d[3])
-        disco_mais_antigo = f'{mais_antigo[0]} - {mais_antigo[1]} ({mais_antigo[3]})'
-        disco_mais_recente = f'{mais_recente[0]} - {mais_recente[1]} ({mais_recente[3]})'
+  // ===== STATS ROW =====
+  const statsFormato = [
+    { valor: stats.lps || 0, label: 'Vinil', href: 'colecao.html?formato=vinil' },
+    { valor: stats.cds || 0, label: 'CDs', href: 'colecao.html?formato=cd' },
+    { valor: stats.cassetes || 0, label: 'Cassete', href: 'colecao.html?formato=cassete' },
+    { valor: stats.dvd_bluray || 0, label: 'DVD/Blu-ray', href: 'colecao.html?formato=dvd_bluray' }
+  ].filter(s => s.valor > 0);
 
-        decadas_count = Counter((a // 10) * 10 for a in anos)
-        decada_top, qtd_decada = decadas_count.most_common(1)[0]
-        decada_favorita = {'nome': f'{decada_top}s', 'contagem': qtd_decada}
+  html += `<div class="dash-stats">`;
+  html += `<a href="colecao.html" class="dash-stat-item"><div class="number">${stats.total_discos || colecao.length}</div><div class="label">Discos</div></a>`;
+  statsFormato.forEach(s => {
+    html += `<a href="${s.href}" class="dash-stat-item"><div class="number">${s.valor}</div><div class="label">${s.label}</div></a>`;
+  });
+  html += `<a href="estatisticas.html" class="dash-stat-item"><div class="number">${artistasUnicos.size}</div><div class="label">Artistas</div></a>`;
+  html += `<a href="wishlist.html" class="dash-stat-item"><div class="number">${wishlist.length}</div><div class="label">Wishlist</div></a>`;
+  html += `</div>`;
 
-    mostrar_valor = eh_o_proprio_dono or usuario[12] == 1
-    mostrar_wishlist = eh_o_proprio_dono or usuario[13] == 1
+  // ===== NEXT PURCHASES + MARKET OPPORTUNITIES =====
+  html += `<div class="dash-two-col">`;
+  html += `<div><div class="dash-section-title">Próximas compras <a href="wishlist.html" class="see-all">ver todas</a></div>`;
+  if (wishlist.length > 0) {
+    wishlist.slice(0, 3).forEach((item, idx) => {
+      const thumbStyle = item.capa_url ? `background-image:url('${item.capa_url}');` : `background:${corTier(item.tier)};`;
+      html += `
+        <div class="dash-purchase-card">
+          <div class="thumb" id="dashPurchase-${idx}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${thumbStyle}"></div>
+          <div class="info">
+            <div class="title">${item.album || 'Álbum'}</div>
+            <div class="artist">${item.artista || 'Artista'}</div>
+          </div>
+          <div class="score">${item.tier}</div>
+        </div>
+      `;
+    });
+  } else {
+    html += `<div class="dash-placeholder-note">Nada na wishlist ainda — vá em Importar para gerar recomendações.</div>`;
+  }
+  html += `</div>`;
 
-    return jsonify({
-        'id': usuario[0],
-        'nome': usuario[1],
-        'nome_exibicao': usuario[2],
-        'email': usuario[3],
-        'data_criacao': usuario[4],
-        'foto_url': usuario[5],
-        'bio': usuario[6],
-        'spotify_url': usuario[7],
-        'discogs_url': usuario[8],
-        'instagram_url': usuario[9],
-        'localizacao': usuario[10],
-        'total_discos': total_discos,
-        'total_wishlist': total_wishlist if mostrar_wishlist else None,
-        'total_artistas': len(set(artistas)),
-        'valor_total': (round(valor_total, 2) if valor_total else None) if mostrar_valor else None,
-        'formatos_possuidos': sorted(formatos_com_disco),
-        'colecao_por_formato': colecao_por_formato,
-        'recentes': recentes,
-        'favoritos': favoritos,
-        'favoritos_e_provisorio': usando_fallback_favoritos,
-        'wishlist': wishlist if mostrar_wishlist else [],
-        'genero_predominante': genero_predominante,
-        'genero_predominante_pct': genero_predominante_pct,
-        'generos_favoritos': generos_favoritos,
-        'banda_mais_presente': banda_mais_presente,
-        'disco_mais_antigo': disco_mais_antigo,
-        'disco_mais_recente': disco_mais_recente,
-        'decada_favorita': decada_favorita
-    })
+  html += `<div><div class="dash-section-title">Oportunidades de mercado</div><div id="dashOportunidades"></div></div>`;
+  html += `</div>`;
 
-@app.route('/editar_perfil', methods=['PUT'])
-def editar_perfil():
-    """Edição do próprio perfil (autenticado). Nome e foto vêm do Google
-    automaticamente — aqui só bio, nome de exibição e links de redes sociais são editáveis."""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    dados = request.json or {}
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        UPDATE usuarios SET
-            bio = ?,
-            spotify_url = ?,
-            discogs_url = ?,
-            instagram_url = ?,
-            nome_exibicao = ?,
-            localizacao = ?
-        WHERE id = ?
-    ''', (
-        (dados.get('bio') or '').strip()[:280],
-        (dados.get('spotify_url') or '').strip(),
-        (dados.get('discogs_url') or '').strip(),
-        (dados.get('instagram_url') or '').strip(),
-        (dados.get('nome_exibicao') or '').strip()[:60],
-        (dados.get('localizacao') or '').strip()[:60],
-        usuario_id
-    ))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Perfil atualizado!'})
+  // ===== COLLECTION INSIGHTS + WISHLIST GRID =====
+  html += `<div class="dash-two-col">`;
+  html += `<div><div class="dash-section-title">Destaques da coleção</div><div class="dash-insights-grid">`;
 
-# ================================================================
-# CONFIGURAÇÕES (Settings) — carrega e salva tudo da nova página de
-# uma vez só, incluindo as preferências que ainda não existiam.
-# ================================================================
-@app.route('/configuracoes')
-def get_configuracoes():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        SELECT nome, email, data_criacao, foto_url, bio, spotify_url, discogs_url, instagram_url,
-               nome_exibicao, localizacao, formato_preferido, moeda_preferida, marketplace_preferido,
-               visualizacao_padrao, notif_price_drop, notif_wishlist, notif_novidades, notif_discografia,
-               notif_email, privacidade_perfil_publico, privacidade_busca, privacidade_valor,
-               privacidade_wishlist, tema, idioma
-        FROM usuarios WHERE id = ?
-    ''', (usuario_id,))
-    u = c.fetchone()
-    conn.close()
-    if not u:
-        return jsonify({'erro': 'Usuário não encontrado'}), 404
+  if (stats.genero_predominante) {
+    html += `
+      <div class="dash-insight-card">
+        <div class="stat"><span class="highlight">${stats.genero_predominante_pct}%</span> ${stats.genero_predominante}</div>
+        <div class="desc">seu gênero predominante</div>
+        <div class="bar"><div class="fill" style="width:${stats.genero_predominante_pct}%;"></div></div>
+      </div>
+    `;
+  }
+  if (stats.decadas && stats.decadas.length > 0) {
+    const topDecada = [...stats.decadas].sort((a, b) => b.contagem - a.contagem)[0];
+    const pct = Math.round((topDecada.contagem / (stats.total_discos || 1)) * 100);
+    html += `
+      <div class="dash-insight-card">
+        <div class="stat"><span class="highlight">${topDecada.nome}</span></div>
+        <div class="desc">década mais coletada · ${topDecada.contagem} discos</div>
+        <div class="bar"><div class="fill" style="width:${pct}%;"></div></div>
+      </div>
+    `;
+  }
+  if (stats.valor_total) {
+    html += `
+      <div class="dash-insight-card">
+        <div class="stat"><span class="highlight">R$ ${stats.valor_total}</span></div>
+        <div class="desc">valor estimado da coleção</div>
+      </div>
+    `;
+  }
+  html += `
+    <div class="dash-insight-card">
+      <div class="stat"><span class="highlight">em breve</span></div>
+      <div class="desc">discografias completas</div>
+      <div class="dash-placeholder-note">Depende das trilogias (V0.10+)</div>
+    </div>
+  `;
+  html += `</div></div>`;
 
-    campos = ['nome', 'email', 'data_criacao', 'foto_url', 'bio', 'spotify_url', 'discogs_url', 'instagram_url',
-              'nome_exibicao', 'localizacao', 'formato_preferido', 'moeda_preferida', 'marketplace_preferido',
-              'visualizacao_padrao', 'notif_price_drop', 'notif_wishlist', 'notif_novidades', 'notif_discografia',
-              'notif_email', 'privacidade_perfil_publico', 'privacidade_busca', 'privacidade_valor',
-              'privacidade_wishlist', 'tema', 'idioma']
-    resultado = {'id': usuario_id}
-    for campo, valor in zip(campos, u):
-        resultado[campo] = valor
-    return jsonify(resultado)
+  html += `<div><div class="dash-section-title">Wishlist <a href="wishlist.html" class="see-all">ver tudo</a></div><div class="dash-wishlist-grid">`;
+  if (wishlist.length > 0) {
+    wishlist.slice(0, 3).forEach((item, idx) => {
+      const coverStyle = item.capa_url ? `background-image:url('${item.capa_url}');` : `background:${corTier(item.tier)};`;
+      html += `
+        <div class="dash-wishlist-item">
+          <div class="cover" id="dashWish-${idx}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">
+            <span class="priority" style="background:${corTier(item.tier)};">${item.tier}</span>
+            <span class="fallback-icon">${item.capa_url ? '' : '♢'}</span>
+          </div>
+          <div class="info">
+            <div class="title">${item.album || 'Álbum'}</div>
+            <div class="artist">${item.artista || 'Artista'}</div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    html += `<div class="dash-placeholder-note">Sua wishlist está vazia.</div>`;
+  }
+  html += `</div></div>`;
+  html += `</div>`;
 
-@app.route('/configuracoes', methods=['PUT'])
-def editar_configuracoes():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    dados = request.json or {}
+  // ===== RECENT ACTIVITY + DISCOVER =====
+  const recentes = [...colecao]
+    .filter(d => d.data_adicao)
+    .sort((a, b) => (a.data_adicao < b.data_adicao ? 1 : -1))
+    .slice(0, 5);
 
-    def bool_int(chave, padrao=1):
-        if chave not in dados:
-            return padrao
-        return 1 if dados.get(chave) else 0
+  html += `<div class="dash-two-col">`;
+  html += `<div><div class="dash-section-title">Atividade recente</div><div id="dashAtividade">`;
+  if (recentes.length > 0) {
+    html += recentes.map(item => `
+      <div class="dash-activity-item">
+        <span class="icon">+</span>
+        <span class="text"><strong>${item.album || 'Álbum'}</strong> — ${item.artista || 'Artista'} adicionado à coleção</span>
+        <span class="time">${item.data_adicao}</span>
+      </div>
+    `).join('');
+  } else {
+    html += `<div class="dash-placeholder-note">Nenhuma atividade ainda.</div>`;
+  }
+  html += `</div></div>`;
 
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        UPDATE usuarios SET
-            bio = ?,
-            spotify_url = ?,
-            discogs_url = ?,
-            instagram_url = ?,
-            nome_exibicao = ?,
-            localizacao = ?,
-            formato_preferido = ?,
-            moeda_preferida = ?,
-            marketplace_preferido = ?,
-            visualizacao_padrao = ?,
-            notif_price_drop = ?,
-            notif_wishlist = ?,
-            notif_novidades = ?,
-            notif_discografia = ?,
-            notif_email = ?,
-            privacidade_perfil_publico = ?,
-            privacidade_busca = ?,
-            privacidade_valor = ?,
-            privacidade_wishlist = ?,
-            tema = ?,
-            idioma = ?
-        WHERE id = ?
-    ''', (
-        (dados.get('bio') or '').strip()[:280],
-        (dados.get('spotify_url') or '').strip(),
-        (dados.get('discogs_url') or '').strip(),
-        (dados.get('instagram_url') or '').strip(),
-        (dados.get('nome_exibicao') or '').strip()[:60],
-        (dados.get('localizacao') or '').strip()[:60],
-        dados.get('formato_preferido') or 'Vinil',
-        dados.get('moeda_preferida') or 'BRL',
-        dados.get('marketplace_preferido') or 'Discogs',
-        dados.get('visualizacao_padrao') or 'cards',
-        bool_int('notif_price_drop'),
-        bool_int('notif_wishlist'),
-        bool_int('notif_novidades', 0),
-        bool_int('notif_discografia'),
-        bool_int('notif_email'),
-        bool_int('privacidade_perfil_publico'),
-        bool_int('privacidade_busca', 0),
-        bool_int('privacidade_valor'),
-        bool_int('privacidade_wishlist'),
-        dados.get('tema') or 'dark',
-        dados.get('idioma') or 'pt-BR',
-        usuario_id
-    ))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Configurações salvas!'})
+  html += `<div><div class="dash-section-title">Descobrir</div><div id="dashDescobrir" class="dash-discover-grid"></div></div>`;
+  html += `</div>`;
 
-@app.route('/configuracoes/resetar', methods=['POST'])
-def resetar_configuracoes():
-    """Restaura as preferências (não mexe em bio/redes/nome de exibição)."""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        UPDATE usuarios SET
-            formato_preferido = 'Vinil',
-            moeda_preferida = 'BRL',
-            marketplace_preferido = 'Discogs',
-            visualizacao_padrao = 'cards',
-            notif_price_drop = 1,
-            notif_wishlist = 1,
-            notif_novidades = 0,
-            notif_discografia = 1,
-            notif_email = 1,
-            privacidade_perfil_publico = 1,
-            privacidade_busca = 0,
-            privacidade_valor = 1,
-            privacidade_wishlist = 1,
-            tema = 'dark',
-            idioma = 'pt-BR'
-        WHERE id = ?
-    ''', (usuario_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Preferências restauradas para o padrão!'})
+  document.getElementById('dashContent').innerHTML = html;
+  carregarCapasFaltantesDashboard();
 
-@app.route('/exportar_colecao')
-def exportar_colecao():
-    """Exporta a coleção inteira em CSV — funcionalidade real, não placeholder."""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        SELECT artista, album, formato, ano_lancamento, genero, condicao_midia, condicao_capa,
-               preco, data_adicao, notas, codigo_barras, favorito
-        FROM colecao WHERE usuario_id = ? ORDER BY data_adicao DESC
-    ''', (usuario_id,))
-    linhas = c.fetchall()
-    conn.close()
+  buscarOportunidadesMercado().then(lista => {
+    const el = document.getElementById('dashOportunidades');
+    if (!el) return;
+    el.innerHTML = lista.map(op => `
+      <div class="dash-opp-card">
+        <div class="left">
+          <div class="tag">${op.tag}</div>
+          <div class="name">${op.nome}</div>
+          <div class="sub">${op.sub}</div>
+        </div>
+        <div class="right">${op.preco ? `${op.precoAntigo ? `<span class="old">R$ ${op.precoAntigo}</span>` : ''}<span class="price">R$ ${op.preco}</span>` : ''}</div>
+      </div>
+    `).join('') + '<div class="dash-placeholder-note">Monitoramento de preços real chega na V0.11.</div>';
+  });
 
-    saida = io.StringIO()
-    writer = csv.writer(saida)
-    writer.writerow(['Artista', 'Álbum', 'Formato', 'Ano', 'Gênero', 'Condição Mídia', 'Condição Capa',
-                      'Preço', 'Data Adicionado', 'Notas', 'Código de Barras', 'Favorito'])
-    for linha in linhas:
-        writer.writerow(linha)
-
-    resposta = make_response(saida.getvalue())
-    resposta.headers['Content-Type'] = 'text/csv; charset=utf-8'
-    resposta.headers['Content-Disposition'] = 'attachment; filename=discoteca_colecao.csv'
-    return resposta
-
-@app.route('/backup_dados')
-def backup_dados():
-    """Backup completo em JSON — coleção, wishlist e perfil. Funcionalidade real."""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-
-    c.execute('SELECT nome, email, bio, nome_exibicao, localizacao FROM usuarios WHERE id = ?', (usuario_id,))
-    u = c.fetchone()
-
-    c.execute('''
-        SELECT artista, album, formato, ano_lancamento, genero, condicao_midia, condicao_capa,
-               preco, data_adicao, notas, codigo_barras, favorito
-        FROM colecao WHERE usuario_id = ?
-    ''', (usuario_id,))
-    colecao_cols = ['artista', 'album', 'formato', 'ano_lancamento', 'genero', 'condicao_midia',
-                     'condicao_capa', 'preco', 'data_adicao', 'notas', 'codigo_barras', 'favorito']
-    colecao = [dict(zip(colecao_cols, row)) for row in c.fetchall()]
-
-    c.execute('''
-        SELECT artista, album, tier, estrategia, nota, origem, data_adicao
-        FROM recomendacoes WHERE usuario_id = ? AND comprado = 0
-    ''', (usuario_id,))
-    wishlist_cols = ['artista', 'album', 'tier', 'estrategia', 'nota', 'origem', 'data_adicao']
-    wishlist = [dict(zip(wishlist_cols, row)) for row in c.fetchall()]
-    conn.close()
-
-    backup = {
-        'gerado_em': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'perfil': {'nome': u[0], 'email': u[1], 'bio': u[2], 'nome_exibicao': u[3], 'localizacao': u[4]} if u else {},
-        'colecao': colecao,
-        'wishlist': wishlist
+  buscarDescobertas().then(lista => {
+    const el = document.getElementById('dashDescobrir');
+    if (!el) return;
+    if (lista.length === 0) {
+      el.innerHTML = '<div class="dash-placeholder-note">Motor de descoberta ainda não existe — planejado pra frente.</div>';
     }
-    resposta = make_response(jsonify(backup))
-    resposta.headers['Content-Disposition'] = 'attachment; filename=discoteca_backup.json'
-    return resposta
-
-# ================================================================
-# COLEÇÃO
-# ================================================================
-@app.route('/colecao')
-def get_colecao():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify([])
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        SELECT id, artista, album, formato, ano_lancamento, genero, capa_url, condicao_midia, condicao_capa, preco, data_adicao, codigo_barras, favorito
-        FROM colecao WHERE usuario_id = ?
-    ''', (usuario_id,))
-    dados = c.fetchall()
-    conn.close()
-    return jsonify([{
-        'id': d[0],
-        'artista': d[1],
-        'album': d[2],
-        'formato': d[3] or '',
-        'ano_lancamento': d[4],
-        'genero': d[5] or '',
-        'capa_url': d[6],
-        'condicao_midia': d[7] or '',
-        'condicao_capa': d[8] or '',
-        'preco': d[9],
-        'data_adicao': d[10] or '',
-        'codigo_barras': d[11] or '',
-        'favorito': d[12] or 0
-    } for d in dados])
-
-_discogs_cache = {}
-
-def _buscar_discogs(codigo=None, artista=None, album=None):
-    """Busca no Discogs por código de barras (se fornecido) ou por artista+álbum.
-    Retorna um dict {'ano': ..., 'genero': ..., 'capa_url': ...} (valores podem ser None).
-    Cacheado em memória por processo pra não repetir a mesma chamada duas vezes
-    (ex: ano, gênero e capa do mesmo disco saem da mesma busca)."""
-    chave = codigo or f'{(artista or "").lower()}|{(album or "").lower()}'
-    if chave in _discogs_cache:
-        return _discogs_cache[chave]
-
-    resultado = {'ano': None, 'genero': None, 'capa_url': None}
-    try:
-        url = 'https://api.discogs.com/database/search'
-        if codigo:
-            params = {'barcode': codigo, 'per_page': 1}
-        elif artista and album:
-            params = {'artist': artista, 'release_title': album, 'type': 'release'}
-        else:
-            return resultado
-        headers = {
-            'User-Agent': 'Discoteca/0.9 (fportelada@gmail.com)',
-            'Accept': 'application/json'
-        }
-        resp = requests.get(url, params=params, headers=headers, timeout=8)
-        if resp.status_code != 200:
-            print(f'[_buscar_discogs] Discogs retornou status {resp.status_code} para "{codigo or f"{artista} - {album}"}": {resp.text[:200]}')
-            _discogs_cache[chave] = resultado
-            return resultado
-        resultados = resp.json().get('results', [])
-        for item in resultados:
-            if not resultado['ano'] and item.get('year'):
-                resultado['ano'] = int(item['year'])
-            if not resultado['genero'] and item.get('genre'):
-                resultado['genero'] = item['genre'][0]
-            if not resultado['capa_url'] and item.get('cover_image'):
-                resultado['capa_url'] = item['cover_image']
-            if resultado['ano'] and resultado['genero'] and resultado['capa_url']:
-                break
-        if not resultados:
-            print(f'[_buscar_discogs] Nenhum resultado no Discogs para "{codigo or f"{artista} - {album}"}"')
-    except Exception as e:
-        print(f'[_buscar_discogs] Erro ao buscar "{codigo or f"{artista} - {album}"}": {repr(e)}')
-
-    _discogs_cache[chave] = resultado
-    return resultado
-
-def buscar_ano_por_codigo_barras(codigo):
-    """Busca o ano de lançamento no Discogs pelo código de barras (busca exata,
-    mais confiável que buscar por nome). Retorna None em caso de erro."""
-    if not codigo:
-        return None
-    return _buscar_discogs(codigo=codigo)['ano']
-
-def buscar_genero_por_codigo_barras(codigo):
-    if not codigo:
-        return None
-    return _buscar_discogs(codigo=codigo)['genero']
-
-def buscar_ano_discogs(artista, album):
-    """Busca o ano de lançamento no Discogs por artista + álbum (sem código de barras).
-    Retorna None se não encontrar ou se der erro — nunca derruba a rota que chamou."""
-    if not artista or not album:
-        return None
-    return _buscar_discogs(artista=artista, album=album)['ano']
-
-def buscar_genero_discogs(artista, album):
-    if not artista or not album:
-        return None
-    return _buscar_discogs(artista=artista, album=album)['genero']
-
-def buscar_capa_por_codigo_barras(codigo):
-    if not codigo:
-        return None
-    return _buscar_discogs(codigo=codigo)['capa_url']
-
-def buscar_capa_discogs(artista, album):
-    if not artista or not album:
-        return None
-    return _buscar_discogs(artista=artista, album=album)['capa_url']
-
-@app.route('/buscar_por_artista_album')
-def buscar_por_artista_album():
-    """Igual à busca por código de barras, mas por texto — usada pra
-    preencher o ano de lançamento quando o usuário não tem o código."""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    artista = request.args.get('artista')
-    album = request.args.get('album')
-    ano = buscar_ano_discogs(artista, album)
-    if ano:
-        return jsonify({'sucesso': True, 'ano': ano})
-    return jsonify({'sucesso': False, 'ano': None})
-
-@app.route('/buscar_capa')
-def buscar_capa():
-    """Busca a capa de verdade no Discogs (sem crop forçado como o Last.fm faz).
-    Pública (sem exigir login) porque o perfil público também usa, e usada
-    sob demanda pelo lazy-load — não trava a geração de recomendações em massa."""
-    artista = request.args.get('artista')
-    album = request.args.get('album')
-    capa_url = buscar_capa_discogs(artista, album)
-    if capa_url:
-        return jsonify({'sucesso': True, 'capa_url': capa_url})
-    return jsonify({'sucesso': False, 'capa_url': None})
-
-@app.route('/adicionar_disco', methods=['POST'])
-def adicionar_disco():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    dados = request.json
-    artista = dados.get('artista')
-    album = dados.get('album')
-    if not artista or not album:
-        return jsonify({'erro': 'Artista e álbum são obrigatórios'}), 400
-
-    ano_lancamento = dados.get('ano_lancamento') or None
-    codigo_barras = (dados.get('codigo_barras') or '').strip()
-    genero = None
-    capa_url = None
-
-    # Tenta pelo código de barras primeiro (busca exata, mais confiável)
-    if codigo_barras:
-        r = _buscar_discogs(codigo=codigo_barras)
-        ano_lancamento = ano_lancamento or r['ano']
-        genero = genero or r['genero']
-        capa_url = capa_url or r['capa_url']
-
-    # Se ainda não achou, tenta pelo nome do artista + álbum
-    if not ano_lancamento or not genero or not capa_url:
-        r = _buscar_discogs(artista=artista, album=album)
-        ano_lancamento = ano_lancamento or r['ano']
-        genero = genero or r['genero']
-        capa_url = capa_url or r['capa_url']
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        INSERT INTO colecao (usuario_id, artista, album, formato, ano_lancamento, genero, capa_url, condicao_midia, condicao_capa, preco, data_adicao, notas, codigo_barras, favorito)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        usuario_id,
-        artista,
-        album,
-        dados.get('formato', ''),
-        ano_lancamento,
-        genero,
-        capa_url,
-        dados.get('condicao_midia', ''),
-        dados.get('condicao_capa', ''),
-        dados.get('preco'),
-        dados.get('data_aquisicao') or datetime.now().strftime('%Y-%m-%d'),
-        dados.get('notas', ''),
-        codigo_barras,
-        1 if dados.get('favorito') else 0
-    ))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': f'"{artista} - {album}" adicionado!'})
-
-@app.route('/editar_disco/<int:disco_id>', methods=['PUT'])
-def editar_disco(disco_id):
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    dados = request.json
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-
-    # O campo "ano" não existe mais no formulário de edição — preserva o
-    # que já estava salvo. Só tenta buscar de novo se ainda estiver vazio.
-    c.execute('SELECT ano_lancamento, genero, capa_url FROM colecao WHERE id = ? AND usuario_id = ?', (disco_id, usuario_id))
-    row = c.fetchone()
-    ano_lancamento = row[0] if row else None
-    genero = row[1] if row else None
-    capa_url = row[2] if row else None
-    if not ano_lancamento or not genero or not capa_url:
-        r = _buscar_discogs(artista=dados.get('artista'), album=dados.get('album'))
-        ano_lancamento = ano_lancamento or r['ano']
-        genero = genero or r['genero']
-        capa_url = capa_url or r['capa_url']
-
-    c.execute('''
-        UPDATE colecao SET
-            artista = ?,
-            album = ?,
-            formato = ?,
-            ano_lancamento = ?,
-            genero = ?,
-            capa_url = ?,
-            condicao_midia = ?,
-            condicao_capa = ?,
-            preco = ?,
-            data_adicao = ?,
-            notas = ?,
-            codigo_barras = ?,
-            favorito = ?
-        WHERE id = ? AND usuario_id = ?
-    ''', (
-        dados.get('artista'),
-        dados.get('album'),
-        dados.get('formato', ''),
-        ano_lancamento,
-        genero,
-        capa_url,
-        dados.get('condicao_midia', ''),
-        dados.get('condicao_capa', ''),
-        dados.get('preco'),
-        dados.get('data_aquisicao') or datetime.now().strftime('%Y-%m-%d'),
-        dados.get('notas', ''),
-        dados.get('codigo_barras', ''),
-        1 if dados.get('favorito') else 0,
-        disco_id,
-        usuario_id
-    ))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Disco atualizado!'})
-
-@app.route('/remover_disco/<int:disco_id>', methods=['DELETE'])
-def remover_disco(disco_id):
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('DELETE FROM colecao WHERE id = ? AND usuario_id = ?', (disco_id, usuario_id))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Disco removido!'})
-
-# ================================================================
-# RECOMENDAÇÕES (WISHLIST)
-# ================================================================
-@app.route('/recomendacoes')
-def get_recomendacoes():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify([])
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        SELECT id, artista, album, tier, estrategia, nota, justificativa, origem, comprado, capa_url, data_adicao
-        FROM recomendacoes
-        WHERE usuario_id = ? AND comprado = 0
-        ORDER BY CASE tier WHEN 'S' THEN 1 WHEN 'A' THEN 2 WHEN 'B' THEN 3 WHEN 'C' THEN 4 END, id ASC
-    ''', (usuario_id,))
-    dados = c.fetchall()
-    conn.close()
-
-    resultado = []
-    for d in dados:
-        item = {
-            'id': d[0],
-            'artista': d[1],
-            'album': d[2],
-            'tier': d[3],
-            'estrategia': d[4],
-            'nota': d[5],
-            'justificativa': d[6] or '',
-            'origem': d[7] or 'algoritmo',
-            'comprado': d[8] or 0,
-            'capa_url': d[9],
-            'data_adicao': d[10]
-        }
-        # Adiciona frase Padrão 5 (sem emojis)
-        item['frase'] = gerar_frase_padrao5(usuario_id, d[1], d[2])
-        resultado.append(item)
-
-    return jsonify(resultado)
-
-@app.route('/adicionar_recomendacao', methods=['POST'])
-def adicionar_recomendacao():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    dados = request.json
-    artista = dados.get('artista')
-    album = dados.get('album')
-    tier = dados.get('tier', 'B')
-    nota = dados.get('notas', 'Adicionado manualmente')
-    if not artista or not album:
-        return jsonify({'erro': 'Artista e álbum são obrigatórios'}), 400
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    capa_url = buscar_capa_discogs(artista, album)
-    c.execute('''
-        INSERT INTO recomendacoes (usuario_id, artista, album, tier, estrategia, nota, origem, justificativa, capa_url, data_adicao)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (usuario_id, artista, album, tier, f'Prioridade {tier} - Adicionado manualmente', nota, 'manual', 'Adicionado manualmente à lista de compras.', capa_url, datetime.now().strftime('%Y-%m-%d')))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': f'"{artista} - {album}" adicionado à lista de compras!'})
-
-@app.route('/marcar_como_tenho/<int:rec_id>', methods=['POST'])
-def marcar_como_tenho(rec_id):
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('SELECT artista, album, capa_url FROM recomendacoes WHERE id = ? AND usuario_id = ?', (rec_id, usuario_id))
-    rec = c.fetchone()
-    if not rec:
-        conn.close()
-        return jsonify({'erro': 'Recomendação não encontrada'}), 404
-
-    artista, album, capa_url = rec
-    r = _buscar_discogs(artista=artista, album=album)
-    ano_lancamento = r['ano']
-    genero = r['genero']
-    capa_url = capa_url or r['capa_url']
-    c.execute('''
-        INSERT INTO colecao (usuario_id, artista, album, ano_lancamento, genero, capa_url, data_adicao)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (usuario_id, artista, album, ano_lancamento, genero, capa_url, datetime.now().strftime('%Y-%m-%d')))
-    c.execute('UPDATE recomendacoes SET comprado = 1 WHERE id = ? AND usuario_id = ?', (rec_id, usuario_id))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': f'"{artista} - {album}" movido para a coleção!'})
-
-# ================================================================
-# NOVAS ROTAS: EDITAR TIER E REMOVER DA WISHLIST
-# ================================================================
-@app.route('/wishlist/update_tier/<int:rec_id>', methods=['PUT'])
-def update_wishlist_tier(rec_id):
-    """Atualiza o tier de um item na wishlist"""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    dados = request.json
-    novo_tier = dados.get('tier')
-
-    if not novo_tier or novo_tier not in ['S', 'A', 'B', 'C']:
-        return jsonify({'erro': 'Tier inválido'}), 400
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        UPDATE recomendacoes
-        SET tier = ?
-        WHERE id = ? AND usuario_id = ? AND comprado = 0
-    ''', (novo_tier, rec_id, usuario_id))
-
-    if c.rowcount == 0:
-        conn.close()
-        return jsonify({'erro': 'Item não encontrado'}), 404
-
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Tier atualizado!'})
-
-@app.route('/wishlist/remove/<int:rec_id>', methods=['DELETE'])
-def remove_from_wishlist(rec_id):
-    """Remove um item da wishlist (exclui permanentemente)"""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        DELETE FROM recomendacoes
-        WHERE id = ? AND usuario_id = ? AND comprado = 0
-    ''', (rec_id, usuario_id))
-
-    if c.rowcount == 0:
-        conn.close()
-        return jsonify({'erro': 'Item não encontrado'}), 404
-
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Item removido da wishlist!'})
-
-# ================================================================
-# AJUSTE FINO
-# ================================================================
-# O front-end manda uma lista de respostas: [{artista, relacao}, ...]
-# relacao é sempre um destes 4 valores:
-#   'amo'       -> "Ainda curto muito"              (sobe 1 tier)
-#   'ok'        -> "É bom, mas não ouço sempre"      (mantém o tier)
-#   'pouco'     -> "Ainda gosto, mas bem menos"      (desce 1 tier)
-#   'nao_quero' -> "Prefiro que não apareça"         (vai direto pra C)
-@app.route('/ajuste_fino', methods=['POST'])
-def ajuste_fino():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    dados = request.json
-    respostas = dados.get('respostas', [])
-    if not respostas:
-        return jsonify({'erro': 'Nenhuma resposta enviada'}), 400
-
-    ordem_tiers = ['C', 'B', 'A', 'S']
-    relacoes_validas = ('amo', 'ok', 'pouco', 'nao_quero')
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-
-    for resposta in respostas:
-        artista = resposta.get('artista')
-        relacao = resposta.get('relacao')
-        if not artista or relacao not in relacoes_validas:
-            continue
-
-        # Salva/atualiza a resposta (usada depois pra não perguntar de novo)
-        c.execute('''
-            SELECT id FROM artista_ajuste
-            WHERE usuario_id = ? AND LOWER(artista) = LOWER(?)
-        ''', (usuario_id, artista))
-        existente = c.fetchone()
-        if existente:
-            c.execute('''
-                UPDATE artista_ajuste
-                SET relacao = ?, data_ajuste = ?
-                WHERE usuario_id = ? AND LOWER(artista) = LOWER(?)
-            ''', (relacao, datetime.now().isoformat(), usuario_id, artista))
-        else:
-            c.execute('''
-                INSERT INTO artista_ajuste (usuario_id, artista, relacao, data_ajuste)
-                VALUES (?, ?, ?, ?)
-            ''', (usuario_id, artista, relacao, datetime.now().isoformat()))
-
-        # Aplica o efeito no tier de cada recomendação ainda não comprada
-        c.execute('''
-            SELECT id, tier FROM recomendacoes
-            WHERE usuario_id = ? AND LOWER(artista) = LOWER(?) AND comprado = 0
-        ''', (usuario_id, artista))
-        for rec_id, tier_atual in c.fetchall():
-            if relacao == 'nao_quero':
-                novo_tier = 'C'
-            else:
-                idx = ordem_tiers.index(tier_atual) if tier_atual in ordem_tiers else 0
-                if relacao == 'amo':
-                    idx = min(idx + 1, len(ordem_tiers) - 1)
-                elif relacao == 'pouco':
-                    idx = max(idx - 1, 0)
-                # relacao == 'ok' mantém o tier atual (idx não muda)
-                novo_tier = ordem_tiers[idx]
-
-            if novo_tier != tier_atual:
-                c.execute('''
-                    UPDATE recomendacoes SET tier = ?
-                    WHERE id = ? AND usuario_id = ?
-                ''', (novo_tier, rec_id, usuario_id))
-
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Ajuste fino aplicado com sucesso!'})
-
-# ================================================================
-# FUNÇÃO: FRASE PADRÃO 5 (SEM EMOJIS)
-# ================================================================
-def gerar_frase_padrao5(usuario_id, artista, album):
-    """Gera frase no Padrão 5 sem emojis: '[Álbum]: X faixas • Álbum mais presente na sua coleção'"""
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('''
-            SELECT COUNT(*) FROM playlists
-            WHERE usuario_id = ? AND LOWER(artista) = ? AND LOWER(album) = ?
-        ''', (usuario_id, artista.lower().strip(), album.lower().strip()))
-        count = c.fetchone()[0]
-        conn.close()
-
-        if count > 0:
-            return f"{album}: {count} faixas • Álbum mais presente na sua coleção"
-        else:
-            # Busca se tem na coleção como fallback
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute('''
-                SELECT COUNT(*) FROM colecao
-                WHERE usuario_id = ? AND LOWER(artista) = ? AND LOWER(album) = ?
-            ''', (usuario_id, artista.lower().strip(), album.lower().strip()))
-            count_col = c.fetchone()[0]
-            conn.close()
-
-            if count_col > 0:
-                return f"{album}: {count_col} faixas • Álbum em destaque na sua coleção"
-            else:
-                return f"{album}: Álbum em destaque na sua wishlist"
-    except Exception as e:
-        print(f"Erro ao gerar frase: {e}")
-        return f"{album}: Álbum em destaque"
-
-# ================================================================
-# PREENCHER ANOS FALTANTES (discos adicionados antes da busca automática)
-# ================================================================
-@app.route('/preencher_anos_faltantes', methods=['POST'])
-def preencher_anos_faltantes():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        SELECT id, artista, album, codigo_barras, ano_lancamento, genero FROM colecao
-        WHERE usuario_id = ? AND (
-            ano_lancamento IS NULL OR ano_lancamento = '' OR
-            genero IS NULL OR genero = ''
-        )
-    ''', (usuario_id,))
-    faltando = c.fetchall()
-
-    atualizados = 0
-    nao_encontrados = []
-    for disco_id, artista, album, codigo_barras, ano_atual, genero_atual in faltando:
-        ano = ano_atual
-        genero = genero_atual
-        if codigo_barras:
-            r = _buscar_discogs(codigo=codigo_barras)
-            ano = ano or r['ano']
-            genero = genero or r['genero']
-        if not ano or not genero:
-            r = _buscar_discogs(artista=artista, album=album)
-            ano = ano or r['ano']
-            genero = genero or r['genero']
-
-        if ano != ano_atual or genero != genero_atual:
-            c.execute('UPDATE colecao SET ano_lancamento = ?, genero = ? WHERE id = ? AND usuario_id = ?',
-                       (ano, genero, disco_id, usuario_id))
-            atualizados += 1
-        else:
-            nao_encontrados.append(f'{artista} - {album}')
-
-    conn.commit()
-    conn.close()
-    return jsonify({
-        'sucesso': True,
-        'total_verificados': len(faltando),
-        'atualizados': atualizados,
-        'nao_encontrados': nao_encontrados
-    })
-
-# ================================================================
-# ZERAR DADOS
-# ================================================================
-@app.route('/zerar_playlists', methods=['DELETE'])
-def zerar_playlists():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('DELETE FROM playlists WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM recomendacoes WHERE usuario_id = ? AND origem = "algoritmo"', (usuario_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Playlists e recomendações zeradas!'})
-
-@app.route('/zerar_colecao', methods=['DELETE'])
-def zerar_colecao():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('DELETE FROM colecao WHERE usuario_id = ?', (usuario_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Coleção zerada!'})
-
-@app.route('/zerar_wishlist', methods=['DELETE'])
-def zerar_wishlist():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('DELETE FROM recomendacoes WHERE usuario_id = ? AND comprado = 0', (usuario_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Wishlist zerada!'})
-
-@app.route('/zerar_tudo', methods=['DELETE'])
-def zerar_tudo():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('DELETE FROM playlists WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM colecao WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM recomendacoes WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM descobertas WHERE usuario_id = ?', (usuario_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'sucesso': True, 'mensagem': 'Todos os dados zerados!'})
-
-@app.route('/excluir_conta', methods=['DELETE'])
-def excluir_conta():
-    """Apaga a conta e todos os dados associados. Irreversível — o front-end
-    exige confirmação explícita antes de chamar isso."""
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    if DEV_MODE:
-        return jsonify({'erro': 'Exclusão de conta desativada no ambiente de teste (DEV_MODE).'}), 403
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('DELETE FROM playlists WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM colecao WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM recomendacoes WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM descobertas WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM artista_ajuste WHERE usuario_id = ?', (usuario_id,))
-    c.execute('DELETE FROM usuarios WHERE id = ?', (usuario_id,))
-    conn.commit()
-    conn.close()
-    session.clear()
-    return jsonify({'sucesso': True, 'mensagem': 'Conta excluída.'})
-
-# ================================================================
-# BUSCAR POR CÓDIGO DE BARRAS
-# ================================================================
-@app.route('/buscar_por_codigo_barras')
-def buscar_por_codigo_barras():
-    codigo = request.args.get('codigo')
-    if not codigo:
-        return jsonify({'erro': 'Código de barras não informado'}), 400
-
-    url = f'https://api.discogs.com/database/search?barcode={codigo}&format=vinyl&format=cd&format=cassette'
-    headers = {
-        'User-Agent': 'Discoteca/0.8.9 (fportelada@gmail.com)',
-        'Accept': 'application/json'
-    }
-    try:
-        resp = requests.get(url, headers=headers, timeout=10)
-        if resp.status_code != 200:
-            return jsonify({'erro': 'Erro ao buscar no Discogs'}), 500
-
-        data = resp.json()
-        resultados = data.get('results', [])
-        if not resultados:
-            return jsonify({'sucesso': False, 'mensagem': 'Nenhum disco encontrado para este código'})
-
-        item = resultados[0]
-        title = item.get('title', '')
-        artist = ''
-        album = ''
-        if ' - ' in title:
-            parts = title.split(' - ', 1)
-            artist = parts[0].strip()
-            album = parts[1].strip()
-        else:
-            artist = title.strip()
-            album = ''
-
-        formato = ''
-        format_str = item.get('format', [''])[0] if item.get('format') else ''
-        if 'vinyl' in format_str.lower():
-            formato = 'LP'
-        elif 'cd' in format_str.lower():
-            formato = 'CD'
-        elif 'cassette' in format_str.lower():
-            formato = 'Cassete'
-
-        ano = item.get('year', '')
-
-        return jsonify({
-            'sucesso': True,
-            'disco': {
-                'artista': artist,
-                'album': album,
-                'formato': formato,
-                'ano': ano,
-                'gravadora': item.get('label', [''])[0] if item.get('label') else '',
-                'titulo_original': title
-            }
-        })
-
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-# ================================================================
-# IMPORTAR PLAYLIST
-# ================================================================
-@app.route('/importar_playlist', methods=['POST'])
-def importar_playlist():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    arquivo = request.files.get('arquivo')
-    tipo = request.form.get('tipo')
-    if not arquivo or not tipo:
-        return jsonify({'erro': 'Arquivo e tipo são obrigatórios'}), 400
-
-    try:
-        content = arquivo.read().decode('utf-8')
-        reader = csv.reader(io.StringIO(content))
-        header = next(reader)
-
-        is_spotify_format = False
-        if header and len(header) > 0:
-            first_col = header[0].strip().lower()
-            if 'spotify:track' in first_col or 'track uri' in first_col:
-                is_spotify_format = True
-
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('DELETE FROM playlists WHERE usuario_id = ? AND tipo = ?', (usuario_id, tipo))
-
-        importados = 0
-        for row in reader:
-            if len(row) < 2:
-                continue
-
-            if is_spotify_format:
-                artista = row[3].strip() if len(row) > 3 else ''
-                album = row[2].strip() if len(row) > 2 else ''
-                if len(row) > 11 and row[11].strip():
-                    genero = row[11].strip()
-                else:
-                    genero = ''
-                ano_str = row[4].strip() if len(row) > 4 else ''
-                explicita = 1 if len(row) > 8 and row[8].strip().upper() == 'TRUE' else 0
-                duracao_str = row[5].strip() if len(row) > 5 else ''
-            else:
-                artista = row[0].strip()
-                album = row[1].strip()
-                genero = row[2].strip() if len(row) > 2 else ''
-                ano_str = row[3].strip() if len(row) > 3 else ''
-                explicita = 1 if len(row) > 4 and row[4].strip().upper() == 'TRUE' else 0
-                duracao_str = row[5].strip() if len(row) > 5 else ''
-
-            if not artista or not album:
-                continue
-
-            ano = 0
-            if ano_str:
-                try:
-                    if '-' in ano_str:
-                        ano_str = ano_str.split('-')[0]
-                    if ano_str.isdigit():
-                        ano = int(ano_str)
-                except:
-                    pass
-
-            duracao = 0
-            if duracao_str:
-                try:
-                    duracao = int(duracao_str)
-                except:
-                    pass
-
-            c.execute('''
-                INSERT INTO playlists (usuario_id, tipo, artista, album, data_importacao)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (usuario_id, tipo, artista, album, datetime.now().isoformat()))
-
-            c.execute('''
-                SELECT id FROM musicas_usuario
-                WHERE usuario_id = ? AND artista = ? AND album = ?
-            ''', (usuario_id, artista, album))
-            if not c.fetchone():
-                c.execute('''
-                    INSERT INTO musicas_usuario (usuario_id, artista, album, genero, ano, explicita, duracao_ms, data_importacao)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (usuario_id, artista, album, genero, ano, explicita, duracao, datetime.now().isoformat()))
-
-            importados += 1
-
-        conn.commit()
-        conn.close()
-        return jsonify({'sucesso': True, 'mensagem': f'{importados} itens importados'})
-
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-# ================================================================
-# IMPORTAR COLEÇÃO DO DISCOGS
-# ================================================================
-@app.route('/importar_colecao', methods=['POST'])
-def importar_colecao():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    arquivo = request.files.get('arquivo')
-    if not arquivo:
-        return jsonify({'erro': 'Arquivo é obrigatório'}), 400
-
-    try:
-        content = arquivo.read().decode('utf-8')
-        reader = csv.reader(io.StringIO(content))
-        header = next(reader)
-
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('DELETE FROM colecao WHERE usuario_id = ?', (usuario_id,))
-
-        importados = 0
-        for row in reader:
-            if len(row) < 13:
-                continue
-            artista = row[1].strip() if len(row) > 1 else ''
-            album = row[2].strip() if len(row) > 2 else ''
-            formato = row[4].strip() if len(row) > 4 else ''
-            condicao_midia = row[10].strip() if len(row) > 10 else ''
-            condicao_capa = row[11].strip() if len(row) > 11 else ''
-            data_adicao = row[9].strip() if len(row) > 9 else ''
-            notas = row[12].strip() if len(row) > 12 else ''
-
-            if not artista or not album:
-                continue
-
-            c.execute('''
-                INSERT INTO colecao (usuario_id, artista, album, formato, condicao_midia, condicao_capa, data_adicao, notas)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (usuario_id, artista, album, formato, condicao_midia, condicao_capa, data_adicao, notas))
-            importados += 1
-
-        conn.commit()
-        conn.close()
-        return jsonify({'sucesso': True, 'mensagem': f'{importados} discos importados'})
-
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-# ================================================================
-# STATUS DA IMPORTAÇÃO — o que já foi enviado, real e persistente
-# (antes isso só existia "durante a sessão", sumia ao recarregar).
-# Reaproveita a coluna `tipo` da tabela playlists, que já existia mas
-# nunca tinha sido consultada de volta.
-# ================================================================
-@app.route('/status_importacao')
-def status_importacao():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-
-    c.execute('SELECT tipo, COUNT(*) FROM playlists WHERE usuario_id = ? GROUP BY tipo', (usuario_id,))
-    contagem_por_tipo = dict(c.fetchall())
-
-    c.execute('SELECT COUNT(*) FROM colecao WHERE usuario_id = ?', (usuario_id,))
-    total_discos = c.fetchone()[0]
-
-    c.execute('SELECT COUNT(DISTINCT artista) FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-    artistas_unicos = c.fetchone()[0]
-    c.execute('SELECT COUNT(DISTINCT artista || album) FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-    albuns_unicos = c.fetchone()[0]
-    c.execute('SELECT COUNT(*) FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-    total_musicas = c.fetchone()[0]
-    c.execute('SELECT COUNT(DISTINCT genero) FROM musicas_usuario WHERE usuario_id = ? AND genero != ""', (usuario_id,))
-    generos_unicos = c.fetchone()[0]
-    c.execute('SELECT DISTINCT ano FROM musicas_usuario WHERE usuario_id = ? AND ano > 0', (usuario_id,))
-    decadas_unicas = len(set((a[0] // 10) * 10 for a in c.fetchall()))
-    conn.close()
-
-    fontes = {
-        'top': contagem_por_tipo.get('top', 0),
-        'desc': contagem_por_tipo.get('desc', 0),
-        'fav': contagem_por_tipo.get('fav', 0)
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  verificarSessao();
+});
+
+// ================================================================
+// BUSCA (topo)
+// ================================================================
+function configurarBuscaDashboard() {
+  const input = document.getElementById('dashSearch');
+  const results = document.getElementById('dashSearchResults');
+  if (!input || !results) return;
+
+  input.addEventListener('input', function() {
+    const termo = this.value.trim().toLowerCase();
+    if (!termo) {
+      results.innerHTML = '';
+      results.classList.remove('open');
+      return;
     }
 
-    # Confiança da recomendação: pondera pelas fontes já importadas (Top
-    # pesa mais, igual o motor de recomendação já usa). Simples e honesto —
-    # não é um "score de IA" de verdade, só reflete quanta base de dado existe.
-    pontos = 0
-    maximo = 10
-    if fontes['top'] > 0:
-        pontos += 4
-    if fontes['fav'] > 0:
-        pontos += 3
-    if fontes['desc'] > 0:
-        pontos += 2
-    if total_discos > 0:
-        pontos += 1
-    confianca_pct = round(pontos / maximo * 100)
-
-    return jsonify({
-        'fontes': fontes,
-        'colecao_importada': total_discos > 0,
-        'total_discos': total_discos,
-        'cobertura': {
-            'artistas': artistas_unicos,
-            'albuns': albuns_unicos,
-            'musicas': total_musicas,
-            'generos': generos_unicos,
-            'decadas': decadas_unicas
-        },
-        'confianca_pct': confianca_pct
-    })
-
-# ================================================================
-# CURADORIA INTELIGENTE - CORRIGIDA (SEM EMOJIS, PADRÃO 5)
-# ================================================================
-@app.route('/gerar_recomendacoes', methods=['POST'])
-def gerar_recomendacoes():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-
-    c.execute('''
-        SELECT p.tipo, p.artista, p.album, m.ano
-        FROM playlists p
-        JOIN musicas_usuario m ON p.usuario_id = m.usuario_id AND p.artista = m.artista AND p.album = m.album
-        WHERE p.usuario_id = ?
-    ''', (usuario_id,))
-    dados = c.fetchall()
-
-    if not dados:
-        conn.close()
-        return jsonify({'erro': 'Nenhuma playlist encontrada'}), 400
-
-    c.execute('SELECT artista, album FROM colecao WHERE usuario_id = ?', (usuario_id,))
-    colecao = c.fetchall()
-    colecao_set = set((a.lower().strip(), b.lower().strip()) for a, b in colecao)
-
-    contagem_artista = defaultdict(lambda: {'top': 0, 'descobertas': 0, 'favoritos': 0})
-    contagem_album = defaultdict(lambda: defaultdict(int))
-    contagem_musica = defaultdict(int)
-    anos_artista = defaultdict(set)
-    ao_vivo_por_artista = defaultdict(lambda: {'contagem': 0, 'album': ''})
-    musica_para_album = {}
-
-    for tipo, artista, album, ano in dados:
-        if not artista or not album:
-            continue
-
-        if tipo == 'desc':
-            tipo_normalizado = 'descobertas'
-        elif tipo == 'fav':
-            tipo_normalizado = 'favoritos'
-        else:
-            tipo_normalizado = tipo
-
-        artista_lower = artista.lower().strip()
-        album_lower = album.lower().strip()
-
-        contagem_artista[artista_lower][tipo_normalizado] += 1
-        contagem_album[artista_lower][album_lower] += 1
-
-        musica_key = f"{artista_lower}|{album_lower}"
-        contagem_musica[musica_key] += 1
-        musica_para_album[musica_key] = album
-
-        if ano and ano > 1900:
-            anos_artista[artista_lower].add(ano)
-
-        if any(palavra in album_lower for palavra in ['live', 'ao vivo', 's&m', 'tokyo tales', 'alive', 'unplugged']):
-            if contagem_album[artista_lower][album_lower] > ao_vivo_por_artista[artista_lower]['contagem']:
-                ao_vivo_por_artista[artista_lower]['contagem'] = contagem_album[artista_lower][album_lower]
-                ao_vivo_por_artista[artista_lower]['album'] = album
-
-    pontuacao = {}
-    for artista, counts in contagem_artista.items():
-        pontuacao[artista] = counts['top'] * 3 + counts['descobertas'] * 2 + counts['favoritos'] * 1
-
-        if len(anos_artista.get(artista, set())) >= 3:
-            pontuacao[artista] += 5
-
-        if ao_vivo_por_artista.get(artista, {}).get('contagem', 0) >= 2:
-            pontuacao[artista] += 3
-
-    artistas_ordenados = sorted(pontuacao.items(), key=lambda x: x[1], reverse=True)
-    top_artistas = artistas_ordenados[:15]
-
-    if not top_artistas:
-        conn.close()
-        return jsonify({'erro': 'Nenhum artista encontrado'}), 400
-
-    total = len(top_artistas)
-    tiers = {}
-    for i, (artista, pontos) in enumerate(top_artistas):
-        if i < total * 0.2:
-            tier = 'S'
-        elif i < total * 0.5:
-            tier = 'A'
-        elif i < total * 0.8:
-            tier = 'B'
-        else:
-            tier = 'C'
-        tiers[artista] = tier
-
-    c.execute('DELETE FROM recomendacoes WHERE usuario_id = ? AND origem = "algoritmo"', (usuario_id,))
-
-    for artista, tier in tiers.items():
-        artista_original = artista
-        c.execute('''
-            SELECT artista FROM playlists WHERE usuario_id = ? AND LOWER(artista) = ?
-            LIMIT 1
-        ''', (usuario_id, artista_original))
-        artista_nome = c.fetchone()
-        artista_display = artista_nome[0] if artista_nome else artista_original.title()
-
-        albuns_ordenados = sorted(contagem_album[artista_original].items(), key=lambda x: x[1], reverse=True)
-
-        albuns_faltantes = []
-        for album_lower, count in albuns_ordenados:
-            ja_tem = False
-            for colecao_artista, colecao_album in colecao_set:
-                if colecao_artista == artista_original:
-                    if colecao_album in album_lower or album_lower in colecao_album:
-                        ja_tem = True
-                        break
-            if not ja_tem:
-                albuns_faltantes.append((album_lower, count))
-
-        if not albuns_faltantes:
-            albuns_faltantes = albuns_ordenados[:1]
-
-        if not albuns_faltantes:
-            continue
-
-        melhor_album_lower, melhor_count = albuns_faltantes[0]
-
-        c.execute('''
-            SELECT album FROM playlists WHERE usuario_id = ? AND LOWER(artista) = ? AND LOWER(album) = ?
-            LIMIT 1
-        ''', (usuario_id, artista_original, melhor_album_lower))
-        album_result = c.fetchone()
-        album_display = album_result[0] if album_result else melhor_album_lower.title()
-
-        # ===== JUSTIFICATIVA NO PADRÃO 5 (SEM EMOJIS) =====
-        # Usa a função gerar_frase_padrao5 para criar a justificativa
-        justificativa = gerar_frase_padrao5(usuario_id, artista_display, album_display)
-
-        if tier == 'S':
-            estrategia = 'Prioridade Maxima - Comprar assim que aparecer'
-            nota = f'{artista_display} e uma das bandas mais consistentes nas suas playlists.'
-        elif tier == 'A':
-            estrategia = 'Alta Prioridade - Comprar na sequencia'
-            nota = f'{artista_display} apareceu com frequencia nas suas playlists.'
-        elif tier == 'B':
-            estrategia = 'Sem Urgencia - Acompanhar promocoes'
-            nota = f'{artista_display} esta presente nas suas playlists, mas com menor frequencia.'
-        else:
-            estrategia = 'Baixa Prioridade - Apenas se aparecer oportunidade'
-            nota = f'{artista_display} aparece ocasionalmente nas suas playlists.'
-
-        c.execute('''
-            INSERT INTO recomendacoes (usuario_id, artista, album, tier, estrategia, nota, justificativa, origem, data_adicao)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (usuario_id, artista_display, album_display, tier, estrategia, nota, justificativa, 'algoritmo', datetime.now().strftime('%Y-%m-%d')))
-
-    # ===== AJUSTE FINO: escolhe até 3 artistas ainda não perguntados =====
-    c.execute('SELECT LOWER(artista) FROM artista_ajuste WHERE usuario_id = ?', (usuario_id,))
-    ja_perguntados = set(row[0] for row in c.fetchall())
-
-    artistas_para_ajuste = []
-    for artista_lower, _pontos in top_artistas:
-        if artista_lower in ja_perguntados:
-            continue
-        c.execute('''
-            SELECT artista FROM playlists WHERE usuario_id = ? AND LOWER(artista) = ?
-            LIMIT 1
-        ''', (usuario_id, artista_lower))
-        nome = c.fetchone()
-        artistas_para_ajuste.append(nome[0] if nome else artista_lower.title())
-        if len(artistas_para_ajuste) >= 3:
-            break
-
-    ajuste_necessario = len(artistas_para_ajuste) > 0
-
-    conn.commit()
-    conn.close()
-    return jsonify({
-        'sucesso': True,
-        'mensagem': f'Recomendacoes geradas para {len(tiers)} artistas!',
-        'ajuste_necessario': ajuste_necessario,
-        'artistas_para_ajuste': artistas_para_ajuste
-    })
-
-# ================================================================
-# ESTATÍSTICAS DO PLAYER
-# ================================================================
-@app.route('/estatisticas')
-def get_estatisticas():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('''
-            SELECT artista, album, genero, ano, explicita, duracao_ms
-            FROM musicas_usuario
-            WHERE usuario_id = ?
-        ''', (usuario_id,))
-        musicas = c.fetchall()
-        conn.close()
-
-        if not musicas:
-            return jsonify({'total_musicas': 0})
-
-        artistas = []
-        albuns = []
-        generos = []
-        anos = []
-        explicitas = 0
-        total = len(musicas)
-        duracao_total_ms = 0
-
-        for artista, album, genero, ano, explicita, duracao in musicas:
-            if artista:
-                for a in artista.split(';'):
-                    artistas.append(a.strip())
-            if album:
-                albuns.append(album)
-            if genero:
-                primeiro_genero = genero.split(',')[0].strip()
-                if primeiro_genero:
-                    generos.append(primeiro_genero)
-            if ano and ano > 0:
-                anos.append(ano)
-            if explicita:
-                explicitas += 1
-            if duracao:
-                duracao_total_ms += duracao
-
-        top_artistas = Counter(artistas).most_common(10)
-        top_albuns = Counter(albuns).most_common(10)
-        top_generos = Counter(generos).most_common(10)
-
-        decadas = {}
-        for ano in anos:
-            if ano >= 2020:
-                decada = '2020s'
-            elif ano >= 2010:
-                decada = '2010s'
-            elif ano >= 2000:
-                decada = '2000s'
-            elif ano >= 1990:
-                decada = '1990s'
-            elif ano >= 1980:
-                decada = '1980s'
-            elif ano >= 1970:
-                decada = '1970s'
-            else:
-                decada = 'Outros'
-            decadas[decada] = decadas.get(decada, 0) + 1
-
-        duracao_horas = duracao_total_ms / (1000 * 60 * 60)
-
-        return jsonify({
-            'total_musicas': total,
-            'artistas_unicos': len(set(artistas)),
-            'albuns_unicos': len(set(albuns)),
-            'duracao_horas': round(duracao_horas, 1),
-            'explicitas': explicitas,
-            'nao_explicitas': total - explicitas,
-            'top_artistas': [{'nome': a, 'contagem': c} for a, c in top_artistas],
-            'top_albuns': [{'nome': a, 'contagem': c} for a, c in top_albuns],
-            'top_generos': [{'nome': g, 'contagem': c} for g, c in top_generos],
-            'decadas': [{'nome': d, 'contagem': c} for d, c in decadas.items()]
-        })
-
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-# ================================================================
-# ESTATÍSTICAS DA ESTANTE (MELHORADAS)
-# ================================================================
-@app.route('/estatisticas_colecao')
-def get_estatisticas_colecao():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('''
-            SELECT artista, album, formato, ano_lancamento, genero, data_adicao, preco, condicao_midia
-            FROM colecao
-            WHERE usuario_id = ?
-        ''', (usuario_id,))
-        discos = c.fetchall()
-        conn.close()
-
-        if not discos:
-            return jsonify({'total_discos': 0})
-
-        total = len(discos)
-        artistas = []
-        formatos = []
-        generos = []
-        anos = []
-        precos = []
-        valor_total = 0
-        condicoes_registradas = 0
-        dados_completos = []
-
-        for artista, album, formato, ano_lancamento, genero, data_adicao, preco, condicao_midia in discos:
-            if artista:
-                artistas.append(artista.strip())
-            if formato:
-                formatos.append(formato.strip())
-            if genero:
-                generos.append(genero.strip())
-            if ano_lancamento:
-                anos.append(int(ano_lancamento))
-            if preco:
-                valor_total += preco
-                precos.append(preco)
-            if condicao_midia and condicao_midia.strip():
-                condicoes_registradas += 1
-            dados_completos.append({
-                'artista': artista,
-                'album': album,
-                'data_adicao': data_adicao,
-                'preco': preco
-            })
-
-        lps = sum(1 for f in formatos if f and ('LP' in f or 'EP' in f or 'Vinil' in f))
-        cds = sum(1 for f in formatos if f and 'CD' in f)
-        cassetes = sum(1 for f in formatos if f and ('Cassete' in f or 'cassette' in f.lower()))
-        dvd_bluray = sum(1 for f in formatos if f and ('DVD' in f or 'Blu-ray' in f or 'Bluray' in f))
-        outros = total - lps - cds - cassetes - dvd_bluray
-
-        top_artistas = Counter(artistas).most_common(5)
-
-        genero_predominante = None
-        genero_predominante_pct = None
-        if generos:
-            nome_genero, contagem_genero = Counter(generos).most_common(1)[0]
-            genero_predominante = nome_genero
-            genero_predominante_pct = round(contagem_genero / len(generos) * 100)
-
-        decadas = {}
-        for ano in anos:
-            if ano >= 2020:
-                decada = '2020s'
-            elif ano >= 2010:
-                decada = '2010s'
-            elif ano >= 2000:
-                decada = '2000s'
-            elif ano >= 1990:
-                decada = '1990s'
-            elif ano >= 1980:
-                decada = '1980s'
-            elif ano >= 1970:
-                decada = '1970s'
-            else:
-                decada = 'Outros'
-            decadas[decada] = decadas.get(decada, 0) + 1
-
-        album_mais_antigo = None
-        album_mais_recente = None
-        if dados_completos:
-            dados_ordenados = sorted(dados_completos, key=lambda x: x['data_adicao'] if x['data_adicao'] else '')
-            if dados_ordenados:
-                primeiro = dados_ordenados[0]
-                album_mais_antigo = f"{primeiro['artista']} - {primeiro['album']}" if primeiro['artista'] and primeiro[
-                    'album'] else None
-                ultimo = dados_ordenados[-1]
-                album_mais_recente = f"{ultimo['artista']} - {ultimo['album']}" if ultimo['artista'] and ultimo[
-                    'album'] else None
-
-        preco_medio = round(valor_total / total, 2) if total > 0 and valor_total > 0 else 0
-
-        disco_mais_caro = None
-        disco_mais_barato = None
-        if precos:
-            max_preco = max(precos)
-            min_preco = min(precos)
-            for d in dados_completos:
-                if d['preco'] == max_preco:
-                    disco_mais_caro = f"{d['artista']} - {d['album']} (R$ {max_preco:.2f})"
-                    break
-            for d in dados_completos:
-                if d['preco'] == min_preco:
-                    disco_mais_barato = f"{d['artista']} - {d['album']} (R$ {min_preco:.2f})"
-                    break
-
-        # Valor por formato (real — reaproveita o mesmo dado já buscado acima)
-        valor_por_formato = {'vinil': 0, 'cd': 0, 'cassete': 0, 'dvd_bluray': 0}
-        for artista, album, formato, ano_lancamento, genero, data_adicao, preco, condicao_midia in discos:
-            if not preco:
-                continue
-            f = formato or ''
-            if 'LP' in f or 'EP' in f or 'Vinil' in f:
-                valor_por_formato['vinil'] += preco
-            elif 'CD' in f:
-                valor_por_formato['cd'] += preco
-            elif 'Cassete' in f or 'cassette' in f.lower():
-                valor_por_formato['cassete'] += preco
-            elif 'DVD' in f or 'Blu-ray' in f:
-                valor_por_formato['dvd_bluray'] += preco
-        valor_por_formato = {k: round(v, 2) for k, v in valor_por_formato.items()}
-
-        # Crescimento mensal (últimos 12 meses, real — a partir de data_adicao)
-        hoje = datetime.now()
-        meses_ordem = []
-        contagem_mensal = defaultdict(int)
-        for i in range(11, -1, -1):
-            mes_ref = (hoje.month - i - 1) % 12 + 1
-            ano_ref = hoje.year + ((hoje.month - i - 1) // 12)
-            chave = f'{ano_ref}-{mes_ref:02d}'
-            meses_ordem.append(chave)
-            contagem_mensal[chave] = 0
-        for d in dados_completos:
-            if d['data_adicao']:
-                chave = d['data_adicao'][:7]
-                if chave in contagem_mensal:
-                    contagem_mensal[chave] += 1
-        crescimento_mensal = [{'mes': m, 'contagem': contagem_mensal[m]} for m in meses_ordem]
-
-        return jsonify({
-            'total_discos': total,
-            'lps': lps,
-            'cds': cds,
-            'cassetes': cassetes,
-            'dvd_bluray': dvd_bluray,
-            'outros': outros,
-            'genero_predominante': genero_predominante,
-            'genero_predominante_pct': genero_predominante_pct,
-            'top_artistas': [{'nome': a, 'contagem': c} for a, c in top_artistas],
-            'decadas': [{'nome': d, 'contagem': c} for d, c in decadas.items()],
-            'valor_total': round(valor_total, 2),
-            'valor_por_formato': valor_por_formato,
-            'preco_medio': preco_medio,
-            'album_mais_antigo': album_mais_antigo,
-            'album_mais_recente': album_mais_recente,
-            'disco_mais_caro': disco_mais_caro,
-            'disco_mais_barato': disco_mais_barato,
-            'condicoes_registradas': condicoes_registradas,
-            'total_discos_com_condicao': total,
-            'crescimento_mensal': crescimento_mensal
-        })
-
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-# ================================================================
-# ESTATÍSTICAS AVANÇADAS — progresso da wishlist e cruzamento
-# ouvido-vs-possuído. Junta dado que já existia em tabelas separadas.
-# ================================================================
-@app.route('/estatisticas_avancadas')
-def get_estatisticas_avancadas():
-    usuario_id = get_usuario_id()
-    if not usuario_id:
-        return jsonify({'erro': 'Usuário não logado'}), 401
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-
-        # ---- Progresso da wishlist (real: recomendacoes guarda comprado=1
-        # quando o item é marcado "já tenho", sem apagar a linha) ----
-        c.execute('SELECT tier, comprado FROM recomendacoes WHERE usuario_id = ?', (usuario_id,))
-        todas_recs = c.fetchall()
-        adquiridos = sum(1 for _, comprado in todas_recs if comprado == 1)
-        pendentes = [tier for tier, comprado in todas_recs if comprado == 0]
-        tier_pendente = Counter(pendentes)
-        total_recs = len(todas_recs)
-        pct_wishlist = round((adquiridos / total_recs) * 100) if total_recs > 0 else 0
-
-        # ---- Ouvido vs Possuído (cruza playlists importadas com a coleção) ----
-        c.execute('SELECT DISTINCT artista, album FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-        ouvidos = set((a.strip().lower(), b.strip().lower()) for a, b in c.fetchall() if a and b)
-        c.execute('SELECT artista FROM musicas_usuario WHERE usuario_id = ?', (usuario_id,))
-        artistas_ouvidos = [a[0].strip() for a in c.fetchall() if a[0]]
-
-        c.execute('SELECT DISTINCT artista, album FROM colecao WHERE usuario_id = ?', (usuario_id,))
-        possuidos = set((a.strip().lower(), b.strip().lower()) for a, b in c.fetchall() if a and b)
-        c.execute('SELECT DISTINCT artista FROM colecao WHERE usuario_id = ?', (usuario_id,))
-        artistas_possuidos = set(a[0].strip().lower() for a in c.fetchall() if a[0])
-        conn.close()
-
-        ouvidos_mas_faltando = len(ouvidos - possuidos)
-        possuidos_nunca_ouvidos = len(possuidos - ouvidos)
-
-        top_artista_nao_possuido = None
-        if artistas_ouvidos:
-            contagem_art = Counter(a for a in artistas_ouvidos if a.strip().lower() not in artistas_possuidos)
-            if contagem_art:
-                top_artista_nao_possuido = contagem_art.most_common(1)[0][0]
-
-        cobertura = None
-        if ouvidos:
-            cobertura = round(len(ouvidos & possuidos) / len(ouvidos) * 100)
-
-        return jsonify({
-            'wishlist_progress': {
-                'adquiridos': adquiridos,
-                'total': total_recs,
-                'restantes': total_recs - adquiridos,
-                'pct': pct_wishlist,
-                'tiers_pendentes': {t: tier_pendente.get(t, 0) for t in ['S', 'A', 'B', 'C']}
-            },
-            'ouvido_vs_possuido': {
-                'top_artista_nao_possuido': top_artista_nao_possuido,
-                'albuns_ouvidos_faltando': ouvidos_mas_faltando,
-                'discos_nunca_ouvidos': possuidos_nunca_ouvidos,
-                'cobertura_pct': cobertura
-            }
-        })
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    const daColecao = dashColecao
+      .filter(d => `${d.artista} ${d.album}`.toLowerCase().includes(termo))
+      .slice(0, 5)
+      .map(d => ({ artista: d.artista, album: d.album, origem: 'Coleção', href: 'colecao.html' }));
+
+    const daWishlist = dashWishlist
+      .filter(d => `${d.artista} ${d.album}`.toLowerCase().includes(termo))
+      .slice(0, 5)
+      .map(d => ({ artista: d.artista, album: d.album, origem: 'Wishlist', href: 'wishlist.html' }));
+
+    const achados = [...daColecao, ...daWishlist].slice(0, 8);
+
+    if (achados.length === 0) {
+      results.innerHTML = '<div class="dash-search-empty">Nenhum resultado.</div>';
+    } else {
+      results.innerHTML = achados.map(item => `
+        <a href="${item.href}" class="dash-search-item">
+          <span class="title">${item.album}</span>
+          <span class="artist">${item.artista}</span>
+          <span class="tag">${item.origem}</span>
+        </a>
+      `).join('');
+    }
+    results.classList.add('open');
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!input.contains(e.target) && !results.contains(e.target)) {
+      results.classList.remove('open');
+    }
+  });
+}
+  </script>
+</body>
+</html>

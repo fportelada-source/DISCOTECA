@@ -810,6 +810,7 @@ function renderRecomendacoes(dados) {
             msg.className = 'form-msg success';
             carregarDados();
             formWish.reset();
+            btn.disabled = false;
             setTimeout(() => modalWish.classList.remove('open'), 1000);
           } else {
             msg.textContent = '❌ ' + (resultado.erro || 'Erro ao adicionar');
@@ -876,6 +877,7 @@ function renderRecomendacoes(dados) {
             msg.className = 'form-msg success';
             carregarDados();
             formEditTier.reset();
+            btn.disabled = false;
             setTimeout(() => modalEditTier.classList.remove('open'), 800);
           } else {
             msg.textContent = '❌ ' + (data.erro || 'Erro ao atualizar');

@@ -112,12 +112,26 @@
     function montarCoverDiv(item) {
       const cor = getCor(item.artista);
       const capaAttr = item.capa_url ? ` data-capa="${item.capa_url}"` : '';
-      return `data-artista="${item.artista || ''}" data-album="${item.album || ''}"${capaAttr} style="background-color:${cor}; background-size:cover; background-position:center;"`;
+      return `data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${capaAttr} style="background-color:${cor}; background-size:cover; background-position:center;"`;
+    }
+
+    // Escapa qualquer texto vindo de dados do usuário (bio, nome, artista,
+    // álbum, etc.) antes de inserir no HTML — sem isso, alguém poderia
+    // colocar <script> na própria bio e rodar código no navegador de
+    // QUALQUER visitante do perfil público (sem precisar estar logado).
+    function escapeHtml(texto) {
+      if (texto === null || texto === undefined) return '';
+      return String(texto)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     function renderPerfil(data) {
       const container = document.getElementById('perfil-content');
-      const nome = data.nome_exibicao || data.nome || 'Colecionador';
+      const nome = escapeHtml(data.nome_exibicao || data.nome || 'Colecionador');
       const ano = data.data_criacao ? data.data_criacao.split('-')[0] : '';
       const avatarHtml = data.foto_url ? `<img src="${data.foto_url}" alt="${nome}">` : nome.charAt(0).toUpperCase();
       const formatosBadge = (data.formatos_possuidos || []).map(f => NOME_FORMATO[f] || f).join(' · ');
@@ -128,9 +142,9 @@
             <div class="pp-avatar">${avatarHtml}</div>
             <div class="pp-meta">
               <div class="pp-name">${nome}${formatosBadge ? `<span class="badge">${formatosBadge}</span>` : ''}</div>
-              ${data.bio ? `<div class="pp-bio">${data.bio}</div>` : ''}
+              ${data.bio ? `<div class="pp-bio">${escapeHtml(data.bio)}</div>` : ''}
               <div class="pp-details">
-                ${data.localizacao ? `<span>📍 ${data.localizacao}</span>` : ''}
+                ${data.localizacao ? `<span>📍 ${escapeHtml(data.localizacao)}</span>` : ''}
                 ${ano ? `<span>📅 membro desde ${ano}</span>` : ''}
                 <span>🎧 ${data.total_discos || 0} discos</span>
               </div>
@@ -143,7 +157,7 @@
               ` : ''}
               ${data.generos_favoritos && data.generos_favoritos.length > 0 ? `
                 <div class="pp-genre-tags">
-                  ${data.generos_favoritos.map((g, i) => `<span class="tag${i < 3 ? ' active' : ''}">${g}</span>`).join('')}
+                  ${data.generos_favoritos.map((g, i) => `<span class="tag${i < 3 ? ' active' : ''}">${escapeHtml(g)}</span>`).join('')}
                 </div>
               ` : ''}
             </div>
@@ -178,7 +192,7 @@
                 <span class="fallback-icon">♢</span>
                 <span class="rank">#${idx + 1}</span>
               </div>
-              <div class="info"><div class="title">${item.album || 'Álbum'}</div><div class="artist">${item.artista || 'Artista'}</div></div>
+              <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
             </div>
           `;
         });
@@ -196,8 +210,8 @@
             <div class="pp-recent-item">
               <div class="cover" ${montarCoverDiv(item)}><span class="fallback-icon">◈</span></div>
               <div class="info">
-                <div class="title">${item.album || 'Álbum'}</div>
-                <div class="artist">${item.artista || 'Artista'}</div>
+                <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
+                <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
                 <div class="date">adicionado em ${item.data_adicao || '—'}</div>
               </div>
             </div>
@@ -220,7 +234,7 @@
                 <span class="priority" style="background:${cor};">${item.tier}</span>
                 <span class="fallback-icon">◈</span>
               </div>
-              <div class="info"><div class="title">${item.album || 'Álbum'}</div><div class="artist">${item.artista || 'Artista'}</div></div>
+              <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
             </div>
           `;
         });
@@ -246,7 +260,7 @@
       html += `<div class="pp-section"><div class="pp-section-header"><h2>📖 Linha do tempo</h2></div><div class="pp-timeline">`;
       if (data.recentes && data.recentes.length > 0) {
         data.recentes.slice(0, 5).forEach(item => {
-          html += `<div class="pp-timeline-item"><span class="icon">+</span><span class="text"><strong>${item.album || 'Álbum'}</strong> — ${item.artista || 'Artista'} adicionado à coleção</span><span class="time">${item.data_adicao || ''}</span></div>`;
+          html += `<div class="pp-timeline-item"><span class="icon">+</span><span class="text"><strong>${escapeHtml(item.album) || 'Álbum'}</strong> — ${escapeHtml(item.artista) || 'Artista'} adicionado à coleção</span><span class="time">${item.data_adicao || ''}</span></div>`;
         });
       } else {
         html += `<div class="pp-empty-note">Nenhuma atividade ainda.</div>`;
@@ -260,7 +274,7 @@
       if (todosDiscos.length > 0) {
         html += `<div class="pp-shelf-grid">`;
         todosDiscos.slice(0, 24).forEach(item => {
-          html += `<div class="pp-shelf-item" ${montarCoverDiv(item)}><span class="fallback-icon">♢</span></div>`;
+          html += `<div class="pp-shelf-item" title="${escapeHtml(item.artista) || 'Artista'} — ${escapeHtml(item.album) || 'Álbum'}" ${montarCoverDiv(item)}><span class="fallback-icon">♢</span></div>`;
         });
         html += `</div>`;
       } else {

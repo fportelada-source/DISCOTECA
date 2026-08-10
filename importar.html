@@ -429,6 +429,16 @@ function carregarDados() {
   carregarStatusImportacao();
 }
 
+function escapeHtml(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function carregarStatusImportacao() {
   if (!usuarioId) return;
   fetch(API_URL + '/status_importacao?user_id=' + usuarioId)
@@ -631,7 +641,8 @@ function renderStatusImportacao(d) {
       if (!container || !artistas || artistas.length === 0) return;
 
       ajusteFinoRespostas = {};
-      container.innerHTML = artistas.map((artista, i) => {
+      container.innerHTML = artistas.map((artistaOriginal, i) => {
+        const artista = escapeHtml(artistaOriginal);
         const pergunta = AJUSTE_PERGUNTAS[i % AJUSTE_PERGUNTAS.length](artista);
         const opcoesHtml = AJUSTE_OPCOES.map(op =>
           `<button type="button" data-artista="${artista}" data-valor="${op.valor}" onclick="selecionarAjuste(this)">${op.texto}</button>`

@@ -585,6 +585,16 @@ function renderPriorityNav(dados) {
   });
 }
 
+function escapeHtml(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function renderWishlistGrid(dados) {
   const container = document.getElementById('compras-container');
   const todosAtivos = dados.filter(d => d.comprado === 0);
@@ -614,18 +624,18 @@ function renderWishlistGrid(dados) {
     const capaAttr = item.capa_url ? ` data-capa="${item.capa_url}"` : '';
     html += `
       <div class="wl-card">
-        <div class="art" id="art-${id}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${capaAttr} style="background-color:${getCorFallbackWishlist(item.artista)};">
+        <div class="art" id="art-${id}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${capaAttr} style="background-color:${getCorFallbackWishlist(item.artista)};">
           <span class="priority-badge" style="background:${cor};">${item.tier}${item.origem === 'manual' ? ' ✏️' : ''}</span>
-          <div class="art-fallback" id="fallback-${id}" style="opacity:0.6; font-size:11px; text-align:center; padding:0 8px;">${item.artista || '?'}<br>${item.album || '?'}</div>
+          <div class="art-fallback" id="fallback-${id}" style="opacity:0.6; font-size:11px; text-align:center; padding:0 8px;">${escapeHtml(item.artista) || '?'}<br>${escapeHtml(item.album) || '?'}</div>
         </div>
         <div class="info">
-          <div class="title">${item.album || 'Álbum'} <span class="ano-lancamento" id="ano-${id}"></span></div>
-          <div class="artist">${item.artista || 'Artista'}</div>
-          ${item.nota ? `<div class="note">"${item.nota}"</div>` : ''}
+          <div class="title">${escapeHtml(item.album) || 'Álbum'} <span class="ano-lancamento" id="ano-${id}"></span></div>
+          <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
+          ${item.nota ? `<div class="note">"${escapeHtml(item.nota)}"</div>` : ''}
           <div class="actions">
-            <button onclick="abrirEditTier('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}', '${item.tier || 'A'}')" title="Editar prioridade">✎</button>
-            <button onclick="marcarComoTenho('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')" title="Já tenho">✓</button>
-            <button onclick="removerDaWishlist('${item.id || ''}', '${item.artista || ''}', '${item.album || ''}')" title="Remover">✕</button>
+            <button onclick="abrirEditTier('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}', '${item.tier || 'A'}')" title="Editar prioridade">✎</button>
+            <button onclick="marcarComoTenho('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}')" title="Já tenho">✓</button>
+            <button onclick="removerDaWishlist('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}')" title="Remover">✕</button>
           </div>
         </div>
       </div>
@@ -704,7 +714,7 @@ function renderAtividadeWishlist(dados) {
   el.innerHTML = recentes.map(item => `
     <div class="dash-activity-item">
       <span class="icon">+</span>
-      <span class="text"><strong>${item.album || 'Álbum'}</strong> — ${item.artista || 'Artista'} adicionado à wishlist</span>
+      <span class="text"><strong>${escapeHtml(item.album) || 'Álbum'}</strong> — ${escapeHtml(item.artista) || 'Artista'} adicionado à wishlist</span>
       <span class="time">${item.data_adicao}</span>
     </div>
   `).join('');

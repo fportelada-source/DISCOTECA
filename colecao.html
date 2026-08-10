@@ -228,6 +228,10 @@
           <label>Data de Aquisição</label>
           <input type="date" id="campo-data">
         </div>
+        <div class="form-group" id="grupoPrensagem" style="display:none;">
+          <label>Prensagem</label>
+          <div id="textoPrensagem" style="font-size:13px; opacity:0.5; padding:8px 0;"></div>
+        </div>
         <div class="form-group">
           <label>Notas</label>
           <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
@@ -808,11 +812,11 @@ function carregarDados() {
     }
 
     function checarAnosFaltantes() {
-      const faltando = colecao.filter(d => !d.ano_lancamento).length;
+      const faltando = colecao.filter(d => !d.ano_lancamento || !d.ano_original).length;
       const banner = document.getElementById('bannerAnoFaltante');
       const texto = document.getElementById('textoAnoFaltante');
       if (faltando > 0) {
-        texto.textContent = `${faltando} disco${faltando > 1 ? 's' : ''} sem ano de lançamento cadastrado — provavelmente de uma importação antiga do Discogs. A correção também completa o gênero, se estiver faltando.`;
+        texto.textContent = `${faltando} disco${faltando > 1 ? 's' : ''} sem o ano original do álbum — provavelmente de uma importação do Discogs. A correção também completa gênero e limpa nomes tipo "Artista (2)".`;
         banner.style.display = 'flex';
       } else {
         banner.style.display = 'none';
@@ -908,7 +912,7 @@ function carregarDados() {
               <div class="title">${escapeHtml(item.album) || '?'}</div>
               <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
               <div class="meta">
-                <span title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem que você tem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? ` <span style="opacity:0.5; font-size:0.85em;">(prensagem ${item.ano_lancamento})</span>` : ''}</span>
+                <span title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem que você tem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</span>
                 ${item.preco ? `<span class="price">R$ ${item.preco}</span>` : ''}
               </div>
             </div>
@@ -1021,7 +1025,7 @@ function carregarDados() {
           <tr>
             <td><strong>${escapeHtml(item.artista) || '?'}</strong></td>
             <td>${escapeHtml(item.album) || '?'}</td>
-            <td title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? ` <span style="opacity:0.5; font-size:0.85em;">(prensagem ${item.ano_lancamento})</span>` : ''}</td>
+            <td title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</td>
             <td><span class="format-badge ${formatClass}">${formatClass ? formatClass.charAt(0).toUpperCase() + formatClass.slice(1) : '—'}</span></td>
             <td>
               <div class="list-actions">
@@ -1184,6 +1188,13 @@ function carregarDados() {
           document.getElementById('campo-album').value = disco.album || '';
           document.getElementById('campo-formato').value = disco.formato || '';
           document.getElementById('campo-ano').value = disco.ano_lancamento || '';
+          const grupoPrensagem = document.getElementById('grupoPrensagem');
+          if (disco.ano_lancamento && disco.ano_original && disco.ano_lancamento !== disco.ano_original) {
+            document.getElementById('textoPrensagem').textContent = `Você tem a prensagem de ${disco.ano_lancamento} (o álbum original é de ${disco.ano_original}).`;
+            grupoPrensagem.style.display = 'block';
+          } else {
+            grupoPrensagem.style.display = 'none';
+          }
           document.getElementById('campo-condicao-midia').value = disco.condicao_midia || '';
           document.getElementById('campo-condicao-capa').value = disco.condicao_capa || '';
           document.getElementById('campo-preco').value = disco.preco || '';

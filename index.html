@@ -327,7 +327,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   // ===== HERO RECOMMENDATION =====
   if (hero) {
-    const capaHero = hero.capa_url ? `style="background-image:url('${hero.capa_url}'); background-size:cover; background-position:center;"` : '';
+    const capaHero = hero.capa_url ? `style="background-image:url('${escapeHtml(hero.capa_url)}'); background-size:cover; background-position:center;"` : '';
     html += `
       <div class="dash-hero">
         <div class="cover" id="dashHeroCover" data-artista="${escapeHtml(hero.artista || '')}" data-album="${escapeHtml(hero.album || '')}"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '♬'}</div>
@@ -364,7 +364,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   html += `<div><div class="dash-section-title">Próximas compras <a href="wishlist.html" class="see-all">ver todas</a></div>`;
   if (wishlist.length > 0) {
     wishlist.slice(0, 3).forEach((item, idx) => {
-      const thumbStyle = item.capa_url ? `background-image:url('${item.capa_url}');` : `background:${corTier(item.tier)};`;
+      const thumbStyle = item.capa_url ? `background-image:url('${escapeHtml(item.capa_url)}');` : `background:${corTier(item.tier)};`;
       html += `
         <div class="dash-purchase-card">
           <div class="thumb" id="dashPurchase-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${thumbStyle}"></div>
@@ -428,7 +428,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   html += `<div><div class="dash-section-title">Wishlist <a href="wishlist.html" class="see-all">ver tudo</a></div><div class="dash-wishlist-grid">`;
   if (wishlist.length > 0) {
     wishlist.slice(0, 3).forEach((item, idx) => {
-      const coverStyle = item.capa_url ? `background-image:url('${item.capa_url}');` : `background:${corTier(item.tier)};`;
+      const coverStyle = item.capa_url ? `background-image:url('${escapeHtml(item.capa_url)}');` : `background:${corTier(item.tier)};`;
       html += `
         <div class="dash-wishlist-item">
           <div class="cover" id="dashWish-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">

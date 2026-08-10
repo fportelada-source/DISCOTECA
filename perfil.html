@@ -231,6 +231,9 @@
           <div class="set-card set-danger">
             <div class="card-header"><h3>⚠️ Zona de perigo</h3><span class="sub">ações irreversíveis</span></div>
             <div class="set-danger-item"><div class="left"><div class="title">Limpar dados importados</div><div class="sub">Remove playlists importadas (mantém coleção e wishlist)</div></div><button id="btnLimparImportados">Limpar</button></div>
+            <div class="set-danger-item"><div class="left"><div class="title">Zerar coleção</div><div class="sub">Apaga todos os discos da coleção física</div></div><button id="btnZerarColecao">Zerar</button></div>
+            <div class="set-danger-item"><div class="left"><div class="title">Zerar wishlist</div><div class="sub">Apaga a lista de compras atual</div></div><button id="btnZerarWishlist">Zerar</button></div>
+            <div class="set-danger-item"><div class="left"><div class="title">Zerar tudo</div><div class="sub">Apaga playlists, coleção e wishlist de uma vez (mantém seu perfil)</div></div><button id="btnZerarTudo">Zerar tudo</button></div>
             <div class="set-danger-item"><div class="left"><div class="title">Restaurar preferências</div><div class="sub">Volta tudo desta página pro padrão</div></div><button id="btnResetarPrefs">Restaurar</button></div>
             <div class="set-danger-item"><div class="left"><div class="title">Desconectar serviços</div><div class="sub">Nenhum serviço conectado ainda</div></div><button id="btnDesconectarTudo">Desconectar</button></div>
             <div class="set-danger-item"><div class="left"><div class="title">Excluir conta</div><div class="sub">Remove todos os seus dados permanentemente</div></div><button id="btnExcluirConta">Excluir conta</button></div>
@@ -673,6 +676,33 @@ document.addEventListener('DOMContentLoaded', function() {
       fetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Dados importados limpos!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
+        .catch(() => mostrarMsg('Erro de conexão.', 'error'));
+    });
+  });
+
+  document.getElementById('btnZerarColecao').addEventListener('click', function() {
+    abrirConfirm('Apagar TODOS os discos da sua coleção física? Essa ação é permanente.', function() {
+      fetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(d => mostrarMsg(d.sucesso ? 'Coleção zerada!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
+        .catch(() => mostrarMsg('Erro de conexão.', 'error'));
+    });
+  });
+
+  document.getElementById('btnZerarWishlist').addEventListener('click', function() {
+    abrirConfirm('Apagar toda a sua wishlist atual? Essa ação é permanente.', function() {
+      fetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(d => mostrarMsg(d.sucesso ? 'Wishlist zerada!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
+        .catch(() => mostrarMsg('Erro de conexão.', 'error'));
+    });
+  });
+
+  document.getElementById('btnZerarTudo').addEventListener('click', function() {
+    abrirConfirm('⚠️ Isso apaga playlists, coleção E wishlist de uma vez. Seu perfil (bio, foto, preferências) é mantido. Essa ação é permanente. Confirmar?', function() {
+      fetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(d => mostrarMsg(d.sucesso ? 'Tudo zerado! Pode começar a importar de novo.' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
     });
   });

@@ -235,6 +235,21 @@
           <div id="textoPrensagem" style="font-size:13px; opacity:0.5; padding:8px 0;"></div>
         </div>
         <div class="form-group">
+          <label>Sua avaliação</label>
+          <div id="starPicker" style="display:flex; gap:4px; font-size:26px; cursor:pointer;">
+            <span class="star" data-valor="1">☆</span>
+            <span class="star" data-valor="2">☆</span>
+            <span class="star" data-valor="3">☆</span>
+            <span class="star" data-valor="4">☆</span>
+            <span class="star" data-valor="5">☆</span>
+          </div>
+          <input type="hidden" id="campo-avaliacao" value="0">
+        </div>
+        <div class="form-group">
+          <label>Tags <span style="opacity:0.4; font-weight:400;">(separadas por vírgula)</span></label>
+          <input type="text" id="campo-tags" placeholder="Ex: presente, primeira prensagem, edição limitada">
+        </div>
+        <div class="form-group">
           <label>Notas</label>
           <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
         </div>
@@ -617,6 +632,15 @@ function carregarDados() {
         html += `<div class="col-insight-card"><div class="value">${escapeHtml(nomeArt)}</div><div class="label">artista mais coletado <span class="highlight">${qtdArt}</span></div></div>`;
       }
 
+      const formatos = colecao.map(d => classeFormato(d.formato));
+      if (formatos.length > 0) {
+        const contagemFmt = formatos.reduce((acc, f) => (acc[f] = (acc[f] || 0) + 1, acc), {});
+        const [fmtChave, qtdFmt] = Object.entries(contagemFmt).sort((a, b) => b[1] - a[1])[0];
+        const label = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/Blu-ray' }[fmtChave] || fmtChave;
+        const pctFmt = Math.round(qtdFmt / formatos.length * 100);
+        html += `<div class="col-insight-card"><div class="value">${pctFmt}% <span class="sub">${label}</span></div><div class="label">formato predominante</div></div>`;
+      }
+
       const comPreco = colecao.filter(d => d.preco);
       if (comPreco.length > 0) {
         const maisCaro = comPreco.reduce((max, d) => (d.preco > max.preco ? d : max), comPreco[0]);
@@ -923,6 +947,8 @@ function carregarDados() {
                 <span title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem que você tem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</span>
                 ${item.preco ? `<span class="price">R$ ${item.preco}</span>` : ''}
               </div>
+              ${item.avaliacao > 0 ? `<div class="rating-display">${'★'.repeat(item.avaliacao)}${'☆'.repeat(5 - item.avaliacao)}</div>` : ''}
+              ${item.tags ? `<div class="tags-display">${item.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
             </div>
           </div>
         `;
@@ -1210,6 +1236,28 @@ function carregarDados() {
     const formAdicionar = document.getElementById('form-adicionar');
     const btnSubmit = document.getElementById('btn-submit');
 
+    function atualizarEstrelas(valor) {
+      document.querySelectorAll('#starPicker .star').forEach(el => {
+        const v = parseInt(el.dataset.valor);
+        el.textContent = v <= valor ? '★' : '☆';
+        el.style.color = v <= valor ? 'var(--terracotta)' : 'inherit';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('#starPicker .star').forEach(el => {
+        el.addEventListener('click', function() {
+          const valorClicado = parseInt(this.dataset.valor);
+          const valorAtual = parseInt(document.getElementById('campo-avaliacao').value) || 0;
+          // Clicar na mesma estrela que já era o valor máximo zera a avaliação
+          // (assim dá pra "desfazer" sem precisar de outro botão).
+          const novoValor = valorClicado === valorAtual ? 0 : valorClicado;
+          document.getElementById('campo-avaliacao').value = novoValor;
+          atualizarEstrelas(novoValor);
+        });
+      });
+    });
+
     function abrirModal(discoId = null) {
       editandoId = discoId;
       document.getElementById('campo-id').value = discoId || '';
@@ -1241,6 +1289,9 @@ function carregarDados() {
           document.getElementById('campo-codigo-barras').value = '';
           document.getElementById('campo-favorito').value = disco.favorito ? '1' : '0';
           document.getElementById('campo-capa-manual').value = disco.capa_url || '';
+          document.getElementById('campo-avaliacao').value = disco.avaliacao || 0;
+          document.getElementById('campo-tags').value = disco.tags || '';
+          atualizarEstrelas(disco.avaliacao || 0);
           atualizarBotaoFavoritar();
         }
         document.getElementById('btnRemoverDisco').style.display = 'block';
@@ -1260,6 +1311,9 @@ function carregarDados() {
         document.getElementById('campo-codigo-barras').value = '';
         document.getElementById('campo-favorito').value = '0';
         document.getElementById('campo-capa-manual').value = '';
+        document.getElementById('campo-avaliacao').value = 0;
+        document.getElementById('campo-tags').value = '';
+        atualizarEstrelas(0);
         atualizarBotaoFavoritar();
         document.getElementById('btnRemoverDisco').style.display = 'none';
       }
@@ -1308,7 +1362,9 @@ function carregarDados() {
         notas: document.getElementById('campo-notas').value.trim(),
         codigo_barras: document.getElementById('campo-codigo-barras').value.trim(),
         favorito: document.getElementById('campo-favorito').value === '1',
-        capa_url: document.getElementById('campo-capa-manual').value.trim()
+        capa_url: document.getElementById('campo-capa-manual').value.trim(),
+        avaliacao: parseInt(document.getElementById('campo-avaliacao').value) || 0,
+        tags: document.getElementById('campo-tags').value.trim()
       };
 
       if (!dados.artista || !dados.album) {

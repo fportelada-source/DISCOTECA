@@ -1347,13 +1347,13 @@
       gap: 8px;
     }
     .add-btn {
-      background: var(--s-color);
+      background: var(--terracotta);
       color: var(--ink);
       border: none;
-      width: 48px;
-      height: 48px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 700;
       cursor: pointer;
       transition: 0.2s;
@@ -2527,31 +2527,40 @@
       border: 1px solid var(--card-line); margin-bottom: 24px;
     }
     .col-controls .search-mini {
-      flex: 1; min-width: 160px; display: flex; align-items: center; gap: 6px;
-      background: #0f0f0f; border: 1px solid var(--card-line); border-radius: 40px; padding: 4px 14px;
+      flex: 1; min-width: 160px; height: 34px; box-sizing: border-box;
+      display: flex; align-items: center; gap: 6px;
+      background: #0f0f0f; border: 1px solid var(--card-line); border-radius: 40px; padding: 0 14px;
     }
     .col-controls .search-mini span { opacity: 0.3; font-size: 13px; }
     .col-controls .search-mini input { background: transparent; border: none; color: var(--paper); font-size: 12px; width: 100%; outline: none; font-family: 'Inter', sans-serif; }
     .col-filter-pills { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
     .col-filter-pills .pill {
-      background: transparent; border: 1px solid var(--card-line); padding: 4px 12px; border-radius: 30px;
+      height: 34px; box-sizing: border-box;
+      background: transparent; border: 1px solid var(--card-line); padding: 0 12px; border-radius: 30px;
       font-size: 11px; font-weight: 500; opacity: 0.5; cursor: pointer; color: var(--paper); font-family: 'Inter', sans-serif;
       transition: all 0.15s ease;
     }
     .col-filter-pills .pill.active { border-color: var(--terracotta); opacity: 1; color: var(--terracotta); }
     .col-filter-pills .pill:hover { opacity: 0.85; }
     .col-sort-select {
-      background: transparent; border: 1px solid var(--card-line); padding: 4px 10px; border-radius: 30px;
+      height: 34px; box-sizing: border-box;
+      background: transparent; border: 1px solid var(--card-line); padding: 0 10px; border-radius: 30px;
       font-size: 11px; color: var(--paper); font-family: 'Inter', sans-serif; opacity: 0.7; cursor: pointer;
     }
-    .col-view-toggle { display: flex; background: #0f0f0f; border-radius: 30px; border: 1px solid var(--card-line); overflow: hidden; }
+    .col-view-toggle { height: 34px; box-sizing: border-box; display: flex; background: #0f0f0f; border-radius: 30px; border: 1px solid var(--card-line); overflow: hidden; }
     .col-view-toggle button {
-      padding: 5px 11px; background: transparent; border: none; color: var(--paper); font-size: 13px;
+      height: 100%; padding: 0 11px; background: transparent; border: none; color: var(--paper); font-size: 13px;
       opacity: 0.35; cursor: pointer;
     }
     .col-view-toggle button.active { opacity: 1; background: #2a2a2a; }
 
     /* ===== GRID DE ÁLBUNS ===== */
+    .col-shelf { margin-bottom: 8px; }
+    .col-shelf-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .col-shelf-header .icone { font-size: 18px; }
+    .col-shelf-header h3 { font-size: 16px; font-weight: 700; }
+    .col-shelf-header .count { font-size: 12px; opacity: 0.35; background: var(--card); border: 1px solid var(--card-line); padding: 1px 10px; border-radius: 20px; }
+
     .col-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 18px; margin-bottom: 32px; }
     .album-card {
       background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--card-line);
@@ -2610,6 +2619,11 @@
     }
     .col-fix-banner .btn-fix:hover { background: var(--terracotta-wash); }
     .col-fix-banner .btn-fix:disabled { opacity: 0.4; cursor: default; }
+    .col-fix-banner .btn-fix-close {
+      background: transparent; border: none; color: var(--paper); opacity: 0.3;
+      font-size: 14px; cursor: pointer; padding: 4px 6px; transition: opacity 0.15s ease;
+    }
+    .col-fix-banner .btn-fix-close:hover { opacity: 0.8; }
 
     .col-insights-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
     .col-insight-card { background: var(--card); border-radius: 16px; padding: 16px 14px; border: 1px solid var(--card-line); text-align: center; }

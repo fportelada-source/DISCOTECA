@@ -14,17 +14,41 @@
 
   <!-- ===== LOGIN ===== -->
   <div id="loginScreen" class="login-container">
-    <div class="login-box">
-      <div class="logo">Discoteca<span>.</span></div>
-      <p class="sub">Sua coleção de discos, organizada com recomendações personalizadas.</p>
-      <button class="login-btn" id="btnLogin">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Entrar com Google
-      </button>
-      <div id="loginError" class="login-error">Erro ao fazer login. Tente novamente.</div>
+    <div class="login-mockup">
+
+      <!-- LADO ESQUERDO — MARCA -->
+      <div class="login-left">
+        <div class="brand">
+          <div class="mark">D</div>
+          <div class="logo-text">Discoteca<span>.</span></div>
+        </div>
+        <div class="content">
+          <div class="tagline">Bem-vindo de volta</div>
+          <h1>Sua coleção<br><span class="accent">está esperando.</span></h1>
+          <p class="desc">Um companheiro pra sua coleção física. Seu gosto, sua estante, sua próxima compra.</p>
+        </div>
+        <div class="grid-bg">
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="footer-note">Mídia física · inteligência digital</div>
+      </div>
+
+      <!-- LADO DIREITO — LOGIN -->
+      <div class="login-right">
+        <div class="welcome">Bem-vindo de volta</div>
+        <h2>Entrar</h2>
+        <p class="sub">Acesse sua coleção e recomendações.</p>
+        <button class="login-btn" id="btnLogin">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Entrar com Google
+        </button>
+        <div id="loginError" class="login-error">Erro ao fazer login. Tente novamente.</div>
+      </div>
+
     </div>
   </div>
-
   <!-- ===== APP ===== -->
   <div id="appScreen" style="display:none;">
     <div class="app-shell">
@@ -341,7 +365,7 @@ function configurarBuscaTopo() {
       ? '<div class="dash-search-empty">Nenhum resultado.</div>'
       : achados.map(item => `
           <a href="#" class="dash-search-item" onclick="event.preventDefault(); document.getElementById('searchInput').value='${(item.album || '').replace(/'/g, "\\'")}'; aplicarFiltros(); document.getElementById('colSearchResults').classList.remove('open'); document.getElementById('colSearchTop').value='';">
-            <span class="title">${item.album}</span><span class="artist">${item.artista}</span>
+            <span class="title">${escapeHtml(item.album)}</span><span class="artist">${escapeHtml(item.artista)}</span>
           </a>
         `).join('');
     results.classList.add('open');
@@ -573,13 +597,13 @@ function carregarDados() {
       if (artistas.length > 0) {
         const contagemArt = artistas.reduce((acc, a) => (acc[a] = (acc[a] || 0) + 1, acc), {});
         const [nomeArt, qtdArt] = Object.entries(contagemArt).sort((a, b) => b[1] - a[1])[0];
-        html += `<div class="col-insight-card"><div class="value">${nomeArt}</div><div class="label">artista mais coletado <span class="highlight">${qtdArt}</span></div></div>`;
+        html += `<div class="col-insight-card"><div class="value">${escapeHtml(nomeArt)}</div><div class="label">artista mais coletado <span class="highlight">${qtdArt}</span></div></div>`;
       }
 
       const comPreco = colecao.filter(d => d.preco);
       if (comPreco.length > 0) {
         const maisCaro = comPreco.reduce((max, d) => (d.preco > max.preco ? d : max), comPreco[0]);
-        html += `<div class="col-insight-card"><div class="value">R$ ${maisCaro.preco}</div><div class="label">mais valioso <span class="highlight">${maisCaro.album}</span></div></div>`;
+        html += `<div class="col-insight-card"><div class="value">R$ ${maisCaro.preco}</div><div class="label">mais valioso <span class="highlight">${escapeHtml(maisCaro.album)}</span></div></div>`;
       }
 
       el.innerHTML = html || '<div class="pp-empty-note">Sem dados suficientes ainda.</div>';
@@ -592,12 +616,12 @@ function carregarDados() {
       if (recentes.length === 0) { el.innerHTML = '<div class="pp-empty-note">Nenhuma adição ainda.</div>'; return; }
       el.innerHTML = recentes.map((item, idx) => `
         <div class="pp-recent-item">
-          <div class="cover" id="rec-art-${idx}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+          <div class="cover" id="rec-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
             <span class="fallback-icon">◈</span>
           </div>
           <div class="info">
-            <div class="title">${item.album || 'Álbum'}</div>
-            <div class="artist">${item.artista || 'Artista'}</div>
+            <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
+            <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
             <div class="date">adicionado em ${item.data_adicao}</div>
           </div>
         </div>
@@ -612,10 +636,10 @@ function carregarDados() {
       if (favoritos.length === 0) { el.innerHTML = '<div class="pp-empty-note">Marque discos como favoritos (no modal de edição) pra vê-los aqui.</div>'; return; }
       el.innerHTML = favoritos.slice(0, 8).map((item, idx) => `
         <div class="pp-fav-item">
-          <div class="cover" id="fav-art-${idx}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+          <div class="cover" id="fav-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
             <span class="fallback-icon">♢</span>
           </div>
-          <div class="info"><div class="title">${item.album || 'Álbum'}</div><div class="artist">${item.artista || 'Artista'}</div></div>
+          <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
         </div>
       `).join('');
       carregarCapasGenericas(el);
@@ -626,7 +650,7 @@ function carregarDados() {
       if (!el) return;
       if (colecao.length === 0) { el.innerHTML = '<div class="pp-empty-note">Prateleira vazia.</div>'; return; }
       el.innerHTML = colecao.slice(0, 24).map((item, idx) => `
-        <div class="pp-shelf-item" id="shelf-art-${idx}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+        <div class="pp-shelf-item" id="shelf-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
           <span class="fallback-icon">♢</span>
         </div>
       `).join('');
@@ -759,6 +783,19 @@ function carregarDados() {
       }
     }
 
+    // Escapa texto vindo de dados do usuário (artista, álbum, notas) antes
+    // de inserir no HTML — protege contra XSS, já que esse mesmo dado pode
+    // aparecer depois no perfil público, visível sem login.
+    function escapeHtml(texto) {
+      if (texto === null || texto === undefined) return '';
+      return String(texto)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function renderColecao() {
       const container = document.getElementById('colecao-container');
       if (!container) return;
@@ -789,15 +826,15 @@ function carregarDados() {
         const corFundo = getCorFallback(item.artista);
 
         html += `
-          <div class="album-card" data-artista="${item.artista || ''}" data-album="${item.album || ''}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} onclick="editarDisco('${item.id || ''}')">
+          <div class="album-card" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} onclick="editarDisco('${item.id || ''}')">
             <div class="art" id="art-${uniqueId}" style="background-color:${corFundo};">
               ${item.favorito ? '<span class="fav-indicator">⭐</span>' : ''}
               <span class="format-badge ${chave}">${label}</span>
-              <div class="art-fallback" id="fallback-${uniqueId}" style="opacity:0.6; font-size:11px; text-align:center; padding:0 8px;">${item.artista || '?'}<br>${item.album || '?'}</div>
+              <div class="art-fallback" id="fallback-${uniqueId}" style="opacity:0.6; font-size:11px; text-align:center; padding:0 8px;">${escapeHtml(item.artista) || '?'}<br>${escapeHtml(item.album) || '?'}</div>
             </div>
             <div class="info">
-              <div class="title">${item.album || '?'}</div>
-              <div class="artist">${item.artista || 'Artista'}</div>
+              <div class="title">${escapeHtml(item.album) || '?'}</div>
+              <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
               <div class="meta">
                 <span>${item.ano_lancamento || (item.data_adicao ? item.data_adicao.split('-')[0] : '—')}</span>
                 ${item.preco ? `<span class="price">R$ ${item.preco}</span>` : ''}
@@ -910,8 +947,8 @@ function carregarDados() {
 
         html += `
           <tr>
-            <td><strong>${item.artista || '?'}</strong></td>
-            <td>${item.album || '?'}</td>
+            <td><strong>${escapeHtml(item.artista) || '?'}</strong></td>
+            <td>${escapeHtml(item.album) || '?'}</td>
             <td>${item.ano_lancamento || '—'}</td>
             <td><span class="format-badge ${formatClass}">${formatClass ? formatClass.charAt(0).toUpperCase() + formatClass.slice(1) : '—'}</span></td>
             <td>

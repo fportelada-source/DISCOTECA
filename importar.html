@@ -204,7 +204,6 @@
 
         <div class="imp-cta">
           <button class="primary" id="btn-gerar">🧠 Gerar Wishlist Personalizada</button>
-          <button class="secondary" onclick="zerarTudo()">↻ Zerar tudo e recomeçar</button>
         </div>
         <div id="status-gerar" class="upload-status" style="text-align:center; margin-top:-14px; margin-bottom:26px;"></div>
 
@@ -218,14 +217,7 @@
           </div>
         </div>
 
-        <!-- ZONA DE PERIGO (mantida, reaproveitada) -->
-        <div class="set-card set-danger" style="margin-top:26px;">
-          <div class="card-header"><h3>⚠️ Zona de perigo</h3><span class="sub">ações irreversíveis</span></div>
-          <div class="set-danger-item"><div class="left"><div class="title">Zerar playlists</div><div class="sub">Apaga o que foi importado do Spotify + recomendações geradas</div></div><button onclick="zerarPlaylists()">Zerar</button></div>
-          <div class="set-danger-item"><div class="left"><div class="title">Zerar coleção</div><div class="sub">Apaga todos os discos da coleção física</div></div><button onclick="zerarColecao()">Zerar</button></div>
-          <div class="set-danger-item"><div class="left"><div class="title">Zerar wishlist</div><div class="sub">Apaga a lista de compras atual</div></div><button onclick="zerarWishlist()">Zerar</button></div>
-          <div class="set-danger-item"><div class="left"><div class="title">Zerar tudo</div><div class="sub">Apaga playlists, coleção e wishlist de uma vez</div></div><button onclick="zerarTudo()">Zerar tudo</button></div>
-        </div>
+        <p style="text-align:center; font-size:12.5px; opacity:0.35; margin-top:20px;">Precisa zerar playlists, coleção ou wishlist? Isso agora vive só em <a href="perfil.html" style="color:var(--terracotta);">Configurações → Zona de Perigo</a>.</p>
 
       </div>
     </div>
@@ -637,54 +629,6 @@ function renderStatusImportacao(d) {
     `;
   }
 }
-
-    function zerarPlaylists() {
-      abrirConfirm('⚠️ Tem certeza? Isso vai apagar TODAS as playlists importadas e as recomendações geradas. Essa ação é permanente.', function() {
-        fetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
-          .then(r => r.json())
-          .then(data => {
-            alert(data.mensagem);
-            carregarDados();
-          })
-          .catch(() => alert('❌ Erro ao zerar playlists'));
-      });
-    }
-
-    function zerarColecao() {
-      abrirConfirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua coleção. Essa ação é permanente.', function() {
-        fetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
-          .then(r => r.json())
-          .then(data => {
-            alert(data.mensagem);
-            carregarDados();
-          })
-          .catch(() => alert('❌ Erro ao zerar coleção'));
-      });
-    }
-
-    function zerarWishlist() {
-      abrirConfirm('⚠️ Tem certeza? Isso vai apagar TODOS os discos da sua lista de compras (wishlist). Essa ação é permanente.', function() {
-        fetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
-          .then(r => r.json())
-          .then(data => {
-            alert(data.mensagem);
-            carregarDados();
-          })
-          .catch(() => alert('❌ Erro ao zerar wishlist'));
-      });
-    }
-
-    function zerarTudo() {
-      abrirConfirm('🔥 Tem certeza ABSOLUTA? Isso vai apagar TODOS os seus dados: playlists, coleção, wishlist, estatísticas. Tudo. Essa ação é permanente e não pode ser desfeita.', function() {
-        fetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
-          .then(r => r.json())
-          .then(data => {
-            alert(data.mensagem);
-            carregarDados();
-          })
-          .catch(() => alert('❌ Erro ao zerar tudo'));
-      });
-    }
 
     function uploadPlaylist(tipo, input) {
       const statusEl = document.getElementById('status-' + tipo);

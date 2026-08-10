@@ -89,7 +89,7 @@
           <div class="flow">
             <span class="step">🎵 <span class="highlight">Spotify</span></span>
             <span class="arrow">→</span>
-            <span class="step">📥 <span class="highlight">Exportify</span> <span style="opacity:0.35;">CSV</span></span>
+            <span class="step">📥 <span class="highlight">Last.fm ou Exportify</span></span>
             <span class="arrow">→</span>
             <span class="step">🧠 <span class="highlight">Discoteca</span></span>
             <span class="arrow">→</span>
@@ -98,6 +98,37 @@
           <span class="badge">inteligente</span>
         </div>
 
+        <!-- SELETOR DE MÉTODO -->
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap;">
+          <div class="col-view-toggle" id="metodoImportToggle">
+            <button class="active" data-metodo="lastfm">🎧 Last.fm</button>
+            <button data-metodo="csv">📄 CSV (Exportify)</button>
+          </div>
+          <div style="position:relative;">
+            <button type="button" id="btnPorqueNaoSpotify" style="background:transparent; border:1px solid var(--card-line); color:var(--paper); width:26px; height:26px; border-radius:50%; cursor:pointer; font-weight:700; font-family:'Inter',sans-serif;">?</button>
+            <div id="popoverSpotify" style="display:none; position:absolute; top:32px; left:0; z-index:20; width:280px; background:var(--card); border:1px solid var(--card-line); border-radius:14px; padding:14px 16px; font-size:12.5px; line-height:1.5; opacity:0.85; box-shadow:0 12px 30px rgba(0,0,0,0.5);">
+              <strong style="opacity:1;">Cadê o login direto do Spotify? 🤔</strong><br>
+              Eles só liberam OAuth de graça pra <strong>5 pessoas</strong> testando — depois disso, exigem <strong>250 mil usuários ativos por mês</strong> pra desbloquear mais. A gente ainda não tem 250 mil (nem 250, sinceramente 😅). Então é Last.fm ou CSV por enquanto — essa porta abre assim que a gente crescer.
+            </div>
+          </div>
+        </div>
+
+        <!-- PAINEL LAST.FM -->
+        <div id="painelLastfm" class="imp-upload-card" style="margin-bottom:26px;">
+          <div class="card-header">
+            <div><div class="icon">🎧</div><div class="title">Conectar com Last.fm</div></div>
+            <span class="imp-status-badge missing" id="badge-lastfm">⚠️ não conectado</span>
+          </div>
+          <div class="desc">Já usa Last.fm com o Spotify conectado? Só digita seu usuário — a gente puxa seus álbuns mais ouvidos e as tocadas recentes direto, sem subir arquivo nenhum. Não tem Last.fm ainda? <a href="https://www.last.fm/settings/applications" target="_blank" style="color:var(--terracotta);">conecta seu Spotify aqui</a> primeiro (2 minutos, só uma vez).</div>
+          <div class="btn-group">
+            <input type="text" id="campoUsuarioLastfm" placeholder="seu usuário do Last.fm" style="flex:1; min-width:180px; background:#0f0f0f; border:1px solid var(--card-line); border-radius:8px; padding:8px 12px; color:var(--paper); font-family:'Inter',sans-serif; font-size:13px;">
+            <button class="imp-btn primary" id="btnConectarLastfm" type="button">Conectar</button>
+          </div>
+          <div class="imp-file-info" id="statusLastfm" style="margin-top:8px; display:block;"></div>
+        </div>
+
+        <!-- PAINEL CSV -->
+        <div id="painelCsv" style="display:none;">
         <div class="imp-upload-grid">
           <div class="imp-upload-card">
             <div class="card-header">
@@ -147,6 +178,7 @@
             </div>
           </div>
         </div>
+        </div><!-- /painelCsv -->
 
         <div class="imp-quality-section">
           <div class="imp-quality-card">
@@ -463,6 +495,72 @@ function escapeHtml(texto) {
     .replace(/'/g, '&#039;');
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+  // Alterna entre painel Last.fm e painel CSV
+  document.querySelectorAll('#metodoImportToggle button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#metodoImportToggle button').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const metodo = this.dataset.metodo;
+      document.getElementById('painelLastfm').style.display = metodo === 'lastfm' ? 'block' : 'none';
+      document.getElementById('painelCsv').style.display = metodo === 'csv' ? 'block' : 'none';
+    });
+  });
+
+  // Popover "por que não Spotify"
+  const btnPop = document.getElementById('btnPorqueNaoSpotify');
+  const popover = document.getElementById('popoverSpotify');
+  if (btnPop && popover) {
+    btnPop.addEventListener('click', function(e) {
+      e.stopPropagation();
+      popover.style.display = popover.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', function(e) {
+      if (!popover.contains(e.target) && e.target !== btnPop) popover.style.display = 'none';
+    });
+  }
+
+  // Conectar Last.fm
+  const btnLastfm = document.getElementById('btnConectarLastfm');
+  if (btnLastfm) {
+    btnLastfm.addEventListener('click', function() {
+      const usuario = document.getElementById('campoUsuarioLastfm').value.trim();
+      const status = document.getElementById('statusLastfm');
+      const badge = document.getElementById('badge-lastfm');
+      if (!usuario) {
+        status.textContent = '❌ Digita seu usuário do Last.fm primeiro.';
+        status.className = 'imp-file-info';
+        return;
+      }
+      btnLastfm.disabled = true;
+      status.textContent = '⏳ Buscando seus dados no Last.fm...';
+      fetch(API_URL + '/importar_lastfm?user_id=' + usuarioId, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: usuario })
+      })
+        .then(r => r.json())
+        .then(d => {
+          btnLastfm.disabled = false;
+          if (d.sucesso) {
+            status.textContent = '✅ ' + d.mensagem;
+            badge.textContent = '✓ conectado';
+            badge.classList.remove('missing');
+            badge.classList.add('uploaded');
+            document.getElementById('btn-gerar').disabled = false;
+            carregarStatusImportacao();
+          } else {
+            status.textContent = '❌ ' + (d.erro || 'Erro ao conectar.');
+          }
+        })
+        .catch(() => {
+          btnLastfm.disabled = false;
+          status.textContent = '❌ Erro de conexão.';
+        });
+    });
+  }
+});
+
 function carregarStatusImportacao() {
   if (!usuarioId) return;
   fetch(API_URL + '/status_importacao?user_id=' + usuarioId)
@@ -495,6 +593,15 @@ function renderStatusImportacao(d) {
     const statusEl = document.getElementById('status-discogs');
     if (statusEl && !statusEl.textContent) statusEl.textContent = `${d.total_discos} discos na coleção`;
   }
+  const lastfmConectado = (d.fontes.lastfm_top > 0 || d.fontes.lastfm_recent > 0);
+  if (lastfmConectado) {
+    const badgeEl = document.getElementById('badge-lastfm');
+    const statusEl = document.getElementById('statusLastfm');
+    badgeEl.textContent = '✓ conectado';
+    badgeEl.classList.remove('missing');
+    badgeEl.classList.add('uploaded');
+    if (statusEl && !statusEl.textContent) statusEl.textContent = `${d.fontes.lastfm_top} álbuns do topo + ${d.fontes.lastfm_recent} recentes`;
+  }
 
   // Anel de confiança
   const circulo = document.getElementById('impConfiancaCirculo');
@@ -507,10 +614,12 @@ function renderStatusImportacao(d) {
     stat.innerHTML = d.confianca_pct > 0
       ? `Baseado em <span class="highlight">${d.cobertura.musicas}</span> músicas e ${d.total_discos} discos`
       : 'Nenhum dado enviado ainda';
+    const temTop = d.fontes.top > 0 || d.fontes.lastfm_top > 0;
+    const temDesc = d.fontes.desc > 0 || d.fontes.lastfm_recent > 0;
     checklist.innerHTML = `
-      <div class="item"><span class="check ${d.fontes.top > 0 ? 'done' : 'missing'}">${d.fontes.top > 0 ? '✅' : '❌'}</span> Top do Ano</div>
+      <div class="item"><span class="check ${temTop ? 'done' : 'missing'}">${temTop ? '✅' : '❌'}</span> Top do Ano ${d.fontes.lastfm_top > 0 ? '(via Last.fm)' : ''}</div>
       <div class="item"><span class="check ${d.fontes.fav > 0 ? 'done' : 'missing'}">${d.fontes.fav > 0 ? '✅' : '❌'}</span> Favoritos</div>
-      <div class="item"><span class="check ${d.fontes.desc > 0 ? 'done' : 'missing'}">${d.fontes.desc > 0 ? '✅' : '❌'}</span> Descobertas</div>
+      <div class="item"><span class="check ${temDesc ? 'done' : 'missing'}">${temDesc ? '✅' : '❌'}</span> Descobertas ${d.fontes.lastfm_recent > 0 ? '(via Last.fm)' : ''}</div>
       <div class="item"><span class="check ${d.colecao_importada ? 'done' : 'missing'}">${d.colecao_importada ? '✅' : '❌'}</span> Coleção importada</div>
     `;
   }

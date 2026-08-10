@@ -270,6 +270,16 @@ function carregarCapasFaltantesDashboard() {
   });
 }
 
+function escapeHtml(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function renderDashboard(colecao, wishlist, stats, perfil) {
   const avatarEl = document.getElementById('userAvatar');
   const nomeExibicao = perfil.nome_exibicao || perfil.nome || DEV_USER_NOME;
@@ -296,12 +306,12 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
     const capaHero = hero.capa_url ? `style="background-image:url('${hero.capa_url}'); background-size:cover; background-position:center;"` : '';
     html += `
       <div class="dash-hero">
-        <div class="cover" id="dashHeroCover" data-artista="${hero.artista || ''}" data-album="${hero.album || ''}"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '♬'}</div>
+        <div class="cover" id="dashHeroCover" data-artista="${escapeHtml(hero.artista || '')}" data-album="${escapeHtml(hero.album || '')}"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '♬'}</div>
         <div class="info">
           <div class="badge">★ Prioridade ${hero.tier}</div>
-          <h2>${hero.album || 'Álbum'}</h2>
-          <div class="artist">${hero.artista || 'Artista'}</div>
-          <div class="desc">${hero.nota || hero.estrategia || 'Complementa bem sua coleção atual.'}</div>
+          <h2>${escapeHtml(hero.album) || 'Álbum'}</h2>
+          <div class="artist">${escapeHtml(hero.artista) || 'Artista'}</div>
+          <div class="desc">${escapeHtml(hero.nota || hero.estrategia) || 'Complementa bem sua coleção atual.'}</div>
           <a href="wishlist.html" class="btn">Ver na Wishlist →</a>
         </div>
       </div>
@@ -333,10 +343,10 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       const thumbStyle = item.capa_url ? `background-image:url('${item.capa_url}');` : `background:${corTier(item.tier)};`;
       html += `
         <div class="dash-purchase-card">
-          <div class="thumb" id="dashPurchase-${idx}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${thumbStyle}"></div>
+          <div class="thumb" id="dashPurchase-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${thumbStyle}"></div>
           <div class="info">
-            <div class="title">${item.album || 'Álbum'}</div>
-            <div class="artist">${item.artista || 'Artista'}</div>
+            <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
+            <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
           </div>
           <div class="score">${item.tier}</div>
         </div>
@@ -397,13 +407,13 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       const coverStyle = item.capa_url ? `background-image:url('${item.capa_url}');` : `background:${corTier(item.tier)};`;
       html += `
         <div class="dash-wishlist-item">
-          <div class="cover" id="dashWish-${idx}" data-artista="${item.artista || ''}" data-album="${item.album || ''}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">
+          <div class="cover" id="dashWish-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">
             <span class="priority" style="background:${corTier(item.tier)};">${item.tier}</span>
             <span class="fallback-icon">${item.capa_url ? '' : '♢'}</span>
           </div>
           <div class="info">
-            <div class="title">${item.album || 'Álbum'}</div>
-            <div class="artist">${item.artista || 'Artista'}</div>
+            <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
+            <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
           </div>
         </div>
       `;
@@ -426,7 +436,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
     html += recentes.map(item => `
       <div class="dash-activity-item">
         <span class="icon">+</span>
-        <span class="text"><strong>${item.album || 'Álbum'}</strong> — ${item.artista || 'Artista'} adicionado à coleção</span>
+        <span class="text"><strong>${escapeHtml(item.album) || 'Álbum'}</strong> — ${escapeHtml(item.artista) || 'Artista'} adicionado à coleção</span>
         <span class="time">${item.data_adicao}</span>
       </div>
     `).join('');
@@ -502,8 +512,8 @@ function configurarBuscaDashboard() {
     } else {
       results.innerHTML = achados.map(item => `
         <a href="${item.href}" class="dash-search-item">
-          <span class="title">${item.album}</span>
-          <span class="artist">${item.artista}</span>
+          <span class="title">${escapeHtml(item.album)}</span>
+          <span class="artist">${escapeHtml(item.artista)}</span>
           <span class="tag">${item.origem}</span>
         </a>
       `).join('');

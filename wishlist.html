@@ -645,7 +645,7 @@ function renderWishlistGrid(dados) {
   itens.forEach((item, idx) => {
     const id = `rec-${idx}`;
     const cor = corTierWishlist(item.tier);
-    const capaAttr = item.capa_url ? ` data-capa="${item.capa_url}"` : '';
+    const capaAttr = item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : '';
     html += `
       <div class="wl-card">
         <div class="art" id="art-${id}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${capaAttr} style="background-color:${getCorFallbackWishlist(item.artista)};">

@@ -931,7 +931,7 @@ function carregarDados() {
       function cardHtml(item, i) {
         const uniqueId = `col-${i}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
         const chave = classeFormato(item.formato);
-        const label = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/BR' }[chave] || 'Vinil';
+        const label = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/BR', outros: item.formato || '?' }[chave] || (item.formato || '?');
         const corFundo = getCorFallback(item.artista);
         return `
           <div class="album-card" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} onclick="editarDisco('${item.id || ''}')">
@@ -963,13 +963,14 @@ function carregarDados() {
       const deveSeparar = groupPreference === 'separado' && !filtroFormatoAtivo;
 
       if (deveSeparar) {
-        const buckets = { vinil: [], cd: [], cassete: [], dvd_bluray: [] };
+        const buckets = { vinil: [], cd: [], cassete: [], dvd_bluray: [], outros: [] };
         colecaoFiltrada.forEach(item => buckets[classeFormato(item.formato)].push(item));
         const secoes = [
           { chave: 'vinil', titulo: 'Todos os Vinis', icone: '🎵' },
           { chave: 'cd', titulo: 'Todos os CDs', icone: '💿' },
           { chave: 'cassete', titulo: 'Todas as Cassetes', icone: '📼' },
-          { chave: 'dvd_bluray', titulo: 'Todos os DVD/Blu-ray', icone: '📀' }
+          { chave: 'dvd_bluray', titulo: 'Todos os DVD/Blu-ray', icone: '📀' },
+          { chave: 'outros', titulo: 'Outros formatos', icone: '📦' }
         ];
         secoes.forEach(({ chave, titulo, icone }) => {
           const items = buckets[chave];
@@ -1003,12 +1004,12 @@ function carregarDados() {
     }
 
     function classeFormato(formato) {
-      const f = formato || '';
-      if (f.includes('LP') || f.includes('EP') || f.includes('Vinil')) return 'vinil';
-      if (f.includes('CD')) return 'cd';
-      if (f.includes('Cassete') || f.toLowerCase().includes('cassette')) return 'cassete';
-      if (f.includes('DVD') || f.includes('Blu-ray')) return 'dvd_bluray';
-      return 'vinil';
+      const f = (formato || '').toLowerCase();
+      if (f.includes('lp') || f.includes('ep') || f.includes('vinil') || f.includes('vinyl')) return 'vinil';
+      if (f.includes('cd')) return 'cd';
+      if (f.includes('cassete') || f.includes('cassette')) return 'cassete';
+      if (f.includes('dvd') || f.includes('blu-ray') || f.includes('bluray')) return 'dvd_bluray';
+      return 'outros';
     }
 
     function getCorFallback(texto) {

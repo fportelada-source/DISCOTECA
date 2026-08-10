@@ -823,28 +823,50 @@ function carregarDados() {
       const btn = document.getElementById('btnCorrigirAnos');
       if (btn) {
         btn.addEventListener('click', function() {
-          btn.disabled = true;
-          btn.textContent = 'Corrigindo...';
-          fetch(API_URL + '/preencher_anos_faltantes?user_id=' + usuarioId, { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-              btn.disabled = false;
-              btn.textContent = 'Corrigir automaticamente';
-              const texto = document.getElementById('textoAnoFaltante');
-              if (d.sucesso) {
-                texto.textContent = `${d.atualizados} de ${d.total_verificados} discos corrigidos.` + (d.nao_encontrados.length > 0 ? ` Não achei: ${d.nao_encontrados.slice(0, 3).join(', ')}${d.nao_encontrados.length > 3 ? '...' : ''}` : '');
-                carregarDados();
-              } else {
-                texto.textContent = d.erro || 'Erro ao corrigir.';
-              }
-            })
-            .catch(() => {
-              btn.disabled = false;
-              btn.textContent = 'Corrigir automaticamente';
-            });
+          rodarCorrecaoEmLotes(0, 0);
         });
       }
     });
+
+    function rodarCorrecaoEmLotes(totalCorrigidoAteAgora, totalVerificadoAteAgora) {
+      const btn = document.getElementById('btnCorrigirAnos');
+      const texto = document.getElementById('textoAnoFaltante');
+      btn.disabled = true;
+      btn.textContent = 'Corrigindo...';
+      texto.textContent = totalVerificadoAteAgora > 0
+        ? `Corrigindo... ${totalCorrigidoAteAgora} de ${totalVerificadoAteAgora} já ajustados até agora.`
+        : 'Corrigindo, isso pode levar um tempinho (fazemos 2 buscas no Discogs por disco)...';
+
+      fetch(API_URL + '/preencher_anos_faltantes?user_id=' + usuarioId, { method: 'POST' })
+        .then(r => {
+          if (!r.ok) throw new Error('status ' + r.status);
+          return r.json();
+        })
+        .then(d => {
+          if (!d.sucesso) {
+            btn.disabled = false;
+            btn.textContent = 'Corrigir automaticamente';
+            texto.textContent = '❌ ' + (d.erro || 'Erro ao corrigir.');
+            return;
+          }
+          const novoTotalCorrigido = totalCorrigidoAteAgora + d.atualizados;
+          const novoTotalVerificado = totalVerificadoAteAgora + d.total_verificados;
+          if (d.restantes > 0) {
+            // Ainda tem lote pra processar — chama de novo sozinho
+            rodarCorrecaoEmLotes(novoTotalCorrigido, novoTotalVerificado);
+          } else {
+            btn.disabled = false;
+            btn.textContent = 'Corrigir automaticamente';
+            texto.textContent = `✅ ${novoTotalCorrigido} de ${novoTotalVerificado} discos corrigidos.` + (d.nao_encontrados.length > 0 ? ` Não achei: ${d.nao_encontrados.slice(0, 3).join(', ')}${d.nao_encontrados.length > 3 ? '...' : ''}` : '');
+            carregarDados();
+          }
+        })
+        .catch((err) => {
+          btn.disabled = false;
+          btn.textContent = 'Corrigir automaticamente';
+          texto.textContent = '❌ Erro de conexão ao corrigir (' + err.message + '). Tenta de novo — o que já foi corrigido fica salvo.';
+        });
+    }
 
     function renderColecao() {
       const container = document.getElementById('colecao-container');

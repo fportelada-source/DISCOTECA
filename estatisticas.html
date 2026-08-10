@@ -439,7 +439,7 @@ function renderEstatisticasPlayer(dados, apenasCabecalho) {
     const max = dados.top_generos[0].contagem;
     html += `<div class="st-subhead">Top gêneros</div><div class="st-bar-chart">`;
     dados.top_generos.slice(0, 3).forEach(g => {
-      html += `<div class="st-bar-row"><span class="label">${g.nome}</span><div class="track"><div class="fill" style="width:${Math.round(g.contagem / max * 100)}%;"></div></div><span class="value">${g.contagem}</span></div>`;
+      html += `<div class="st-bar-row"><span class="label">${escapeHtml(g.nome)}</span><div class="track"><div class="fill" style="width:${Math.round(g.contagem / max * 100)}%;"></div></div><span class="value">${g.contagem}</span></div>`;
     });
     html += `</div>`;
   }
@@ -552,11 +552,21 @@ function renderValor(estante) {
       <div class="st-value-item"><span class="label">Cassetes</span><span class="value">R$ ${vf.cassete || 0}</span></div>
       <div class="st-value-item"><span class="label">DVD/Blu-ray</span><span class="value">R$ ${vf.dvd_bluray || 0}</span></div>
     </div>
-    ${estante.disco_mais_caro ? `<div class="pp-empty-note" style="margin-top:10px;">Mais valioso: ${estante.disco_mais_caro}</div>` : ''}
+    ${estante.disco_mais_caro ? `<div class="pp-empty-note" style="margin-top:10px;">Mais valioso: ${escapeHtml(estante.disco_mais_caro)}</div>` : ''}
   `;
 }
 
 // ===== TOP ARTISTAS =====
+function escapeHtml(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function renderTopArtistas(estante) {
   const el = document.getElementById('stTopArtistas');
   if (!el) return;
@@ -568,7 +578,7 @@ function renderTopArtistas(estante) {
   el.innerHTML = estante.top_artistas.map((a, i) => `
     <div class="st-rank-item">
       <span class="pos">#${i + 1}</span>
-      <span class="name">${a.nome}</span>
+      <span class="name">${escapeHtml(a.nome)}</span>
       <div class="progress"><div class="bar"><div class="fill" style="width:${Math.round(a.contagem / max * 100)}%;"></div></div><span class="count">${a.contagem}</span></div>
     </div>
   `).join('');
@@ -590,7 +600,7 @@ function renderInsightsDestaques(estante) {
   if (estante.album_mais_recente) cards.push({ icon: '🆕', value: estante.album_mais_recente, label: 'mais recente', sub: '' });
 
   el.innerHTML = cards.length > 0
-    ? cards.map(c => `<div class="st-insight-card"><div class="icon">${c.icon}</div><div class="value">${c.value}</div><div class="label">${c.label}</div>${c.sub ? `<div class="sub">${c.sub}</div>` : ''}</div>`).join('')
+    ? cards.map(c => `<div class="st-insight-card"><div class="icon">${c.icon}</div><div class="value">${escapeHtml(c.value)}</div><div class="label">${escapeHtml(c.label)}</div>${c.sub ? `<div class="sub">${escapeHtml(c.sub)}</div>` : ''}</div>`).join('')
     : '<div class="pp-empty-note">Sem dados suficientes ainda.</div>';
 }
 
@@ -623,7 +633,7 @@ function renderMarcos(estante, avancadas) {
     cards.push({ icon: '🎯', value: String(avancadas.wishlist_progress.adquiridos), label: 'itens adquiridos', sub: 'via wishlist' });
   }
   cards.push({ icon: '📀', value: 'em breve', label: 'anos colecionando', sub: 'desde o cadastro' });
-  el.innerHTML = cards.map(c => `<div class="st-insight-card"><div class="icon">${c.icon}</div><div class="value">${c.value}</div><div class="label">${c.label}</div>${c.sub ? `<div class="sub">${c.sub}</div>` : ''}</div>`).join('');
+  el.innerHTML = cards.map(c => `<div class="st-insight-card"><div class="icon">${c.icon}</div><div class="value">${escapeHtml(c.value)}</div><div class="label">${escapeHtml(c.label)}</div>${c.sub ? `<div class="sub">${escapeHtml(c.sub)}</div>` : ''}</div>`).join('');
 }
 let configAtualAno = null;
 

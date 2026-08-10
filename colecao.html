@@ -239,6 +239,11 @@
           </div>
         </div>
         <div class="form-group">
+          <label>URL da capa (opcional)</label>
+          <input type="url" id="campo-capa-manual" placeholder="Cole um link de imagem — só se a busca automática não achar">
+          <div style="font-size:11.5px; opacity:0.4; margin-top:4px;">Deixe em branco pra continuar buscando automático no Discogs/Last.fm. Preencher aqui sempre tem prioridade.</div>
+        </div>
+        <div class="form-group">
           <button type="button" id="btnFavoritar" class="btn-favoritar">☆ Marcar como favorito</button>
         </div>
         <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
@@ -1119,6 +1124,7 @@ function carregarDados() {
           document.getElementById('campo-notas').value = '';
           document.getElementById('campo-codigo-barras').value = '';
           document.getElementById('campo-favorito').value = disco.favorito ? '1' : '0';
+          document.getElementById('campo-capa-manual').value = disco.capa_url || '';
           atualizarBotaoFavoritar();
         }
         document.getElementById('btnRemoverDisco').style.display = 'block';
@@ -1136,6 +1142,7 @@ function carregarDados() {
         document.getElementById('campo-notas').value = '';
         document.getElementById('campo-codigo-barras').value = '';
         document.getElementById('campo-favorito').value = '0';
+        document.getElementById('campo-capa-manual').value = '';
         atualizarBotaoFavoritar();
         document.getElementById('btnRemoverDisco').style.display = 'none';
       }
@@ -1183,7 +1190,8 @@ function carregarDados() {
         data_aquisicao: document.getElementById('campo-data').value || null,
         notas: document.getElementById('campo-notas').value.trim(),
         codigo_barras: document.getElementById('campo-codigo-barras').value.trim(),
-        favorito: document.getElementById('campo-favorito').value === '1'
+        favorito: document.getElementById('campo-favorito').value === '1',
+        capa_url: document.getElementById('campo-capa-manual').value.trim()
       };
 
       if (!dados.artista || !dados.album) {

@@ -111,7 +111,7 @@
 
     function montarCoverDiv(item) {
       const cor = getCor(item.artista);
-      const capaAttr = item.capa_url ? ` data-capa="${item.capa_url}"` : '';
+      const capaAttr = item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : '';
       return `data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${capaAttr} style="background-color:${cor}; background-size:cover; background-position:center;"`;
     }
 

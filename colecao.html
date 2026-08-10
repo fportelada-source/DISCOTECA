@@ -90,9 +90,10 @@
           <div class="stats-mini" id="colHeroStats"></div>
         </div>
 
-        <div id="bannerAnoFaltante" style="display:none; background:var(--terracotta-wash); border:1px solid var(--terracotta); border-radius:14px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-          <span style="flex:1; font-size:13px;" id="textoAnoFaltante"></span>
-          <button id="btnCorrigirAnos" class="imp-btn primary" type="button" style="white-space:nowrap;">Corrigir automaticamente</button>
+        <div id="bannerAnoFaltante" class="col-fix-banner" style="display:none;">
+          <div class="icon">🎯</div>
+          <span class="texto" id="textoAnoFaltante"></span>
+          <button id="btnCorrigirAnos" class="btn-fix" type="button">Corrigir automaticamente</button>
         </div>
 
         <!-- CONTROLES -->
@@ -1213,6 +1214,7 @@ function carregarDados() {
         document.getElementById('campo-album').value = '';
         document.getElementById('campo-formato').value = '';
         document.getElementById('campo-ano').value = '';
+        document.getElementById('grupoPrensagem').style.display = 'none';
         document.getElementById('campo-condicao-midia').value = '';
         document.getElementById('campo-condicao-capa').value = '';
         document.getElementById('campo-preco').value = '';

@@ -90,6 +90,11 @@
           <div class="stats-mini" id="colHeroStats"></div>
         </div>
 
+        <div id="bannerAnoFaltante" style="display:none; background:var(--terracotta-wash); border:1px solid var(--terracotta); border-radius:14px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <span style="flex:1; font-size:13px;" id="textoAnoFaltante"></span>
+          <button id="btnCorrigirAnos" class="imp-btn primary" type="button" style="white-space:nowrap;">Corrigir automaticamente</button>
+        </div>
+
         <!-- CONTROLES -->
         <div class="col-controls">
           <div class="search-mini">
@@ -543,6 +548,7 @@ function carregarDados() {
       renderRecentesColecao();
       renderFavoritosColecao();
       aplicarFiltros();
+      checarAnosFaltantes();
     })
     .catch(() => {});
   sincronizarBadge();
@@ -801,6 +807,45 @@ function carregarDados() {
         .replace(/'/g, '&#039;');
     }
 
+    function checarAnosFaltantes() {
+      const faltando = colecao.filter(d => !d.ano_lancamento).length;
+      const banner = document.getElementById('bannerAnoFaltante');
+      const texto = document.getElementById('textoAnoFaltante');
+      if (faltando > 0) {
+        texto.textContent = `${faltando} disco${faltando > 1 ? 's' : ''} sem ano de lançamento cadastrado — provavelmente de uma importação antiga do Discogs. A correção também completa o gênero, se estiver faltando.`;
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('btnCorrigirAnos');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          btn.disabled = true;
+          btn.textContent = 'Corrigindo...';
+          fetch(API_URL + '/preencher_anos_faltantes?user_id=' + usuarioId, { method: 'POST' })
+            .then(r => r.json())
+            .then(d => {
+              btn.disabled = false;
+              btn.textContent = 'Corrigir automaticamente';
+              const texto = document.getElementById('textoAnoFaltante');
+              if (d.sucesso) {
+                texto.textContent = `${d.atualizados} de ${d.total_verificados} discos corrigidos.` + (d.nao_encontrados.length > 0 ? ` Não achei: ${d.nao_encontrados.slice(0, 3).join(', ')}${d.nao_encontrados.length > 3 ? '...' : ''}` : '');
+                carregarDados();
+              } else {
+                texto.textContent = d.erro || 'Erro ao corrigir.';
+              }
+            })
+            .catch(() => {
+              btn.disabled = false;
+              btn.textContent = 'Corrigir automaticamente';
+            });
+        });
+      }
+    });
+
     function renderColecao() {
       const container = document.getElementById('colecao-container');
       if (!container) return;
@@ -841,7 +886,7 @@ function carregarDados() {
               <div class="title">${escapeHtml(item.album) || '?'}</div>
               <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
               <div class="meta">
-                <span>${item.ano_lancamento || (item.data_adicao ? item.data_adicao.split('-')[0] : '—')}</span>
+                <span>${item.ano_lancamento || '—'}</span>
                 ${item.preco ? `<span class="price">R$ ${item.preco}</span>` : ''}
               </div>
             </div>

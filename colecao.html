@@ -94,6 +94,7 @@
           <div class="icon">🎯</div>
           <span class="texto" id="textoAnoFaltante"></span>
           <button id="btnCorrigirAnos" class="btn-fix" type="button">Corrigir automaticamente</button>
+          <button id="btnFecharBannerAno" class="btn-fix-close" type="button" title="Dispensar">✕</button>
         </div>
 
         <!-- CONTROLES -->
@@ -764,12 +765,7 @@ function carregarDados() {
       document.querySelectorAll('#viewToggle button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === view);
       });
-      const groupControls = document.getElementById('groupControls');
-      if (view === 'list') {
-        groupControls.style.display = 'flex';
-      } else {
-        groupControls.style.display = 'none';
-      }
+      document.getElementById('groupControls').style.display = 'flex';
       aplicarView();
     }
 
@@ -779,6 +775,7 @@ function carregarDados() {
       document.querySelectorAll('#groupToggle button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.group === group);
       });
+      renderColecao();
       renderLista();
       aplicarView();
     }
@@ -816,13 +813,25 @@ function carregarDados() {
       const faltando = colecao.filter(d => !d.ano_lancamento || !d.ano_original).length;
       const banner = document.getElementById('bannerAnoFaltante');
       const texto = document.getElementById('textoAnoFaltante');
-      if (faltando > 0) {
-        texto.textContent = `${faltando} disco${faltando > 1 ? 's' : ''} sem o ano original do álbum — provavelmente de uma importação do Discogs. A correção também completa gênero e limpa nomes tipo "Artista (2)".`;
+      const dispensadoPara = localStorage.getItem('discoteca_banner_ano_dispensado');
+      if (faltando > 0 && dispensadoPara !== String(faltando)) {
+        texto.textContent = `${faltando} disco${faltando > 1 ? 's' : ''} sem o ano original do álbum — provavelmente de uma importação do Discogs. A correção também completa gênero e limpa nomes tipo "Artista (2)". Alguns podem não ter esse dado cadastrado no Discogs e continuar faltando mesmo após corrigir.`;
         banner.style.display = 'flex';
       } else {
         banner.style.display = 'none';
       }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const btnFechar = document.getElementById('btnFecharBannerAno');
+      if (btnFechar) {
+        btnFechar.addEventListener('click', function() {
+          const faltando = colecao.filter(d => !d.ano_lancamento || !d.ano_original).length;
+          localStorage.setItem('discoteca_banner_ano_dispensado', String(faltando));
+          document.getElementById('bannerAnoFaltante').style.display = 'none';
+        });
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
       const btn = document.getElementById('btnCorrigirAnos');
@@ -895,14 +904,12 @@ function carregarDados() {
         return;
       }
 
-      let html = '<div class="col-grid">';
-      colecaoFiltrada.forEach((item, i) => {
+      function cardHtml(item, i) {
         const uniqueId = `col-${i}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
         const chave = classeFormato(item.formato);
         const label = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/BR' }[chave] || 'Vinil';
         const corFundo = getCorFallback(item.artista);
-
-        html += `
+        return `
           <div class="album-card" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} onclick="editarDisco('${item.id || ''}')">
             <div class="art" id="art-${uniqueId}" style="background-color:${corFundo};">
               ${item.favorito ? '<span class="fav-indicator">⭐</span>' : ''}
@@ -919,8 +926,38 @@ function carregarDados() {
             </div>
           </div>
         `;
-      });
-      html += '</div>';
+      }
+
+      let html = '';
+
+      // Só existe motivo pra separar em estantes quando o filtro "Tudo"
+      // está ativo — se a pessoa já filtrou por um formato específico
+      // (só Vinil, por exemplo), uma seção só seria redundante.
+      const filtroFormatoAtivo = document.querySelector('#formatPills .pill.active')?.dataset.formato || '';
+      const deveSeparar = groupPreference === 'separado' && !filtroFormatoAtivo;
+
+      if (deveSeparar) {
+        const buckets = { vinil: [], cd: [], cassete: [], dvd_bluray: [] };
+        colecaoFiltrada.forEach(item => buckets[classeFormato(item.formato)].push(item));
+        const secoes = [
+          { chave: 'vinil', titulo: 'Todos os Vinis', icone: '🎵' },
+          { chave: 'cd', titulo: 'Todos os CDs', icone: '💿' },
+          { chave: 'cassete', titulo: 'Todas as Cassetes', icone: '📼' },
+          { chave: 'dvd_bluray', titulo: 'Todos os DVD/Blu-ray', icone: '📀' }
+        ];
+        secoes.forEach(({ chave, titulo, icone }) => {
+          const items = buckets[chave];
+          if (items.length === 0) return;
+          html += `
+            <div class="col-shelf">
+              <div class="col-shelf-header"><span class="icone">${icone}</span><h3>${titulo}</h3><span class="count">${items.length}</span></div>
+              <div class="col-grid">${items.map((item, i) => cardHtml(item, i)).join('')}</div>
+            </div>
+          `;
+        });
+      } else {
+        html = `<div class="col-grid">${colecaoFiltrada.map((item, i) => cardHtml(item, i)).join('')}</div>`;
+      }
 
       container.innerHTML = html;
 

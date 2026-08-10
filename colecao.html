@@ -621,7 +621,7 @@ function carregarDados() {
       if (recentes.length === 0) { el.innerHTML = '<div class="pp-empty-note">Nenhuma adição ainda.</div>'; return; }
       el.innerHTML = recentes.map((item, idx) => `
         <div class="pp-recent-item">
-          <div class="cover" id="rec-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+          <div class="cover" id="rec-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
             <span class="fallback-icon">◈</span>
           </div>
           <div class="info">
@@ -641,7 +641,7 @@ function carregarDados() {
       if (favoritos.length === 0) { el.innerHTML = '<div class="pp-empty-note">Marque discos como favoritos (no modal de edição) pra vê-los aqui.</div>'; return; }
       el.innerHTML = favoritos.slice(0, 8).map((item, idx) => `
         <div class="pp-fav-item">
-          <div class="cover" id="fav-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+          <div class="cover" id="fav-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
             <span class="fallback-icon">♢</span>
           </div>
           <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
@@ -655,7 +655,7 @@ function carregarDados() {
       if (!el) return;
       if (colecao.length === 0) { el.innerHTML = '<div class="pp-empty-note">Prateleira vazia.</div>'; return; }
       el.innerHTML = colecao.slice(0, 24).map((item, idx) => `
-        <div class="pp-shelf-item" id="shelf-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+        <div class="pp-shelf-item" id="shelf-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
           <span class="fallback-icon">♢</span>
         </div>
       `).join('');
@@ -831,7 +831,7 @@ function carregarDados() {
         const corFundo = getCorFallback(item.artista);
 
         html += `
-          <div class="album-card" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${item.capa_url}"` : ''} onclick="editarDisco('${item.id || ''}')">
+          <div class="album-card" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} onclick="editarDisco('${item.id || ''}')">
             <div class="art" id="art-${uniqueId}" style="background-color:${corFundo};">
               ${item.favorito ? '<span class="fav-indicator">⭐</span>' : ''}
               <span class="format-badge ${chave}">${label}</span>

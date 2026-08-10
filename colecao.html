@@ -886,7 +886,7 @@ function carregarDados() {
               <div class="title">${escapeHtml(item.album) || '?'}</div>
               <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
               <div class="meta">
-                <span title="${item.ano_original && item.ano_original !== item.ano_lancamento ? `Álbum original de ${item.ano_original} — essa é a prensagem de ${item.ano_lancamento}` : ''}">${item.ano_lancamento || '—'}${item.ano_original && item.ano_original !== item.ano_lancamento ? ` <span style="opacity:0.5; font-size:0.85em;">(orig. ${item.ano_original})</span>` : ''}</span>
+                <span title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem que você tem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? ` <span style="opacity:0.5; font-size:0.85em;">(prensagem ${item.ano_lancamento})</span>` : ''}</span>
                 ${item.preco ? `<span class="price">R$ ${item.preco}</span>` : ''}
               </div>
             </div>
@@ -999,7 +999,7 @@ function carregarDados() {
           <tr>
             <td><strong>${escapeHtml(item.artista) || '?'}</strong></td>
             <td>${escapeHtml(item.album) || '?'}</td>
-            <td title="${item.ano_original && item.ano_original !== item.ano_lancamento ? `Álbum original de ${item.ano_original}` : ''}">${item.ano_lancamento || '—'}${item.ano_original && item.ano_original !== item.ano_lancamento ? ` <span style="opacity:0.5; font-size:0.85em;">(orig. ${item.ano_original})</span>` : ''}</td>
+            <td title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? ` <span style="opacity:0.5; font-size:0.85em;">(prensagem ${item.ano_lancamento})</span>` : ''}</td>
             <td><span class="format-badge ${formatClass}">${formatClass ? formatClass.charAt(0).toUpperCase() + formatClass.slice(1) : '—'}</span></td>
             <td>
               <div class="list-actions">

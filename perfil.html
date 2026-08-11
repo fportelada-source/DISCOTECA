@@ -294,6 +294,15 @@
 // CONFIGURAÇÕES
 // ================================================================
 const API_URL = 'https://fportelada.pythonanywhere.com';
+
+
+// Toda chamada ao backend passa por aqui — garante que o cookie de
+// sessão (login de verdade) sempre vá junto, mesmo entre domínios
+// diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
+// não manda o cookie, e a autenticação real nunca chega a funcionar.
+function apiFetch(url, opcoes = {}) {
+  return fetch(url, { ...opcoes, credentials: 'include' });
+}
 const DEV_MODE = false;
 const DEV_USER_ID = 1;
 const DEV_USER_NOME = 'Teste ID 1';
@@ -314,7 +323,7 @@ function atualizarBadgeWishlist(n) {
 
 function carregarAvatarTopo() {
   if (!usuarioId) return;
-  fetch(API_URL + '/perfil/' + usuarioId)
+  apiFetch(API_URL + '/perfil/' + usuarioId)
     .then(r => r.json())
     .then(perfil => {
       if (!perfil || perfil.erro) return;
@@ -332,7 +341,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -399,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const error = document.getElementById('loginError');
       btn.disabled = true;
       if (error) error.style.display = 'none';
-      fetch(API_URL + '/login')
+      apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
           if (d.auth_url) window.location.href = d.auth_url;
@@ -449,7 +458,7 @@ function verificarSessao() {
     if (typeof onPaginaPronta === 'function') onPaginaPronta();
     return;
   }
-  fetch(API_URL + '/sessao')
+  apiFetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
@@ -473,7 +482,7 @@ function onPaginaPronta() {
 
 function carregarConfiguracoes() {
   if (!usuarioId) return;
-  fetch(API_URL + '/configuracoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/configuracoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => preencherPagina(data))
     .catch(() => mostrarMsg('Erro ao carregar configurações.', 'error'));
@@ -571,7 +580,7 @@ function salvarConfiguracoes() {
   const btn = document.getElementById('btnSalvarTudo');
   btn.disabled = true;
   btn.textContent = 'Salvando...';
-  fetch(API_URL + '/configuracoes?user_id=' + usuarioId, {
+  apiFetch(API_URL + '/configuracoes?user_id=' + usuarioId, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(coletarConfiguracoes())
@@ -600,7 +609,7 @@ function uploadCsv(inputId, statusId, tipo) {
   formData.append('tipo', tipo);
   formData.append('arquivo', input.files[0]);
   status.textContent = 'Enviando...';
-  return fetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: formData })
+  return apiFetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: formData })
     .then(r => r.json())
     .then(d => {
       status.textContent = d.sucesso ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Enviado' : (d.erro || 'Erro');
@@ -670,7 +679,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnLimparImportados').addEventListener('click', function() {
     abrirConfirm('Limpar todos os dados de playlists importadas? A coleção e a wishlist não são afetadas.', function() {
-      fetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Dados importados limpos!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -679,7 +688,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnZerarColecao').addEventListener('click', function() {
     abrirConfirm('Apagar TODOS os discos da sua coleção física? Essa ação é permanente.', function() {
-      fetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Coleção zerada!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -688,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnZerarWishlist').addEventListener('click', function() {
     abrirConfirm('Apagar toda a sua wishlist atual? Essa ação é permanente.', function() {
-      fetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Wishlist zerada!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -697,7 +706,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnZerarTudo').addEventListener('click', function() {
     abrirConfirm('<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ Isso apaga playlists, coleção E wishlist de uma vez. Seu perfil (bio, foto, preferências) é mantido. Essa ação é permanente. Confirmar?', function() {
-      fetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Tudo zerado! Pode começar a importar de novo.' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -706,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnResetarPrefs').addEventListener('click', function() {
     abrirConfirm('Restaurar todas as preferências desta página para o padrão?', function() {
-      fetch(API_URL + '/configuracoes/resetar?user_id=' + usuarioId, { method: 'POST' })
+      apiFetch(API_URL + '/configuracoes/resetar?user_id=' + usuarioId, { method: 'POST' })
         .then(r => r.json())
         .then(d => {
           mostrarMsg(d.sucesso ? 'Preferências restauradas!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error');
@@ -722,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnExcluirConta').addEventListener('click', function() {
     abrirConfirm('Excluir sua conta apaga TUDO permanentemente: coleção, wishlist e perfil. Essa ação não pode ser desfeita. Confirmar?', function() {
-      fetch(API_URL + '/excluir_conta?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/excluir_conta?user_id=' + usuarioId, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
           if (d.sucesso) {

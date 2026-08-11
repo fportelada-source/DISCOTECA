@@ -161,119 +161,155 @@
 
   <!-- ===== MODAL: ADICIONAR/EDITAR DISCO ===== -->
   <div class="modal-overlay" id="modalAdicionar">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 id="modalTitle">➕ Adicionar Disco</h2>
-        <button class="modal-close" id="btnFecharModal">✕</button>
+    <div class="modal modal-v2">
+      <div class="modal-v2-header">
+        <div class="left">
+          <div class="cover" id="modalCoverPreview">◈</div>
+          <div class="title-group">
+            <div class="title" id="modalTitle">Adicionar Disco</div>
+            <div class="sub" id="modalSub">Novo disco</div>
+          </div>
+        </div>
+        <div class="right">
+          <button type="button" id="btnFavoritar" class="fav-btn" title="Marcar como favorito">☆</button>
+          <button type="button" class="close-btn" id="btnFecharModal">✕</button>
+        </div>
       </div>
       <form id="form-adicionar">
         <input type="hidden" id="campo-id" value="">
         <input type="hidden" id="campo-ano" value="">
         <input type="hidden" id="campo-favorito" value="0">
-        <div class="form-group">
-          <label>Artista *</label>
-          <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
-        </div>
-        <div class="form-group">
-          <label>Álbum *</label>
-          <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Formato</label>
-            <select id="campo-formato">
-              <option value="">Selecione</option>
-              <option value="LP">LP (Vinil)</option>
-              <option value="2xLP">2xLP (Vinil)</option>
-              <option value="EP">EP (Vinil)</option>
-              <option value="CD">CD</option>
-              <option value="2xCD">2xCD</option>
-              <option value="Cassete">Cassete</option>
-              <option value="DVD">DVD</option>
-              <option value="Blu-ray">Blu-ray</option>
-            </select>
+        <div class="form-grid">
+
+          <div class="form-section">
+            <div class="section-title">Álbum</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Artista <span class="required">*</span></label>
+                <input type="text" id="campo-artista" placeholder="Ex: Metallica" required>
+              </div>
+              <div class="form-group">
+                <label>Álbum <span class="required">*</span></label>
+                <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
+              </div>
+            </div>
+            <div class="form-row" style="margin-top:10px;">
+              <div class="form-group">
+                <label>Formato</label>
+                <select id="campo-formato">
+                  <option value="">Selecione</option>
+                  <option value="LP">LP (Vinil)</option>
+                  <option value="2xLP">2xLP (Vinil)</option>
+                  <option value="EP">EP (Vinil)</option>
+                  <option value="CD">CD</option>
+                  <option value="2xCD">2xCD</option>
+                  <option value="Cassete">Cassete</option>
+                  <option value="DVD">DVD</option>
+                  <option value="Blu-ray">Blu-ray</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Preço (R$)</label>
-            <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
+
+          <div class="form-section">
+            <div class="section-title">Sua Cópia</div>
+            <div class="form-row three">
+              <div class="form-group">
+                <label>Cond. Mídia</label>
+                <select id="campo-condicao-midia">
+                  <option value="">Selecione</option>
+                  <option value="M">M (Mint)</option>
+                  <option value="NM">NM (Near Mint)</option>
+                  <option value="VG+">VG+</option>
+                  <option value="VG">VG</option>
+                  <option value="G">G</option>
+                  <option value="F">F</option>
+                  <option value="P">P</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Cond. Capa</label>
+                <select id="campo-condicao-capa">
+                  <option value="">Selecione</option>
+                  <option value="M">M (Mint)</option>
+                  <option value="NM">NM (Near Mint)</option>
+                  <option value="VG+">VG+</option>
+                  <option value="VG">VG</option>
+                  <option value="G">G</option>
+                  <option value="F">F</option>
+                  <option value="P">P</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Data de Aquisição</label>
+                <input type="date" id="campo-data">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">Edição</div>
+            <div class="form-group" id="grupoPrensagem" style="display:none; margin-bottom:10px;">
+              <label>Prensagem</label>
+              <div id="textoPrensagem" style="font-size:12.5px; opacity:0.5; padding:6px 0;"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Código de Barras</label>
+                <div class="barcode-row">
+                  <input type="text" id="campo-codigo-barras" placeholder="Ex: 042284834181">
+                  <button type="button" class="btn-scan" id="btnBarcode">📷 Ler</button>
+                </div>
+                <div class="barcode-reader-container" id="barcode-reader-container">
+                  <div id="barcode-reader"></div>
+                  <button type="button" class="btn" style="margin-top:8px; background:var(--card-line); color:var(--paper);" id="btnBarcodeCancel">Cancelar</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>URL da Capa (opcional)</label>
+                <input type="url" id="campo-capa-manual" placeholder="https://...">
+                <div class="cover-help">Deixe em branco pra buscar automático no Discogs/Last.fm. Preencher aqui sempre tem prioridade.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">Pessoal</div>
+            <div class="form-group full">
+              <label>Sua Avaliação</label>
+              <div id="starPicker" class="rating-stars">
+                <span class="star" data-valor="1">★</span>
+                <span class="star" data-valor="2">★</span>
+                <span class="star" data-valor="3">★</span>
+                <span class="star" data-valor="4">★</span>
+                <span class="star" data-valor="5">★</span>
+                <span class="label" id="ratingLabel">0 / 5</span>
+              </div>
+              <input type="hidden" id="campo-avaliacao" value="0">
+            </div>
+            <div class="form-row" style="margin-top:10px;">
+              <div class="form-group full">
+                <label>Notas</label>
+                <textarea id="campo-notas" rows="2" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-v2-actions">
+          <div class="left">
+            <button type="button" id="btnRemoverDisco" class="btn-danger" style="display:none;">🗑 Remover este disco</button>
+          </div>
+          <div class="right">
+            <button type="button" class="btn btn-secondary" id="btnCancelarDisco">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit">Salvar Disco</button>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Condição da Mídia</label>
-            <select id="campo-condicao-midia">
-              <option value="">Selecione</option>
-              <option value="M">M (Mint)</option>
-              <option value="NM">NM (Near Mint)</option>
-              <option value="VG+">VG+ (Very Good Plus)</option>
-              <option value="VG">VG (Very Good)</option>
-              <option value="G">G (Good)</option>
-              <option value="F">F (Fair)</option>
-              <option value="P">P (Poor)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Condição da Capa</label>
-            <select id="campo-condicao-capa">
-              <option value="">Selecione</option>
-              <option value="M">M (Mint)</option>
-              <option value="NM">NM (Near Mint)</option>
-              <option value="VG+">VG+ (Very Good Plus)</option>
-              <option value="VG">VG (Very Good)</option>
-              <option value="G">G (Good)</option>
-              <option value="F">F (Fair)</option>
-              <option value="P">P (Poor)</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Data de Aquisição</label>
-          <input type="date" id="campo-data">
-        </div>
-        <div class="form-group" id="grupoPrensagem" style="display:none;">
-          <label>Prensagem</label>
-          <div id="textoPrensagem" style="font-size:13px; opacity:0.5; padding:8px 0;"></div>
-        </div>
-        <div class="form-group">
-          <label>Sua avaliação</label>
-          <div id="starPicker" style="display:flex; gap:4px; font-size:26px; cursor:pointer;">
-            <span class="star" data-valor="1">☆</span>
-            <span class="star" data-valor="2">☆</span>
-            <span class="star" data-valor="3">☆</span>
-            <span class="star" data-valor="4">☆</span>
-            <span class="star" data-valor="5">☆</span>
-          </div>
-          <input type="hidden" id="campo-avaliacao" value="0">
-        </div>
-        <div class="form-group">
-          <label>Tags <span style="opacity:0.4; font-weight:400;">(separadas por vírgula)</span></label>
-          <input type="text" id="campo-tags" placeholder="Ex: presente, primeira prensagem, edição limitada">
-        </div>
-        <div class="form-group">
-          <label>Notas</label>
-          <textarea id="campo-notas" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Código de Barras</label>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <input type="text" id="campo-codigo-barras" placeholder="Ex: 042284834181" style="flex:1;">
-            <button type="button" class="barcode-btn" id="btnBarcode">📷 Ler</button>
-          </div>
-          <div class="barcode-reader-container" id="barcode-reader-container">
-            <div id="barcode-reader"></div>
-            <button type="button" class="btn" style="margin-top:8px; background:var(--card-line); color:var(--paper);" id="btnBarcodeCancel">Cancelar</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>URL da capa (opcional)</label>
-          <input type="url" id="campo-capa-manual" placeholder="Cole um link de imagem — só se a busca automática não achar">
-          <div style="font-size:11.5px; opacity:0.4; margin-top:4px;">Deixe em branco pra continuar buscando automático no Discogs/Last.fm. Preencher aqui sempre tem prioridade.</div>
-        </div>
-        <div class="form-group">
-          <button type="button" id="btnFavoritar" class="btn-favoritar">☆ Marcar como favorito</button>
-        </div>
-        <button type="submit" class="form-btn" id="btn-submit">Salvar Disco</button>
-        <button type="button" id="btnRemoverDisco" class="btn-remover-disco" style="display:none;">Remover este disco</button>
         <div class="form-msg" id="form-msg"></div>
       </form>
     </div>
@@ -1206,8 +1242,8 @@ function carregarDados() {
       const btn = document.getElementById('btnFavoritar');
       if (!btn) return;
       const favoritado = document.getElementById('campo-favorito').value === '1';
-      btn.textContent = favoritado ? '★ Favorito' : '☆ Marcar como favorito';
-      btn.classList.toggle('ativo', favoritado);
+      btn.textContent = favoritado ? '★' : '☆';
+      btn.classList.toggle('active', favoritado);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1240,9 +1276,10 @@ function carregarDados() {
     function atualizarEstrelas(valor) {
       document.querySelectorAll('#starPicker .star').forEach(el => {
         const v = parseInt(el.dataset.valor);
-        el.textContent = v <= valor ? '★' : '☆';
-        el.style.color = v <= valor ? 'var(--terracotta)' : 'inherit';
+        el.classList.toggle('active', v <= valor);
       });
+      const label = document.getElementById('ratingLabel');
+      if (label) label.textContent = `${valor} / 5`;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1267,10 +1304,14 @@ function carregarDados() {
       btnSubmit.disabled = false;
 
       if (discoId) {
-        document.getElementById('modalTitle').textContent = '✏️ Editar Disco';
         btnSubmit.textContent = 'Atualizar Disco';
         const disco = colecao.find(d => d.id == discoId);
         if (disco) {
+          document.getElementById('modalTitle').textContent = disco.album || 'Editar Disco';
+          const anoExibido = disco.ano_original || disco.ano_lancamento;
+          document.getElementById('modalSub').textContent = `${disco.artista || ''}${anoExibido ? ' · ' + anoExibido : ''}`;
+          const coverEl = document.getElementById('modalCoverPreview');
+          coverEl.innerHTML = disco.capa_url ? `<img src="${escapeHtml(disco.capa_url)}" alt="">` : '◈';
           document.getElementById('campo-artista').value = disco.artista || '';
           document.getElementById('campo-album').value = disco.album || '';
           document.getElementById('campo-formato').value = disco.formato || '';
@@ -1286,18 +1327,19 @@ function carregarDados() {
           document.getElementById('campo-condicao-capa').value = disco.condicao_capa || '';
           document.getElementById('campo-preco').value = disco.preco || '';
           document.getElementById('campo-data').value = disco.data_adicao || '';
-          document.getElementById('campo-notas').value = '';
-          document.getElementById('campo-codigo-barras').value = '';
+          document.getElementById('campo-notas').value = disco.notas || '';
+          document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
           document.getElementById('campo-favorito').value = disco.favorito ? '1' : '0';
           document.getElementById('campo-capa-manual').value = disco.capa_url || '';
           document.getElementById('campo-avaliacao').value = disco.avaliacao || 0;
-          document.getElementById('campo-tags').value = disco.tags || '';
           atualizarEstrelas(disco.avaliacao || 0);
           atualizarBotaoFavoritar();
         }
         document.getElementById('btnRemoverDisco').style.display = 'block';
       } else {
-        document.getElementById('modalTitle').textContent = '➕ Adicionar Disco';
+        document.getElementById('modalTitle').textContent = 'Adicionar Disco';
+        document.getElementById('modalSub').textContent = 'Novo disco';
+        document.getElementById('modalCoverPreview').innerHTML = '◈';
         btnSubmit.textContent = 'Salvar Disco';
         document.getElementById('campo-artista').value = '';
         document.getElementById('campo-album').value = '';
@@ -1313,7 +1355,6 @@ function carregarDados() {
         document.getElementById('campo-favorito').value = '0';
         document.getElementById('campo-capa-manual').value = '';
         document.getElementById('campo-avaliacao').value = 0;
-        document.getElementById('campo-tags').value = '';
         atualizarEstrelas(0);
         atualizarBotaoFavoritar();
         document.getElementById('btnRemoverDisco').style.display = 'none';
@@ -1339,6 +1380,7 @@ function carregarDados() {
 
     btnAbrirModal.addEventListener('click', () => abrirModal(null));
     btnFecharModal.addEventListener('click', fecharModal);
+    document.getElementById('btnCancelarDisco')?.addEventListener('click', fecharModal);
     modal.addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharModal(); });
 
@@ -1364,8 +1406,7 @@ function carregarDados() {
         codigo_barras: document.getElementById('campo-codigo-barras').value.trim(),
         favorito: document.getElementById('campo-favorito').value === '1',
         capa_url: document.getElementById('campo-capa-manual').value.trim(),
-        avaliacao: parseInt(document.getElementById('campo-avaliacao').value) || 0,
-        tags: document.getElementById('campo-tags').value.trim()
+        avaliacao: parseInt(document.getElementById('campo-avaliacao').value) || 0
       };
 
       if (!dados.artista || !dados.album) {

@@ -51,7 +51,7 @@
       img.src = url;
     }
 
-    // Prioridade: capa já salva → Discogs sob demanda → Last.fm por último.
+    // Prioridade: capa já salva <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> Discogs sob demanda <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> Last.fm por último.
     // Lazy (só busca quando o card entra na tela) — importante pra coleções grandes.
     function configurarLazyLoadCapas() {
       const itens = document.querySelectorAll('[data-artista][data-album]');
@@ -144,9 +144,9 @@
               <div class="pp-name">${nome}${formatosBadge ? `<span class="badge">${formatosBadge}</span>` : ''}</div>
               ${data.bio ? `<div class="pp-bio">${escapeHtml(data.bio)}</div>` : ''}
               <div class="pp-details">
-                ${data.localizacao ? `<span>📍 ${escapeHtml(data.localizacao)}</span>` : ''}
-                ${ano ? `<span>📅 membro desde ${ano}</span>` : ''}
-                <span>🎧 ${data.total_discos || 0} discos</span>
+                ${data.localizacao ? `<span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${escapeHtml(data.localizacao)}</span>` : ''}
+                ${ano ? `<span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> membro desde ${ano}</span>` : ''}
+                <span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg> ${data.total_discos || 0} discos</span>
               </div>
               ${(data.spotify_url || data.discogs_url || data.instagram_url) ? `
                 <div class="pp-social-links">
@@ -179,7 +179,7 @@
         </div>
       `;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2>⭐ Álbuns favoritos</h2></div>`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Álbuns favoritos</h2></div>`;
       if (data.favoritos && data.favoritos.length > 0) {
         if (data.favoritos_e_provisorio) {
           html += `<div class="pp-empty-note" style="margin-bottom:10px;">Ninguém foi marcado como favorito ainda — mostrando os mais recentes por enquanto.</div>`;
@@ -189,7 +189,7 @@
           html += `
             <div class="pp-fav-item">
               <div class="cover" ${montarCoverDiv(item)}>
-                <span class="fallback-icon">♢</span>
+                <span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg></span>
                 <span class="rank">#${idx + 1}</span>
               </div>
               <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
@@ -202,7 +202,7 @@
       }
       html += `</div>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2>🕒 Adicionados recentemente</h2></div>`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Adicionados recentemente</h2></div>`;
       if (data.recentes && data.recentes.length > 0) {
         html += `<div class="pp-recent-scroll">`;
         data.recentes.forEach(item => {
@@ -223,7 +223,7 @@
       }
       html += `</div>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2>💭 Wishlist atual</h2></div>`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Wishlist atual</h2></div>`;
       if (data.wishlist && data.wishlist.length > 0) {
         html += `<div class="pp-wishlist-grid">`;
         data.wishlist.slice(0, 6).forEach(item => {
@@ -244,7 +244,7 @@
       }
       html += `</div>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2>📊 Destaques da coleção</h2></div><div class="pp-highlights-grid">`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da coleção</h2></div><div class="pp-highlights-grid">`;
       if (data.genero_predominante) {
         html += `<div class="pp-highlight-card"><div class="value">${data.genero_predominante_pct}%</div><div class="label">${data.genero_predominante}</div><div class="sub">gênero predominante</div></div>`;
       }
@@ -257,7 +257,7 @@
       html += `<div class="pp-highlight-card"><div class="value">em breve</div><div class="label">completude</div><div class="sub">discografias completas</div></div>`;
       html += `</div></div>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2>📖 Linha do tempo</h2></div><div class="pp-timeline">`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Linha do tempo</h2></div><div class="pp-timeline">`;
       if (data.recentes && data.recentes.length > 0) {
         data.recentes.slice(0, 5).forEach(item => {
           html += `<div class="pp-timeline-item"><span class="icon">+</span><span class="text"><strong>${escapeHtml(item.album) || 'Álbum'}</strong> — ${escapeHtml(item.artista) || 'Artista'} adicionado à coleção</span><span class="time">${item.data_adicao || ''}</span></div>`;
@@ -267,14 +267,14 @@
       }
       html += `</div></div>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2>📚 Prévia da estante</h2></div>`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Prévia da estante</h2></div>`;
       const todosDiscos = data.colecao_por_formato
         ? [...data.colecao_por_formato.vinil, ...data.colecao_por_formato.cd, ...data.colecao_por_formato.cassete, ...data.colecao_por_formato.dvd_bluray]
         : [];
       if (todosDiscos.length > 0) {
         html += `<div class="pp-shelf-grid">`;
         todosDiscos.slice(0, 24).forEach(item => {
-          html += `<div class="pp-shelf-item" title="${escapeHtml(item.artista) || 'Artista'} — ${escapeHtml(item.album) || 'Álbum'}" ${montarCoverDiv(item)}><span class="fallback-icon">♢</span></div>`;
+          html += `<div class="pp-shelf-item" title="${escapeHtml(item.artista) || 'Artista'} — ${escapeHtml(item.album) || 'Álbum'}" ${montarCoverDiv(item)}><span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg></span></div>`;
         });
         html += `</div>`;
       } else {
@@ -284,7 +284,7 @@
 
       html += `
         <div class="pp-section">
-          <div class="pp-section-header"><h2>🔗 Gostos em comum</h2></div>
+          <div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Gostos em comum</h2></div>
           <div class="pp-shared-taste">
             <div class="circle">—</div>
             <div class="info">

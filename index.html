@@ -92,6 +92,15 @@
 // CONFIGURAÇÕES
 // ================================================================
 const API_URL = 'https://fportelada.pythonanywhere.com';
+
+
+// Toda chamada ao backend passa por aqui — garante que o cookie de
+// sessão (login de verdade) sempre vá junto, mesmo entre domínios
+// diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
+// não manda o cookie, e a autenticação real nunca chega a funcionar.
+function apiFetch(url, opcoes = {}) {
+  return fetch(url, { ...opcoes, credentials: 'include' });
+}
 const DEV_MODE = false;
 const DEV_USER_ID = 1;
 const DEV_USER_NOME = 'Teste ID 1';
@@ -132,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const error = document.getElementById('loginError');
       btn.disabled = true;
       if (error) error.style.display = 'none';
-      fetch(API_URL + '/login')
+      apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
           if (d.auth_url) window.location.href = d.auth_url;
@@ -175,7 +184,7 @@ function verificarSessao() {
     carregarDashboard();
     return;
   }
-  fetch(API_URL + '/sessao')
+  apiFetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
@@ -208,10 +217,10 @@ function buscarDescobertas() {
 // ================================================================
 function carregarDashboard() {
   Promise.all([
-    fetch(API_URL + '/colecao?user_id=' + usuarioId).then(r => r.json()),
-    fetch(API_URL + '/recomendacoes?user_id=' + usuarioId).then(r => r.json()),
-    fetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId).then(r => r.json()),
-    fetch(API_URL + '/perfil/' + usuarioId).then(r => r.json())
+    apiFetch(API_URL + '/colecao?user_id=' + usuarioId).then(r => r.json()),
+    apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId).then(r => r.json()),
+    apiFetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId).then(r => r.json()),
+    apiFetch(API_URL + '/perfil/' + usuarioId).then(r => r.json())
   ]).then(([colecao, wishlist, stats, perfil]) => {
     dashColecao = Array.isArray(colecao) ? colecao : [];
     dashWishlist = Array.isArray(wishlist) ? wishlist : [];
@@ -238,7 +247,7 @@ async function getCoverUrlLastfm(artist, album) {
   if (!artist || !album) return null;
   try {
     const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-    const res = await fetch(url);
+    const res = await apiFetch(url);
     const data = await res.json();
     if (data.album && data.album.image) {
       const img = data.album.image.find(i => i.size === 'extralarge');
@@ -269,7 +278,7 @@ function carregarCapasFaltantesDashboard() {
       else el.textContent = '';
     }
 
-    fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
+    apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
       .then(r => r.json())
       .then(d => {
         if (d.sucesso && d.capa_url) {

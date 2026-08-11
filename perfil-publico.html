@@ -25,8 +25,19 @@
 // sessão (login de verdade) sempre vá junto, mesmo entre domínios
 // diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
 // não manda o cookie, e a autenticação real nunca chega a funcionar.
+function lerCookie(nome) {
+  const match = document.cookie.match(new RegExp('(^| )' + nome + '=([^;]+)'));
+  return match ? match[2] : null;
+}
+
 function apiFetch(url, opcoes = {}) {
-  return fetch(url, { ...opcoes, credentials: 'include' });
+  const metodo = (opcoes.method || 'GET').toUpperCase();
+  const opcoesFinais = { ...opcoes, credentials: 'include' };
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(metodo)) {
+    const csrfToken = lerCookie('csrf_token');
+    opcoesFinais.headers = { ...(opcoes.headers || {}), 'X-CSRF-Token': csrfToken || '' };
+  }
+  return fetch(url, opcoesFinais);
 }
     const CORES_TIER = { S: 'var(--s-color)', A: 'var(--a-color)', B: 'var(--b-color)', C: 'var(--c-color)' };
     const NOME_FORMATO = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/Blu-ray' };

@@ -305,18 +305,10 @@ const API_URL = 'https://fportelada.pythonanywhere.com';
 // sessão (login de verdade) sempre vá junto, mesmo entre domínios
 // diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
 // não manda o cookie, e a autenticação real nunca chega a funcionar.
-function lerCookie(nome) {
-  const match = document.cookie.match(new RegExp('(^| )' + nome + '=([^;]+)'));
-  return match ? match[2] : null;
-}
-
 function apiFetch(url, opcoes = {}) {
-  const metodo = (opcoes.method || 'GET').toUpperCase();
-  const opcoesFinais = { ...opcoes, credentials: 'include' };
-  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(metodo)) {
-    const csrfToken = lerCookie('csrf_token');
-    opcoesFinais.headers = { ...(opcoes.headers || {}), 'X-CSRF-Token': csrfToken || '' };
-  }
+  const sessaoToken = localStorage.getItem('discoteca_session_token');
+  const opcoesFinais = { ...opcoes };
+  opcoesFinais.headers = { ...(opcoes.headers || {}), 'X-Session-Token': sessaoToken || '' };
   return fetch(url, opcoesFinais);
 }
 const DEV_MODE = false;
@@ -366,19 +358,22 @@ function sincronizarBadge() {
 // ================================================================
 // LOGIN
 // ================================================================
-function salvarSessao(userId, nome) {
+function salvarSessao(userId, nome, token) {
   localStorage.setItem('discoteca_user_id', userId);
   localStorage.setItem('discoteca_user_nome', nome);
+  if (token) localStorage.setItem('discoteca_session_token', token);
 }
 function carregarSessao() {
   const userId = localStorage.getItem('discoteca_user_id');
   const nome = localStorage.getItem('discoteca_user_nome');
-  if (userId && nome) return { userId, nome };
+  const token = localStorage.getItem('discoteca_session_token');
+  if (userId && nome && token) return { userId, nome, token };
   return null;
 }
 function limparSessao() {
   localStorage.removeItem('discoteca_user_id');
   localStorage.removeItem('discoteca_user_nome');
+  localStorage.removeItem('discoteca_session_token');
 }
 
 // ================================================================
@@ -459,8 +454,9 @@ function verificarSessao() {
   const params = new URLSearchParams(window.location.search);
   const userId = params.get('user_id');
   const nome = params.get('nome');
-  if (userId && nome) {
-    salvarSessao(userId, nome);
+  const token = params.get('token');
+  if (userId && nome && token) {
+    salvarSessao(userId, nome, token);
     usuarioId = userId;
     ativarTelaApp(nome);
     window.history.replaceState({}, document.title, window.location.pathname);

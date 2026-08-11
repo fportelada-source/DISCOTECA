@@ -211,9 +211,21 @@ function verificarSessao() {
 // não precisa mudar.
 // ================================================================
 function buscarOportunidadesMercado() {
-  return Promise.resolve([
-    { tag: 'em breve', nome: 'Monitoramento de preços', sub: 'Chega na V0.11', preco: null, precoAntigo: null }
-  ]);
+  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.sucesso || !Array.isArray(d.itens)) return [];
+      const oportunidades = d.itens.filter(i => i.encontrado && (i.bateu_alvo || i.boa_oferta));
+      if (oportunidades.length === 0) return [];
+      return oportunidades.slice(0, 4).map(o => ({
+        tag: o.bateu_alvo ? 'bateu seu alvo' : 'boa oferta',
+        nome: `${o.artista} — ${o.album}`,
+        sub: o.motivo || 'Vale a pena olhar',
+        preco: o.preco_atual ? o.preco_atual.toFixed(2) : null,
+        precoAntigo: o.media_30_dias ? o.media_30_dias.toFixed(2) : null
+      }));
+    })
+    .catch(() => []);
 }
 function buscarDescobertas() {
   return Promise.resolve([]);
@@ -489,6 +501,10 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   buscarOportunidadesMercado().then(lista => {
     const el = document.getElementById('dashOportunidades');
     if (!el) return;
+    if (lista.length === 0) {
+      el.innerHTML = `<div class="dash-placeholder-note">Nenhuma oportunidade agora. Defina um preço-alvo nos itens da Wishlist pra começar a acompanhar.</div>`;
+      return;
+    }
     el.innerHTML = lista.map(op => `
       <div class="dash-opp-card">
         <div class="left">

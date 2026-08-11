@@ -168,6 +168,15 @@
 // promover essas paginas para o ambiente real.
 const API_URL = 'https://fportelada.pythonanywhere.com';
 
+
+// Toda chamada ao backend passa por aqui — garante que o cookie de
+// sessão (login de verdade) sempre vá junto, mesmo entre domínios
+// diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
+// não manda o cookie, e a autenticação real nunca chega a funcionar.
+function apiFetch(url, opcoes = {}) {
+  return fetch(url, { ...opcoes, credentials: 'include' });
+}
+
 // DEV_MODE: quando true, pula o login do Google inteiramente e usa
 // o usuario de teste (Teste ID 1). Usar SOMENTE no ambiente de teste.
 // Isso espelha o bypass que o back-end tambem precisa ter (ver app.py).
@@ -197,7 +206,7 @@ function atualizarBadgeWishlist(n) {
 
 function carregarAvatarTopo() {
   if (!usuarioId) return;
-  fetch(API_URL + '/perfil/' + usuarioId)
+  apiFetch(API_URL + '/perfil/' + usuarioId)
     .then(r => r.json())
     .then(perfil => {
       if (!perfil || perfil.erro) return;
@@ -215,7 +224,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -258,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const error = document.getElementById('loginError');
       btn.disabled = true;
       if (error) error.style.display = 'none';
-      fetch(API_URL + '/login')
+      apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
           if (d.auth_url) window.location.href = d.auth_url;
@@ -314,7 +323,7 @@ function verificarSessao() {
     return;
   }
 
-  fetch(API_URL + '/sessao')
+  apiFetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
@@ -376,10 +385,10 @@ function onPaginaPronta() {
 function carregarDados() {
   if (!usuarioId) return;
   Promise.all([
-    fetch(API_URL + '/estatisticas?user_id=' + usuarioId).then(r => r.json()).catch(() => ({ erro: true })),
-    fetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId).then(r => r.json()).catch(() => ({ erro: true })),
-    fetch(API_URL + '/estatisticas_avancadas?user_id=' + usuarioId).then(r => r.json()).catch(() => ({ erro: true })),
-    fetch(API_URL + '/recomendacoes?user_id=' + usuarioId).then(r => r.json()).catch(() => [])
+    apiFetch(API_URL + '/estatisticas?user_id=' + usuarioId).then(r => r.json()).catch(() => ({ erro: true })),
+    apiFetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId).then(r => r.json()).catch(() => ({ erro: true })),
+    apiFetch(API_URL + '/estatisticas_avancadas?user_id=' + usuarioId).then(r => r.json()).catch(() => ({ erro: true })),
+    apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId).then(r => r.json()).catch(() => [])
   ]).then(([dadosPlayer, dadosEstante, avancadas, wishlist]) => {
     const playerVazio = !dadosPlayer || dadosPlayer.erro || !dadosPlayer.total_musicas;
     const estanteVazia = !dadosEstante || dadosEstante.erro || !dadosEstante.total_discos;

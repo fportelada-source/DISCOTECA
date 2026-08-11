@@ -91,6 +91,13 @@
         <!-- PRIORIDADE -->
         <div class="wl-priority-nav" id="wlPriorityNav"></div>
 
+        <div class="col-fix-banner" id="bannerVerificarPrecos" style="display:none;">
+          <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <span class="texto" id="textoVerificarPrecos">Você tem itens com preço-alvo definido. Quer checar se algum já caiu de preço?</span>
+          <button id="btnVerificarPrecos" class="btn-fix" type="button">Verificar preços</button>
+          <button id="btnFecharBannerPrecos" class="btn-fix-close" type="button" title="Dispensar">✕</button>
+        </div>
+
         <!-- ===== WISHLIST GRID ===== -->
         <div id="compras-container"></div>
 
@@ -198,6 +205,10 @@
             <option value="B">B (Média)</option>
             <option value="C">C (Baixa)</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label>Preço-alvo (R$) <span style="opacity:0.4; font-weight:400;">— opcional, avisa se achar por esse valor ou menos</span></label>
+          <input type="number" id="edit-tier-preco-alvo" placeholder="Ex: 180.00" step="0.01" min="0">
         </div>
         <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar Tier</button>
         <div class="form-msg" id="edit-tier-msg"></div>
@@ -457,9 +468,63 @@ function carregarDados() {
     .then(data => {
       recomendacoes = Array.isArray(data) ? data : [];
       renderRecomendacoes(recomendacoes);
+      const comAlvo = recomendacoes.filter(r => r.preco_alvo).length;
+      const banner = document.getElementById('bannerVerificarPrecos');
+      const dispensadoPara = localStorage.getItem('discoteca_banner_preco_dispensado');
+      if (banner) {
+        if (comAlvo > 0 && dispensadoPara !== String(comAlvo)) {
+          document.getElementById('textoVerificarPrecos').textContent = `${comAlvo} disco${comAlvo > 1 ? 's' : ''} com preço-alvo definido. Quer checar se algum já caiu de preço? (cobre vinil disponível na Amazon, via Garimpa Vinil)`;
+          banner.style.display = 'flex';
+        } else {
+          banner.style.display = 'none';
+        }
+      }
     })
     .catch(() => {});
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const btnFechar = document.getElementById('btnFecharBannerPrecos');
+  if (btnFechar) {
+    btnFechar.addEventListener('click', function() {
+      const comAlvo = recomendacoes.filter(r => r.preco_alvo).length;
+      localStorage.setItem('discoteca_banner_preco_dispensado', String(comAlvo));
+      document.getElementById('bannerVerificarPrecos').style.display = 'none';
+    });
+  }
+  const btnVerificar = document.getElementById('btnVerificarPrecos');
+  if (btnVerificar) {
+    btnVerificar.addEventListener('click', function() {
+      btnVerificar.disabled = true;
+      btnVerificar.textContent = 'Verificando...';
+      const texto = document.getElementById('textoVerificarPrecos');
+      apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
+        .then(r => r.json())
+        .then(d => {
+          btnVerificar.disabled = false;
+          btnVerificar.textContent = 'Verificar preços';
+          if (!d.sucesso) {
+            texto.textContent = '❌ ' + (d.erro || 'Erro ao verificar preços.');
+            return;
+          }
+          const oportunidades = d.itens.filter(i => i.encontrado && (i.bateu_alvo || i.boa_oferta));
+          const naoEncontrados = d.itens.filter(i => !i.encontrado).length;
+          if (oportunidades.length === 0) {
+            texto.textContent = `Nenhuma oportunidade agora. ${naoEncontrados > 0 ? naoEncontrados + ' disco(s) não achado(s) no catálogo do Garimpa Vinil.' : ''}`;
+          } else {
+            texto.innerHTML = oportunidades.map(o =>
+              `<strong>${escapeHtml(o.artista)} - ${escapeHtml(o.album)}</strong>: R$ ${o.preco_atual.toFixed(2)}${o.motivo ? ' — ' + escapeHtml(o.motivo) : ''}`
+            ).join('<br>');
+          }
+        })
+        .catch(() => {
+          btnVerificar.disabled = false;
+          btnVerificar.textContent = 'Verificar preços';
+          texto.textContent = '❌ Erro de conexão.';
+        });
+    });
+  }
+});
 
 // ================================================================
 // LAST.FM (capas dos álbuns)
@@ -906,6 +971,7 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-artista').value = '';
       document.getElementById('edit-tier-album').value = '';
       document.getElementById('edit-tier-select').value = 'A';
+      document.getElementById('edit-tier-preco-alvo').value = '';
       document.getElementById('edit-tier-msg').textContent = '';
       document.getElementById('edit-tier-msg').className = 'form-msg';
       document.getElementById('btn-edit-tier-submit').disabled = false;
@@ -914,6 +980,11 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-artista').value = artista;
       document.getElementById('edit-tier-album').value = album;
       document.getElementById('edit-tier-select').value = tierAtual || 'A';
+
+      const itemAtual = (recomendacoes || []).find(r => String(r.id) === String(id));
+      if (itemAtual && itemAtual.preco_alvo) {
+        document.getElementById('edit-tier-preco-alvo').value = itemAtual.preco_alvo;
+      }
       
       modalEditTier.classList.add('open');
     }
@@ -932,6 +1003,7 @@ function renderRecomendacoes(dados) {
       const msg = document.getElementById('edit-tier-msg');
       const id = document.getElementById('edit-tier-id').value;
       const novoTier = document.getElementById('edit-tier-select').value;
+      const precoAlvo = document.getElementById('edit-tier-preco-alvo').value;
 
       btn.disabled = true;
       msg.textContent = '⏳ Salvando...';
@@ -944,8 +1016,17 @@ function renderRecomendacoes(dados) {
         })
         .then(r => r.json())
         .then(data => {
+          if (!data.sucesso) throw new Error(data.erro || 'Erro ao atualizar tier');
+          return apiFetch(API_URL + `/definir_preco_alvo/${id}?user_id=${usuarioId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ preco_alvo: precoAlvo ? parseFloat(precoAlvo) : null })
+          });
+        })
+        .then(r => r.json())
+        .then(data => {
           if (data.sucesso) {
-            msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ' + data.mensagem;
+            msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Salvo!';
             msg.className = 'form-msg success';
             carregarDados();
             formEditTier.reset();
@@ -957,8 +1038,8 @@ function renderRecomendacoes(dados) {
             btn.disabled = false;
           }
         })
-        .catch(() => {
-          msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Erro de conexão';
+        .catch((err) => {
+          msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (err.message || 'Erro de conexão');
           msg.className = 'form-msg error';
           btn.disabled = false;
         });

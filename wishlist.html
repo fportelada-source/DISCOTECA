@@ -231,6 +231,15 @@
 // promover essas paginas para o ambiente real.
 const API_URL = 'https://fportelada.pythonanywhere.com';
 
+
+// Toda chamada ao backend passa por aqui — garante que o cookie de
+// sessão (login de verdade) sempre vá junto, mesmo entre domínios
+// diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
+// não manda o cookie, e a autenticação real nunca chega a funcionar.
+function apiFetch(url, opcoes = {}) {
+  return fetch(url, { ...opcoes, credentials: 'include' });
+}
+
 // DEV_MODE: quando true, pula o login do Google inteiramente e usa
 // o usuario de teste (Teste ID 1). Usar SOMENTE no ambiente de teste.
 // Isso espelha o bypass que o back-end tambem precisa ter (ver app.py).
@@ -260,7 +269,7 @@ function atualizarBadgeWishlist(n) {
 
 function carregarAvatarTopo() {
   if (!usuarioId) return;
-  fetch(API_URL + '/perfil/' + usuarioId)
+  apiFetch(API_URL + '/perfil/' + usuarioId)
     .then(r => r.json())
     .then(perfil => {
       if (!perfil || perfil.erro) return;
@@ -278,7 +287,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -321,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const error = document.getElementById('loginError');
       btn.disabled = true;
       if (error) error.style.display = 'none';
-      fetch(API_URL + '/login')
+      apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
           if (d.auth_url) window.location.href = d.auth_url;
@@ -377,7 +386,7 @@ function verificarSessao() {
     return;
   }
 
-  fetch(API_URL + '/sessao')
+  apiFetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
@@ -438,7 +447,7 @@ function onPaginaPronta() {
 
 function carregarDados() {
   if (!usuarioId) return;
-  fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
       recomendacoes = Array.isArray(data) ? data : [];
@@ -463,7 +472,7 @@ async function getCoverUrl(artist, album) {
   try {
     const url =
       `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-    const res = await fetch(url);
+    const res = await apiFetch(url);
     const data = await res.json();
     if (data.album && data.album.image) {
       const img = data.album.image.find(i => i.size === 'extralarge');
@@ -537,7 +546,7 @@ function carregarCapa(item, artId, fallbackId) {
     return;
   }
 
-  fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(item.artista)}&album=${encodeURIComponent(item.album)}`)
+  apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(item.artista)}&album=${encodeURIComponent(item.album)}`)
     .then(r => r.json())
     .then(d => {
       if (d.sucesso && d.capa_url) aplicar(d.capa_url);
@@ -553,7 +562,7 @@ async function fetchAnoLancamento(artist, album, spanId) {
   if (!el || !artist || !album) return;
   try {
     const url = API_URL + `/buscar_por_artista_album?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&user_id=${usuarioId}`;
-    const res = await fetch(url);
+    const res = await apiFetch(url);
     const data = await res.json();
     if (data.sucesso && data.ano) {
       el.textContent = `(${data.ano})`;
@@ -781,7 +790,7 @@ function renderRecomendacoes(dados) {
         return;
       }
       abrirConfirm(`Marcar "${artista} - ${album}" como JÁ TENHO?`, function() {
-        fetch(API_URL + `/marcar_como_tenho/${id}?user_id=${usuarioId}`, { method: 'POST' })
+        apiFetch(API_URL + `/marcar_como_tenho/${id}?user_id=${usuarioId}`, { method: 'POST' })
           .then(r => r.json())
           .then(data => {
             if (data.sucesso) {
@@ -801,7 +810,7 @@ function renderRecomendacoes(dados) {
         return;
       }
       abrirConfirm(`Remover "${artista} - ${album}" da lista de compras?`, function() {
-        fetch(API_URL + `/wishlist/remove/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
+        apiFetch(API_URL + `/wishlist/remove/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
           .then(r => r.json())
           .then(data => {
             if (data.sucesso) {
@@ -856,7 +865,7 @@ function renderRecomendacoes(dados) {
         return;
       }
 
-      fetch(API_URL + '/adicionar_recomendacao?user_id=' + usuarioId, {
+      apiFetch(API_URL + '/adicionar_recomendacao?user_id=' + usuarioId, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dados)
@@ -923,7 +932,7 @@ function renderRecomendacoes(dados) {
       msg.textContent = '⏳ Salvando...';
       msg.className = 'form-msg';
 
-      fetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
+      apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tier: novoTier })

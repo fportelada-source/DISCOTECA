@@ -628,7 +628,7 @@ function uploadCsv(inputId, statusId, tipo) {
   return apiFetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: formData })
     .then(r => r.json())
     .then(d => {
-      status.textContent = d.sucesso ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Enviado' : (d.erro || 'Erro');
+      status.innerHTML = d.sucesso ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Enviado' : (d.erro || 'Erro');
       return !!d.sucesso;
     })
     .catch(() => { status.textContent = 'Erro de conexão'; return false; });

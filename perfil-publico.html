@@ -50,7 +50,7 @@ function apiFetch(url, opcoes = {}) {
       if (!artist || !album) return null;
       try {
         const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await apiFetch(url);
+        const res = await fetch(url);
         const data = await res.json();
         if (data.album && data.album.image) {
           const img = data.album.image.find(i => i.size === 'extralarge');

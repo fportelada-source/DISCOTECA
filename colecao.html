@@ -342,6 +342,15 @@
 // promover essas paginas para o ambiente real.
 const API_URL = 'https://fportelada.pythonanywhere.com';
 
+
+// Toda chamada ao backend passa por aqui — garante que o cookie de
+// sessão (login de verdade) sempre vá junto, mesmo entre domínios
+// diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
+// não manda o cookie, e a autenticação real nunca chega a funcionar.
+function apiFetch(url, opcoes = {}) {
+  return fetch(url, { ...opcoes, credentials: 'include' });
+}
+
 // DEV_MODE: quando true, pula o login do Google inteiramente e usa
 // o usuario de teste (Teste ID 1). Usar SOMENTE no ambiente de teste.
 // Isso espelha o bypass que o back-end tambem precisa ter (ver app.py).
@@ -375,7 +384,7 @@ function atualizarBadgeWishlist(n) {
 
 function carregarAvatarTopo() {
   if (!usuarioId) return;
-  fetch(API_URL + '/perfil/' + usuarioId)
+  apiFetch(API_URL + '/perfil/' + usuarioId)
     .then(r => r.json())
     .then(perfil => {
       if (!perfil || perfil.erro) return;
@@ -390,7 +399,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  fetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -480,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const error = document.getElementById('loginError');
       btn.disabled = true;
       if (error) error.style.display = 'none';
-      fetch(API_URL + '/login')
+      apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
           if (d.auth_url) window.location.href = d.auth_url;
@@ -536,7 +545,7 @@ function verificarSessao() {
     return;
   }
 
-  fetch(API_URL + '/sessao')
+  apiFetch(API_URL + '/sessao')
     .then(r => r.json())
     .then(data => {
       if (data.logado) {
@@ -596,7 +605,7 @@ function onPaginaPronta() {
 
 function carregarDados() {
   if (!usuarioId) return;
-  fetch(API_URL + '/colecao?user_id=' + usuarioId)
+  apiFetch(API_URL + '/colecao?user_id=' + usuarioId)
     .then(r => r.json())
     .then(data => {
       colecao = Array.isArray(data) ? data : [];
@@ -742,7 +751,7 @@ function carregarDados() {
       if (!artist || !album) return null;
       try {
         const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY_COL}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         const data = await res.json();
         if (data.album && data.album.image) {
           const img = data.album.image.find(i => i.size === 'extralarge');
@@ -765,7 +774,7 @@ function carregarDados() {
           if (fallback) fallback.style.display = 'none';
         }
         if (capaSalva) { aplicar(capaSalva); return; }
-        fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
+        apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
           .then(r => r.json())
           .then(d => {
             if (d.sucesso && d.capa_url) aplicar(d.capa_url);
@@ -912,7 +921,7 @@ function carregarDados() {
         ? `Corrigindo... ${totalCorrigidoAteAgora} de ${totalVerificadoAteAgora} já ajustados até agora.`
         : 'Corrigindo, isso pode levar um tempinho (fazemos 2 buscas no Discogs por disco)...';
 
-      fetch(API_URL + '/preencher_anos_faltantes?user_id=' + usuarioId, { method: 'POST' })
+      apiFetch(API_URL + '/preencher_anos_faltantes?user_id=' + usuarioId, { method: 'POST' })
         .then(r => {
           if (!r.ok) throw new Error('status ' + r.status);
           return r.json();
@@ -1162,7 +1171,7 @@ function carregarDados() {
       try {
         const url =
           `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         const data = await res.json();
         if (data.album && data.album.image) {
           const img = data.album.image.find(i => i.size === 'extralarge');
@@ -1236,7 +1245,7 @@ function carregarDados() {
         return;
       }
 
-      fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
+      apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
         .then(r => r.json())
         .then(d => {
           if (d.sucesso && d.capa_url) aplicar(d.capa_url);
@@ -1432,7 +1441,7 @@ function carregarDados() {
         method = 'POST';
       }
 
-      fetch(url, {
+      apiFetch(url, {
           method: method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dados)
@@ -1466,7 +1475,7 @@ function carregarDados() {
 
     function removerDisco(id) {
       abrirConfirm('Tem certeza que deseja remover este disco da coleção?', function() {
-        fetch(API_URL + `/remover_disco/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
+        apiFetch(API_URL + `/remover_disco/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
           .then(r => r.json())
           .then(data => {
             if (data.sucesso) {
@@ -1554,7 +1563,7 @@ function carregarDados() {
       const album = document.getElementById('campo-album').value.trim();
       const campoAno = document.getElementById('campo-ano');
       if (!artista || !album || campoAno.value) return; // já tem ano, não sobrescreve
-      fetch(API_URL + `/buscar_por_artista_album?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&user_id=${usuarioId}`)
+      apiFetch(API_URL + `/buscar_por_artista_album?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&user_id=${usuarioId}`)
         .then(r => r.json())
         .then(d => {
           if (d.sucesso && d.ano && !campoAno.value) {
@@ -1567,7 +1576,7 @@ function carregarDados() {
 
     function buscarDiscoPorCodigo(codigo) {
       if (!codigo || codigo.length < 8) return;
-      fetch(API_URL + `/buscar_por_codigo_barras?codigo=${codigo}&user_id=${usuarioId}`)
+      apiFetch(API_URL + `/buscar_por_codigo_barras?codigo=${codigo}&user_id=${usuarioId}`)
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.disco) {

@@ -129,36 +129,44 @@
 
   <!-- ===== MODAL: ADICIONAR À WISHLIST ===== -->
   <div class="modal-overlay" id="modalAddWishlist">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>➕ Adicionar à Wishlist</h2>
-        <button class="modal-close" id="btnFecharWishlist">✕</button>
+    <div class="modal wish-modal">
+      <div class="wish-modal-header">
+        <div class="left">
+          <span class="icon">⭐</span>
+          <span class="title">Adicionar à Wishlist</span>
+        </div>
+        <button type="button" class="close-btn" id="btnFecharWishlist">✕</button>
       </div>
       <form id="form-wishlist">
-        <div class="form-group">
-          <label>Artista *</label>
-          <input type="text" id="wish-artista" placeholder="Ex: Metallica" required>
-        </div>
-        <div class="form-group">
-          <label>Álbum *</label>
-          <input type="text" id="wish-album" placeholder="Ex: Master of Puppets" required>
-        </div>
-        <div class="form-row">
+        <div class="wish-form-grid">
           <div class="form-group">
-            <label>Prioridade</label>
-            <select id="wish-tier">
-              <option value="S">S (Prioridade Máxima)</option>
-              <option value="A">A (Alta)</option>
-              <option value="B">B (Média)</option>
-              <option value="C">C (Baixa)</option>
-            </select>
+            <label>Artista <span class="required">*</span></label>
+            <input type="text" id="wish-artista" placeholder="Ex: Metallica" required>
           </div>
           <div class="form-group">
-            <label>Notas</label>
-            <input type="text" id="wish-notas" placeholder="Ex: Versão japonesa">
+            <label>Álbum <span class="required">*</span></label>
+            <input type="text" id="wish-album" placeholder="Ex: Master of Puppets" required>
+          </div>
+          <div class="wish-form-row">
+            <div class="form-group">
+              <label>Prioridade</label>
+              <select id="wish-tier">
+                <option value="S">S (Prioridade Máxima)</option>
+                <option value="A">A (Alta)</option>
+                <option value="B">B (Média)</option>
+                <option value="C">C (Baixa)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Notas</label>
+              <input type="text" id="wish-notas" placeholder="Ex: Versão japonesa">
+            </div>
           </div>
         </div>
-        <button type="submit" class="form-btn" id="btn-wish-submit">Adicionar à Lista</button>
+        <div class="wish-modal-actions">
+          <button type="button" class="btn btn-secondary" id="btnCancelarWishlist">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-wish-submit">Adicionar à Lista</button>
+        </div>
         <div class="form-msg" id="wish-msg"></div>
       </form>
     </div>
@@ -808,6 +816,7 @@ function renderRecomendacoes(dados) {
     window.abrirWishlist = abrirWishlist;
 
     btnFecharWish.addEventListener('click', () => modalWish.classList.remove('open'));
+    document.getElementById('btnCancelarWishlist')?.addEventListener('click', () => modalWish.classList.remove('open'));
     modalWish.addEventListener('click', function(e) { if (e.target === this) modalWish.classList.remove('open'); });
 
     formWish.addEventListener('submit', function(e) {

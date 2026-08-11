@@ -19,6 +19,15 @@
 
   <script>
     const API_URL = 'https://fportelada.pythonanywhere.com';
+
+
+// Toda chamada ao backend passa por aqui — garante que o cookie de
+// sessão (login de verdade) sempre vá junto, mesmo entre domínios
+// diferentes (GitHub Pages -> PythonAnywhere). Sem isso, o navegador
+// não manda o cookie, e a autenticação real nunca chega a funcionar.
+function apiFetch(url, opcoes = {}) {
+  return fetch(url, { ...opcoes, credentials: 'include' });
+}
     const CORES_TIER = { S: 'var(--s-color)', A: 'var(--a-color)', B: 'var(--b-color)', C: 'var(--c-color)' };
     const NOME_FORMATO = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/Blu-ray' };
 
@@ -30,7 +39,7 @@
       if (!artist || !album) return null;
       try {
         const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         const data = await res.json();
         if (data.album && data.album.image) {
           const img = data.album.image.find(i => i.size === 'extralarge');
@@ -60,7 +69,7 @@
         el.dataset.capaCarregada = '1';
         const artista = el.dataset.artista, album = el.dataset.album, capaSalva = el.dataset.capa;
         if (capaSalva) { aplicarCapa(el, capaSalva); return; }
-        fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
+        apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
           .then(r => r.json())
           .then(d => {
             if (d.sucesso && d.capa_url) aplicarCapa(el, d.capa_url);
@@ -94,7 +103,7 @@
           `<div style="text-align:center; padding:80px 20px;">Perfil não especificado. Use o link com <code>?id=</code>.</div>`;
         return;
       }
-      fetch(API_URL + `/perfil/${userId}`)
+      apiFetch(API_URL + `/perfil/${userId}`)
         .then(async r => {
           if (!r.ok) {
             const corpo = await r.json().catch(() => ({}));

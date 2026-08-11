@@ -91,13 +91,6 @@
         <!-- PRIORIDADE -->
         <div class="wl-priority-nav" id="wlPriorityNav"></div>
 
-        <div class="col-fix-banner" id="bannerVerificarPrecos" style="display:none;">
-          <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-          <span class="texto" id="textoVerificarPrecos">Você tem itens com preço-alvo definido. Quer checar se algum já caiu de preço?</span>
-          <button id="btnVerificarPrecos" class="btn-fix" type="button">Verificar preços</button>
-          <button id="btnFecharBannerPrecos" class="btn-fix-close" type="button" title="Dispensar">✕</button>
-        </div>
-
         <!-- ===== WISHLIST GRID ===== -->
         <div id="compras-container"></div>
 
@@ -468,63 +461,75 @@ function carregarDados() {
     .then(data => {
       recomendacoes = Array.isArray(data) ? data : [];
       renderRecomendacoes(recomendacoes);
-      const comAlvo = recomendacoes.filter(r => r.preco_alvo).length;
-      const banner = document.getElementById('bannerVerificarPrecos');
-      const dispensadoPara = localStorage.getItem('discoteca_banner_preco_dispensado');
-      if (banner) {
-        if (comAlvo > 0 && dispensadoPara !== String(comAlvo)) {
-          document.getElementById('textoVerificarPrecos').textContent = `${comAlvo} disco${comAlvo > 1 ? 's' : ''} com preço-alvo definido. Quer checar se algum já caiu de preço? (cobre vinil disponível na Amazon, via Garimpa Vinil)`;
-          banner.style.display = 'flex';
-        } else {
-          banner.style.display = 'none';
-        }
-      }
     })
     .catch(() => {});
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const btnFechar = document.getElementById('btnFecharBannerPrecos');
-  if (btnFechar) {
-    btnFechar.addEventListener('click', function() {
-      const comAlvo = recomendacoes.filter(r => r.preco_alvo).length;
-      localStorage.setItem('discoteca_banner_preco_dispensado', String(comAlvo));
-      document.getElementById('bannerVerificarPrecos').style.display = 'none';
-    });
-  }
-  const btnVerificar = document.getElementById('btnVerificarPrecos');
-  if (btnVerificar) {
-    btnVerificar.addEventListener('click', function() {
-      btnVerificar.disabled = true;
-      btnVerificar.textContent = 'Verificando...';
-      const texto = document.getElementById('textoVerificarPrecos');
-      apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
-        .then(r => r.json())
-        .then(d => {
-          btnVerificar.disabled = false;
-          btnVerificar.textContent = 'Verificar preços';
-          if (!d.sucesso) {
-            texto.textContent = '❌ ' + (d.erro || 'Erro ao verificar preços.');
-            return;
-          }
-          const oportunidades = d.itens.filter(i => i.encontrado && (i.bateu_alvo || i.boa_oferta));
+function rodarVerificacaoPrecos() {
+  const statBtn = document.getElementById('statVerificarPrecos');
+  const el = document.getElementById('wlOportunidades');
+  const elPrecos = document.getElementById('wlPrecos');
+  if (statBtn) statBtn.querySelector('.label').textContent = 'Verificando...';
+  if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Verificando preços...</div>`;
+
+  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (statBtn) statBtn.querySelector('.label').textContent = 'Verificar preços';
+      if (!d.sucesso) {
+        if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">❌ ${escapeHtml(d.erro || 'Erro ao verificar preços.')}</div>`;
+        if (elPrecos) elPrecos.innerHTML = '';
+        return d;
+      }
+
+      const comAlvo = d.itens.length;
+      const oportunidades = d.itens.filter(i => i.encontrado && (i.bateu_alvo || i.boa_oferta));
+
+      if (el) {
+        if (comAlvo === 0) {
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
+        } else if (oportunidades.length === 0) {
           const naoEncontrados = d.itens.filter(i => !i.encontrado).length;
-          if (oportunidades.length === 0) {
-            texto.textContent = `Nenhuma oportunidade agora. ${naoEncontrados > 0 ? naoEncontrados + ' disco(s) não achado(s) no catálogo do Garimpa Vinil.' : ''}`;
-          } else {
-            texto.innerHTML = oportunidades.map(o =>
-              `<strong>${escapeHtml(o.artista)} - ${escapeHtml(o.album)}</strong>: R$ ${o.preco_atual.toFixed(2)}${o.motivo ? ' — ' + escapeHtml(o.motivo) : ''}`
-            ).join('<br>');
-          }
-        })
-        .catch(() => {
-          btnVerificar.disabled = false;
-          btnVerificar.textContent = 'Verificar preços';
-          texto.textContent = '❌ Erro de conexão.';
-        });
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhuma oportunidade agora.${naoEncontrados > 0 ? ' ' + naoEncontrados + ' disco(s) não achado(s) no catálogo de preços.' : ''}</div>`;
+        } else {
+          el.innerHTML = oportunidades.map(o => `
+            <div class="wl-gap-card">
+              <div class="label" style="text-transform:uppercase; font-size:10px; color:var(--terracotta); margin-bottom:6px;">${o.bateu_alvo ? 'bateu seu alvo' : 'boa oferta'}</div>
+              <div class="count" style="font-size:15px;">${escapeHtml(o.artista)} — ${escapeHtml(o.album)}</div>
+              <div class="sub">R$ ${o.preco_atual.toFixed(2)}${o.motivo ? ' · ' + escapeHtml(o.motivo) : ''}</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      if (elPrecos) {
+        const encontrados = d.itens.filter(i => i.encontrado);
+        if (encontrados.length === 0) {
+          elPrecos.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">${comAlvo === 0 ? 'Defina um preço-alvo em algum item da wishlist pra ver o contexto de preço aqui.' : 'Nenhum dos itens com preço-alvo foi encontrado no catálogo de preços ainda.'}</div>`;
+        } else {
+          elPrecos.innerHTML = encontrados.map(o => `
+            <div class="wl-gap-card">
+              <div class="count" style="font-size:15px;">${escapeHtml(o.artista)} — ${escapeHtml(o.album)}</div>
+              <div class="sub">
+                Atual: R$ ${o.preco_atual.toFixed(2)}
+                ${o.media_30_dias ? ' · Média 30d: R$ ' + o.media_30_dias.toFixed(2) : ''}
+                ${o.minima_historica ? ' · Mínima: R$ ' + o.minima_historica.toFixed(2) : ''}
+                ${o.maxima_historica ? ' · Máxima: R$ ' + o.maxima_historica.toFixed(2) : ''}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      return d;
+    })
+    .catch(() => {
+      if (statBtn) statBtn.querySelector('.label').textContent = 'Verificar preços';
+      if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">❌ Erro de conexão.</div>`;
+      if (elPrecos) elPrecos.innerHTML = '';
     });
-  }
-});
+}
+window.rodarVerificacaoPrecos = rodarVerificacaoPrecos;
 
 // ================================================================
 // LAST.FM (capas dos álbuns)
@@ -669,6 +674,7 @@ function renderHeroWishlist(dados) {
   statsEl.innerHTML = `
     <div class="stat"><div class="num">${ativos.length}</div><div class="label">Total</div></div>
     <a href="#" class="stat" style="text-decoration:none;" onclick="event.preventDefault(); abrirWishlist();"><div class="num">+</div><div class="label">Adicionar</div></a>
+    <a href="#" class="stat" style="text-decoration:none;" id="statVerificarPrecos" onclick="event.preventDefault(); rodarVerificacaoPrecos();"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></a>
   `;
 }
 
@@ -782,44 +788,20 @@ function renderWishlistGrid(dados) {
 // Início) — trocar o corpo destas funções quando as features existirem
 // (scraper de preços, análise de discografia).
 // ================================================================
-function buscarOportunidadesWishlist() {
-  return Promise.resolve([
-    { tag: 'em breve', nome: 'Monitoramento de preços', sub: 'Chega na V0.12', preco: null, precoAntigo: null }
-  ]);
-}
 function buscarLacunasColecao() {
   return Promise.resolve([]);
-}
-function buscarInteligenciaPreco() {
-  return Promise.resolve(null);
 }
 function buscarDescobertasWishlist() {
   return Promise.resolve([]);
 }
 
 function renderSecoesPlaceholder() {
-  buscarOportunidadesWishlist().then(lista => {
-    const el = document.getElementById('wlOportunidades');
-    if (!el) return;
-    el.innerHTML = lista.map(op => `
-      <div class="wl-gap-card">
-        <div class="label" style="text-transform:uppercase; font-size:10px; color:var(--terracotta); margin-bottom:6px;">${op.tag}</div>
-        <div class="count" style="font-size:16px;">${op.nome}</div>
-        <div class="sub">${op.sub}</div>
-      </div>
-    `).join('') + '<div class="pp-empty-note" style="grid-column:1/-1;">Monitoramento de preços real chega na V0.12.</div>';
-  });
+  rodarVerificacaoPrecos();
 
   buscarLacunasColecao().then(lista => {
     const el = document.getElementById('wlGaps');
     if (!el) return;
     el.innerHTML = '<div class="pp-empty-note">Análise de lacunas depende das trilogias e discografias completas — planejado pra frente.</div>';
-  });
-
-  buscarInteligenciaPreco().then(dados => {
-    const el = document.getElementById('wlPrecos');
-    if (!el) return;
-    el.innerHTML = '<div class="pp-empty-note">Sem histórico de preço ainda — chega junto com o monitoramento (V0.12).</div>';
   });
 
   buscarDescobertasWishlist().then(lista => {

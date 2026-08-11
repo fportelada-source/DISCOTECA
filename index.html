@@ -56,11 +56,11 @@
       <aside class="app-sidebar">
         <a href="index.html" class="logo">D<span>.</span></a>
         <nav class="nav-icons">
-          <a href="index.html" class="active" title="Início">🏠</a>
-          <a href="wishlist.html" title="Wishlist">📋<span class="badge-count" id="navWishlistCount" style="display:none;">0</span></a>
-          <a href="colecao.html" title="Coleção">💿</a>
-          <a href="estatisticas.html" title="Estatísticas">📊</a>
-          <a href="importar.html" title="Importar">📤</a>
+          <a href="index.html" class="active" title="Início"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+          <a href="wishlist.html" title="Wishlist"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><span class="badge-count" id="navWishlistCount" style="display:none;">0</span></a>
+          <a href="colecao.html" title="Coleção"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></a>
+          <a href="estatisticas.html" title="Estatísticas"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></a>
+          <a href="importar.html" title="Importar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></a>
         </nav>
       </aside>
 
@@ -69,12 +69,7 @@
 
         <!-- TOP BAR -->
         <div class="app-topbar">
-          <div class="search" style="position:relative;">
-            <span>⌕</span>
-            <input type="text" id="dashSearch" placeholder="Buscar álbuns, artistas, coleção...">
-            <div id="dashSearchResults" class="dash-search-results"></div>
-          </div>
-          <a href="perfil.html" class="user">
+          <a href="perfil.html" class="user" style="margin-left:auto;">
             <span class="name" id="userNameDisplay">Carregando...</span>
             <div class="avatar" id="userAvatar">?</div>
           </a>
@@ -225,7 +220,6 @@ function carregarDashboard() {
       stats && !stats.erro ? stats : {},
       perfil && !perfil.erro ? perfil : {}
     );
-    configurarBuscaDashboard();
   }).catch(() => {
     document.getElementById('dashContent').innerHTML =
       '<div style="opacity:0.5; font-size:13px;">Não consegui carregar o dashboard. Tenta recarregar a página.</div>';
@@ -321,7 +315,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   }
 
   const artistasUnicos = new Set(colecao.map(d => d.artista).filter(Boolean));
-  const hero = wishlist[0]; // já vem ordenado S → C do back-end
+  const hero = wishlist[0]; // já vem ordenado S <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> C do back-end
 
   let html = '';
 
@@ -330,13 +324,13 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
     const capaHero = hero.capa_url ? `style="background-image:url('${escapeHtml(hero.capa_url)}'); background-size:cover; background-position:center;"` : '';
     html += `
       <div class="dash-hero">
-        <div class="cover" id="dashHeroCover" data-artista="${escapeHtml(hero.artista || '')}" data-album="${escapeHtml(hero.album || '')}"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '♬'}</div>
+        <div class="cover" id="dashHeroCover" data-artista="${escapeHtml(hero.artista || '')}" data-album="${escapeHtml(hero.album || '')}"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'}</div>
         <div class="info">
-          <div class="badge">★ Prioridade ${hero.tier}</div>
+          <div class="badge"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Prioridade ${hero.tier}</div>
           <h2>${escapeHtml(hero.album) || 'Álbum'}</h2>
           <div class="artist">${escapeHtml(hero.artista) || 'Artista'}</div>
           <div class="desc">${escapeHtml(hero.nota || hero.estrategia) || 'Complementa bem sua coleção atual.'}</div>
-          <a href="wishlist.html" class="btn">Ver na Wishlist →</a>
+          <a href="wishlist.html" class="btn">Ver na Wishlist <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
       </div>
     `;
@@ -433,7 +427,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
         <div class="dash-wishlist-item">
           <div class="cover" id="dashWish-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">
             <span class="priority" style="background:${corTier(item.tier)};">${item.tier}</span>
-            <span class="fallback-icon">${item.capa_url ? '' : '♢'}</span>
+            <span class="fallback-icon">${item.capa_url ? '' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg>'}</span>
           </div>
           <div class="info">
             <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
@@ -502,55 +496,6 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 document.addEventListener('DOMContentLoaded', function() {
   verificarSessao();
 });
-
-// ================================================================
-// BUSCA (topo)
-// ================================================================
-function configurarBuscaDashboard() {
-  const input = document.getElementById('dashSearch');
-  const results = document.getElementById('dashSearchResults');
-  if (!input || !results) return;
-
-  input.addEventListener('input', function() {
-    const termo = this.value.trim().toLowerCase();
-    if (!termo) {
-      results.innerHTML = '';
-      results.classList.remove('open');
-      return;
-    }
-
-    const daColecao = dashColecao
-      .filter(d => `${d.artista} ${d.album}`.toLowerCase().includes(termo))
-      .slice(0, 5)
-      .map(d => ({ artista: d.artista, album: d.album, origem: 'Coleção', href: 'colecao.html' }));
-
-    const daWishlist = dashWishlist
-      .filter(d => `${d.artista} ${d.album}`.toLowerCase().includes(termo))
-      .slice(0, 5)
-      .map(d => ({ artista: d.artista, album: d.album, origem: 'Wishlist', href: 'wishlist.html' }));
-
-    const achados = [...daColecao, ...daWishlist].slice(0, 8);
-
-    if (achados.length === 0) {
-      results.innerHTML = '<div class="dash-search-empty">Nenhum resultado.</div>';
-    } else {
-      results.innerHTML = achados.map(item => `
-        <a href="${item.href}" class="dash-search-item">
-          <span class="title">${escapeHtml(item.album)}</span>
-          <span class="artist">${escapeHtml(item.artista)}</span>
-          <span class="tag">${item.origem}</span>
-        </a>
-      `).join('');
-    }
-    results.classList.add('open');
-  });
-
-  document.addEventListener('click', function(e) {
-    if (!input.contains(e.target) && !results.contains(e.target)) {
-      results.classList.remove('open');
-    }
-  });
-}
   </script>
 </body>
 </html>

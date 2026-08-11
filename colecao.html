@@ -984,7 +984,7 @@ function carregarDados() {
                 <span title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem que você tem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</span>
                 ${item.preco ? `<span class="price">R$ ${item.preco}</span>` : ''}
               </div>
-              ${item.avaliacao > 0 ? `<div class="rating-display">${'<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>'.repeat(item.avaliacao)}${'<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>'.repeat(5 - item.avaliacao)}</div>` : ''}
+              ${item.avaliacao > 0 ? `<div class="rating-display">${Array.from({length:5}, (_, i) => estrelaSvg(i < item.avaliacao)).join('')}</div>` : ''}
               ${item.tags ? `<div class="tags-display">${item.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
             </div>
           </div>
@@ -1038,6 +1038,12 @@ function carregarDados() {
           setTimeout(() => carregarCapaColecao(artista, album, capaSalva, artId, fallbackId), 100);
         }
       });
+    }
+
+    function estrelaSvg(preenchida) {
+      const cor = preenchida ? 'fill="currentColor" stroke="currentColor"' : 'fill="none" stroke="currentColor"';
+      const opacidade = preenchida ? '1' : '0.3';
+      return `<svg viewBox="0 0 24 24" width="1em" height="1em" ${cor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;opacity:${opacidade};"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>`;
     }
 
     function classeFormato(formato) {

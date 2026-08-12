@@ -163,6 +163,10 @@
               <input type="text" id="wish-notas" placeholder="Ex: Versão japonesa">
             </div>
           </div>
+          <div class="form-group">
+            <label>Preço-alvo (R$) <span style="opacity:0.4; font-weight:400;">— opcional, avisa se achar por esse valor ou menos</span></label>
+            <input type="number" id="wish-preco-alvo" placeholder="Ex: 180.00" step="0.01" min="0">
+          </div>
         </div>
         <div class="wish-modal-actions">
           <button type="button" class="btn btn-secondary" id="btnCancelarWishlist">Cancelar</button>
@@ -734,7 +738,7 @@ function renderHeroWishlist(dados) {
   statsEl.innerHTML = `
     <div class="stat"><div class="num">${ativos.length}</div><div class="label">Total</div></div>
     <a href="#" class="stat" style="text-decoration:none;" onclick="event.preventDefault(); abrirWishlist();"><div class="num">+</div><div class="label">Adicionar</div></a>
-    <span class="stat" style="opacity:0.3; cursor:default;" id="statVerificarPrecos" title="Verificação de preço pausada até liberar o domínio no PythonAnywhere"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></span>
+    <a href="#" class="stat" style="text-decoration:none;" id="statVerificarPrecos" onclick="event.preventDefault(); rodarVerificacaoPrecos(true);"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></a>
   `;
 }
 
@@ -856,13 +860,12 @@ function buscarDescobertasWishlist() {
 }
 
 function renderSecoesPlaceholder() {
-  // Verificação automática DESLIGADA por enquanto — o domínio do
-  // Garimpa Vinil ainda não está liberado no PythonAnywhere (bloqueio
-  // de rede, pedido de liberação enviado). Enquanto isso, mostra
-  // cards de exemplo já no visual final. O botão "Verificar preços"
-  // continua funcionando manualmente se alguém quiser tentar mesmo
-  // assim.
-  mostrarExemploOportunidades();
+  // Verificação ativa de novo — a fonte de dado é 'mock' por enquanto
+  // (dado simulado, mas realista e testável de ponta a ponta), até o
+  // domínio do Garimpa Vinil ser liberado no PythonAnywhere. Quando
+  // liberar, o backend troca sozinho pra fonte real via FONTE_PRECO,
+  // sem precisar mexer em nada aqui.
+  setTimeout(() => rodarVerificacaoPrecos(), 800);
 
   buscarLacunasColecao().then(lista => {
     const el = document.getElementById('wlGaps');
@@ -951,6 +954,7 @@ function renderRecomendacoes(dados) {
       document.getElementById('wish-album').value = '';
       document.getElementById('wish-tier').value = 'S';
       document.getElementById('wish-notas').value = '';
+      document.getElementById('wish-preco-alvo').value = '';
       document.getElementById('wish-msg').textContent = '';
       document.getElementById('wish-msg').className = 'form-msg';
       modalWish.classList.add('open');
@@ -973,7 +977,8 @@ function renderRecomendacoes(dados) {
         artista: document.getElementById('wish-artista').value.trim(),
         album: document.getElementById('wish-album').value.trim(),
         tier: document.getElementById('wish-tier').value,
-        notas: document.getElementById('wish-notas').value.trim()
+        notas: document.getElementById('wish-notas').value.trim(),
+        preco_alvo: document.getElementById('wish-preco-alvo').value ? parseFloat(document.getElementById('wish-preco-alvo').value) : null
       };
 
       if (!dados.artista || !dados.album) {

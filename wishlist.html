@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
 
@@ -569,6 +569,73 @@ function renderPaginaOportunidades() {
   if (btnProx) btnProx.addEventListener('click', () => { paginaOportunidades++; renderPaginaOportunidades(); });
 }
 
+function carregarPrecosSalvos() {
+  const el = document.getElementById('wlOportunidades');
+  const elPrecos = document.getElementById('wlPrecos');
+  const elAviso = document.getElementById('wlFonteAviso');
+
+  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId + '&apenas_cache=1', { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.sucesso) return d;
+
+      const comAlvo = d.itens.length;
+      const botaoIniciar = `<button type="button" class="btn-fix-standalone" onclick="rodarVerificacaoPrecos(true)">Verifique o preço para começar</button>`;
+
+      if (comAlvo === 0) {
+        const msg = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
+        if (el) el.innerHTML = msg;
+        if (elPrecos) elPrecos.innerHTML = msg;
+        return d;
+      }
+
+      const jaVerificados = d.itens.filter(i => i.verificado);
+      if (jaVerificados.length === 0) {
+        // Nunca foi checado ainda — mostra o botão em vez de fingir dado
+        if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1; margin-bottom:10px;">${comAlvo} disco${comAlvo > 1 ? 's' : ''} com preço-alvo, ainda não verificado${comAlvo > 1 ? 's' : ''}.</div>` + botaoIniciar;
+        if (elPrecos) elPrecos.innerHTML = botaoIniciar;
+        return d;
+      }
+
+      // Já tem algo verificado antes (cache válido) — mostra normal,
+      // igual rodarVerificacaoPrecos mostraria, sem precisar buscar de novo.
+      if (elAviso) {
+        elAviso.innerHTML = d.fonte === 'mock'
+          ? `<div class="dash-mock-warning"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Preços simulados (dados de teste) — Garimpa Vinil real pendente de liberação.</div>`
+          : '';
+      }
+      const encontrados = jaVerificados.filter(i => i.encontrado);
+      if (el) {
+        if (encontrados.length === 0) {
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens verificados foi achado no catálogo de preços.</div>` + botaoIniciar;
+        } else {
+          itensOportunidadesAtuais = encontrados;
+          paginaOportunidades = 0;
+          renderPaginaOportunidades();
+        }
+      }
+      if (elPrecos) {
+        if (encontrados.length === 0) {
+          elPrecos.innerHTML = '';
+        } else {
+          elPrecos.innerHTML = encontrados.map(o => `
+            <div class="wl-gap-card">
+              <div class="count" style="font-size:15px;">${escapeHtml(o.artista)} — ${escapeHtml(o.album)}</div>
+              <div class="sub">
+                Atual: R$ ${o.preco_atual.toFixed(2)}
+                ${o.media_30_dias ? ' · Média 30d: R$ ' + o.media_30_dias.toFixed(2) : ''}
+                ${o.minima_historica ? ' · Mínima: R$ ' + o.minima_historica.toFixed(2) : ''}
+                ${o.maxima_historica ? ' · Máxima: R$ ' + o.maxima_historica.toFixed(2) : ''}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+      return d;
+    })
+    .catch(() => {});
+}
+
 function rodarVerificacaoPrecos(forcar) {
   const statBtn = document.getElementById('statVerificarPrecos');
   const el = document.getElementById('wlOportunidades');
@@ -904,13 +971,12 @@ function buscarDescobertasWishlist() {
 }
 
 function renderSecoesPlaceholder() {
-  // Verificação automática voltou, mas SEM forçar (forcar=false) — se
-  // já tem cache de menos de 24h (ex: você clicou "Verificar preços"
-  // antes), isso é instantâneo, só lê o banco, sem chamada externa
-  // nenhuma. Só fica lento na primeira vez ou depois do cache expirar.
-  // "Verificar preços" (o botão) continua sendo o único caminho que
-  // força buscar de novo mesmo com cache válido.
-  setTimeout(() => rodarVerificacaoPrecos(), 400);
+  // Nunca dispara busca de preço sozinho — só lê o que já está em
+  // cache (instantâneo, sem chamada externa nenhuma, mesmo que o
+  // cache tenha expirado ou nunca tenha existido). Se não tiver nada
+  // verificado ainda, mostra um botão pra pessoa disparar a busca de
+  // propósito, em vez de fingir que já tem dado.
+  setTimeout(() => carregarPrecosSalvos(), 300);
 
   buscarLacunasColecao().then(lista => {
     const el = document.getElementById('wlGaps');

@@ -2888,6 +2888,11 @@
     .opp-card .bottom .badge.acima_do_alvo { background: rgba(90, 106, 122, 0.15); color: #8a9aac; border: 1px solid rgba(90, 106, 122, 0.25); }
     .opp-card .bottom .action { font-size: 12px; font-weight: 500; opacity: 0.4; display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s; }
     .opp-card .bottom .action:hover { opacity: 0.8; }
+    .opp-card-exemplo { position: relative; opacity: 0.55; }
+    .opp-exemplo-tag {
+      position: absolute; top: 12px; right: 14px; font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; opacity: 0.5; background: var(--card-line); padding: 2px 8px; border-radius: 10px;
+    }
 
     @media (max-width: 700px) {
       .wl-opp-grid { grid-template-columns: 1fr; }

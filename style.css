@@ -2266,7 +2266,7 @@
     .dash-opp-header .wishlist-link:hover { opacity: 0.8; }
     .dash-opp-header .wishlist-link svg { width: 14px; height: 14px; stroke-width: 1.5; }
 
-    .dash-opp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .dash-opp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 14px; }
     .dash-opp-card { background: var(--card); border-radius: 14px; border: 1px solid var(--card-line); padding: 14px 16px; transition: 0.2s; display: flex; flex-direction: column; }
     .dash-opp-card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
     .dash-opp-card .album { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }

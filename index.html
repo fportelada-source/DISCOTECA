@@ -234,6 +234,42 @@ function buscarDescobertas() {
 // ================================================================
 // CARREGAR DASHBOARD
 // ================================================================
+const BADGES_OPORTUNIDADE_DASH = {
+  oportunidade: { texto: 'Boa oportunidade', classe: 'boa', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' },
+  bom_preco: { texto: 'Bom preço', classe: 'boa', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' },
+  quase_la: { texto: 'Quase lá', classe: 'quase', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' },
+  acima_do_alvo: { texto: 'Acima do alvo', classe: 'acima', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' }
+};
+
+function gerarCardOportunidadeDash(o) {
+  const badge = BADGES_OPORTUNIDADE_DASH[o.categoria] || BADGES_OPORTUNIDADE_DASH.acima_do_alvo;
+  const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
+  return `
+    <div class="opp-card opp-card-exemplo">
+      <div class="opp-exemplo-tag">Exemplo</div>
+      <div class="album">
+        <div class="art">◈</div>
+        <div class="info">
+          <div class="title">${escapeHtml(o.album)}</div>
+          <div class="artist">${escapeHtml(o.artista)}</div>
+        </div>
+      </div>
+      <div class="prices">
+        <span class="current">R$ ${o.preco_atual.toFixed(0)}</span>
+        <span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(0)}</span></span>
+      </div>
+      <div class="context">
+        <span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Menor: R$ ${o.minima_historica.toFixed(0)}</span>
+        <span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média: R$ ${o.media_30_dias.toFixed(0)}</span>
+      </div>
+      <div class="bottom">
+        <span class="badge ${o.categoria}">${badge.icone} ${badge.texto}</span>
+        <span class="action">${ehOportunidade ? 'Ver oferta' : 'Esperar'}</span>
+      </div>
+    </div>
+  `;
+}
+
 function carregarDashboard() {
   Promise.all([
     apiFetch(API_URL + '/colecao?user_id=' + usuarioId).then(r => r.json()),
@@ -404,7 +440,17 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   }
   html += `</div>`;
 
-  html += `<div><div class="dash-section-title">Oportunidades de mercado</div><div id="dashOportunidades"></div></div>`;
+  html += `
+    <div>
+      <div class="dash-opp-header">
+        <div class="left">
+          <h2><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Oportunidades de mercado <span class="badge-pill">Price Intelligence</span></h2>
+          <div class="sub">Encontre boas oportunidades para os discos que você quer comprar. <span class="badge-pill">Baseado na sua Wishlist</span></div>
+        </div>
+        <a href="wishlist.html" class="wishlist-link">Ver Wishlist <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>
+      </div>
+      <div id="dashOportunidades"></div>
+    </div>`;
   html += `</div>`;
 
   // ===== COLLECTION INSIGHTS + WISHLIST GRID =====
@@ -500,7 +546,17 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   const elOportunidades = document.getElementById('dashOportunidades');
   if (elOportunidades) {
-    elOportunidades.innerHTML = `<div class="dash-placeholder-note">Verificação automática de preço pausada por enquanto (aguardando liberação de rede). Defina um preço-alvo na Wishlist e use "Verificar preços" por lá.</div>`;
+    const exemplos = [
+      { artista: 'Metallica', album: 'Master of Puppets', categoria: 'oportunidade', preco_atual: 179, preco_alvo: 200, media_30_dias: 201, minima_historica: 169 },
+      { artista: 'Architects', album: 'All Our Gods Have Abandoned Us', categoria: 'quase_la', preco_atual: 189, preco_alvo: 180, media_30_dias: 195, minima_historica: 175 },
+      { artista: 'Metallica', album: 'Ride the Lightning', categoria: 'acima_do_alvo', preco_atual: 219, preco_alvo: 180, media_30_dias: 209, minima_historica: 169 }
+    ];
+    elOportunidades.innerHTML = `
+      <div class="opp-card-grid">${exemplos.map(o => gerarCardOportunidadeDash(o)).join('')}</div>
+      <div class="dash-opp-footer">
+        <span class="monitor-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Monitoramento automático <span class="highlight">em breve</span> · Defina seus preços-alvo na Wishlist</span>
+        <a href="wishlist.html" class="btn-outline"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Ver oportunidades</a>
+      </div>`;
   }
 
   buscarDescobertas().then(lista => {

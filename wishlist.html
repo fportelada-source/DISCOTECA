@@ -860,12 +860,13 @@ function buscarDescobertasWishlist() {
 }
 
 function renderSecoesPlaceholder() {
-  // Verificação ativa de novo — a fonte de dado é 'mock' por enquanto
-  // (dado simulado, mas realista e testável de ponta a ponta), até o
-  // domínio do Garimpa Vinil ser liberado no PythonAnywhere. Quando
-  // liberar, o backend troca sozinho pra fonte real via FONTE_PRECO,
-  // sem precisar mexer em nada aqui.
-  setTimeout(() => rodarVerificacaoPrecos(), 800);
+  // Verificação NÃO roda mais sozinha ao entrar na página — deixava o
+  // carregamento lento, competindo com o das capas. Agora só dispara
+  // quando a pessoa clica em "Verificar preços" de propósito.
+  const elOportunidades = document.getElementById('wlOportunidades');
+  const elPrecos = document.getElementById('wlPrecos');
+  if (elOportunidades) elOportunidades.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Clica em "Verificar preços" (ao lado do total de itens, no topo) pra ver as oportunidades.</div>`;
+  if (elPrecos) elPrecos.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Clica em "Verificar preços" pra carregar o contexto de preço aqui.</div>`;
 
   buscarLacunasColecao().then(lista => {
     const el = document.getElementById('wlGaps');

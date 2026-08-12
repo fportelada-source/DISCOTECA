@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
 
@@ -99,7 +99,7 @@
 
           <!-- PERFIL DE COLECIONADOR -->
           <div class="set-card">
-            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Perfil de colecionador</h3><span class="sub" id="setLinkPerfilPublico"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> ver perfil público</span></div>
+            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Perfil de colecionador</h3><span id="setLinkPerfilPublico"></span></div>
             <div class="set-row"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span><span class="label">Nome de exibição</span><input type="text" id="campo-nome-exibicao" maxlength="60" placeholder="Como quer aparecer publicamente"></div>
             <div class="set-row"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="label">Localização</span><input type="text" id="campo-localizacao" maxlength="60" placeholder="Ex: São Luís, MA"></div>
             <div class="set-row"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span><span class="label">Bio</span><textarea id="campo-bio" maxlength="280" placeholder="Conte um pouco sobre sua coleção..."></textarea></div>
@@ -517,7 +517,7 @@ function preencherPagina(data) {
   document.getElementById('setNomeGoogle').textContent = data.nome || '—';
   const ano = data.data_criacao ? data.data_criacao.split('-')[0] : '';
   document.getElementById('setMembroDesde').textContent = ano || '—';
-  document.getElementById('setLinkPerfilPublico').innerHTML = `<a href="perfil-publico.html?id=${data.id}" target="_blank" style="color:var(--terracotta); text-decoration:none;"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> ver perfil público</a>`;
+  document.getElementById('setLinkPerfilPublico').innerHTML = `<a href="perfil-publico.html?id=${data.id}" target="_blank" class="btn-outline-terracota"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> Ver perfil público</a>`;
 
   document.getElementById('campo-nome-exibicao').value = data.nome_exibicao || '';
   document.getElementById('campo-localizacao').value = data.localizacao || '';

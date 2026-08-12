@@ -498,24 +498,10 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   document.getElementById('dashContent').innerHTML = html;
   carregarCapasFaltantesDashboard();
 
-  buscarOportunidadesMercado().then(lista => {
-    const el = document.getElementById('dashOportunidades');
-    if (!el) return;
-    if (lista.length === 0) {
-      el.innerHTML = `<div class="dash-placeholder-note">Nenhuma oportunidade agora. Defina um preço-alvo nos itens da Wishlist pra começar a acompanhar.</div>`;
-      return;
-    }
-    el.innerHTML = lista.map(op => `
-      <div class="dash-opp-card">
-        <div class="left">
-          <div class="tag">${op.tag}</div>
-          <div class="name">${op.nome}</div>
-          <div class="sub">${op.sub}</div>
-        </div>
-        <div class="right">${op.preco ? `${op.precoAntigo ? `<span class="old">R$ ${op.precoAntigo}</span>` : ''}<span class="price">R$ ${op.preco}</span>` : ''}</div>
-      </div>
-    `).join('') + '<div class="dash-placeholder-note">Monitoramento de preços real chega na V0.11.</div>';
-  });
+  const elOportunidades = document.getElementById('dashOportunidades');
+  if (elOportunidades) {
+    elOportunidades.innerHTML = `<div class="dash-placeholder-note">Verificação automática de preço pausada por enquanto (aguardando liberação de rede). Defina um preço-alvo na Wishlist e use "Verificar preços" por lá.</div>`;
+  }
 
   buscarDescobertas().then(lista => {
     const el = document.getElementById('dashDescobrir');

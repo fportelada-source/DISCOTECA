@@ -483,22 +483,53 @@ function rodarVerificacaoPrecos() {
       }
 
       const comAlvo = d.itens.length;
-      const oportunidades = d.itens.filter(i => i.encontrado && (i.bateu_alvo || i.boa_oferta));
 
       if (el) {
+        const encontrados = d.itens.filter(i => i.encontrado);
         if (comAlvo === 0) {
           el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
-        } else if (oportunidades.length === 0) {
-          const naoEncontrados = d.itens.filter(i => !i.encontrado).length;
-          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhuma oportunidade agora.${naoEncontrados > 0 ? ' ' + naoEncontrados + ' disco(s) não achado(s) no catálogo de preços.' : ''}</div>`;
+        } else if (encontrados.length === 0) {
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens com preço-alvo foi achado no catálogo de preços ainda.</div>`;
         } else {
-          el.innerHTML = oportunidades.map(o => `
-            <div class="wl-gap-card">
-              <div class="label" style="text-transform:uppercase; font-size:10px; color:var(--terracotta); margin-bottom:6px;">${o.bateu_alvo ? 'bateu seu alvo' : 'boa oferta'}</div>
-              <div class="count" style="font-size:15px;">${escapeHtml(o.artista)} — ${escapeHtml(o.album)}</div>
-              <div class="sub">R$ ${o.preco_atual.toFixed(2)}${o.motivo ? ' · ' + escapeHtml(o.motivo) : ''}</div>
+          const iconeEstrela = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>';
+          const iconeCheck = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+          const iconeRelogio = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+          const badges = {
+            oportunidade: { texto: 'Oportunidade', icone: iconeEstrela },
+            bom_preco: { texto: 'Bom preço', icone: iconeCheck },
+            acima_do_alvo: { texto: 'Acima do alvo', icone: iconeRelogio }
+          };
+          el.innerHTML = encontrados.map(o => {
+            const badge = badges[o.categoria] || badges.acima_do_alvo;
+            const ehOportunidade = o.categoria !== 'acima_do_alvo';
+            return `
+            <div class="opp-card">
+              <div class="album">
+                <div class="art">◈</div>
+                <div class="info">
+                  <div class="title">${escapeHtml(o.album)}</div>
+                  <div class="artist">${escapeHtml(o.artista)}</div>
+                </div>
+              </div>
+              <div class="prices">
+                <span class="current">R$ ${o.preco_atual.toFixed(2)}</span>
+                ${o.preco_alvo ? `<span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(2)}</span></span>` : ''}
+              </div>
+              <div class="context">
+                ${o.media_30_dias ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média 30d: R$ ${o.media_30_dias.toFixed(2)}</span>` : ''}
+                ${o.minima_historica ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Melhor: R$ ${o.minima_historica.toFixed(2)}</span>` : ''}
+              </div>
+              <div class="bottom">
+                <span class="badge ${o.categoria}">${badge.icone} ${badge.texto}</span>
+                ${ehOportunidade
+                  ? (o.url_oferta
+                      ? `<a href="${escapeHtml(o.url_oferta)}" target="_blank" rel="noopener" class="action">Ver oferta <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`
+                      : `<a href="https://www.amazon.com.br/s?k=${encodeURIComponent(o.artista + ' ' + o.album + ' vinil')}" target="_blank" rel="noopener" class="action">Buscar na Amazon <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`)
+                  : `<span class="action">Esperar</span>`}
+              </div>
             </div>
-          `).join('');
+          `;
+          }).join('');
         }
       }
 

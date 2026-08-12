@@ -465,6 +465,72 @@ function carregarDados() {
     .catch(() => {});
 }
 
+const BADGES_OPORTUNIDADE = {
+  oportunidade: { texto: 'Oportunidade', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>' },
+  bom_preco: { texto: 'Bom preço', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' },
+  quase_la: { texto: 'Quase lá', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' },
+  acima_do_alvo: { texto: 'Acima do alvo', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' }
+};
+
+function gerarCardOportunidade(o, ehExemplo) {
+  const badge = BADGES_OPORTUNIDADE[o.categoria] || BADGES_OPORTUNIDADE.acima_do_alvo;
+  const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
+  return `
+    <div class="opp-card${ehExemplo ? ' opp-card-exemplo' : ''}">
+      ${ehExemplo ? '<div class="opp-exemplo-tag">Exemplo</div>' : ''}
+      <div class="album">
+        <div class="art">◈</div>
+        <div class="info">
+          <div class="title">${escapeHtml(o.album)}</div>
+          <div class="artist">${escapeHtml(o.artista)}</div>
+        </div>
+      </div>
+      <div class="prices">
+        <span class="current">R$ ${o.preco_atual.toFixed(2)}</span>
+        ${o.preco_alvo ? `<span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(2)}</span></span>` : ''}
+      </div>
+      <div class="context">
+        ${o.media_30_dias ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média 30d: R$ ${o.media_30_dias.toFixed(2)}</span>` : ''}
+        ${o.minima_historica ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Melhor: R$ ${o.minima_historica.toFixed(2)}</span>` : ''}
+      </div>
+      <div class="bottom">
+        <span class="badge ${o.categoria}">${badge.icone} ${badge.texto}</span>
+        ${ehExemplo
+          ? `<span class="action">Ver oferta</span>`
+          : (ehOportunidade
+              ? (o.url_oferta
+                  ? `<a href="${escapeHtml(o.url_oferta)}" target="_blank" rel="noopener" class="action">Ver oferta <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`
+                  : `<a href="https://www.amazon.com.br/s?k=${encodeURIComponent(o.artista + ' ' + o.album + ' vinil')}" target="_blank" rel="noopener" class="action">Buscar na Amazon <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`)
+              : `<span class="action">${o.categoria === 'quase_la' ? 'De olho...' : 'Esperar'}</span>`)}
+      </div>
+    </div>
+  `;
+}
+
+function mostrarExemploOportunidades() {
+  const el = document.getElementById('wlOportunidades');
+  const elPrecos = document.getElementById('wlPrecos');
+  const exemplos = [
+    { artista: 'Metallica', album: 'Ride the Lightning', categoria: 'oportunidade', preco_atual: 174.90, preco_alvo: 180, media_30_dias: 209, minima_historica: 169 },
+    { artista: 'Metallica', album: 'Master of Puppets', categoria: 'bom_preco', preco_atual: 189, preco_alvo: 210, media_30_dias: 214, minima_historica: 175 },
+    { artista: 'Iron Maiden', album: 'The Number of the Beast', categoria: 'acima_do_alvo', preco_atual: 239, preco_alvo: 200, media_30_dias: 225, minima_historica: 189 }
+  ];
+  if (el) {
+    el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Verificação de preço pausada por enquanto (aguardando liberação de rede) — os cards abaixo são só um exemplo de como vai ficar.</div>`
+      + exemplos.map(o => gerarCardOportunidade(o, true)).join('');
+  }
+  if (elPrecos) {
+    elPrecos.innerHTML = exemplos.map(o => `
+      <div class="wl-gap-card opp-card-exemplo">
+        <div class="count" style="font-size:15px;">${escapeHtml(o.artista)} — ${escapeHtml(o.album)}</div>
+        <div class="sub">
+          Atual: R$ ${o.preco_atual.toFixed(2)} · Média 30d: R$ ${o.media_30_dias.toFixed(2)} · Mínima: R$ ${o.minima_historica.toFixed(2)}
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
 function rodarVerificacaoPrecos(forcar) {
   const statBtn = document.getElementById('statVerificarPrecos');
   const el = document.getElementById('wlOportunidades');
@@ -492,47 +558,7 @@ function rodarVerificacaoPrecos(forcar) {
         } else if (encontrados.length === 0) {
           el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens com preço-alvo foi achado no catálogo de preços ainda.</div>`;
         } else {
-          const iconeEstrela = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>';
-          const iconeCheck = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
-          const iconeRelogio = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
-          const iconeQuase = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
-          const badges = {
-            oportunidade: { texto: 'Oportunidade', icone: iconeEstrela },
-            bom_preco: { texto: 'Bom preço', icone: iconeCheck },
-            quase_la: { texto: 'Quase lá', icone: iconeQuase },
-            acima_do_alvo: { texto: 'Acima do alvo', icone: iconeRelogio }
-          };
-          el.innerHTML = encontrados.map(o => {
-            const badge = badges[o.categoria] || badges.acima_do_alvo;
-            const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
-            return `
-            <div class="opp-card">
-              <div class="album">
-                <div class="art">◈</div>
-                <div class="info">
-                  <div class="title">${escapeHtml(o.album)}</div>
-                  <div class="artist">${escapeHtml(o.artista)}</div>
-                </div>
-              </div>
-              <div class="prices">
-                <span class="current">R$ ${o.preco_atual.toFixed(2)}</span>
-                ${o.preco_alvo ? `<span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(2)}</span></span>` : ''}
-              </div>
-              <div class="context">
-                ${o.media_30_dias ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média 30d: R$ ${o.media_30_dias.toFixed(2)}</span>` : ''}
-                ${o.minima_historica ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Melhor: R$ ${o.minima_historica.toFixed(2)}</span>` : ''}
-              </div>
-              <div class="bottom">
-                <span class="badge ${o.categoria}">${badge.icone} ${badge.texto}</span>
-                ${ehOportunidade
-                  ? (o.url_oferta
-                      ? `<a href="${escapeHtml(o.url_oferta)}" target="_blank" rel="noopener" class="action">Ver oferta <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`
-                      : `<a href="https://www.amazon.com.br/s?k=${encodeURIComponent(o.artista + ' ' + o.album + ' vinil')}" target="_blank" rel="noopener" class="action">Buscar na Amazon <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`)
-                  : `<span class="action">${o.categoria === 'quase_la' ? 'De olho...' : 'Esperar'}</span>`}
-              </div>
-            </div>
-          `;
-          }).join('');
+          el.innerHTML = encontrados.map(o => gerarCardOportunidade(o, false)).join('');
         }
       }
 
@@ -830,7 +856,13 @@ function buscarDescobertasWishlist() {
 }
 
 function renderSecoesPlaceholder() {
-  rodarVerificacaoPrecos();
+  // Verificação automática DESLIGADA por enquanto — o domínio do
+  // Garimpa Vinil ainda não está liberado no PythonAnywhere (bloqueio
+  // de rede, pedido de liberação enviado). Enquanto isso, mostra
+  // cards de exemplo já no visual final. O botão "Verificar preços"
+  // continua funcionando manualmente se alguém quiser tentar mesmo
+  // assim.
+  mostrarExemploOportunidades();
 
   buscarLacunasColecao().then(lista => {
     const el = document.getElementById('wlGaps');

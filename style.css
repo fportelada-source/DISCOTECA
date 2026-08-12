@@ -2884,6 +2884,7 @@
     .opp-card .bottom .badge { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
     .opp-card .bottom .badge.oportunidade { background: rgba(184, 107, 92, 0.15); color: var(--terracotta); border: 1px solid rgba(184, 107, 92, 0.25); }
     .opp-card .bottom .badge.bom_preco { background: rgba(107, 140, 122, 0.15); color: #6b8c7a; border: 1px solid rgba(107, 140, 122, 0.25); }
+    .opp-card .bottom .badge.quase_la { background: rgba(201, 168, 107, 0.15); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.25); }
     .opp-card .bottom .badge.acima_do_alvo { background: rgba(90, 106, 122, 0.15); color: #8a9aac; border: 1px solid rgba(90, 106, 122, 0.25); }
     .opp-card .bottom .action { font-size: 12px; font-weight: 500; opacity: 0.4; display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s; }
     .opp-card .bottom .action:hover { opacity: 0.8; }

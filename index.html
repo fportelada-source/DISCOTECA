@@ -549,10 +549,38 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   const elOportunidades = document.getElementById('dashOportunidades');
   if (elOportunidades) {
-    // Não busca sozinho mais — competia com o carregamento das capas
-    // e deixava a página lenta. Verificação de preço agora só roda
-    // manualmente, pelo botão na Wishlist.
-    elOportunidades.innerHTML = `<div class="dash-placeholder-note">Vá na <a href="wishlist.html" style="color:var(--terracotta);">Wishlist</a> e clique em "Verificar preços" pra ver as oportunidades aqui.</div>`;
+    // Sem forçar — se já tem cache válido (ex: você verificou na
+    // Wishlist), é instantâneo, só lê o banco. Só é lento se nunca
+    // verificou nada ainda ou o cache expirou (24h).
+    setTimeout(() => {
+      apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
+        .then(r => r.json())
+        .then(d => {
+          if (!d.sucesso || !Array.isArray(d.itens) || d.itens.length === 0) {
+            elOportunidades.innerHTML = `<div class="dash-placeholder-note">Defina um preço-alvo em algum item da <a href="wishlist.html" style="color:var(--terracotta);">Wishlist</a> pra começar a acompanhar oportunidades aqui.</div>`;
+            return;
+          }
+          const encontrados = d.itens.filter(i => i.encontrado).slice(0, 4);
+          if (encontrados.length === 0) {
+            elOportunidades.innerHTML = `<div class="dash-placeholder-note">Nenhum dos itens com preço-alvo foi achado no catálogo ainda.</div>`;
+            return;
+          }
+          const avisoMock = d.fonte === 'mock' ? `<div class="dash-mock-warning"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Preços simulados (dados de teste) — Garimpa Vinil real pendente de liberação.</div>` : '';
+          elOportunidades.innerHTML = avisoMock + `
+            <div class="dash-opp-grid">${encontrados.map(o => gerarCardOportunidadeDash(o, false)).join('')}</div>
+            <div class="dash-opp-footer">
+              <div class="left">
+                <span class="monitor-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${d.itens.length} item${d.itens.length > 1 ? 's' : ''} monitorável${d.itens.length > 1 ? 'is' : ''}</span>
+              </div>
+              <div class="right">
+                <a href="wishlist.html" class="btn-outline"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Ver oportunidades</a>
+              </div>
+            </div>`;
+        })
+        .catch(() => {
+          elOportunidades.innerHTML = `<div class="dash-placeholder-note">Erro ao verificar preços.</div>`;
+        });
+    }, 400);
   }
 
   buscarDescobertas().then(lista => {

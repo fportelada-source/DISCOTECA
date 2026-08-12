@@ -734,7 +734,7 @@ function renderHeroWishlist(dados) {
   statsEl.innerHTML = `
     <div class="stat"><div class="num">${ativos.length}</div><div class="label">Total</div></div>
     <a href="#" class="stat" style="text-decoration:none;" onclick="event.preventDefault(); abrirWishlist();"><div class="num">+</div><div class="label">Adicionar</div></a>
-    <a href="#" class="stat" style="text-decoration:none;" id="statVerificarPrecos" onclick="event.preventDefault(); rodarVerificacaoPrecos(true);"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></a>
+    <span class="stat" style="opacity:0.3; cursor:default;" id="statVerificarPrecos" title="Verificação de preço pausada até liberar o domínio no PythonAnywhere"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></span>
   `;
 }
 

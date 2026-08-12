@@ -2878,7 +2878,8 @@
     .wl-card .info .actions button:hover { border-color: var(--terracotta); }
 
     .wl-opp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .wl-gaps-grid, .wl-price-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .wl-gaps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .wl-price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
     .wl-gap-card, .wl-price-card { background: var(--card); border-radius: 16px; padding: 16px 14px; border: 1px solid var(--card-line); text-align: center; }
     .wl-gap-card .icon { font-size: 26px; margin-bottom: 4px; opacity: 0.5; }
     .wl-gap-card .count { font-size: 20px; font-weight: 800; color: var(--terracotta); }
@@ -2932,12 +2933,12 @@
 
     @media (max-width: 1000px) {
       .wl-opp-grid { grid-template-columns: 1fr 1fr; }
-      .wl-gaps-grid, .wl-price-grid, .wl-discover-grid { grid-template-columns: 1fr 1fr; }
+      .wl-gaps-grid, .wl-discover-grid { grid-template-columns: 1fr 1fr; }
       .wl-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     }
     @media (max-width: 600px) {
       .wl-hero { flex-direction: column; align-items: flex-start; }
-      .wl-opp-grid, .wl-gaps-grid, .wl-price-grid, .wl-discover-grid { grid-template-columns: 1fr; }
+      .wl-opp-grid, .wl-gaps-grid, .wl-discover-grid { grid-template-columns: 1fr; }
       .wl-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     }
 

@@ -2815,6 +2815,20 @@
       padding: 8px 18px; border-radius: 30px; cursor: pointer; white-space: nowrap; transition: 0.15s ease;
     }
     .col-fix-banner .btn-fix:hover { background: var(--terracotta-wash); }
+    .btn-fix-standalone {
+      background: transparent; border: 1px solid var(--terracotta); color: var(--terracotta);
+      font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
+      padding: 9px 20px; border-radius: 30px; cursor: pointer; white-space: nowrap; transition: 0.15s ease;
+      display: block; margin: 6px auto 0;
+    }
+    .btn-fix-standalone:hover { background: var(--terracotta-wash); }
+    .btn-outline-terracota {
+      background: transparent; border: 1px solid var(--terracotta); color: var(--terracotta);
+      font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 30px;
+      display: inline-flex; align-items: center; gap: 5px; text-decoration: none; transition: 0.2s;
+    }
+    .btn-outline-terracota:hover { background: var(--terracotta-wash); }
+    .btn-outline-terracota svg { width: 13px; height: 13px; stroke-width: 1.5; }
     .col-fix-banner .btn-fix:disabled { opacity: 0.4; cursor: default; }
     .col-fix-banner .btn-fix-close {
       background: transparent; border: none; color: var(--paper); opacity: 0.3;
@@ -2970,6 +2984,29 @@
     .dash-intel-card .price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
     .dash-intel-card .price-row .current { font-size: 15px; font-weight: 700; color: var(--paper); }
     .dash-intel-card .price-row .note { font-size: 10px; opacity: 0.4; }
+
+    /* ===== LACUNAS DA COLEÇÃO (Dashboard) ===== */
+    .dash-gaps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .dash-gap-card { background: var(--card); border-radius: 12px; border: 1px solid var(--card-line); padding: 14px 14px 12px; transition: 0.2s; }
+    .dash-gap-card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
+    .dash-gap-card .artist { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+    .dash-gap-card .artist .icon { font-size: 12px; color: #5a5a5a; }
+    .dash-gap-card .count-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 11.5px; opacity: 0.45; margin-bottom: 4px; gap: 6px; }
+    .dash-gap-card .count-row .owned { font-weight: 500; opacity: 1; color: var(--paper); }
+    .dash-gap-card .count-row .missing { font-weight: 500; opacity: 1; color: var(--terracotta); white-space: nowrap; }
+    .dash-gap-card .track { width: 100%; height: 3px; background: #282828; border-radius: 20px; overflow: hidden; margin-bottom: 8px; }
+    .dash-gap-card .track .fill { height: 3px; border-radius: 20px; }
+    .dash-gap-card .track .fill.high { background: var(--terracotta); }
+    .dash-gap-card .track .fill.medium { background: #c9a86b; }
+    .dash-gap-card .track .fill.low { background: #5a6a7a; }
+    .dash-gap-card .bottom { display: flex; justify-content: flex-start; align-items: center; padding-top: 6px; border-top: 1px solid var(--card-line); }
+    .dash-gap-card .bottom .badge { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 8px; border-radius: 20px; }
+    .dash-gap-card .bottom .badge.high { background: rgba(184, 107, 92, 0.12); color: var(--terracotta); border: 1px solid rgba(184, 107, 92, 0.12); }
+    .dash-gap-card .bottom .badge.medium { background: rgba(201, 168, 107, 0.12); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.12); }
+    .dash-gap-card .bottom .badge.low { background: rgba(90, 106, 122, 0.12); color: #5a6a7a; border: 1px solid rgba(90, 106, 122, 0.12); }
+
+    @media (max-width: 900px) { .dash-gaps-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .dash-gaps-grid { grid-template-columns: 1fr; } }
 
     .wl-gaps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
     .wl-price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }

@@ -2256,22 +2256,71 @@
 
     .dash-two-col { display: grid; grid-template-columns: 1.7fr 1fr; gap: 24px; }
 
-    .dash-opp-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
-    .dash-opp-header .left h2 { font-size: 15.5px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
-    .dash-opp-header .left h2 svg { color: var(--terracotta); }
-    .dash-opp-header .left .sub { font-size: 12px; opacity: 0.4; margin-top: 3px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .badge-pill { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; background: var(--terracotta-wash); color: var(--terracotta); padding: 2px 9px; border-radius: 30px; border: 1px solid rgba(184, 107, 92, 0.2); white-space: nowrap; }
-    .dash-opp-header .wishlist-link { font-size: 12px; opacity: 0.4; display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s; }
+    .dash-opp-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .dash-opp-header .left h2 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .dash-opp-header .left h2 svg { width: 18px; height: 18px; stroke-width: 1.5; color: var(--terracotta); }
+    .dash-opp-header .left .sub { font-size: 12px; opacity: 0.45; margin-top: 1px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .badge-pill { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; background: var(--terracotta-wash); color: var(--terracotta); padding: 1px 8px; border-radius: 30px; border: 1px solid rgba(184, 107, 92, 0.12); white-space: nowrap; }
+    .dash-opp-header .right { display: flex; align-items: center; gap: 10px; font-size: 12px; opacity: 0.45; }
+    .dash-opp-header .wishlist-link { display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s; }
     .dash-opp-header .wishlist-link:hover { opacity: 0.8; }
-    .opp-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
-    .dash-opp-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 12px; border-top: 1px solid var(--card-line); }
-    .dash-opp-footer .monitor-badge { font-size: 11px; opacity: 0.45; display: flex; align-items: center; gap: 6px; }
+    .dash-opp-header .wishlist-link svg { width: 14px; height: 14px; stroke-width: 1.5; }
+
+    .dash-opp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .dash-opp-card { background: var(--card); border-radius: 14px; border: 1px solid var(--card-line); padding: 14px 16px; transition: 0.2s; display: flex; flex-direction: column; }
+    .dash-opp-card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
+    .dash-opp-card .album { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .dash-opp-card .album .art {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+      background-image: linear-gradient(145deg, #3a3a3a, #202020);
+      display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5a5a5a;
+    }
+    .dash-opp-card .album .info { flex: 1; min-width: 0; }
+    .dash-opp-card .album .info .title {
+      font-size: 13px; font-weight: 600; line-height: 1.2;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .dash-opp-card .album .info .artist { font-size: 11px; opacity: 0.4; margin-top: 1px; }
+    .dash-opp-card .album .opp-exemplo-tag {
+      flex-shrink: 0; font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; opacity: 0.7; background: var(--card-line); padding: 2px 7px; border-radius: 10px; white-space: nowrap;
+    }
+    .dash-opp-card .price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 2px; }
+    .dash-opp-card .price-row .current { font-size: 17px; font-weight: 700; color: var(--paper); }
+    .dash-opp-card .price-row .target { font-size: 11px; opacity: 0.45; }
+    .dash-opp-card .price-row .target span { color: var(--terracotta); opacity: 1; }
+    .dash-opp-card .context { display: flex; gap: 10px; font-size: 10px; opacity: 0.35; margin-bottom: 6px; flex-wrap: wrap; }
+    .dash-opp-card .context .item { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+    .dash-opp-card .context .item svg { width: 11px; height: 11px; stroke-width: 1.5; }
+    .dash-opp-card .bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--card-line); margin-top: auto; gap: 8px; flex-wrap: wrap; }
+    .dash-opp-card .bottom .badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 20px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .dash-opp-card .bottom .badge svg { width: 12px; height: 12px; stroke-width: 1.5; }
+    .dash-opp-card .bottom .badge.oportunidade { background: rgba(184, 107, 92, 0.12); color: var(--terracotta); border: 1px solid rgba(184, 107, 92, 0.12); }
+    .dash-opp-card .bottom .badge.bom_preco { background: rgba(107, 140, 122, 0.12); color: #6b8c7a; border: 1px solid rgba(107, 140, 122, 0.12); }
+    .dash-opp-card .bottom .badge.quase_la { background: rgba(201, 168, 107, 0.12); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.12); }
+    .dash-opp-card .bottom .badge.acima_do_alvo { background: rgba(90, 106, 122, 0.12); color: #5a6a7a; border: 1px solid rgba(90, 106, 122, 0.12); }
+    .dash-opp-card .bottom .action { font-size: 11px; font-weight: 500; opacity: 0.45; display: flex; align-items: center; gap: 3px; text-decoration: none; color: inherit; transition: 0.2s; white-space: nowrap; }
+    .dash-opp-card .bottom .action:hover { opacity: 0.85; }
+    .dash-opp-card.opp-card-exemplo { opacity: 0.55; }
+
+    .dash-opp-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 10px; border-top: 1px solid var(--card-line); }
+    .dash-opp-footer .monitor-badge { font-size: 11px; opacity: 0.45; display: flex; align-items: center; gap: 5px; }
+    .dash-opp-footer .monitor-badge svg { width: 13px; height: 13px; stroke-width: 1.5; }
     .dash-opp-footer .monitor-badge .highlight { color: var(--terracotta); opacity: 1; }
+    .dash-opp-footer .right { display: flex; align-items: center; gap: 10px; font-size: 12px; opacity: 0.35; }
+    .dash-opp-footer .count { display: flex; align-items: center; gap: 4px; }
+    .dash-opp-footer .count svg { width: 14px; height: 14px; stroke-width: 1.5; }
     .dash-opp-footer .btn-outline {
-      font-size: 12px; font-weight: 500; opacity: 0.5; border: 1px solid var(--card-line); padding: 4px 14px; border-radius: 30px;
+      font-size: 11px; font-weight: 500; opacity: 0.5; border: 1px solid var(--card-line); padding: 3px 12px; border-radius: 30px;
       display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s;
     }
+    .dash-opp-footer .btn-outline svg { width: 13px; height: 13px; stroke-width: 1.5; }
     .dash-opp-footer .btn-outline:hover { opacity: 1; border-color: #4a4a4a; }
+
+    @media (max-width: 600px) {
+      .dash-opp-grid { grid-template-columns: 1fr; }
+      .dash-opp-header, .dash-opp-footer { flex-direction: column; align-items: flex-start; }
+    }
 
     @media (max-width: 780px) {
       .opp-card-grid { grid-template-columns: 1fr 1fr; }

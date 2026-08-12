@@ -246,13 +246,14 @@ function gerarCardOportunidadeDash(o) {
   const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
   return `
     <div class="opp-card opp-card-exemplo">
-      <div class="opp-exemplo-tag">Exemplo</div>
       <div class="album">
         <div class="art">◈</div>
         <div class="info">
           <div class="title">${escapeHtml(o.album)}</div>
           <div class="artist">${escapeHtml(o.artista)}</div>
         </div>
+        <div class="opp-exemplo-tag">Exemplo</div>
+      </div>
       </div>
       <div class="prices">
         <span class="current">R$ ${o.preco_atual.toFixed(0)}</span>
@@ -418,8 +419,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   html += `<a href="wishlist.html" class="dash-stat-item"><div class="number">${wishlist.length}</div><div class="label">Wishlist</div></a>`;
   html += `</div>`;
 
-  // ===== NEXT PURCHASES + MARKET OPPORTUNITIES =====
-  html += `<div class="dash-two-col">`;
+  // ===== NEXT PURCHASES (linha própria — lista simples, cabe numa coluna estreita) =====
   html += `<div><div class="dash-section-title">Próximas compras <a href="wishlist.html" class="see-all">ver todas</a></div>`;
   if (wishlist.length > 0) {
     wishlist.slice(0, 3).forEach((item, idx) => {
@@ -440,6 +440,9 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   }
   html += `</div>`;
 
+  // ===== MARKET OPPORTUNITIES (linha própria, largura total — os cards
+  // ricos (capa+preço+contexto+badge) precisam de espaço; espremidos
+  // numa coluna de metade da página o texto quebra e desalinha tudo) =====
   html += `
     <div>
       <div class="dash-opp-header">
@@ -451,7 +454,6 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       </div>
       <div id="dashOportunidades"></div>
     </div>`;
-  html += `</div>`;
 
   // ===== COLLECTION INSIGHTS + WISHLIST GRID =====
   html += `<div class="dash-two-col">`;

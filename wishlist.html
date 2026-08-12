@@ -465,14 +465,15 @@ function carregarDados() {
     .catch(() => {});
 }
 
-function rodarVerificacaoPrecos() {
+function rodarVerificacaoPrecos(forcar) {
   const statBtn = document.getElementById('statVerificarPrecos');
   const el = document.getElementById('wlOportunidades');
   const elPrecos = document.getElementById('wlPrecos');
   if (statBtn) statBtn.querySelector('.label').textContent = 'Verificando...';
   if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Verificando preços...</div>`;
 
-  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
+  const urlForcar = forcar ? '&forcar=1' : '';
+  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId + urlForcar, { method: 'POST' })
     .then(r => r.json())
     .then(d => {
       if (statBtn) statBtn.querySelector('.label').textContent = 'Verificar preços';
@@ -494,14 +495,16 @@ function rodarVerificacaoPrecos() {
           const iconeEstrela = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>';
           const iconeCheck = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
           const iconeRelogio = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+          const iconeQuase = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
           const badges = {
             oportunidade: { texto: 'Oportunidade', icone: iconeEstrela },
             bom_preco: { texto: 'Bom preço', icone: iconeCheck },
+            quase_la: { texto: 'Quase lá', icone: iconeQuase },
             acima_do_alvo: { texto: 'Acima do alvo', icone: iconeRelogio }
           };
           el.innerHTML = encontrados.map(o => {
             const badge = badges[o.categoria] || badges.acima_do_alvo;
-            const ehOportunidade = o.categoria !== 'acima_do_alvo';
+            const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
             return `
             <div class="opp-card">
               <div class="album">
@@ -525,7 +528,7 @@ function rodarVerificacaoPrecos() {
                   ? (o.url_oferta
                       ? `<a href="${escapeHtml(o.url_oferta)}" target="_blank" rel="noopener" class="action">Ver oferta <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`
                       : `<a href="https://www.amazon.com.br/s?k=${encodeURIComponent(o.artista + ' ' + o.album + ' vinil')}" target="_blank" rel="noopener" class="action">Buscar na Amazon <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`)
-                  : `<span class="action">Esperar</span>`}
+                  : `<span class="action">${o.categoria === 'quase_la' ? 'De olho...' : 'Esperar'}</span>`}
               </div>
             </div>
           `;
@@ -705,7 +708,7 @@ function renderHeroWishlist(dados) {
   statsEl.innerHTML = `
     <div class="stat"><div class="num">${ativos.length}</div><div class="label">Total</div></div>
     <a href="#" class="stat" style="text-decoration:none;" onclick="event.preventDefault(); abrirWishlist();"><div class="num">+</div><div class="label">Adicionar</div></a>
-    <a href="#" class="stat" style="text-decoration:none;" id="statVerificarPrecos" onclick="event.preventDefault(); rodarVerificacaoPrecos();"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></a>
+    <a href="#" class="stat" style="text-decoration:none;" id="statVerificarPrecos" onclick="event.preventDefault(); rodarVerificacaoPrecos(true);"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></a>
   `;
 }
 

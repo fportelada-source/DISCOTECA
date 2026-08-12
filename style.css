@@ -2863,6 +2863,35 @@
     .wl-price-card .label { font-size: 10.5px; opacity: 0.4; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
     .wl-price-card .sub { font-size: 10.5px; opacity: 0.25; margin-top: 2px; }
 
+    /* ===== OPPORTUNITY CARD (Oportunidades de compra) ===== */
+    .opp-card { background: var(--card); border-radius: 16px; border: 1px solid var(--card-line); padding: 16px 18px; transition: 0.2s; }
+    .opp-card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
+    .opp-card .album { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .opp-card .album .art {
+      width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
+      background-image: linear-gradient(145deg, #3a3a3a, #202020);
+      display: flex; align-items: center; justify-content: center; font-size: 16px; color: #5a5a5a;
+    }
+    .opp-card .album .info .title { font-size: 14px; font-weight: 600; line-height: 1.2; }
+    .opp-card .album .info .artist { font-size: 12px; opacity: 0.4; }
+    .opp-card .prices { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .opp-card .prices .current { font-size: 18px; font-weight: 700; color: var(--paper); }
+    .opp-card .prices .target { font-size: 13px; opacity: 0.4; }
+    .opp-card .prices .target span { color: var(--terracotta); opacity: 1; }
+    .opp-card .context { display: flex; gap: 14px; font-size: 11px; opacity: 0.35; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-line); flex-wrap: wrap; }
+    .opp-card .context .item { display: flex; align-items: center; gap: 4px; }
+    .opp-card .bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .opp-card .bottom .badge { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .opp-card .bottom .badge.oportunidade { background: rgba(184, 107, 92, 0.15); color: var(--terracotta); border: 1px solid rgba(184, 107, 92, 0.25); }
+    .opp-card .bottom .badge.bom_preco { background: rgba(107, 140, 122, 0.15); color: #6b8c7a; border: 1px solid rgba(107, 140, 122, 0.25); }
+    .opp-card .bottom .badge.acima_do_alvo { background: rgba(90, 106, 122, 0.15); color: #8a9aac; border: 1px solid rgba(90, 106, 122, 0.25); }
+    .opp-card .bottom .action { font-size: 12px; font-weight: 500; opacity: 0.4; display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s; }
+    .opp-card .bottom .action:hover { opacity: 0.8; }
+
+    @media (max-width: 700px) {
+      .wl-opp-grid { grid-template-columns: 1fr; }
+    }
+
     .wl-discover-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
     .wl-discover-item { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--card-line); opacity: 0.65; }
     .wl-discover-item .art { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #5a5a5a; background-size: cover; background-position: center; }

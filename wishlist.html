@@ -97,7 +97,8 @@
         <!-- OPORTUNIDADES DE COMPRA -->
         <div class="col-section">
           <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Oportunidades de compra</h3></div>
-          <div class="wl-opp-grid" id="wlOportunidades"></div>
+          <div id="wlFonteAviso"></div>
+          <div id="wlOportunidades"></div>
         </div>
 
         <!-- LACUNAS DA COLEÇÃO -->
@@ -535,10 +536,44 @@ function mostrarExemploOportunidades() {
   }
 }
 
+let paginaOportunidades = 0;
+let itensOportunidadesAtuais = [];
+
+function renderPaginaOportunidades() {
+  const el = document.getElementById('wlOportunidades');
+  if (!el) return;
+  const POR_PAGINA = 6;
+  const total = itensOportunidadesAtuais.length;
+  const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+  if (paginaOportunidades >= totalPaginas) paginaOportunidades = totalPaginas - 1;
+  const inicio = paginaOportunidades * POR_PAGINA;
+  const pagina = itensOportunidadesAtuais.slice(inicio, inicio + POR_PAGINA);
+
+  const grid = `<div class="wl-opp-grid">${pagina.map(o => gerarCardOportunidade(o, false)).join('')}</div>`;
+  const nav = totalPaginas > 1 ? `
+    <div class="wl-opp-nav">
+      <button type="button" class="wl-opp-nav-btn" id="btnOppAnterior" ${paginaOportunidades === 0 ? 'disabled' : ''}>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="wl-opp-nav-count">${paginaOportunidades + 1} / ${totalPaginas}</span>
+      <button type="button" class="wl-opp-nav-btn" id="btnOppProximo" ${paginaOportunidades >= totalPaginas - 1 ? 'disabled' : ''}>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>` : '';
+
+  el.innerHTML = grid + nav;
+
+  const btnAnt = document.getElementById('btnOppAnterior');
+  const btnProx = document.getElementById('btnOppProximo');
+  if (btnAnt) btnAnt.addEventListener('click', () => { paginaOportunidades--; renderPaginaOportunidades(); });
+  if (btnProx) btnProx.addEventListener('click', () => { paginaOportunidades++; renderPaginaOportunidades(); });
+}
+
 function rodarVerificacaoPrecos(forcar) {
   const statBtn = document.getElementById('statVerificarPrecos');
   const el = document.getElementById('wlOportunidades');
   const elPrecos = document.getElementById('wlPrecos');
+  const elAviso = document.getElementById('wlFonteAviso');
   if (statBtn) statBtn.querySelector('.label').textContent = 'Verificando...';
   if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Verificando preços...</div>`;
 
@@ -550,19 +585,28 @@ function rodarVerificacaoPrecos(forcar) {
       if (!d.sucesso) {
         if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">❌ ${escapeHtml(d.erro || 'Erro ao verificar preços.')}</div>`;
         if (elPrecos) elPrecos.innerHTML = '';
+        if (elAviso) elAviso.innerHTML = '';
         return d;
+      }
+
+      if (elAviso) {
+        elAviso.innerHTML = d.fonte === 'mock'
+          ? `<div class="dash-mock-warning"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Preços simulados (dados de teste) — Garimpa Vinil real pendente de liberação.</div>`
+          : '';
       }
 
       const comAlvo = d.itens.length;
 
       if (el) {
         const encontrados = d.itens.filter(i => i.encontrado);
+        itensOportunidadesAtuais = encontrados;
+        paginaOportunidades = 0;
         if (comAlvo === 0) {
           el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
         } else if (encontrados.length === 0) {
           el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens com preço-alvo foi achado no catálogo de preços ainda.</div>`;
         } else {
-          el.innerHTML = encontrados.map(o => gerarCardOportunidade(o, false)).join('');
+          renderPaginaOportunidades();
         }
       }
 
@@ -860,13 +904,13 @@ function buscarDescobertasWishlist() {
 }
 
 function renderSecoesPlaceholder() {
-  // Verificação NÃO roda mais sozinha ao entrar na página — deixava o
-  // carregamento lento, competindo com o das capas. Agora só dispara
-  // quando a pessoa clica em "Verificar preços" de propósito.
-  const elOportunidades = document.getElementById('wlOportunidades');
-  const elPrecos = document.getElementById('wlPrecos');
-  if (elOportunidades) elOportunidades.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Clica em "Verificar preços" (ao lado do total de itens, no topo) pra ver as oportunidades.</div>`;
-  if (elPrecos) elPrecos.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Clica em "Verificar preços" pra carregar o contexto de preço aqui.</div>`;
+  // Verificação automática voltou, mas SEM forçar (forcar=false) — se
+  // já tem cache de menos de 24h (ex: você clicou "Verificar preços"
+  // antes), isso é instantâneo, só lê o banco, sem chamada externa
+  // nenhuma. Só fica lento na primeira vez ou depois do cache expirar.
+  // "Verificar preços" (o botão) continua sendo o único caminho que
+  // força buscar de novo mesmo com cache válido.
+  setTimeout(() => rodarVerificacaoPrecos(), 400);
 
   buscarLacunasColecao().then(lista => {
     const el = document.getElementById('wlGaps');

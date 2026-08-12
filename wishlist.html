@@ -477,13 +477,13 @@ function gerarCardOportunidade(o, ehExemplo) {
   const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
   return `
     <div class="opp-card${ehExemplo ? ' opp-card-exemplo' : ''}">
-      ${ehExemplo ? '<div class="opp-exemplo-tag">Exemplo</div>' : ''}
       <div class="album">
         <div class="art">◈</div>
         <div class="info">
           <div class="title">${escapeHtml(o.album)}</div>
           <div class="artist">${escapeHtml(o.artista)}</div>
         </div>
+        ${ehExemplo ? '<div class="opp-exemplo-tag">Exemplo</div>' : ''}
       </div>
       <div class="prices">
         <span class="current">R$ ${o.preco_atual.toFixed(2)}</span>

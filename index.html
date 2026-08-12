@@ -241,26 +241,26 @@ const BADGES_OPORTUNIDADE_DASH = {
   acima_do_alvo: { texto: 'Acima do alvo', icone: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="17 8 12 3 7 8"/><polyline points="17 16 12 21 7 16"/></svg>' }
 };
 
-function gerarCardOportunidadeDash(o) {
+function gerarCardOportunidadeDash(o, ehExemplo) {
   const badge = BADGES_OPORTUNIDADE_DASH[o.categoria] || BADGES_OPORTUNIDADE_DASH.acima_do_alvo;
   const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
   return `
-    <div class="dash-opp-card opp-card-exemplo">
+    <div class="dash-opp-card${ehExemplo ? ' opp-card-exemplo' : ''}">
       <div class="album">
         <div class="art">◈</div>
         <div class="info">
           <div class="title">${escapeHtml(o.album)}</div>
           <div class="artist">${escapeHtml(o.artista)}</div>
         </div>
-        <div class="opp-exemplo-tag">Exemplo</div>
+        ${ehExemplo ? '<div class="opp-exemplo-tag">Exemplo</div>' : ''}
       </div>
       <div class="price-row">
         <span class="current">R$ ${o.preco_atual.toFixed(0)}</span>
-        <span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(0)}</span></span>
+        ${o.preco_alvo ? `<span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(0)}</span></span>` : ''}
       </div>
       <div class="context">
-        <span class="item"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Menor: R$ ${o.minima_historica.toFixed(0)}</span>
-        <span class="item"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média: R$ ${o.media_30_dias.toFixed(0)}</span>
+        ${o.minima_historica ? `<span class="item"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Menor: R$ ${o.minima_historica.toFixed(0)}</span>` : ''}
+        ${o.media_30_dias ? `<span class="item"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média: R$ ${o.media_30_dias.toFixed(0)}</span>` : ''}
       </div>
       <div class="bottom">
         <span class="badge ${o.categoria}">${badge.icone} ${badge.texto}</span>
@@ -549,23 +549,34 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   const elOportunidades = document.getElementById('dashOportunidades');
   if (elOportunidades) {
-    const exemplos = [
-      { artista: 'Metallica', album: 'Master of Puppets', categoria: 'oportunidade', preco_atual: 179, preco_alvo: 200, media_30_dias: 201, minima_historica: 169 },
-      { artista: 'Megadeth', album: 'Rust in Peace', categoria: 'oportunidade', preco_atual: 165, preco_alvo: 190, media_30_dias: 198, minima_historica: 159 },
-      { artista: 'Architects', album: 'All Our Gods Have Abandoned Us', categoria: 'quase_la', preco_atual: 189, preco_alvo: 180, media_30_dias: 195, minima_historica: 175 },
-      { artista: 'Metallica', album: 'Ride the Lightning', categoria: 'acima_do_alvo', preco_atual: 219, preco_alvo: 180, media_30_dias: 209, minima_historica: 169 }
-    ];
-    elOportunidades.innerHTML = `
-      <div class="dash-opp-grid">${exemplos.map(o => gerarCardOportunidadeDash(o)).join('')}</div>
-      <div class="dash-opp-footer">
-        <div class="left">
-          <span class="monitor-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Monitoramento automático <span class="highlight">em breve</span> · Defina seus preços-alvo na Wishlist</span>
-        </div>
-        <div class="right">
-          <span class="count"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="8" y1="2" x2="8" y2="22"/><line x1="16" y1="2" x2="16" y2="22"/><line x1="2" y1="8" x2="22" y2="8"/><line x1="2" y1="16" x2="22" y2="16"/></svg> ${exemplos.length} itens monitoráveis</span>
-          <a href="wishlist.html" class="btn-outline"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Ver oportunidades</a>
-        </div>
-      </div>`;
+    elOportunidades.innerHTML = `<div class="dash-placeholder-note">Verificando preços...</div>`;
+    apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
+      .then(r => r.json())
+      .then(d => {
+        if (!d.sucesso || !Array.isArray(d.itens) || d.itens.length === 0) {
+          elOportunidades.innerHTML = `<div class="dash-placeholder-note">Defina um preço-alvo em algum item da Wishlist pra começar a acompanhar oportunidades aqui.</div>`;
+          return;
+        }
+        const encontrados = d.itens.filter(i => i.encontrado).slice(0, 4);
+        if (encontrados.length === 0) {
+          elOportunidades.innerHTML = `<div class="dash-placeholder-note">Nenhum dos itens com preço-alvo foi achado no catálogo ainda.</div>`;
+          return;
+        }
+        elOportunidades.innerHTML = `
+          <div class="dash-opp-grid">${encontrados.map(o => gerarCardOportunidadeDash(o, false)).join('')}</div>
+          <div class="dash-opp-footer">
+            <div class="left">
+              <span class="monitor-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Fonte de preço: <span class="highlight">dados de teste</span> · Garimpa Vinil real pendente de liberação</span>
+            </div>
+            <div class="right">
+              <span class="count"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="8" y1="2" x2="8" y2="22"/><line x1="16" y1="2" x2="16" y2="22"/><line x1="2" y1="8" x2="22" y2="8"/><line x1="2" y1="16" x2="22" y2="16"/></svg> ${d.itens.length} item${d.itens.length > 1 ? 's' : ''} monitorável${d.itens.length > 1 ? 'is' : ''}</span>
+              <a href="wishlist.html" class="btn-outline"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Ver oportunidades</a>
+            </div>
+          </div>`;
+      })
+      .catch(() => {
+        elOportunidades.innerHTML = `<div class="dash-placeholder-note">Erro ao verificar preços.</div>`;
+      });
   }
 
   buscarDescobertas().then(lista => {

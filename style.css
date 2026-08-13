@@ -3033,6 +3033,7 @@
     .dash-gap-card { background: var(--card); border-radius: 12px; border: 1px solid var(--card-line); padding: 14px 14px 12px; transition: 0.2s; }
     .dash-gap-card-clicavel {
       font-family: 'Inter', sans-serif; text-align: left; cursor: pointer; width: 100%; display: block;
+      color: var(--paper);
     }
     .dash-gap-card-clicavel:hover { border-color: var(--terracotta); }
     .dash-gap-card-clicavel:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }

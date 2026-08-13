@@ -107,12 +107,6 @@
           <div id="wlOportunidades"></div>
         </div>
 
-        <!-- LACUNAS DA COLEÇÃO -->
-        <div class="col-section">
-          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Lacunas da coleção</h3></div>
-          <div class="wl-gaps-grid" id="wlGaps"></div>
-        </div>
-
         <!-- INTELIGÊNCIA DE PREÇO -->
         <div class="col-section">
           <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Inteligência de preço</h3></div>
@@ -1104,9 +1098,6 @@ function renderWishlistGrid(dados) {
 // Início) — trocar o corpo destas funções quando as features existirem
 // (scraper de preços, análise de discografia).
 // ================================================================
-function buscarLacunasColecao() {
-  return Promise.resolve([]);
-}
 function buscarDescobertasWishlist() {
   return Promise.resolve([]);
 }
@@ -1119,11 +1110,9 @@ function renderSecoesPlaceholder() {
   // propósito, em vez de fingir que já tem dado.
   setTimeout(() => carregarPrecosSalvos(), 300);
 
-  buscarLacunasColecao().then(lista => {
-    const el = document.getElementById('wlGaps');
-    if (!el) return;
-    el.innerHTML = '<div class="pp-empty-note">Análise de lacunas depende das trilogias e discografias completas — planejado pra frente.</div>';
-  });
+  // "Lacunas da coleção" foi removida da Wishlist (a versão real e
+  // funcional dessa feature vive só no Dashboard, em /lacunas_colecao —
+  // ver renderCardLacuna em index.html). Não recriar aqui.
 
   buscarDescobertasWishlist().then(lista => {
     const el = document.getElementById('wlDescobrir');

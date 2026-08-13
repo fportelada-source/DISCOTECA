@@ -634,11 +634,11 @@ function carregarPrecosSalvos() {
     .then(d => {
       if (!d.sucesso) return d;
 
-      const comAlvo = d.itens.length;
+      const totalItens = d.itens.length;
       const botaoIniciar = `<button type="button" class="btn-fix-standalone" onclick="rodarVerificacaoPrecos(true)">Verifique o preço para começar</button>`;
 
-      if (comAlvo === 0) {
-        const msg = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
+      if (totalItens === 0) {
+        const msg = `<div class="pp-empty-note" style="grid-column:1/-1;">Sua wishlist está vazia. Adiciona um disco pra começar a acompanhar preços.</div>`;
         if (el) el.innerHTML = msg;
         if (elPrecos) elPrecos.innerHTML = msg;
         return d;
@@ -647,7 +647,7 @@ function carregarPrecosSalvos() {
       const jaVerificados = d.itens.filter(i => i.verificado);
       if (jaVerificados.length === 0) {
         // Nunca foi checado ainda — mostra o botão em vez de fingir dado
-        if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1; margin-bottom:10px;">${comAlvo} disco${comAlvo > 1 ? 's' : ''} com preço-alvo, ainda não verificado${comAlvo > 1 ? 's' : ''}.</div>` + botaoIniciar;
+        if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1; margin-bottom:10px;">${totalItens} disco${totalItens > 1 ? 's' : ''} na wishlist, ainda não verificado${totalItens > 1 ? 's' : ''}.</div>` + botaoIniciar;
         if (elPrecos) elPrecos.innerHTML = botaoIniciar;
         return d;
       }
@@ -714,24 +714,24 @@ function rodarVerificacaoPrecos(forcar) {
           : '');
       }
 
-      const comAlvo = d.itens.length;
+      const totalItens = d.itens.length;
 
       if (el) {
         const encontrados = d.itens.filter(i => i.encontrado);
         itensOportunidadesAtuais = encontrados;
         paginaOportunidades = 0;
-        if (comAlvo === 0) {
-          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
+        if (totalItens === 0) {
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Sua wishlist está vazia. Adiciona um disco pra começar a acompanhar preços.</div>`;
         } else if (encontrados.length === 0) {
-          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens com preço-alvo foi achado no catálogo de preços ainda.</div>`;
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens verificados foi achado no catálogo de preços ainda.</div>`;
         } else {
           renderPaginaOportunidades();
         }
       }
 
       if (elPrecos) {
-        if (comAlvo === 0) {
-          elPrecos.innerHTML = `<div class="pp-empty-note">Defina um preço-alvo em algum item da wishlist pra ver o contexto de preço aqui.</div>`;
+        if (totalItens === 0) {
+          elPrecos.innerHTML = `<div class="pp-empty-note">Sua wishlist está vazia. Adiciona um disco pra ver o contexto de preço aqui.</div>`;
         } else {
           elPrecos.innerHTML = renderIntelPrecoWishlist(d.itens);
         }

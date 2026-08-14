@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
 </head>
 <body>
 
@@ -100,26 +100,6 @@
         <!-- ===== WISHLIST GRID ===== -->
         <div id="compras-container"></div>
 
-        <!-- OPORTUNIDADES DE COMPRA -->
-        <div class="col-section">
-          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Oportunidades de compra</h3></div>
-          <div class="feature-placeholder">
-            <div class="icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-            <div class="title">Em breve</div>
-            <div class="desc">A busca automática de preços está sendo reconstruída sobre uma fonte confiável.</div>
-          </div>
-        </div>
-
-        <!-- INTELIGÊNCIA DE PREÇO -->
-        <div class="col-section">
-          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Inteligência de preço</h3></div>
-          <div class="feature-placeholder">
-            <div class="icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-            <div class="title">Em breve</div>
-            <div class="desc">A busca automática de preços está sendo reconstruída sobre uma fonte confiável.</div>
-          </div>
-        </div>
-
         <!-- ATIVIDADE RECENTE -->
         <div class="col-section">
           <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Atividade recente</h3></div>
@@ -171,10 +151,6 @@
               <input type="text" id="wish-notas" placeholder="Ex: Versão japonesa">
             </div>
           </div>
-          <div class="form-group">
-            <label>Preço-alvo (R$) <span style="opacity:0.4; font-weight:400;">— opcional, avisa se achar por esse valor ou menos</span></label>
-            <input type="number" id="wish-preco-alvo" placeholder="Ex: 180.00" step="0.01" min="0">
-          </div>
         </div>
         <div class="wish-modal-actions">
           <button type="button" class="btn btn-secondary" id="btnCancelarWishlist">Cancelar</button>
@@ -210,10 +186,6 @@
             <option value="B">B (Média)</option>
             <option value="C">C (Baixa)</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label>Preço-alvo (R$) <span style="opacity:0.4; font-weight:400;">— opcional, avisa se achar por esse valor ou menos</span></label>
-          <input type="number" id="edit-tier-preco-alvo" placeholder="Ex: 180.00" step="0.01" min="0">
         </div>
         <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar Tier</button>
         <div class="form-msg" id="edit-tier-msg"></div>
@@ -753,7 +725,6 @@ function gerarLinhaWishlist(item, id) {
         <a href="colecao.html?artista=${encodeURIComponent(item.artista || '')}" class="wl-linha-artista wl-linha-artista-link">${escapeHtml(item.artista) || 'Artista'}</a>
       </div>
       <div class="wl-linha-motivo">${escapeHtml(item.nota || item.justificativa || '')}</div>
-      <div class="wl-linha-preco">${item.preco_alvo ? `Alvo: R$ ${Number(item.preco_alvo).toFixed(0)}` : ''}</div>
       <div class="wl-linha-acoes">
         <button onclick="abrirEditTier('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}', '${item.tier || 'A'}')" title="Editar prioridade"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
         <button onclick="marcarComoTenho('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}')" title="Já tenho"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg></button>
@@ -932,7 +903,6 @@ function renderRecomendacoes(dados) {
       document.getElementById('wish-album').value = '';
       document.getElementById('wish-tier').value = 'S';
       document.getElementById('wish-notas').value = '';
-      document.getElementById('wish-preco-alvo').value = '';
       document.getElementById('wish-msg').textContent = '';
       document.getElementById('wish-msg').className = 'form-msg';
       modalWish.classList.add('open');
@@ -955,8 +925,7 @@ function renderRecomendacoes(dados) {
         artista: document.getElementById('wish-artista').value.trim(),
         album: document.getElementById('wish-album').value.trim(),
         tier: document.getElementById('wish-tier').value,
-        notas: document.getElementById('wish-notas').value.trim(),
-        preco_alvo: document.getElementById('wish-preco-alvo').value ? parseFloat(document.getElementById('wish-preco-alvo').value) : null
+        notas: document.getElementById('wish-notas').value.trim()
       };
 
       if (!dados.artista || !dados.album) {
@@ -1002,7 +971,6 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-artista').value = '';
       document.getElementById('edit-tier-album').value = '';
       document.getElementById('edit-tier-select').value = 'A';
-      document.getElementById('edit-tier-preco-alvo').value = '';
       document.getElementById('edit-tier-msg').textContent = '';
       document.getElementById('edit-tier-msg').className = 'form-msg';
       document.getElementById('btn-edit-tier-submit').disabled = false;
@@ -1012,11 +980,6 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-album').value = album;
       document.getElementById('edit-tier-select').value = tierAtual || 'A';
 
-      const itemAtual = (recomendacoes || []).find(r => String(r.id) === String(id));
-      if (itemAtual && itemAtual.preco_alvo) {
-        document.getElementById('edit-tier-preco-alvo').value = itemAtual.preco_alvo;
-      }
-      
       modalEditTier.classList.add('open');
     }
     window.abrirEditTier = abrirEditTier;
@@ -1034,7 +997,6 @@ function renderRecomendacoes(dados) {
       const msg = document.getElementById('edit-tier-msg');
       const id = document.getElementById('edit-tier-id').value;
       const novoTier = document.getElementById('edit-tier-select').value;
-      const precoAlvo = document.getElementById('edit-tier-preco-alvo').value;
 
       btn.disabled = true;
       msg.textContent = '⏳ Salvando...';
@@ -1044,15 +1006,6 @@ function renderRecomendacoes(dados) {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tier: novoTier })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (!data.sucesso) throw new Error(data.erro || 'Erro ao atualizar tier');
-          return apiFetch(API_URL + `/definir_preco_alvo/${id}?user_id=${usuarioId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ preco_alvo: precoAlvo ? parseFloat(precoAlvo) : null })
-          });
         })
         .then(r => r.json())
         .then(data => {

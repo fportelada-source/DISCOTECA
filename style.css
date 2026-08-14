@@ -2263,73 +2263,9 @@
     .dash-opp-header .left h2 svg { width: 18px; height: 18px; stroke-width: 1.5; color: var(--terracotta); }
     .dash-opp-header .left .sub { font-size: 12px; opacity: 0.45; margin-top: 1px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .badge-pill { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; background: var(--terracotta-wash); color: var(--terracotta); padding: 1px 8px; border-radius: 30px; border: 1px solid rgba(184, 107, 92, 0.12); white-space: nowrap; }
-    .dash-opp-header .right { display: flex; align-items: center; gap: 10px; font-size: 12px; opacity: 0.45; }
-    .dash-opp-header .wishlist-link { display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s; }
-    .dash-opp-header .wishlist-link:hover { opacity: 0.8; }
-    .dash-opp-header .wishlist-link svg { width: 14px; height: 14px; stroke-width: 1.5; }
-
-    .dash-opp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 14px; }
-    .dash-opp-card { background: var(--card); border-radius: 14px; border: 1px solid var(--card-line); padding: 14px 16px; transition: 0.2s; display: flex; flex-direction: column; }
-    .dash-opp-card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
-    .dash-opp-card .album { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-    .dash-opp-card .album .art {
-      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
-      background-image: linear-gradient(145deg, #3a3a3a, #202020);
-      display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5a5a5a;
-    }
-    .dash-opp-card .album .info { flex: 1; min-width: 0; }
-    .dash-opp-card .album .info .title {
-      font-size: 13px; font-weight: 600; line-height: 1.2;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    }
-    .dash-opp-card .album .info .artist { font-size: 11px; opacity: 0.4; margin-top: 1px; }
-    .dash-opp-card .album .opp-exemplo-tag {
-      flex-shrink: 0; font-size: 9px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; opacity: 0.7; background: var(--card-line); padding: 2px 7px; border-radius: 10px; white-space: nowrap;
-    }
-    .dash-opp-card .price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 2px; }
-    .dash-opp-card .price-row .current { font-size: 17px; font-weight: 700; color: var(--paper); }
-    .dash-opp-card .price-row .target { font-size: 11px; opacity: 0.45; }
-    .dash-opp-card .price-row .target span { color: var(--terracotta); opacity: 1; }
-    .dash-opp-card .context { display: flex; gap: 10px; font-size: 10px; opacity: 0.35; margin-bottom: 6px; flex-wrap: wrap; }
-    .dash-opp-card .context .item { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
-    .dash-opp-card .context .item svg { width: 11px; height: 11px; stroke-width: 1.5; }
-    .dash-opp-card .bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--card-line); margin-top: auto; gap: 8px; flex-wrap: wrap; }
-    .dash-opp-card .bottom .badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 20px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-    .dash-opp-card .bottom .badge svg { width: 12px; height: 12px; stroke-width: 1.5; }
-    .dash-opp-card .bottom .badge.oportunidade { background: rgba(184, 107, 92, 0.12); color: var(--terracotta); border: 1px solid rgba(184, 107, 92, 0.12); }
-    .dash-opp-card .bottom .badge.bom_preco { background: rgba(107, 140, 122, 0.12); color: #6b8c7a; border: 1px solid rgba(107, 140, 122, 0.12); }
-    .dash-opp-card .bottom .badge.quase_la { background: rgba(201, 168, 107, 0.12); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.12); }
-    .dash-opp-card .bottom .badge.acima_do_alvo { background: rgba(90, 106, 122, 0.12); color: #5a6a7a; border: 1px solid rgba(90, 106, 122, 0.12); }
-    .dash-opp-card .bottom .action { font-size: 11px; font-weight: 500; opacity: 0.45; display: flex; align-items: center; gap: 3px; text-decoration: none; color: inherit; transition: 0.2s; white-space: nowrap; }
-    .dash-opp-card .bottom .action:hover { opacity: 0.85; }
-    .dash-opp-card.opp-card-exemplo { opacity: 0.55; }
-
-    .dash-opp-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 10px; border-top: 1px solid var(--card-line); }
-    .dash-opp-footer .monitor-badge { font-size: 11px; opacity: 0.45; display: flex; align-items: center; gap: 5px; }
-    .dash-opp-footer .monitor-badge svg { width: 13px; height: 13px; stroke-width: 1.5; }
-    .dash-opp-footer .monitor-badge .highlight { color: var(--terracotta); opacity: 1; }
-    .dash-opp-footer .right { display: flex; align-items: center; gap: 10px; font-size: 12px; opacity: 0.35; }
-    .dash-opp-footer .count { display: flex; align-items: center; gap: 4px; }
-    .dash-opp-footer .count svg { width: 14px; height: 14px; stroke-width: 1.5; }
-    .dash-opp-footer .btn-outline {
-      font-size: 11px; font-weight: 500; opacity: 0.5; border: 1px solid var(--card-line); padding: 3px 12px; border-radius: 30px;
-      display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s;
-    }
-    .dash-opp-footer .btn-outline svg { width: 13px; height: 13px; stroke-width: 1.5; }
-    .dash-opp-footer .btn-outline:hover { opacity: 1; border-color: #4a4a4a; }
 
     @media (max-width: 600px) {
-      .dash-opp-grid { grid-template-columns: 1fr; }
-      .dash-opp-header, .dash-opp-footer { flex-direction: column; align-items: flex-start; }
-    }
-
-    @media (max-width: 780px) {
-      .opp-card-grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 500px) {
-      .opp-card-grid { grid-template-columns: 1fr; }
-      .dash-opp-footer { flex-direction: column; align-items: flex-start; }
+      .dash-opp-header { flex-direction: column; align-items: flex-start; }
     }
 
     .dash-section-title {
@@ -2349,7 +2285,7 @@
       color: var(--paper);
     }
 
-    .dash-purchase-card, .dash-opp-card {
+    .dash-purchase-card {
       background: var(--card);
       border-radius: 14px;
       padding: 12px 16px;
@@ -2366,22 +2302,12 @@
     }
     .dash-purchase-card .info { flex: 1; min-width: 0; }
     .dash-purchase-card .info .title { font-size: 13.5px; font-weight: 600; }
-    .dash-purchase-card .info .artist { font-size: 12px; opacity: 0.5; }
+    .dash-purchase-card .info .artist { font-size: 12px; opacity: 0.5; color: inherit; text-decoration: none; display: inline-block; transition: opacity 0.15s, color 0.15s; }
+    .dash-purchase-card .info .artist:hover, .dash-purchase-card .info .artist:focus-visible { opacity: 1; color: var(--terracotta); }
     .dash-purchase-card .score {
       font-weight: 700; font-size: 13px; color: var(--terracotta);
       background: var(--terracotta-wash); padding: 2px 10px; border-radius: 30px; flex-shrink: 0;
     }
-
-    .dash-opp-card { justify-content: space-between; }
-    .dash-opp-card .tag {
-      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--terracotta); background: var(--terracotta-wash); padding: 0 8px; border-radius: 12px;
-      display: inline-block; margin-bottom: 3px;
-    }
-    .dash-opp-card .name { font-weight: 600; font-size: 13.5px; }
-    .dash-opp-card .sub { font-size: 12px; opacity: 0.4; }
-    .dash-opp-card .price { font-weight: 700; font-size: 14px; color: var(--terracotta); }
-    .dash-opp-card .old { font-size: 12px; opacity: 0.3; text-decoration: line-through; margin-right: 6px; }
 
     .dash-insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .dash-insight-card { background: var(--card); border-radius: 16px; padding: 16px 14px; border: 1px solid var(--card-line); }
@@ -3003,32 +2929,8 @@
     }
     .wl-card .info .actions button:hover { border-color: var(--terracotta); }
 
-    .wl-opp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .wl-opp-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
-    .wl-opp-nav-btn {
-      width: 32px; height: 32px; border-radius: 50%; background: var(--card); border: 1px solid var(--card-line);
-      color: var(--paper); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
-    }
-    .wl-opp-nav-btn:hover:not(:disabled) { border-color: var(--terracotta); color: var(--terracotta); }
-    .wl-opp-nav-btn:disabled { opacity: 0.25; cursor: default; }
-    .wl-opp-nav-count { font-size: 12px; opacity: 0.4; min-width: 40px; text-align: center; }
-
-    .dash-mock-warning {
-      display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--terracotta); opacity: 0.85;
-      background: var(--terracotta-wash); border: 1px solid rgba(184, 107, 92, 0.2); padding: 6px 12px; border-radius: 10px; margin-bottom: 12px;
-    }
-
-    /* ===== INTELIGÊNCIA DE PREÇO (Dashboard) ===== */
-    .dash-insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 12px; }
-    .dash-insight-mini { background: var(--card); border-radius: 12px; border: 1px solid var(--card-line); padding: 12px 10px; text-align: center; transition: 0.2s; }
-    .dash-insight-mini:hover { border-color: #3a3a3a; }
-    .dash-insight-mini .num { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--paper); }
-    .dash-insight-mini .num.accent { color: var(--terracotta); }
-    .dash-insight-mini .num.green { color: #6b8c7a; }
-    .dash-insight-mini .num.gold { color: #c9a86b; }
-    .dash-insight-mini .label { font-size: 9.5px; opacity: 0.4; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; }
-
-    .dash-intel-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    /* ===== LACUNAS DA COLEÇÃO (Dashboard) ===== */
+    .dash-gaps-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
     .dash-intel-card { background: var(--card); border-radius: 12px; border: 1px solid var(--card-line); padding: 12px 14px; transition: 0.2s; }
     .dash-intel-card-clicavel { display: block; text-decoration: none; color: inherit; cursor: pointer; }
     .dash-intel-card-clicavel:hover { border-color: var(--terracotta); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
@@ -3051,11 +2953,7 @@
     .dash-intel-card .price-row .note { font-size: 10px; opacity: 0.4; }
 
     /* ===== LACUNAS DA COLEÇÃO (Dashboard) ===== */
-    .dash-gaps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .feature-placeholder { background: var(--card); border-radius: 12px; border: 1px dashed var(--card-line); padding: 22px 18px; text-align: center; }
-    .feature-placeholder .icon { color: var(--paper); opacity: 0.3; margin-bottom: 8px; }
-    .feature-placeholder .title { font-size: 14px; font-weight: 600; color: var(--paper); opacity: 0.7; margin-bottom: 4px; }
-    .feature-placeholder .desc { font-size: 12.5px; color: var(--paper); opacity: 0.4; max-width: 380px; margin: 0 auto; line-height: 1.5; }
+    .dash-gaps-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
     .dash-gap-card { background: var(--card); border-radius: 12px; border: 1px solid var(--card-line); padding: 14px 14px 12px; transition: 0.2s; }
     .dash-gap-card-clicavel {
       font-family: 'Inter', sans-serif; text-align: left; cursor: pointer; width: 100%; display: block;
@@ -3084,6 +2982,7 @@
     .dash-gap-card .bottom .badge.medium { background: rgba(201, 168, 107, 0.12); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.12); }
     .dash-gap-card .bottom .badge.low { background: rgba(90, 106, 122, 0.12); color: #5a6a7a; border: 1px solid rgba(90, 106, 122, 0.12); }
 
+    @media (max-width: 1400px) { .dash-gaps-grid { grid-template-columns: repeat(4, 1fr); } }
     @media (max-width: 900px) { .dash-gaps-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px) { .dash-gaps-grid { grid-template-columns: 1fr; } }
 

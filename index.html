@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
 </head>
 <body>
 
@@ -520,23 +520,6 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   }
   html += `</div>`;
 
-  // ===== MARKET OPPORTUNITIES (linha própria, largura total — os cards
-  // ricos (capa+preço+contexto+badge) precisam de espaço; espremidos
-  // numa coluna de metade da página o texto quebra e desalinha tudo) =====
-  html += `
-    <div>
-      <div class="dash-opp-header">
-        <div class="left">
-          <h2><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Oportunidades de mercado <span class="badge-pill">Price Intelligence</span></h2>
-          <div class="sub">Encontre boas oportunidades para os discos que você quer comprar. <span class="badge-pill">Baseado na sua Wishlist</span></div>
-        </div>
-        <div class="right">
-          <a href="wishlist.html" class="wishlist-link">Ver Wishlist <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>
-        </div>
-      </div>
-      <div id="dashOportunidades"></div>
-    </div>`;
-
   html += `
     <div>
       <div class="dash-opp-header">
@@ -638,16 +621,6 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   document.getElementById('dashContent').innerHTML = html;
   carregarCapasFaltantesDashboard();
-
-  const elOportunidades = document.getElementById('dashOportunidades');
-  if (elOportunidades) {
-    elOportunidades.innerHTML = `
-      <div class="feature-placeholder">
-        <div class="icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-        <div class="title">Em breve</div>
-        <div class="desc">A busca automática de preços está sendo reconstruída sobre uma fonte confiável.</div>
-      </div>`;
-  }
 
   const elLacunas = document.getElementById('dashLacunas');
   if (elLacunas) {

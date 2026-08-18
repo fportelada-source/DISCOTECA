@@ -187,6 +187,10 @@
             <option value="C">C (Baixa)</option>
           </select>
         </div>
+        <div class="form-group">
+          <label>Capa (URL) <span style="opacity:0.4; font-weight:400;">— opcional, cola o link de uma imagem se a busca automática não achar</span></label>
+          <input type="url" id="edit-tier-capa-url" placeholder="https://...">
+        </div>
         <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar Tier</button>
         <div class="form-msg" id="edit-tier-msg"></div>
       </form>
@@ -971,6 +975,7 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-artista').value = '';
       document.getElementById('edit-tier-album').value = '';
       document.getElementById('edit-tier-select').value = 'A';
+      document.getElementById('edit-tier-capa-url').value = '';
       document.getElementById('edit-tier-msg').textContent = '';
       document.getElementById('edit-tier-msg').className = 'form-msg';
       document.getElementById('btn-edit-tier-submit').disabled = false;
@@ -979,6 +984,11 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-artista').value = artista;
       document.getElementById('edit-tier-album').value = album;
       document.getElementById('edit-tier-select').value = tierAtual || 'A';
+
+      const itemAtual = (recomendacoes || []).find(r => String(r.id) === String(id));
+      if (itemAtual && itemAtual.capa_url) {
+        document.getElementById('edit-tier-capa-url').value = itemAtual.capa_url;
+      }
 
       modalEditTier.classList.add('open');
     }
@@ -997,19 +1007,26 @@ function renderRecomendacoes(dados) {
       const msg = document.getElementById('edit-tier-msg');
       const id = document.getElementById('edit-tier-id').value;
       const novoTier = document.getElementById('edit-tier-select').value;
+      const capaUrl = document.getElementById('edit-tier-capa-url').value.trim();
 
       btn.disabled = true;
       msg.textContent = '⏳ Salvando...';
       msg.className = 'form-msg';
 
-      apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
+      Promise.all([
+        apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tier: novoTier })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (data.sucesso) {
+        }).then(r => r.json()),
+        apiFetch(API_URL + `/definir_capa_wishlist/${id}?user_id=${usuarioId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ capa_url: capaUrl })
+        }).then(r => r.json())
+      ])
+        .then(([dataTier, dataCapa]) => {
+          if (dataTier.sucesso && dataCapa.sucesso) {
             msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Salvo!';
             msg.className = 'form-msg success';
             carregarDados();
@@ -1017,7 +1034,7 @@ function renderRecomendacoes(dados) {
             btn.disabled = false;
             setTimeout(() => modalEditTier.classList.remove('open'), 800);
           } else {
-            msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (data.erro || 'Erro ao atualizar');
+            msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (dataTier.erro || dataCapa.erro || 'Erro ao atualizar');
             msg.className = 'form-msg error';
             btn.disabled = false;
           }

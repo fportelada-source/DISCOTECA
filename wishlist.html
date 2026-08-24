@@ -7,7 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b0b0b" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Discoteca" />
 </head>
 <body>
 
@@ -100,6 +106,25 @@
         <!-- ===== WISHLIST GRID ===== -->
         <div id="compras-container"></div>
 
+        <!-- OPORTUNIDADES DE COMPRA -->
+        <div class="col-section">
+          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Oportunidades de compra</h3></div>
+          <div id="wlFonteAviso"></div>
+          <div id="wlOportunidades"></div>
+        </div>
+
+        <!-- LACUNAS DA COLEÇÃO -->
+        <div class="col-section">
+          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Lacunas da coleção</h3></div>
+          <div class="wl-gaps-grid" id="wlGaps"></div>
+        </div>
+
+        <!-- INTELIGÊNCIA DE PREÇO -->
+        <div class="col-section">
+          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Inteligência de preço</h3></div>
+          <div id="wlPrecos"></div>
+        </div>
+
         <!-- ATIVIDADE RECENTE -->
         <div class="col-section">
           <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Atividade recente</h3></div>
@@ -151,6 +176,10 @@
               <input type="text" id="wish-notas" placeholder="Ex: Versão japonesa">
             </div>
           </div>
+          <div class="form-group">
+            <label>Preço-alvo (R$) <span style="opacity:0.4; font-weight:400;">— opcional, avisa se achar por esse valor ou menos</span></label>
+            <input type="number" id="wish-preco-alvo" placeholder="Ex: 180.00" step="0.01" min="0">
+          </div>
         </div>
         <div class="wish-modal-actions">
           <button type="button" class="btn btn-secondary" id="btnCancelarWishlist">Cancelar</button>
@@ -188,8 +217,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Capa (URL) <span style="opacity:0.4; font-weight:400;">— opcional, cola o link de uma imagem se a busca automática não achar</span></label>
-          <input type="url" id="edit-tier-capa-url" placeholder="https://...">
+          <label>Preço-alvo (R$) <span style="opacity:0.4; font-weight:400;">— opcional, avisa se achar por esse valor ou menos</span></label>
+          <input type="number" id="edit-tier-preco-alvo" placeholder="Ex: 180.00" step="0.01" min="0">
         </div>
         <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar Tier</button>
         <div class="form-msg" id="edit-tier-msg"></div>
@@ -453,18 +482,284 @@ function carregarDados() {
     .catch(() => {});
 }
 
-// ================================================================
-// VERIFICAÇÃO DE PREÇO REMOVIDA — 13/08/2026
-// ================================================================
-// Garimpa Vinil (429 mesmo após UA+retry, confirmado no ambiente
-// real) e Amazon (acesso automatizado bloqueado) não funcionam como
-// fonte. Removidas: BADGES_OPORTUNIDADE, gerarCardOportunidade,
-// renderPaginaOportunidades, renderIntelPrecoWishlist,
-// carregarPrecosSalvos, rodarVerificacaoPrecos. #wlOportunidades e
-// #wlPrecos agora são placeholders estáticos (ver HTML) — nenhuma
-// chamada de rede acontece mais a partir desta página.
-// ================================================================
+const BADGES_OPORTUNIDADE = {
+  oportunidade: { texto: 'Oportunidade', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>' },
+  bom_preco: { texto: 'Bom preço', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' },
+  quase_la: { texto: 'Quase lá', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' },
+  acima_do_alvo: { texto: 'Acima do alvo', icone: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' }
+};
 
+function gerarCardOportunidade(o, ehExemplo) {
+  const badge = BADGES_OPORTUNIDADE[o.categoria] || BADGES_OPORTUNIDADE.acima_do_alvo;
+  const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
+  return `
+    <div class="opp-card${ehExemplo ? ' opp-card-exemplo' : ''}">
+      <div class="album">
+        <div class="art">◈</div>
+        <div class="info">
+          <div class="title">${escapeHtml(o.album)}</div>
+          <div class="artist">${escapeHtml(o.artista)}</div>
+        </div>
+        ${ehExemplo ? '<div class="opp-exemplo-tag">Exemplo</div>' : ''}
+      </div>
+      <div class="prices">
+        <span class="current">R$ ${o.preco_atual.toFixed(2)}</span>
+        ${o.preco_alvo ? `<span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(2)}</span></span>` : ''}
+      </div>
+      <div class="context">
+        ${o.media_30_dias ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média 30d: R$ ${o.media_30_dias.toFixed(2)}</span>` : ''}
+        ${o.minima_historica ? `<span class="item"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Melhor: R$ ${o.minima_historica.toFixed(2)}</span>` : ''}
+      </div>
+      <div class="bottom">
+        <span class="badge ${o.categoria}">${badge.icone} ${badge.texto}</span>
+        ${ehExemplo
+          ? `<span class="action">Ver oferta</span>`
+          : (ehOportunidade
+              ? (o.url_oferta
+                  ? `<a href="${escapeHtml(o.url_oferta)}" target="_blank" rel="noopener" class="action">Ver oferta <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`
+                  : `<a href="https://www.amazon.com.br/s?k=${encodeURIComponent(o.artista + ' ' + o.album + ' vinil')}" target="_blank" rel="noopener" class="action">Buscar na Amazon <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>`)
+              : `<span class="action">${o.categoria === 'quase_la' ? 'De olho...' : 'Esperar'}</span>`)}
+      </div>
+    </div>
+  `;
+}
+
+let paginaOportunidades = 0;
+let itensOportunidadesAtuais = [];
+
+function renderPaginaOportunidades() {
+  const el = document.getElementById('wlOportunidades');
+  if (!el) return;
+  const POR_PAGINA = 6;
+  const total = itensOportunidadesAtuais.length;
+  const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+  if (paginaOportunidades >= totalPaginas) paginaOportunidades = totalPaginas - 1;
+  const inicio = paginaOportunidades * POR_PAGINA;
+  const pagina = itensOportunidadesAtuais.slice(inicio, inicio + POR_PAGINA);
+
+  const grid = `<div class="wl-opp-grid">${pagina.map(o => gerarCardOportunidade(o, false)).join('')}</div>`;
+  const nav = totalPaginas > 1 ? `
+    <div class="wl-opp-nav">
+      <button type="button" class="wl-opp-nav-btn" id="btnOppAnterior" ${paginaOportunidades === 0 ? 'disabled' : ''}>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="wl-opp-nav-count">${paginaOportunidades + 1} / ${totalPaginas}</span>
+      <button type="button" class="wl-opp-nav-btn" id="btnOppProximo" ${paginaOportunidades >= totalPaginas - 1 ? 'disabled' : ''}>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>` : '';
+
+  el.innerHTML = grid + nav;
+
+  const btnAnt = document.getElementById('btnOppAnterior');
+  const btnProx = document.getElementById('btnOppProximo');
+  if (btnAnt) btnAnt.addEventListener('click', () => { paginaOportunidades--; renderPaginaOportunidades(); });
+  if (btnProx) btnProx.addEventListener('click', () => { paginaOportunidades++; renderPaginaOportunidades(); });
+}
+
+function renderIntelPrecoWishlist(itens) {
+  const encontrados = itens.filter(i => i.encontrado && i.preco_atual != null);
+  if (encontrados.length === 0) {
+    return `<div class="pp-empty-note">Nenhum dos itens verificados foi achado no catálogo ainda.</div>`;
+  }
+
+  const precoMedio = encontrados.reduce((soma, i) => soma + i.preco_atual, 0) / encontrados.length;
+  const precoAlvoMedio = itens.reduce((soma, i) => soma + (i.preco_alvo || 0), 0) / itens.length;
+  const boaOportunidades = encontrados.filter(i => i.categoria === 'oportunidade' || i.categoria === 'bom_preco').length;
+  const economiaPotencial = encontrados.reduce((soma, i) => {
+    if (i.media_30_dias && i.preco_atual < i.media_30_dias) return soma + (i.media_30_dias - i.preco_atual);
+    return soma;
+  }, 0);
+
+  const insights = `
+    <div class="dash-insight-grid">
+      <div class="dash-insight-mini">
+        <div class="num">R$ ${precoMedio.toFixed(0)}</div>
+        <div class="label">Preço médio da Wishlist</div>
+      </div>
+      <div class="dash-insight-mini">
+        <div class="num accent">R$ ${precoAlvoMedio.toFixed(0)}</div>
+        <div class="label">Preço-alvo médio</div>
+      </div>
+      <div class="dash-insight-mini">
+        <div class="num green">${boaOportunidades}</div>
+        <div class="label">Boas oportunidades</div>
+      </div>
+      <div class="dash-insight-mini">
+        <div class="num gold">R$ ${economiaPotencial.toFixed(0)}</div>
+        <div class="label">Economia potencial</div>
+      </div>
+      <div class="dash-insight-mini">
+        <div class="num">${itens.length}</div>
+        <div class="label">Itens monitorados</div>
+      </div>
+    </div>`;
+
+  // Um exemplo real por categoria, só se existir — nunca inventa card pra completar 3
+  const melhorOportunidade = encontrados.filter(i => i.categoria === 'oportunidade').sort((a, b) => (b.desconto_pct || 0) - (a.desconto_pct || 0))[0];
+  const quaseLa = encontrados.find(i => i.categoria === 'quase_la');
+  const bomPreco = encontrados.find(i => i.categoria === 'bom_preco');
+
+  const exemplos = [
+    melhorOportunidade ? { item: melhorOportunidade, tag: 'Melhor oportunidade', classe: 'best' } : null,
+    quaseLa ? { item: quaseLa, tag: 'Quase lá', classe: 'quase' } : null,
+    bomPreco ? { item: bomPreco, tag: 'Preço excelente', classe: 'excelente' } : null
+  ].filter(Boolean);
+
+  if (exemplos.length === 0) return insights;
+
+  // CLICÁVEL: cada card leva pra oferta de verdade (ou busca na Amazon
+  // como alternativa, mesmo padrão já usado nos cards de oportunidade).
+  const linhaOportunidades = `
+    <div class="dash-intel-row">
+      ${exemplos.map(ex => {
+        const href = ex.item.url_oferta || `https://www.amazon.com.br/s?k=${encodeURIComponent(ex.item.artista + ' ' + ex.item.album + ' vinil')}`;
+        return `
+        <a class="dash-intel-card dash-intel-card-clicavel" href="${escapeHtml(href)}" target="_blank" rel="noopener">
+          <span class="tag ${ex.classe}">${ex.tag}</span>
+          <div class="album">
+            <div class="art">◈</div>
+            <div class="info">
+              <div class="name">${escapeHtml(ex.item.album)}</div>
+              <div class="artist">${escapeHtml(ex.item.artista)}</div>
+            </div>
+          </div>
+          <div class="price-row">
+            <span class="current">R$ ${ex.item.preco_atual.toFixed(0)}</span>
+            <span class="note">${ex.item.motivo || ''}</span>
+          </div>
+        </a>
+      `;
+      }).join('')}
+    </div>`;
+
+  return insights + linhaOportunidades;
+}
+
+function carregarPrecosSalvos() {
+  const el = document.getElementById('wlOportunidades');
+  const elPrecos = document.getElementById('wlPrecos');
+  const elAviso = document.getElementById('wlFonteAviso');
+
+  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId + '&apenas_cache=1', { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.sucesso) return d;
+
+      const comAlvo = d.itens.length;
+      const botaoIniciar = `<button type="button" class="btn-fix-standalone" onclick="rodarVerificacaoPrecos(true)">Verifique o preço para começar</button>`;
+
+      if (comAlvo === 0) {
+        const msg = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
+        if (el) el.innerHTML = msg;
+        if (elPrecos) elPrecos.innerHTML = msg;
+        return d;
+      }
+
+      const jaVerificados = d.itens.filter(i => i.verificado);
+      if (jaVerificados.length === 0) {
+        // Nunca foi checado ainda — mostra o botão em vez de fingir dado
+        if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1; margin-bottom:10px;">${comAlvo} disco${comAlvo > 1 ? 's' : ''} com preço-alvo, ainda não verificado${comAlvo > 1 ? 's' : ''}.</div>` + botaoIniciar;
+        if (elPrecos) elPrecos.innerHTML = botaoIniciar;
+        return d;
+      }
+
+      // Já tem algo verificado antes (cache válido) — mostra normal,
+      // igual rodarVerificacaoPrecos mostraria, sem precisar buscar de novo.
+      if (elAviso) {
+        elAviso.innerHTML = d.fonte === 'mock'
+          ? `<div class="dash-mock-warning"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Preços simulados (dados de teste) — Garimpa Vinil real pendente de liberação.</div>`
+          : '';
+      }
+      const encontrados = jaVerificados.filter(i => i.encontrado);
+      if (el) {
+        if (encontrados.length === 0) {
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens verificados foi achado no catálogo de preços.</div>` + botaoIniciar;
+        } else {
+          itensOportunidadesAtuais = encontrados;
+          paginaOportunidades = 0;
+          renderPaginaOportunidades();
+        }
+      }
+      if (elPrecos) {
+        elPrecos.innerHTML = renderIntelPrecoWishlist(jaVerificados);
+      }
+      return d;
+    })
+    .catch(() => {});
+}
+
+function rodarVerificacaoPrecos(forcar) {
+  const statBtn = document.getElementById('statVerificarPrecos');
+  const el = document.getElementById('wlOportunidades');
+  const elPrecos = document.getElementById('wlPrecos');
+  const elAviso = document.getElementById('wlFonteAviso');
+  if (statBtn) statBtn.querySelector('.label').textContent = 'Verificando...';
+  if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Verificando preços... (pode levar até 20s)</div>`;
+
+  // Limite de segurança do lado do navegador — o backend já tem seu
+  // próprio orçamento de tempo (18s) e sempre responde dentro disso,
+  // mas esse timeout aqui é uma segunda camada: se por qualquer
+  // motivo a resposta nunca chegar (rede caiu no meio, etc.), a tela
+  // se recupera sozinha em vez de ficar presa em "Verificando..."
+  // pra sempre.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+  const urlForcar = forcar ? '&forcar=1' : '';
+  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId + urlForcar, { method: 'POST', signal: controller.signal })
+    .then(r => r.json())
+    .then(d => {
+      clearTimeout(timeoutId);
+      if (statBtn) statBtn.querySelector('.label').textContent = 'Verificar preços';
+      if (!d.sucesso) {
+        if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">❌ ${escapeHtml(d.erro || 'Erro ao verificar preços.')}</div>`;
+        if (elPrecos) elPrecos.innerHTML = '';
+        if (elAviso) elAviso.innerHTML = '';
+        return d;
+      }
+
+      if (elAviso) {
+        const avisoParcial = d.parcial ? `<div class="dash-mock-warning"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Alguns itens ainda não deram tempo de verificar — clica em "Verificar preços" de novo pra completar.</div>` : '';
+        elAviso.innerHTML = avisoParcial + (d.fonte === 'mock'
+          ? `<div class="dash-mock-warning"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Preços simulados (dados de teste) — Garimpa Vinil real pendente de liberação.</div>`
+          : '');
+      }
+
+      const comAlvo = d.itens.length;
+
+      if (el) {
+        const encontrados = d.itens.filter(i => i.encontrado);
+        itensOportunidadesAtuais = encontrados;
+        paginaOportunidades = 0;
+        if (comAlvo === 0) {
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum item com preço-alvo definido ainda. Edita a prioridade de um disco na wishlist e define um preço-alvo pra começar a acompanhar.</div>`;
+        } else if (encontrados.length === 0) {
+          el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">Nenhum dos itens com preço-alvo foi achado no catálogo de preços ainda.</div>`;
+        } else {
+          renderPaginaOportunidades();
+        }
+      }
+
+      if (elPrecos) {
+        if (comAlvo === 0) {
+          elPrecos.innerHTML = `<div class="pp-empty-note">Defina um preço-alvo em algum item da wishlist pra ver o contexto de preço aqui.</div>`;
+        } else {
+          elPrecos.innerHTML = renderIntelPrecoWishlist(d.itens);
+        }
+      }
+
+      return d;
+    })
+    .catch((err) => {
+      clearTimeout(timeoutId);
+      if (statBtn) statBtn.querySelector('.label').textContent = 'Verificar preços';
+      const msg = err && err.name === 'AbortError' ? 'A verificação demorou demais e foi cancelada. Tenta de novo.' : 'Erro de conexão.';
+      if (el) el.innerHTML = `<div class="pp-empty-note" style="grid-column:1/-1;">❌ ${msg}</div>`;
+      if (elPrecos) elPrecos.innerHTML = '';
+    });
+}
+window.rodarVerificacaoPrecos = rodarVerificacaoPrecos;
 
 // ================================================================
 // LAST.FM (capas dos álbuns)
@@ -609,6 +904,7 @@ function renderHeroWishlist(dados) {
   statsEl.innerHTML = `
     <div class="stat"><div class="num">${ativos.length}</div><div class="label">Total</div></div>
     <a href="#" class="stat" style="text-decoration:none;" onclick="event.preventDefault(); abrirWishlist();"><div class="num">+</div><div class="label">Adicionar</div></a>
+    <a href="#" class="stat" style="text-decoration:none;" id="statVerificarPrecos" onclick="event.preventDefault(); rodarVerificacaoPrecos(true);"><div class="num"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="label">Verificar preços</div></a>
   `;
 }
 
@@ -704,7 +1000,7 @@ function gerarCardWishlist(item, id) {
       </div>
       <div class="info">
         <div class="title">${escapeHtml(item.album) || 'Álbum'} <span class="ano-lancamento" id="ano-${id}"></span></div>
-        <a href="colecao.html?artista=${encodeURIComponent(item.artista || '')}" class="artist artist-link">${escapeHtml(item.artista) || 'Artista'}</a>
+        <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
         ${item.nota ? `<div class="note">"${escapeHtml(item.nota)}"</div>` : ''}
         <div class="actions">
           <button onclick="abrirEditTier('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}', '${item.tier || 'A'}')" title="Editar prioridade"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
@@ -726,9 +1022,10 @@ function gerarLinhaWishlist(item, id) {
       </div>
       <div class="wl-linha-info">
         <div class="wl-linha-album">${escapeHtml(item.album) || 'Álbum'} <span class="ano-lancamento" id="ano-${id}"></span></div>
-        <a href="colecao.html?artista=${encodeURIComponent(item.artista || '')}" class="wl-linha-artista wl-linha-artista-link">${escapeHtml(item.artista) || 'Artista'}</a>
+        <div class="wl-linha-artista">${escapeHtml(item.artista) || 'Artista'}</div>
       </div>
       <div class="wl-linha-motivo">${escapeHtml(item.nota || item.justificativa || '')}</div>
+      <div class="wl-linha-preco">${item.preco_alvo ? `Alvo: R$ ${Number(item.preco_alvo).toFixed(0)}` : ''}</div>
       <div class="wl-linha-acoes">
         <button onclick="abrirEditTier('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}', '${item.tier || 'A'}')" title="Editar prioridade"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
         <button onclick="marcarComoTenho('${item.id || ''}', '${escapeHtml(item.artista || '')}', '${escapeHtml(item.album || '')}')" title="Já tenho"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg></button>
@@ -813,18 +1110,26 @@ function renderWishlistGrid(dados) {
 // Início) — trocar o corpo destas funções quando as features existirem
 // (scraper de preços, análise de discografia).
 // ================================================================
+function buscarLacunasColecao() {
+  return Promise.resolve([]);
+}
 function buscarDescobertasWishlist() {
   return Promise.resolve([]);
 }
 
 function renderSecoesPlaceholder() {
-  // "Verificar preços" foi removida (ver bloco de comentário acima) —
-  // #wlOportunidades e #wlPrecos agora são HTML estático, nada pra
-  // popular aqui.
+  // Nunca dispara busca de preço sozinho — só lê o que já está em
+  // cache (instantâneo, sem chamada externa nenhuma, mesmo que o
+  // cache tenha expirado ou nunca tenha existido). Se não tiver nada
+  // verificado ainda, mostra um botão pra pessoa disparar a busca de
+  // propósito, em vez de fingir que já tem dado.
+  setTimeout(() => carregarPrecosSalvos(), 300);
 
-  // "Lacunas da coleção" foi removida da Wishlist (a versão real e
-  // funcional dessa feature vive só no Dashboard, em /lacunas_colecao —
-  // ver renderCardLacuna em index.html). Não recriar aqui.
+  buscarLacunasColecao().then(lista => {
+    const el = document.getElementById('wlGaps');
+    if (!el) return;
+    el.innerHTML = '<div class="pp-empty-note">Análise de lacunas depende das trilogias e discografias completas — planejado pra frente.</div>';
+  });
 
   buscarDescobertasWishlist().then(lista => {
     const el = document.getElementById('wlDescobrir');
@@ -907,6 +1212,7 @@ function renderRecomendacoes(dados) {
       document.getElementById('wish-album').value = '';
       document.getElementById('wish-tier').value = 'S';
       document.getElementById('wish-notas').value = '';
+      document.getElementById('wish-preco-alvo').value = '';
       document.getElementById('wish-msg').textContent = '';
       document.getElementById('wish-msg').className = 'form-msg';
       modalWish.classList.add('open');
@@ -929,7 +1235,8 @@ function renderRecomendacoes(dados) {
         artista: document.getElementById('wish-artista').value.trim(),
         album: document.getElementById('wish-album').value.trim(),
         tier: document.getElementById('wish-tier').value,
-        notas: document.getElementById('wish-notas').value.trim()
+        notas: document.getElementById('wish-notas').value.trim(),
+        preco_alvo: document.getElementById('wish-preco-alvo').value ? parseFloat(document.getElementById('wish-preco-alvo').value) : null
       };
 
       if (!dados.artista || !dados.album) {
@@ -975,7 +1282,7 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-artista').value = '';
       document.getElementById('edit-tier-album').value = '';
       document.getElementById('edit-tier-select').value = 'A';
-      document.getElementById('edit-tier-capa-url').value = '';
+      document.getElementById('edit-tier-preco-alvo').value = '';
       document.getElementById('edit-tier-msg').textContent = '';
       document.getElementById('edit-tier-msg').className = 'form-msg';
       document.getElementById('btn-edit-tier-submit').disabled = false;
@@ -986,10 +1293,10 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-select').value = tierAtual || 'A';
 
       const itemAtual = (recomendacoes || []).find(r => String(r.id) === String(id));
-      if (itemAtual && itemAtual.capa_url) {
-        document.getElementById('edit-tier-capa-url').value = itemAtual.capa_url;
+      if (itemAtual && itemAtual.preco_alvo) {
+        document.getElementById('edit-tier-preco-alvo').value = itemAtual.preco_alvo;
       }
-
+      
       modalEditTier.classList.add('open');
     }
     window.abrirEditTier = abrirEditTier;
@@ -1007,26 +1314,29 @@ function renderRecomendacoes(dados) {
       const msg = document.getElementById('edit-tier-msg');
       const id = document.getElementById('edit-tier-id').value;
       const novoTier = document.getElementById('edit-tier-select').value;
-      const capaUrl = document.getElementById('edit-tier-capa-url').value.trim();
+      const precoAlvo = document.getElementById('edit-tier-preco-alvo').value;
 
       btn.disabled = true;
       msg.textContent = '⏳ Salvando...';
       msg.className = 'form-msg';
 
-      Promise.all([
-        apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
+      apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tier: novoTier })
-        }).then(r => r.json()),
-        apiFetch(API_URL + `/definir_capa_wishlist/${id}?user_id=${usuarioId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ capa_url: capaUrl })
-        }).then(r => r.json())
-      ])
-        .then(([dataTier, dataCapa]) => {
-          if (dataTier.sucesso && dataCapa.sucesso) {
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (!data.sucesso) throw new Error(data.erro || 'Erro ao atualizar tier');
+          return apiFetch(API_URL + `/definir_preco_alvo/${id}?user_id=${usuarioId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ preco_alvo: precoAlvo ? parseFloat(precoAlvo) : null })
+          });
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.sucesso) {
             msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Salvo!';
             msg.className = 'form-msg success';
             carregarDados();
@@ -1034,7 +1344,7 @@ function renderRecomendacoes(dados) {
             btn.disabled = false;
             setTimeout(() => modalEditTier.classList.remove('open'), 800);
           } else {
-            msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (dataTier.erro || dataCapa.erro || 'Erro ao atualizar');
+            msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (data.erro || 'Erro ao atualizar');
             msg.className = 'form-msg error';
             btn.disabled = false;
           }
@@ -1049,6 +1359,13 @@ function renderRecomendacoes(dados) {
     document.addEventListener('DOMContentLoaded', function() {
       verificarSessao();
     });
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
   </script>
 </body>
 </html>

@@ -7,7 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b0b0b" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Discoteca" />
 </head>
 <body>
 
@@ -210,19 +216,79 @@ function verificarSessao() {
 // (scraper de preços, motor de descoberta) — o resto do dashboard
 // não precisa mudar.
 // ================================================================
-// ================================================================
-// PIPELINE DE PREÇO REMOVIDO — 13/08/2026
-// ================================================================
-// buscarOportunidadesMercado, BADGES_OPORTUNIDADE_DASH,
-// renderDashPrecos, rodarVerificacaoPrecosDash e gerarCardOportunidadeDash
-// removidas — Garimpa Vinil (429) e Amazon (bloqueio de automação)
-// não funcionam como fonte. #dashOportunidades agora é HTML estático
-// (ver renderDashboard). buscarOportunidadesMercado já não tinha
-// nenhuma chamada em lugar nenhum (código morto de uma versão
-// anterior) — conferido antes de remover.
+function buscarOportunidadesMercado() {
+  return apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.sucesso || !Array.isArray(d.itens)) return [];
+      const oportunidades = d.itens.filter(i => i.encontrado && (i.bateu_alvo || i.boa_oferta));
+      if (oportunidades.length === 0) return [];
+      return oportunidades.slice(0, 4).map(o => ({
+        tag: o.bateu_alvo ? 'bateu seu alvo' : 'boa oferta',
+        nome: `${o.artista} — ${o.album}`,
+        sub: o.motivo || 'Vale a pena olhar',
+        preco: o.preco_atual ? o.preco_atual.toFixed(2) : null,
+        precoAntigo: o.media_30_dias ? o.media_30_dias.toFixed(2) : null
+      }));
+    })
+    .catch(() => []);
+}
 function buscarDescobertas() {
   return Promise.resolve([]);
 }
+
+// ================================================================
+// CARREGAR DASHBOARD
+// ================================================================
+const BADGES_OPORTUNIDADE_DASH = {
+  oportunidade: { texto: 'Boa oportunidade', icone: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>' },
+  bom_preco: { texto: 'Bom preço', icone: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>' },
+  quase_la: { texto: 'Quase lá', icone: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' },
+  acima_do_alvo: { texto: 'Acima do alvo', icone: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="17 8 12 3 7 8"/><polyline points="17 16 12 21 7 16"/></svg>' }
+};
+
+function renderDashPrecos(jaVerificados, fonte, totalMonitorados) {
+  const elOportunidades = document.getElementById('dashOportunidades');
+  const encontrados = jaVerificados.filter(i => i.encontrado).slice(0, 4);
+
+  const avisoMock = fonte === 'mock' ? `<div class="dash-mock-warning"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Preços simulados (dados de teste) — Garimpa Vinil real pendente de liberação.</div>` : '';
+
+  if (elOportunidades) {
+    if (encontrados.length === 0) {
+      elOportunidades.innerHTML = `<div class="dash-placeholder-note">Nenhum dos itens verificados foi achado no catálogo ainda.</div>`;
+    } else {
+      elOportunidades.innerHTML = avisoMock + `
+        <div class="dash-opp-grid">${encontrados.map(o => gerarCardOportunidadeDash(o, false)).join('')}</div>
+        <div class="dash-opp-footer">
+          <div class="left">
+            <span class="monitor-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${totalMonitorados} item${totalMonitorados > 1 ? 's' : ''} monitorável${totalMonitorados > 1 ? 'is' : ''}</span>
+          </div>
+          <div class="right">
+            <a href="wishlist.html" class="btn-outline"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Ver oportunidades</a>
+          </div>
+        </div>`;
+    }
+  }
+}
+
+function rodarVerificacaoPrecosDash() {
+  const elOportunidades = document.getElementById('dashOportunidades');
+  if (elOportunidades) elOportunidades.innerHTML = `<div class="dash-placeholder-note">Verificando preços...</div>`;
+
+  apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId + '&forcar=1', { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.sucesso || !Array.isArray(d.itens)) {
+        if (elOportunidades) elOportunidades.innerHTML = `<div class="dash-placeholder-note">Erro ao verificar preços.</div>`;
+        return;
+      }
+      renderDashPrecos(d.itens.filter(i => i.encontrado !== undefined), d.fonte, d.itens.length);
+    })
+    .catch(() => {
+      if (elOportunidades) elOportunidades.innerHTML = `<div class="dash-placeholder-note">Erro ao verificar preços.</div>`;
+    });
+}
+window.rodarVerificacaoPrecosDash = rodarVerificacaoPrecosDash;
 
 // ================================================================
 // LACUNAS DA COLEÇÃO — cards clicáveis + modal com os 5 álbuns e
@@ -270,8 +336,7 @@ function renderModalLacunasConteudo(indice) {
   const a = lacunasAtuais[indice];
   const el = document.getElementById('lacunasModalLista');
   if (!a || !el) return;
-  document.getElementById('lacunasModalArtista').innerHTML =
-    `<a href="colecao.html?artista=${encodeURIComponent(a.artista)}" class="lacunas-modal-artista-link">${escapeHtml(a.artista)}</a>`;
+  document.getElementById('lacunasModalArtista').textContent = a.artista;
   el.innerHTML = a.albuns.map((album, idxAlbum) => {
     let acao;
     if (album.status === 'colecao') {
@@ -350,6 +415,41 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Escape' && modalLacunas && modalLacunas.classList.contains('open')) fecharModalLacunas();
   });
 });
+
+function gerarCardOportunidadeDash(o, ehExemplo) {
+  const badge = BADGES_OPORTUNIDADE_DASH[o.categoria] || BADGES_OPORTUNIDADE_DASH.acima_do_alvo;
+  const ehOportunidade = o.categoria === 'oportunidade' || o.categoria === 'bom_preco';
+  return `
+    <div class="dash-opp-card${ehExemplo ? ' opp-card-exemplo' : ''}">
+      <div class="album">
+        <div class="art">◈</div>
+        <div class="info">
+          <div class="title">${escapeHtml(o.album)}</div>
+          <div class="artist">${escapeHtml(o.artista)}</div>
+        </div>
+        ${ehExemplo ? '<div class="opp-exemplo-tag">Exemplo</div>' : ''}
+      </div>
+      <div class="price-row">
+        <span class="current">R$ ${o.preco_atual.toFixed(0)}</span>
+        ${o.preco_alvo ? `<span class="target">Alvo: <span>R$ ${o.preco_alvo.toFixed(0)}</span></span>` : ''}
+      </div>
+      <div class="context">
+        ${o.minima_historica ? `<span class="item"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Menor: R$ ${o.minima_historica.toFixed(0)}</span>` : ''}
+        ${o.media_30_dias ? `<span class="item"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Média: R$ ${o.media_30_dias.toFixed(0)}</span>` : ''}
+      </div>
+      <div class="bottom">
+        <span class="badge ${o.categoria}">${badge.icone} ${badge.texto}</span>
+        ${ehExemplo
+          ? `<span class="action">${ehOportunidade ? 'Ver oferta' : 'Esperar'}</span>`
+          : (ehOportunidade
+              ? (o.url_oferta
+                  ? `<a href="${escapeHtml(o.url_oferta)}" target="_blank" rel="noopener" class="action">Ver oferta</a>`
+                  : `<a href="https://www.amazon.com.br/s?k=${encodeURIComponent(o.artista + ' ' + o.album + ' vinil')}" target="_blank" rel="noopener" class="action">Buscar na Amazon</a>`)
+              : `<span class="action">${o.categoria === 'quase_la' ? 'De olho...' : 'Esperar'}</span>`)}
+      </div>
+    </div>
+  `;
+}
 
 function carregarDashboard() {
   Promise.all([
@@ -509,7 +609,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
           <div class="thumb" id="dashPurchase-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${thumbStyle}"></div>
           <div class="info">
             <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
-            <a href="colecao.html?artista=${encodeURIComponent(item.artista || '')}" class="artist artist-link">${escapeHtml(item.artista) || 'Artista'}</a>
+            <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
           </div>
           <div class="score">${item.tier}</div>
         </div>
@@ -519,6 +619,23 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
     html += `<div class="dash-placeholder-note">Nada na wishlist ainda — vá em Importar para gerar recomendações.</div>`;
   }
   html += `</div>`;
+
+  // ===== MARKET OPPORTUNITIES (linha própria, largura total — os cards
+  // ricos (capa+preço+contexto+badge) precisam de espaço; espremidos
+  // numa coluna de metade da página o texto quebra e desalinha tudo) =====
+  html += `
+    <div>
+      <div class="dash-opp-header">
+        <div class="left">
+          <h2><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Oportunidades de mercado <span class="badge-pill">Price Intelligence</span></h2>
+          <div class="sub">Encontre boas oportunidades para os discos que você quer comprar. <span class="badge-pill">Baseado na sua Wishlist</span></div>
+        </div>
+        <div class="right">
+          <a href="wishlist.html" class="wishlist-link">Ver Wishlist <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></a>
+        </div>
+      </div>
+      <div id="dashOportunidades"></div>
+    </div>`;
 
   html += `
     <div>
@@ -537,11 +654,11 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   if (stats.genero_predominante) {
     html += `
-      <a href="colecao.html?genero=${encodeURIComponent(stats.genero_predominante)}" class="dash-insight-card dash-insight-card-clicavel">
-        <div class="stat"><span class="highlight">${stats.genero_predominante_pct}%</span> ${escapeHtml(stats.genero_predominante)}</div>
+      <div class="dash-insight-card">
+        <div class="stat"><span class="highlight">${stats.genero_predominante_pct}%</span> ${stats.genero_predominante}</div>
         <div class="desc">seu gênero predominante</div>
         <div class="bar"><div class="fill" style="width:${stats.genero_predominante_pct}%;"></div></div>
-      </a>
+      </div>
     `;
   }
   if (stats.decadas && stats.decadas.length > 0) {
@@ -584,7 +701,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
           </div>
           <div class="info">
             <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
-            <a href="colecao.html?artista=${encodeURIComponent(item.artista || '')}" class="artist artist-link">${escapeHtml(item.artista) || 'Artista'}</a>
+            <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
           </div>
         </div>
       `;
@@ -621,6 +738,35 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   document.getElementById('dashContent').innerHTML = html;
   carregarCapasFaltantesDashboard();
+
+  const elOportunidades = document.getElementById('dashOportunidades');
+  if (elOportunidades) {
+    // Nunca dispara busca sozinho — só lê o que já está em cache
+    // (apenas_cache=1), instantâneo, sem chamada externa. Se nada foi
+    // verificado ainda, mostra um botão pra disparar de propósito.
+    setTimeout(() => {
+      apiFetch(API_URL + '/verificar_precos_wishlist?user_id=' + usuarioId + '&apenas_cache=1', { method: 'POST' })
+        .then(r => r.json())
+        .then(d => {
+          if (!d.sucesso || !Array.isArray(d.itens) || d.itens.length === 0) {
+            elOportunidades.innerHTML = `<div class="dash-placeholder-note">Defina um preço-alvo em algum item da <a href="wishlist.html" style="color:var(--terracotta);">Wishlist</a> pra começar a acompanhar oportunidades aqui.</div>`;
+            return;
+          }
+
+          const jaVerificados = d.itens.filter(i => i.verificado);
+          if (jaVerificados.length === 0) {
+            const botao = `<button type="button" class="btn-fix-standalone" onclick="rodarVerificacaoPrecosDash()">Verifique o preço para começar</button>`;
+            elOportunidades.innerHTML = `<div class="dash-placeholder-note">${d.itens.length} disco${d.itens.length > 1 ? 's' : ''} com preço-alvo, ainda não verificado${d.itens.length > 1 ? 's' : ''}.</div>${botao}`;
+            return;
+          }
+
+          renderDashPrecos(jaVerificados, d.fonte, d.itens.length);
+        })
+        .catch(() => {
+          elOportunidades.innerHTML = `<div class="dash-placeholder-note">Erro ao verificar preços.</div>`;
+        });
+    }, 400);
+  }
 
   const elLacunas = document.getElementById('dashLacunas');
   if (elLacunas) {
@@ -675,5 +821,12 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

@@ -8,7 +8,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b0b0b" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Discoteca" />
 </head>
 <body>
 
@@ -125,9 +131,6 @@
           </div>
           <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
         </div>
-
-        <!-- FILTRO DE GÊNERO ATIVO (só aparece quando chegou via link, ex: "gênero predominante" do Dashboard) -->
-        <div id="generoFiltroChip" style="display:none; margin-top:-10px; margin-bottom:14px;"></div>
 
         <!-- AGRUPAMENTO -->
         <div class="col-controls" id="groupControls" style="margin-top:-14px; display:none;">
@@ -433,47 +436,6 @@ function configurarPillsFormato() {
     }
   }
 }
-
-// Vem de um link "?artista=X" ou "?genero=X" (nome de artista clicável em
-// qualquer card, gênero predominante do Dashboard, etc). O filtro precisa
-// ser de verdade — não só preencher o campo visualmente — por isso mexe
-// nas mesmas variáveis globais que aplicarFiltros() já lê.
-function configurarFiltroUrlArtistaGenero() {
-  const params = new URLSearchParams(window.location.search);
-  const artistaUrl = params.get('artista');
-  const generoUrl = params.get('genero');
-
-  if (artistaUrl) {
-    const input = document.getElementById('searchInput');
-    if (input) input.value = artistaUrl;
-  }
-
-  if (generoUrl) {
-    filtroGeneroAtivo = generoUrl;
-    const chip = document.getElementById('generoFiltroChip');
-    if (chip) {
-      chip.style.display = 'block';
-      chip.innerHTML = `
-        <span class="genero-filtro-chip">
-          Gênero: ${escapeHtml(generoUrl)}
-          <button type="button" onclick="limparFiltroGenero()" title="Remover filtro de gênero" aria-label="Remover filtro de gênero">✕</button>
-        </span>`;
-    }
-  }
-}
-
-function limparFiltroGenero() {
-  filtroGeneroAtivo = '';
-  const chip = document.getElementById('generoFiltroChip');
-  if (chip) { chip.style.display = 'none'; chip.innerHTML = ''; }
-  // Tira o parâmetro da URL sem recarregar a página, pra um refresh
-  // depois não trazer o filtro de volta.
-  const url = new URL(window.location);
-  url.searchParams.delete('genero');
-  window.history.replaceState({}, '', url);
-  aplicarFiltros();
-}
-window.limparFiltroGenero = limparFiltroGenero;
 
 function configurarBuscaTopo() {
   const input = document.getElementById('colSearchTop');
@@ -836,7 +798,6 @@ function carregarDados() {
     }
 
     let filtroFormatoAtivo = '';
-    let filtroGeneroAtivo = '';
 
     function aplicarFiltros() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -844,7 +805,6 @@ function carregarDados() {
 
       let filtrados = colecao.filter(item => {
         if (filtroFormatoAtivo && classeFormato(item.formato) !== filtroFormatoAtivo) return false;
-        if (filtroGeneroAtivo && (item.genero || '').trim().toLowerCase() !== filtroGeneroAtivo.trim().toLowerCase()) return false;
         if (!searchTerm) return true;
         const artista = (item.artista || '').toLowerCase();
         const album = (item.album || '').toLowerCase();
@@ -1039,7 +999,7 @@ function carregarDados() {
             </div>
             <div class="info">
               <div class="title">${escapeHtml(item.album) || '?'}</div>
-              <a href="colecao.html?artista=${encodeURIComponent(item.artista || '')}" class="artist artist-link" onclick="event.stopPropagation();">${escapeHtml(item.artista) || 'Artista'}</a>
+              <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
               <div class="meta">
                 <span title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem que você tem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</span>
                 ${item.preco ? `<span class="price">R$ ${item.preco}</span>` : ''}
@@ -1191,7 +1151,7 @@ function carregarDados() {
 
         html += `
           <tr>
-            <td><a href="colecao.html?artista=${encodeURIComponent(item.artista || '')}" class="row-artist-link"><strong>${escapeHtml(item.artista) || '?'}</strong></a></td>
+            <td><strong>${escapeHtml(item.artista) || '?'}</strong></td>
             <td>${escapeHtml(item.album) || '?'}</td>
             <td title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</td>
             <td><span class="format-badge ${formatClass}">${formatClass ? formatClass.charAt(0).toUpperCase() + formatClass.slice(1) : '—'}</span></td>
@@ -1661,11 +1621,17 @@ function carregarDados() {
     document.addEventListener('DOMContentLoaded', function() {
       configurarBuscaTopo();
       configurarPillsFormato();
-      configurarFiltroUrlArtistaGenero();
       setView(viewPreference);
       setGroup(groupPreference);
       verificarSessao();
     });
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
   </script>
 </body>
 </html>

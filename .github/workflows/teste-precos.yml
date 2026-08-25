@@ -1,0 +1,39 @@
+name: Teste de Preços (POC)
+
+# Só roda quando alguém clica manualmente em "Run workflow" na aba
+# Actions do GitHub — de propósito, sem agendamento. Essa POC existe
+# só pra provar que um IP de fora do PythonAnywhere consegue consultar
+# o Garimpa Vinil sem levar o bloqueio HTTP 429.
+on:
+  workflow_dispatch:
+    inputs:
+      url_disco:
+        description: 'URL do disco no Garimpa Vinil'
+        required: true
+        type: string
+      preco_alvo:
+        description: 'Preço-alvo (opcional, só pra exibir no resultado)'
+        required: false
+        type: string
+
+jobs:
+  testar-preco:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install requests beautifulsoup4
+
+      - name: Rodar o teste de preço
+        env:
+          TESTE_PRECOS_ENDPOINT: ${{ secrets.TESTE_PRECOS_ENDPOINT }}
+          TESTE_PRECOS_API_KEY: ${{ secrets.TESTE_PRECOS_API_KEY }}
+          TESTE_PRECOS_ALVO: ${{ inputs.preco_alvo }}
+        run: python scripts/teste_precos.py "${{ inputs.url_disco }}"

@@ -1259,8 +1259,6 @@
     .list-view tr:hover td {
       background: rgba(237, 232, 220, 0.03);
     }
-    .row-artist-link { color: var(--paper); text-decoration: none; transition: color 0.15s; }
-    .row-artist-link:hover, .row-artist-link:focus-visible { color: var(--terracotta); text-decoration: underline; }
     .list-view .list-actions {
       display: flex;
       gap: 6px;
@@ -2258,14 +2256,16 @@
 
     .dash-two-col { display: grid; grid-template-columns: 1.7fr 1fr; gap: 24px; }
 
-    .dash-opp-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .dash-opp-header .left h2 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .dash-opp-header .left h2 svg { width: 18px; height: 18px; stroke-width: 1.5; color: var(--terracotta); }
-    .dash-opp-header .left .sub { font-size: 12px; opacity: 0.45; margin-top: 1px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .badge-pill { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; background: var(--terracotta-wash); color: var(--terracotta); padding: 1px 8px; border-radius: 30px; border: 1px solid rgba(184, 107, 92, 0.12); white-space: nowrap; }
 
+
+
     @media (max-width: 600px) {
-      .dash-opp-header { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 780px) {
+    }
+    @media (max-width: 500px) {
     }
 
     .dash-section-title {
@@ -2302,24 +2302,14 @@
     }
     .dash-purchase-card .info { flex: 1; min-width: 0; }
     .dash-purchase-card .info .title { font-size: 13.5px; font-weight: 600; }
-    .dash-purchase-card .info .artist { font-size: 12px; opacity: 0.5; color: inherit; text-decoration: none; display: inline-block; transition: opacity 0.15s, color 0.15s; }
-    .dash-purchase-card .info .artist:hover, .dash-purchase-card .info .artist:focus-visible { opacity: 1; color: var(--terracotta); }
+    .dash-purchase-card .info .artist { font-size: 12px; opacity: 0.5; }
     .dash-purchase-card .score {
       font-weight: 700; font-size: 13px; color: var(--terracotta);
       background: var(--terracotta-wash); padding: 2px 10px; border-radius: 30px; flex-shrink: 0;
     }
 
+
     .dash-insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .dash-insight-card { background: var(--card); border-radius: 16px; padding: 16px 14px; border: 1px solid var(--card-line); }
-    .dash-insight-card-clicavel { display: block; text-decoration: none; color: var(--paper); cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
-    .dash-insight-card-clicavel:hover, .dash-insight-card-clicavel:focus-visible { border-color: var(--terracotta); }
-    .lacunas-modal-artista-link { color: inherit; text-decoration: none; transition: color 0.15s; }
-    .lacunas-modal-artista-link:hover, .lacunas-modal-artista-link:focus-visible { color: var(--terracotta); text-decoration: underline; }
-    .dash-insight-card .stat { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
-    .dash-insight-card .stat .highlight { color: var(--terracotta); }
-    .dash-insight-card .desc { font-size: 12.5px; opacity: 0.5; margin-top: 2px; }
-    .dash-insight-card .bar { width: 100%; height: 4px; background: var(--card-line); border-radius: 10px; margin-top: 10px; }
-    .dash-insight-card .bar .fill { height: 4px; background: var(--terracotta); border-radius: 10px; }
 
     .dash-wishlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .dash-wishlist-item { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--card-line); }
@@ -2666,18 +2656,6 @@
     }
     .col-filter-pills .pill.active { border-color: var(--terracotta); opacity: 1; color: var(--terracotta); }
     .col-filter-pills .pill:hover { opacity: 0.85; }
-    .genero-filtro-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      height: 30px; box-sizing: border-box;
-      background: transparent; border: 1px solid var(--terracotta); padding: 0 6px 0 12px; border-radius: 30px;
-      font-size: 11px; font-weight: 500; color: var(--terracotta); font-family: 'Inter', sans-serif;
-    }
-    .genero-filtro-chip button {
-      background: none; border: none; color: inherit; cursor: pointer; opacity: 0.7;
-      width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.15s, background 0.15s;
-    }
-    .genero-filtro-chip button:hover { opacity: 1; background: rgba(184, 107, 92, 0.15); }
     .col-sort-select {
       height: 34px; box-sizing: border-box;
       background: transparent; border: 1px solid var(--card-line); padding: 0 10px; border-radius: 30px;
@@ -2718,8 +2696,7 @@
     .album-card .art .fav-indicator { position: absolute; top: 8px; right: 8px; font-size: 14px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6)); }
     .album-card .info { padding: 10px 13px 13px 13px; }
     .album-card .info .title { font-weight: 600; font-size: 13.5px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .album-card .info .artist { font-size: 11.5px; opacity: 0.5; margin-top: 2px; color: inherit; text-decoration: none; display: inline-block; transition: opacity 0.15s, color 0.15s; }
-    .album-card .info .artist:hover, .album-card .info .artist:focus-visible { opacity: 1; color: var(--terracotta); }
+    .album-card .info .artist { font-size: 11.5px; opacity: 0.5; margin-top: 2px; }
     .album-card .info .meta {
       display: flex; justify-content: space-between; font-size: 10.5px; opacity: 0.3; margin-top: 6px;
       border-top: 1px solid var(--card-line); padding-top: 5px;
@@ -2760,13 +2737,6 @@
       padding: 8px 18px; border-radius: 30px; cursor: pointer; white-space: nowrap; transition: 0.15s ease;
     }
     .col-fix-banner .btn-fix:hover { background: var(--terracotta-wash); }
-    .btn-fix-standalone {
-      background: transparent; border: 1px solid var(--terracotta); color: var(--terracotta);
-      font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
-      padding: 9px 20px; border-radius: 30px; cursor: pointer; white-space: nowrap; transition: 0.15s ease;
-      display: block; margin: 6px auto 0;
-    }
-    .btn-fix-standalone:hover { background: var(--terracotta-wash); }
     .btn-outline-terracota {
       background: transparent; border: 1px solid var(--terracotta); color: var(--terracotta);
       font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 30px;
@@ -2884,8 +2854,6 @@
     .wl-linha-info { min-width: 140px; flex: 1 1 180px; }
     .wl-linha-album { font-size: 13px; font-weight: 600; color: var(--paper); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .wl-linha-artista { font-size: 11.5px; opacity: 0.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .wl-linha-artista-link { color: inherit; text-decoration: none; display: inline-block; max-width: 100%; transition: opacity 0.15s, color 0.15s; }
-    .wl-linha-artista-link:hover, .wl-linha-artista-link:focus-visible { opacity: 1; color: var(--terracotta); }
     .wl-linha-motivo { flex: 2 1 220px; font-size: 11.5px; opacity: 0.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: none; }
     .wl-linha-preco { flex-shrink: 0; font-size: 12px; color: var(--terracotta); white-space: nowrap; min-width: 90px; text-align: right; }
     .wl-linha-acoes { display: flex; gap: 4px; flex-shrink: 0; }
@@ -2914,8 +2882,7 @@
     }
     .wl-card .info { padding: 11px 14px 14px 14px; }
     .wl-card .info .title { font-weight: 600; font-size: 14.5px; line-height: 1.25; }
-    .wl-card .info .artist { font-size: 12.5px; opacity: 0.5; margin-top: 2px; color: inherit; text-decoration: none; display: inline-block; transition: opacity 0.15s, color 0.15s; }
-    .wl-card .info .artist:hover, .wl-card .info .artist:focus-visible { opacity: 1; color: var(--terracotta); }
+    .wl-card .info .artist { font-size: 12.5px; opacity: 0.5; margin-top: 2px; }
     .wl-card .info .meta { font-size: 11px; opacity: 0.35; margin-top: 4px; }
     .wl-card .info .note {
       font-size: 11.5px; opacity: 0.4; font-style: italic; margin-top: 6px;
@@ -2929,35 +2896,16 @@
     }
     .wl-card .info .actions button:hover { border-color: var(--terracotta); }
 
-    /* ===== LACUNAS DA COLEÇÃO (Dashboard) ===== */
-    .dash-gaps-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
-    .dash-intel-card { background: var(--card); border-radius: 12px; border: 1px solid var(--card-line); padding: 12px 14px; transition: 0.2s; }
-    .dash-intel-card-clicavel { display: block; text-decoration: none; color: inherit; cursor: pointer; }
-    .dash-intel-card-clicavel:hover { border-color: var(--terracotta); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
-    .dash-intel-card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
-    .dash-intel-card .tag { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 1px 8px; border-radius: 20px; display: inline-block; margin-bottom: 6px; }
-    .dash-intel-card .tag.best { background: rgba(107, 140, 122, 0.12); color: #6b8c7a; border: 1px solid rgba(107, 140, 122, 0.15); }
-    .dash-intel-card .tag.quase { background: rgba(201, 168, 107, 0.12); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.15); }
-    .dash-intel-card .tag.excelente { background: rgba(184, 107, 92, 0.12); color: var(--terracotta); border: 1px solid rgba(184, 107, 92, 0.15); }
-    .dash-intel-card .album { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .dash-intel-card .album .art {
-      width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
-      background-image: linear-gradient(145deg, #3a3a3a, #202020);
-      display: flex; align-items: center; justify-content: center; font-size: 11px; color: #5a5a5a;
-    }
-    .dash-intel-card .album .info { min-width: 0; }
-    .dash-intel-card .album .info .name { font-size: 13px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .dash-intel-card .album .info .artist { font-size: 10.5px; opacity: 0.4; }
-    .dash-intel-card .price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-    .dash-intel-card .price-row .current { font-size: 15px; font-weight: 700; color: var(--paper); }
-    .dash-intel-card .price-row .note { font-size: 10px; opacity: 0.4; }
+
+
+    /* ===== INTELIGÊNCIA DE PREÇO (Dashboard) ===== */
+
 
     /* ===== LACUNAS DA COLEÇÃO (Dashboard) ===== */
-    .dash-gaps-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+    .dash-gaps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
     .dash-gap-card { background: var(--card); border-radius: 12px; border: 1px solid var(--card-line); padding: 14px 14px 12px; transition: 0.2s; }
     .dash-gap-card-clicavel {
       font-family: 'Inter', sans-serif; text-align: left; cursor: pointer; width: 100%; display: block;
-      color: var(--paper);
     }
     .dash-gap-card-clicavel:hover { border-color: var(--terracotta); }
     .dash-gap-card-clicavel:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
@@ -2982,12 +2930,10 @@
     .dash-gap-card .bottom .badge.medium { background: rgba(201, 168, 107, 0.12); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.12); }
     .dash-gap-card .bottom .badge.low { background: rgba(90, 106, 122, 0.12); color: #5a6a7a; border: 1px solid rgba(90, 106, 122, 0.12); }
 
-    @media (max-width: 1400px) { .dash-gaps-grid { grid-template-columns: repeat(4, 1fr); } }
     @media (max-width: 900px) { .dash-gaps-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px) { .dash-gaps-grid { grid-template-columns: 1fr; } }
 
     .wl-gaps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .wl-price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
     .wl-gap-card, .wl-price-card { background: var(--card); border-radius: 16px; padding: 16px 14px; border: 1px solid var(--card-line); text-align: center; }
     .wl-gap-card .icon { font-size: 26px; margin-bottom: 4px; opacity: 0.5; }
     .wl-gap-card .count { font-size: 20px; font-weight: 800; color: var(--terracotta); }
@@ -2998,44 +2944,8 @@
     .wl-price-card .sub { font-size: 10.5px; opacity: 0.25; margin-top: 2px; }
 
     /* ===== OPPORTUNITY CARD (Oportunidades de compra) ===== */
-    .opp-card { background: var(--card); border-radius: 16px; border: 1px solid var(--card-line); padding: 16px 18px; transition: 0.2s; display: flex; flex-direction: column; }
-    .opp-card:hover { border-color: #3a3a3a; transform: translateY(-2px); }
-    .opp-card .album { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
-    .opp-card .album .art {
-      width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
-      background-image: linear-gradient(145deg, #3a3a3a, #202020);
-      display: flex; align-items: center; justify-content: center; font-size: 16px; color: #5a5a5a;
-    }
-    .opp-card .album .info { flex: 1; min-width: 0; }
-    .opp-card .album .info .title {
-      font-size: 14px; font-weight: 600; line-height: 1.25;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-      min-height: 2.5em;
-    }
-    .opp-card .album .info .artist { font-size: 12px; opacity: 0.4; margin-top: 2px; }
-    .opp-card .prices { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 8px; }
-    .opp-card .prices .current { font-size: 18px; font-weight: 700; color: var(--paper); white-space: nowrap; }
-    .opp-card .prices .target { font-size: 13px; opacity: 0.4; white-space: nowrap; }
-    .opp-card .prices .target span { color: var(--terracotta); opacity: 1; }
-    .opp-card .context { display: flex; gap: 14px; font-size: 11px; opacity: 0.35; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--card-line); flex-wrap: wrap; }
-    .opp-card .context .item { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-    .opp-card .bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: auto; }
-    .opp-card .bottom .badge { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-    .opp-card .bottom .badge.oportunidade { background: rgba(184, 107, 92, 0.15); color: var(--terracotta); border: 1px solid rgba(184, 107, 92, 0.25); }
-    .opp-card .bottom .badge.bom_preco { background: rgba(107, 140, 122, 0.15); color: #6b8c7a; border: 1px solid rgba(107, 140, 122, 0.25); }
-    .opp-card .bottom .badge.quase_la { background: rgba(201, 168, 107, 0.15); color: #c9a86b; border: 1px solid rgba(201, 168, 107, 0.25); }
-    .opp-card .bottom .badge.acima_do_alvo { background: rgba(90, 106, 122, 0.15); color: #8a9aac; border: 1px solid rgba(90, 106, 122, 0.25); }
-    .opp-card .bottom .action { font-size: 12px; font-weight: 500; opacity: 0.4; display: flex; align-items: center; gap: 4px; text-decoration: none; color: inherit; transition: 0.2s; white-space: nowrap; }
-    .opp-card .bottom .action:hover { opacity: 0.8; }
-    .opp-card-exemplo { opacity: 0.55; }
-    .opp-exemplo-tag {
-      flex-shrink: 0; font-size: 9.5px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; opacity: 0.7; background: var(--card-line); padding: 2px 8px; border-radius: 10px;
-      align-self: flex-start; white-space: nowrap;
-    }
 
     @media (max-width: 700px) {
-      .wl-opp-grid { grid-template-columns: 1fr; }
     }
 
     .wl-discover-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
@@ -3046,13 +2956,12 @@
     .wl-discover-item .info .artist { font-size: 11.5px; opacity: 0.4; }
 
     @media (max-width: 1000px) {
-      .wl-opp-grid { grid-template-columns: 1fr 1fr; }
       .wl-gaps-grid, .wl-discover-grid { grid-template-columns: 1fr 1fr; }
       .wl-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     }
     @media (max-width: 600px) {
       .wl-hero { flex-direction: column; align-items: flex-start; }
-      .wl-opp-grid, .wl-gaps-grid, .wl-discover-grid { grid-template-columns: 1fr; }
+      .wl-gaps-grid, .wl-discover-grid { grid-template-columns: 1fr; }
       .wl-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     }
 

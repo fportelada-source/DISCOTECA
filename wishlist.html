@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=9" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -814,9 +814,11 @@ function renderWishlistGrid(dados) {
 let lacunasAtuais = [];
 
 function corPrioridadeLacuna(prioridade) {
+  if (prioridade === 'completa') return 'complete';
   return prioridade === 'alta' ? 'high' : (prioridade === 'media' ? 'medium' : 'low');
 }
 function textoPrioridadeLacuna(prioridade) {
+  if (prioridade === 'completa') return 'Completo';
   return prioridade === 'alta' ? 'Prioridade' : (prioridade === 'media' ? 'Média' : 'Baixa');
 }
 
@@ -824,23 +826,52 @@ function renderCardLacuna(a, indice) {
   const pct = Math.round((a.possuidos / a.total) * 100);
   const corClasse = corPrioridadeLacuna(a.prioridade);
   const faltandoAgora = a.albuns.filter(x => x.status === 'faltando').length;
+  const textoFaltando = faltandoAgora === 0
+    ? `<span class="complete" id="lacuna-faltando-${indice}">0 faltando</span>`
+    : `<span class="missing" id="lacuna-faltando-${indice}">${faltandoAgora} faltando</span>`;
   return `
-    <button type="button" class="dash-gap-card dash-gap-card-clicavel" onclick="abrirModalLacunas(${indice})" aria-label="Ver álbuns faltando de ${escapeHtml(a.artista)}">
+    <div class="dash-gap-card dash-gap-card-clicavel" role="button" tabindex="0"
+         onclick="abrirModalLacunas(${indice})"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirModalLacunas(${indice});}"
+         aria-label="Ver álbuns faltando de ${escapeHtml(a.artista)}">
+      <button type="button" class="gap-remove-btn" title="Remover desta seção" aria-label="Remover ${escapeHtml(a.artista)} desta seção"
+              onclick="event.stopPropagation(); ocultarArtistaLacuna('${escapeHtml(a.artista)}', this)">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       <div class="artist">
         <span class="name-wrap"><span class="icon">◈</span> ${escapeHtml(a.artista)}</span>
         <span class="chevron"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></span>
       </div>
       <div class="count-row">
-        <span class="owned">${a.possuidos} / ${a.total} da discografia</span>
-        <span class="missing" id="lacuna-faltando-${indice}">${faltandoAgora} faltando</span>
+        <span class="owned">${a.possuidos} / ${a.total} mais populares</span>
+        ${textoFaltando}
       </div>
       <div class="track"><div class="fill ${corClasse}" style="width:${pct}%;"></div></div>
       <div class="bottom">
         <span class="badge ${corClasse}">${textoPrioridadeLacuna(a.prioridade)}</span>
       </div>
-    </button>
+    </div>
   `;
 }
+
+function ocultarArtistaLacuna(artista, btnEl) {
+  btnEl.disabled = true;
+  apiFetch(API_URL + '/lacunas_colecao/ocultar?user_id=' + usuarioId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ artista })
+  })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        buscarLacunasColecao();
+      } else {
+        btnEl.disabled = false;
+      }
+    })
+    .catch(() => { btnEl.disabled = false; });
+}
+window.ocultarArtistaLacuna = ocultarArtistaLacuna;
 
 function iconeStatusAlbum(status) {
   if (status === 'colecao') return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#6b8c7a" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -1191,8 +1222,8 @@ function renderRecomendacoes(dados) {
         <div>
           <h2 id="lacunasModalArtista" style="font-size:20px;"></h2>
           <div style="font-size:12px; opacity:0.4; margin-top:2px;">
-            Álbuns de estúdio
-            <span style="display:block; font-size:10px; opacity:0.7; margin-top:2px;">Discografia de estúdio, via MusicBrainz</span>
+            Álbuns mais populares
+            <span style="display:block; font-size:10px; opacity:0.7; margin-top:2px;">Baseado nos 5 álbuns mais populares do artista no Last.fm</span>
           </div>
         </div>
         <button class="modal-close" id="btnFecharLacunas"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>

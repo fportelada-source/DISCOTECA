@@ -239,7 +239,7 @@ function renderCardLacuna(a, indice) {
         <span class="chevron"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></span>
       </div>
       <div class="count-row">
-        <span class="owned">${a.possuidos} / ${a.total} mais populares</span>
+        <span class="owned">${a.possuidos} / ${a.total} da discografia</span>
         <span class="missing" id="lacuna-faltando-${indice}">${faltandoAgora} faltando</span>
       </div>
       <div class="track"><div class="fill ${corClasse}" style="width:${pct}%;"></div></div>
@@ -653,8 +653,8 @@ document.addEventListener('DOMContentLoaded', function() {
         <div>
           <h2 id="lacunasModalArtista" style="font-size:20px;"></h2>
           <div style="font-size:12px; opacity:0.4; margin-top:2px;">
-            Álbuns mais populares
-            <span style="display:block; font-size:10px; opacity:0.7; margin-top:2px;">Baseado nos 5 álbuns mais populares do artista no Last.fm</span>
+            Álbuns de estúdio
+            <span style="display:block; font-size:10px; opacity:0.7; margin-top:2px;">Discografia de estúdio, via MusicBrainz</span>
           </div>
         </div>
         <button class="modal-close" id="btnFecharLacunas"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>

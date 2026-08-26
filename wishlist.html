@@ -109,7 +109,7 @@
         <!-- LACUNAS DA COLEÇÃO -->
         <div class="col-section">
           <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Lacunas da coleção</h3></div>
-          <div class="wl-gaps-grid" id="wlGaps"></div>
+          <div id="wlGaps"></div>
         </div>
 
         <!-- ATIVIDADE RECENTE -->
@@ -805,23 +805,166 @@ function renderWishlistGrid(dados) {
 }
 
 // ================================================================
-// SEÇÕES AINDA SEM DADOS REAIS (arquitetura pronta, mesmo padrão do
-// Início) — trocar o corpo destas funções quando as features existirem
-// (análise de discografia completa).
+// LACUNAS DA COLEÇÃO — mesma lógica/visual da Dashboard (cache local
+// em lacunasAtuais, modal reaproveitando o padrão de modal já usado
+// no resto da Wishlist). Única diferença real: "Adicionar" aqui
+// também atualiza a lista de wishlist visível na tela, já que a
+// pessoa está literalmente olhando pra ela nesse momento.
 // ================================================================
+let lacunasAtuais = [];
+
+function corPrioridadeLacuna(prioridade) {
+  return prioridade === 'alta' ? 'high' : (prioridade === 'media' ? 'medium' : 'low');
+}
+function textoPrioridadeLacuna(prioridade) {
+  return prioridade === 'alta' ? 'Prioridade' : (prioridade === 'media' ? 'Média' : 'Baixa');
+}
+
+function renderCardLacuna(a, indice) {
+  const pct = Math.round((a.possuidos / a.total) * 100);
+  const corClasse = corPrioridadeLacuna(a.prioridade);
+  const faltandoAgora = a.albuns.filter(x => x.status === 'faltando').length;
+  return `
+    <button type="button" class="dash-gap-card dash-gap-card-clicavel" onclick="abrirModalLacunas(${indice})" aria-label="Ver álbuns faltando de ${escapeHtml(a.artista)}">
+      <div class="artist">
+        <span class="name-wrap"><span class="icon">◈</span> ${escapeHtml(a.artista)}</span>
+        <span class="chevron"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </div>
+      <div class="count-row">
+        <span class="owned">${a.possuidos} / ${a.total} da discografia</span>
+        <span class="missing" id="lacuna-faltando-${indice}">${faltandoAgora} faltando</span>
+      </div>
+      <div class="track"><div class="fill ${corClasse}" style="width:${pct}%;"></div></div>
+      <div class="bottom">
+        <span class="badge ${corClasse}">${textoPrioridadeLacuna(a.prioridade)}</span>
+      </div>
+    </button>
+  `;
+}
+
+function iconeStatusAlbum(status) {
+  if (status === 'colecao') return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#6b8c7a" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>';
+  if (status === 'wishlist') return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c9a86b" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+  return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4a4a4a" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+}
+
+function renderModalLacunasConteudo(indice) {
+  const a = lacunasAtuais[indice];
+  const el = document.getElementById('lacunasModalLista');
+  if (!a || !el) return;
+  document.getElementById('lacunasModalArtista').textContent = a.artista;
+  el.innerHTML = a.albuns.map((album, idxAlbum) => {
+    let acao;
+    if (album.status === 'colecao') {
+      acao = `<span style="font-size:10px; color:#6b8c7a; display:flex; align-items:center; gap:4px;">${iconeStatusAlbum('colecao')} Na coleção</span>`;
+    } else if (album.status === 'wishlist') {
+      acao = `<span style="font-size:10px; color:#c9a86b; display:flex; align-items:center; gap:4px;">${iconeStatusAlbum('wishlist')} Na Wishlist</span>`;
+    } else {
+      acao = `<button type="button" class="btn-outline-terracota" style="font-size:10.5px; padding:3px 10px;" id="lacuna-btn-add-${indice}-${idxAlbum}" onclick="adicionarLacunaWishlist(${indice}, ${idxAlbum}, this)"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Adicionar</button>`;
+    }
+    return `
+      <div class="dash-intel-card" style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px;">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          ${album.status !== 'faltando' ? '' : iconeStatusAlbum('faltando')}
+          <span style="font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(album.album)}</span>
+        </div>
+        <div id="lacuna-acao-${indice}-${idxAlbum}" style="flex-shrink:0;">${acao}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function abrirModalLacunas(indice) {
+  renderModalLacunasConteudo(indice);
+  const modal = document.getElementById('modalLacunas');
+  modal.dataset.indiceAtual = indice;
+  modal.classList.add('open');
+}
+window.abrirModalLacunas = abrirModalLacunas;
+
+function fecharModalLacunas() {
+  document.getElementById('modalLacunas').classList.remove('open');
+}
+
+function adicionarLacunaWishlist(indice, idxAlbum, btnEl) {
+  const a = lacunasAtuais[indice];
+  const album = a.albuns[idxAlbum];
+  if (!album || album.status !== 'faltando') return;
+
+  btnEl.disabled = true;
+  btnEl.textContent = 'Adicionando...';
+
+  apiFetch(API_URL + '/adicionar_recomendacao?user_id=' + usuarioId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ artista: a.artista, album: album.album, tier: 'B', notas: 'Álbum popular do artista, ainda fora da coleção' })
+  })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.sucesso) {
+        btnEl.disabled = false;
+        btnEl.textContent = 'Adicionar';
+        return;
+      }
+      album.status = 'wishlist';
+      const acaoEl = document.getElementById(`lacuna-acao-${indice}-${idxAlbum}`);
+      if (acaoEl) acaoEl.innerHTML = `<span style="font-size:10px; color:#c9a86b; display:flex; align-items:center; gap:4px;">${iconeStatusAlbum('wishlist')} Na Wishlist</span>`;
+
+      const faltandoAgora = a.albuns.filter(x => x.status === 'faltando').length;
+      const badgeFaltando = document.getElementById(`lacuna-faltando-${indice}`);
+      if (badgeFaltando) badgeFaltando.textContent = `${faltandoAgora} faltando`;
+
+      // Diferente da Dashboard: aqui a pessoa está OLHANDO a wishlist —
+      // atualiza a lista visível na tela também, sem precisar recarregar.
+      carregarDados();
+    })
+    .catch(() => {
+      btnEl.disabled = false;
+      btnEl.textContent = 'Adicionar';
+    });
+}
+window.adicionarLacunaWishlist = adicionarLacunaWishlist;
+
+document.addEventListener('DOMContentLoaded', function() {
+  const modalLacunas = document.getElementById('modalLacunas');
+  const btnFecharLacunas = document.getElementById('btnFecharLacunas');
+  if (btnFecharLacunas) btnFecharLacunas.addEventListener('click', fecharModalLacunas);
+  if (modalLacunas) modalLacunas.addEventListener('click', function(e) { if (e.target === this) fecharModalLacunas(); });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modalLacunas && modalLacunas.classList.contains('open')) fecharModalLacunas();
+  });
+});
+
 function buscarLacunasColecao() {
-  return Promise.resolve([]);
+  const el = document.getElementById('wlGaps');
+  if (!el) return Promise.resolve([]);
+  el.innerHTML = `<div class="dash-placeholder-note">Analisando lacunas...</div>`;
+  return apiFetch(API_URL + '/lacunas_colecao?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(d => {
+      if (!d.sucesso) {
+        el.innerHTML = `<div class="dash-placeholder-note">Não deu pra analisar lacunas agora. Tenta de novo mais tarde.</div>`;
+        return [];
+      }
+      if (!Array.isArray(d.artistas) || d.artistas.length === 0) {
+        el.innerHTML = `<div class="dash-placeholder-note">Sua coleção está em dia por aqui. Não encontramos lacunas relevantes entre os artistas analisados.</div>`;
+        return [];
+      }
+      lacunasAtuais = d.artistas;
+      el.innerHTML = `<div class="dash-gaps-grid">${d.artistas.map((a, i) => renderCardLacuna(a, i)).join('')}</div>`;
+      return d.artistas;
+    })
+    .catch(() => {
+      el.innerHTML = `<div class="dash-placeholder-note">Erro ao analisar lacunas. Tenta recarregar a página.</div>`;
+      return [];
+    });
 }
 function buscarDescobertasWishlist() {
   return Promise.resolve([]);
 }
 
 function renderSecoesPlaceholder() {
-  buscarLacunasColecao().then(lista => {
-    const el = document.getElementById('wlGaps');
-    if (!el) return;
-    el.innerHTML = '<div class="pp-empty-note">Análise de lacunas depende das trilogias e discografias completas — planejado pra frente.</div>';
-  });
+  buscarLacunasColecao();
 
   buscarDescobertasWishlist().then(lista => {
     const el = document.getElementById('wlDescobrir');
@@ -1041,5 +1184,23 @@ function renderRecomendacoes(dados) {
       });
     }
   </script>
+  <!-- MODAL: Lacunas da coleção — mesmo padrão já usado na Dashboard -->
+  <div class="modal-overlay" id="modalLacunas">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="lacunasModalArtista" style="font-size:20px;"></h2>
+          <div style="font-size:12px; opacity:0.4; margin-top:2px;">
+            Álbuns de estúdio
+            <span style="display:block; font-size:10px; opacity:0.7; margin-top:2px;">Discografia de estúdio, via MusicBrainz</span>
+          </div>
+        </div>
+        <button class="modal-close" id="btnFecharLacunas"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <hr style="border:none; border-top:1px solid var(--card-line); margin:12px 0 14px;" />
+      <div id="lacunasModalLista" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+  </div>
+
 </body>
 </html>

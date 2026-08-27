@@ -106,6 +106,12 @@
         <!-- ===== WISHLIST GRID ===== -->
         <div id="compras-container"></div>
 
+        <!-- DESCOBERTAS (Adjacent Discovery) -->
+        <div class="col-section">
+          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg> Descobertas</h3></div>
+          <div id="wlDescobertas"></div>
+        </div>
+
         <!-- LACUNAS DA COLEÇÃO -->
         <div class="col-section">
           <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Lacunas da coleção</h3></div>
@@ -116,12 +122,6 @@
         <div class="col-section">
           <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Atividade recente</h3></div>
           <div id="wlAtividade"></div>
-        </div>
-
-        <!-- DESCOBRIR -->
-        <div class="col-section">
-          <div class="col-section-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg> Descobrir</h3></div>
-          <div class="wl-discover-grid" id="wlDescobrir"></div>
         </div>
 
       </div>
@@ -1010,18 +1010,77 @@ function buscarLacunasColecao() {
       return [];
     });
 }
-function buscarDescobertasWishlist() {
-  return Promise.resolve([]);
+function renderCardDescoberta(item) {
+  return `
+    <div class="wl-card">
+      <div class="art" style="background-color:${getCorFallbackWishlist(item.artista)};">
+        <span class="priority-badge" style="background:${corTierWishlist(item.tier)};">${item.tier}</span>
+        <div class="art-fallback" style="opacity:0.6; font-size:11px; text-align:center; padding:0 8px;">${escapeHtml(item.artista) || '?'}<br>${escapeHtml(item.album) || '?'}</div>
+      </div>
+      <div class="info">
+        <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
+        <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
+        ${item.nota ? `<div class="note">"${escapeHtml(item.nota)}"</div>` : ''}
+        <div class="actions">
+          <button onclick="confirmarDescoberta(${item.id}, this)" title="Adicionar à wishlist"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button onclick="dispensarDescoberta(${item.id}, this)" title="Não recomendar mais"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+      </div>
+    </div>
+  `;
 }
+
+function buscarDescobertas() {
+  const el = document.getElementById('wlDescobertas');
+  if (!el) return;
+  apiFetch(API_URL + '/descobertas?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(lista => {
+      if (!Array.isArray(lista) || lista.length === 0) {
+        el.innerHTML = '<div class="pp-empty-note">Nenhuma descoberta ainda — clique em "Atualizar" pra procurar artista novo parecido com o que você já curte.</div>';
+        return;
+      }
+      el.innerHTML = `<div class="wl-grid">${lista.map(renderCardDescoberta).join('')}</div>`;
+    })
+    .catch(() => {
+      el.innerHTML = '<div class="pp-empty-note">Erro ao buscar descobertas.</div>';
+    });
+}
+
+function confirmarDescoberta(id, btnEl) {
+  btnEl.disabled = true;
+  apiFetch(API_URL + `/descobertas/${id}/adicionar?user_id=${usuarioId}`, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        buscarDescobertas();
+        carregarDados(); // a wishlist normal ganhou um item novo — atualiza os tiers também
+      } else {
+        btnEl.disabled = false;
+      }
+    })
+    .catch(() => { btnEl.disabled = false; });
+}
+window.confirmarDescoberta = confirmarDescoberta;
+
+function dispensarDescoberta(id, btnEl) {
+  btnEl.disabled = true;
+  apiFetch(API_URL + `/descobertas/${id}/dispensar?user_id=${usuarioId}`, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.sucesso) {
+        buscarDescobertas();
+      } else {
+        btnEl.disabled = false;
+      }
+    })
+    .catch(() => { btnEl.disabled = false; });
+}
+window.dispensarDescoberta = dispensarDescoberta;
 
 function renderSecoesPlaceholder() {
   buscarLacunasColecao();
-
-  buscarDescobertasWishlist().then(lista => {
-    const el = document.getElementById('wlDescobrir');
-    if (!el) return;
-    el.innerHTML = '<div class="pp-empty-note">Motor de recomendação por similaridade ainda não existe — planejado pra frente.</div>';
-  });
+  buscarDescobertas();
 }
 
 function renderAtividadeWishlist(dados) {

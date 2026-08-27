@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -211,12 +211,13 @@ function verificarSessao() {
 }
 
 // ================================================================
-// SEÇÃO AINDA SEM DADO REAL (arquitetura pronta pra V0.11+)
-// Trocar o corpo desta função quando o motor de descoberta existir —
-// o resto do dashboard não precisa mudar.
+// DESCOBRIR — itens que vieram do Adjacent Discovery (artista novo,
+// que a pessoa ainda não conhecia, sugerido por parecer com o que
+// ela já curte). Não é uma busca própria — o dado já vem junto com
+// a Wishlist normal (/recomendacoes), só filtra pela marcação.
 // ================================================================
-function buscarDescobertas() {
-  return Promise.resolve([]);
+function filtrarDescobertas(wishlist) {
+  return (wishlist || []).filter(item => (item.motivos_extra || '').includes('adjacent_discovery'));
 }
 
 let lacunasAtuais = [];
@@ -606,13 +607,6 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       </div>
     `;
   }
-  html += `
-    <div class="dash-insight-card">
-      <div class="stat"><span class="highlight">em breve</span></div>
-      <div class="desc">discografias completas</div>
-      <div class="dash-placeholder-note">Depende das trilogias (V0.10+)</div>
-    </div>
-  `;
   html += `</div></div>`;
 
   html += `<div><div class="dash-section-title">Wishlist <a href="wishlist.html" class="see-all">ver tudo</a></div><div class="dash-wishlist-grid">`;
@@ -659,21 +653,34 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   }
   html += `</div></div>`;
 
-  html += `<div><div class="dash-section-title">Descobrir</div><div id="dashDescobrir" class="dash-discover-grid"></div></div>`;
+  const descobertas = filtrarDescobertas(wishlist);
+  html += `<div><div class="dash-section-title">Descobrir</div><div id="dashDescobrir" class="dash-discover-grid">`;
+  if (descobertas.length > 0) {
+    descobertas.slice(0, 3).forEach((item, idx) => {
+      const coverStyle = item.capa_url ? `background-image:url('${escapeHtml(item.capa_url)}');` : `background:${corTier(item.tier)};`;
+      html += `
+        <div class="dash-wishlist-item">
+          <div class="cover" id="dashDescobrir-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">
+            <span class="priority" style="background:${corTier(item.tier)};">${item.tier}</span>
+            <span class="fallback-icon">${item.capa_url ? '' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg>'}</span>
+          </div>
+          <div class="info">
+            <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
+            <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    html += `<div class="dash-placeholder-note">Nenhuma descoberta ainda — aparece aqui quando a próxima geração de recomendações achar um artista novo parecido com o que você já curte.</div>`;
+  }
+  html += `</div></div>`;
   html += `</div>`;
 
   document.getElementById('dashContent').innerHTML = html;
   carregarCapasFaltantesDashboard();
 
   buscarLacunasColecao();
-
-  buscarDescobertas().then(lista => {
-    const el = document.getElementById('dashDescobrir');
-    if (!el) return;
-    if (lista.length === 0) {
-      el.innerHTML = '<div class="dash-placeholder-note">Motor de descoberta ainda não existe — planejado pra frente.</div>';
-    }
-  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {

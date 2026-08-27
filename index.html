@@ -7,10 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Discoteca" />
@@ -577,6 +580,15 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
         <div class="stat"><span class="highlight">${stats.genero_predominante_pct}%</span> ${stats.genero_predominante}</div>
         <div class="desc">seu gênero predominante</div>
         <div class="bar"><div class="fill" style="width:${stats.genero_predominante_pct}%;"></div></div>
+      </div>
+    `;
+  }
+  if (stats.formato_predominante) {
+    html += `
+      <div class="dash-insight-card">
+        <div class="stat"><span class="highlight">${stats.formato_predominante_pct}%</span> ${stats.formato_predominante}</div>
+        <div class="desc">seu formato favorito</div>
+        <div class="bar"><div class="fill" style="width:${stats.formato_predominante_pct}%;"></div></div>
       </div>
     `;
   }

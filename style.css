@@ -2309,7 +2309,8 @@
     }
 
 
-    .dash-insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .dash-insights-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .dash-insights-grid .dash-insight-card { flex: 1 1 200px; }
     .dash-insight-card { background: var(--card); border: 1px solid var(--card-line); border-radius: 14px; padding: 16px 18px; }
     .dash-insight-card .stat { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
     .dash-insight-card .stat .highlight { color: var(--terracotta); }
@@ -2367,14 +2368,12 @@
       .dash-two-col { grid-template-columns: 1fr; }
       .dash-wishlist-grid { grid-template-columns: 1fr 1fr; }
       .dash-discover-grid { grid-template-columns: 1fr 1fr; }
-      .dash-insights-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 600px) {
       .dash-hero { flex-direction: column; align-items: flex-start; }
       .dash-hero .cover { width: 100%; height: 160px; }
       .dash-wishlist-grid { grid-template-columns: 1fr; }
       .dash-discover-grid { grid-template-columns: 1fr; }
-      .dash-insights-grid { grid-template-columns: 1fr; }
       .app-topbar .search { width: 100%; }
     }
 

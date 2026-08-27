@@ -2309,7 +2309,7 @@
     }
 
 
-    .dash-insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .dash-insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
     .dash-insight-card { background: var(--card); border: 1px solid var(--card-line); border-radius: 14px; padding: 16px 18px; }
     .dash-insight-card .stat { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
     .dash-insight-card .stat .highlight { color: var(--terracotta); }

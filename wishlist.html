@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=13" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -1013,12 +1013,13 @@ function buscarLacunasColecao() {
       return [];
     });
 }
-function renderCardDescoberta(item) {
+function renderCardDescoberta(item, idx) {
+  const id = `descoberta-${idx}`;
   return `
     <div class="wl-card">
-      <div class="art" style="background-color:${getCorFallbackWishlist(item.artista)};">
+      <div class="art" id="art-${id}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallbackWishlist(item.artista)};">
         <span class="priority-badge" style="background:${corTierWishlist(item.tier)};">${item.tier}</span>
-        <div class="art-fallback" style="opacity:0.6; font-size:11px; text-align:center; padding:0 8px;">${escapeHtml(item.artista) || '?'}<br>${escapeHtml(item.album) || '?'}</div>
+        <div class="art-fallback" id="fallback-${id}" style="opacity:0.6; font-size:11px; text-align:center; padding:0 8px;">${escapeHtml(item.artista) || '?'}<br>${escapeHtml(item.album) || '?'}</div>
       </div>
       <div class="info">
         <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
@@ -1044,6 +1045,9 @@ function buscarDescobertas() {
         return;
       }
       el.innerHTML = `<div class="wl-grid">${lista.map(renderCardDescoberta).join('')}</div>`;
+      lista.forEach((item, idx) => {
+        carregarCapa(item, 'art-descoberta-' + idx, 'fallback-descoberta-' + idx);
+      });
     })
     .catch(() => {
       el.innerHTML = '<div class="pp-empty-note">Erro ao buscar descobertas.</div>';

@@ -2309,8 +2309,11 @@
     }
 
 
-    .dash-insights-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-    .dash-insights-grid .dash-insight-card { flex: 1 1 200px; }
+    .dash-insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    /* Card sozinho na última linha (sobra ímpar) ocupa a largura toda
+       de propósito — decisão de layout, não acidente. Com número par
+       de cards (ex: 4 hoje), isso nunca entra em ação e fica 2×2 puro. */
+    .dash-insights-grid .dash-insight-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
     .dash-insight-card { background: var(--card); border: 1px solid var(--card-line); border-radius: 14px; padding: 16px 18px; }
     .dash-insight-card .stat { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
     .dash-insight-card .stat .highlight { color: var(--terracotta); }
@@ -2374,6 +2377,7 @@
       .dash-hero .cover { width: 100%; height: 160px; }
       .dash-wishlist-grid { grid-template-columns: 1fr; }
       .dash-discover-grid { grid-template-columns: 1fr; }
+      .dash-insights-grid { grid-template-columns: 1fr; }
       .app-topbar .search { width: 100%; }
     }
 
@@ -2762,6 +2766,7 @@
     .col-insight-card .value .sub { font-size: 13px; font-weight: 400; opacity: 0.4; }
     .col-insight-card .label { font-size: 11px; opacity: 0.4; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
     .col-insight-card .label .highlight { color: var(--terracotta); opacity: 1; }
+    .col-insight-card .insight-album-name { font-size: 10.5px; opacity: 0.35; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .col-fav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 

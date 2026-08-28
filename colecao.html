@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="stylesheet" href="style.css?v=14" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -704,7 +704,7 @@ function carregarDados() {
       const comPreco = colecao.filter(d => d.preco);
       if (comPreco.length > 0) {
         const maisCaro = comPreco.reduce((max, d) => (d.preco > max.preco ? d : max), comPreco[0]);
-        html += `<div class="col-insight-card"><div class="value">R$ ${maisCaro.preco}</div><div class="label">mais valioso <span class="highlight">${escapeHtml(maisCaro.album)}</span></div></div>`;
+        html += `<div class="col-insight-card"><div class="value">R$ ${maisCaro.preco}</div><div class="label">mais valioso</div><div class="insight-album-name">${escapeHtml(maisCaro.album)}</div></div>`;
       }
 
       el.innerHTML = html || '<div class="pp-empty-note">Sem dados suficientes ainda.</div>';

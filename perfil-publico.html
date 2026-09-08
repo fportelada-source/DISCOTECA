@@ -275,7 +275,6 @@ function apiFetch(url, opcoes = {}) {
       if (data.valor_total) {
         html += `<div class="pp-highlight-card"><div class="value">R$ ${data.valor_total}</div><div class="label">valor da coleção</div><div class="sub">estimado</div></div>`;
       }
-      html += `<div class="pp-highlight-card"><div class="value">em breve</div><div class="label">completude</div><div class="sub">discografias completas</div></div>`;
       html += `</div></div>`;
 
       html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Linha do tempo</h2></div><div class="pp-timeline">`;

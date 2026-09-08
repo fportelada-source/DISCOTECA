@@ -442,33 +442,47 @@ function carregarCapasFaltantesDashboard() {
     if (el.dataset.hasCapa) return; // já tem capa
     const artista = el.dataset.artista;
     const album = el.dataset.album;
+    const id = el.dataset.id;
+    const tipo = el.dataset.tipo; // 'recomendacao' — tudo que aparece aqui vem da wishlist
     if (!artista || !album) return;
 
-    function aplicar(url) {
+    function salvarCapaEncontrada(url) {
+      // Grava no banco pra nunca mais precisar buscar de novo — evita
+      // a lentidão de buscar ao vivo toda vez que o Dashboard carrega.
+      if (!id || tipo !== 'recomendacao') return;
+      apiFetch(API_URL + `/recomendacoes/${id}/atualizar_capa?user_id=${usuarioId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ capa_url: url })
+      }).catch(() => {});
+    }
+
+    function aplicar(url, encontradaAgora) {
       el.style.backgroundImage = `url('${url}')`;
       el.style.backgroundSize = 'cover';
       el.style.backgroundPosition = 'center';
       const icone = el.querySelector('.fallback-icon');
       if (icone) icone.style.display = 'none';
       else el.textContent = '';
+      if (encontradaAgora) salvarCapaEncontrada(url);
     }
 
     apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
       .then(r => r.json())
       .then(d => {
         if (d.sucesso && d.capa_url) {
-          aplicar(d.capa_url);
+          aplicar(d.capa_url, true);
         } else {
           console.warn('[Dashboard] Discogs sem capa para', artista, '-', album, '— tentando Last.fm');
           getCoverUrlLastfm(artista, album).then(url => {
-            if (url) aplicar(url);
+            if (url) aplicar(url, true);
             else console.warn('[Dashboard] Last.fm também sem capa para', artista, '-', album);
           });
         }
       })
       .catch(err => {
         console.warn('[Dashboard] /buscar_capa falhou para', artista, '-', album, err, '— tentando Last.fm');
-        getCoverUrlLastfm(artista, album).then(url => { if (url) aplicar(url); });
+        getCoverUrlLastfm(artista, album).then(url => { if (url) aplicar(url, true); });
       });
   });
 }
@@ -509,7 +523,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
     const capaHero = hero.capa_url ? `style="background-image:url('${escapeHtml(hero.capa_url)}'); background-size:cover; background-position:center;"` : '';
     html += `
       <div class="dash-hero">
-        <div class="cover" id="dashHeroCover" data-artista="${escapeHtml(hero.artista || '')}" data-album="${escapeHtml(hero.album || '')}"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'}</div>
+        <div class="cover" id="dashHeroCover" data-artista="${escapeHtml(hero.artista || '')}" data-album="${escapeHtml(hero.album || '')}" data-id="${hero.id || ''}" data-tipo="recomendacao"${hero.capa_url ? ' data-has-capa="1"' : ''} ${capaHero}>${hero.capa_url ? '' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'}</div>
         <div class="info">
           <div class="badge"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Prioridade ${hero.tier}</div>
           <h2>${escapeHtml(hero.album) || 'Álbum'}</h2>
@@ -545,7 +559,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       const thumbStyle = item.capa_url ? `background-image:url('${escapeHtml(item.capa_url)}');` : `background:${corTier(item.tier)};`;
       html += `
         <div class="dash-purchase-card">
-          <div class="thumb" id="dashPurchase-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${thumbStyle}"></div>
+          <div class="thumb" id="dashPurchase-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}" data-tipo="recomendacao"${item.capa_url ? ' data-has-capa="1"' : ''} style="${thumbStyle}"></div>
           <div class="info">
             <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
             <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
@@ -619,7 +633,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       const coverStyle = item.capa_url ? `background-image:url('${escapeHtml(item.capa_url)}');` : `background:${corTier(item.tier)};`;
       html += `
         <div class="dash-wishlist-item">
-          <div class="cover" id="dashWish-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">
+          <div class="cover" id="dashWish-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}" data-tipo="recomendacao"${item.capa_url ? ' data-has-capa="1"' : ''} style="${coverStyle}">
             <span class="priority" style="background:${corTier(item.tier)};">${item.tier}</span>
             <span class="fallback-icon">${item.capa_url ? '' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg>'}</span>
           </div>

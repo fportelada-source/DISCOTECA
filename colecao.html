@@ -720,7 +720,7 @@ function carregarDados() {
       if (recentes.length === 0) { el.innerHTML = '<div class="pp-empty-note">Nenhuma adição ainda.</div>'; return; }
       el.innerHTML = recentes.map((item, idx) => `
         <div class="pp-recent-item">
-          <div class="cover" id="rec-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+          <div class="cover" id="rec-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
             <span class="fallback-icon">◈</span>
           </div>
           <div class="info">
@@ -740,7 +740,7 @@ function carregarDados() {
       if (favoritos.length === 0) { el.innerHTML = '<div class="pp-empty-note">Marque discos como favoritos (no modal de edição) pra vê-los aqui.</div>'; return; }
       el.innerHTML = favoritos.slice(0, 8).map((item, idx) => `
         <div class="pp-fav-item">
-          <div class="cover" id="fav-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+          <div class="cover" id="fav-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
             <span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg></span>
           </div>
           <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
@@ -754,7 +754,7 @@ function carregarDados() {
       if (!el) return;
       if (colecao.length === 0) { el.innerHTML = '<div class="pp-empty-note">Prateleira vazia.</div>'; return; }
       el.innerHTML = colecao.slice(0, 24).map((item, idx) => `
-        <div class="pp-shelf-item" id="shelf-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
+        <div class="pp-shelf-item" id="shelf-art-${idx}" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} style="background-color:${getCorFallback(item.artista)};">
           <span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg></span>
         </div>
       `).join('');
@@ -781,24 +781,38 @@ function carregarDados() {
     function carregarCapasGenericas(container) {
       const itens = container.querySelectorAll('[data-artista][data-album]');
       itens.forEach(el => {
-        const artista = el.dataset.artista, album = el.dataset.album, capaSalva = el.dataset.capa;
+        const artista = el.dataset.artista, album = el.dataset.album, capaSalva = el.dataset.capa, discoId = el.dataset.id;
         if (!artista || !album) return;
         const fallback = el.querySelector('.fallback-icon');
-        function aplicar(url) {
+
+        function salvarCapaEncontrada(url) {
+          // Grava no banco pra nunca mais precisar buscar de novo —
+          // sem isso, "Adicionados recentemente"/Favoritos/Prateleira
+          // buscavam capa ao vivo toda vez que a página carregava.
+          if (!discoId) return;
+          apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa?user_id=${usuarioId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ capa_url: url })
+          }).catch(() => {});
+        }
+
+        function aplicar(url, encontradaAgora) {
           el.style.backgroundImage = `url('${url}')`;
           el.style.backgroundSize = 'cover';
           el.style.backgroundPosition = 'center';
           if (fallback) fallback.style.display = 'none';
+          if (encontradaAgora) salvarCapaEncontrada(url);
         }
-        if (capaSalva) { aplicar(capaSalva); return; }
+        if (capaSalva) { aplicar(capaSalva, false); return; }
         apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
           .then(r => r.json())
           .then(d => {
-            if (d.sucesso && d.capa_url) aplicar(d.capa_url);
-            else getCoverUrlLastfmCol(artista, album).then(url => { if (url) aplicar(url); });
+            if (d.sucesso && d.capa_url) aplicar(d.capa_url, true);
+            else getCoverUrlLastfmCol(artista, album).then(url => { if (url) aplicar(url, true); });
           })
           .catch(() => {
-            getCoverUrlLastfmCol(artista, album).then(url => { if (url) aplicar(url); });
+            getCoverUrlLastfmCol(artista, album).then(url => { if (url) aplicar(url, true); });
           });
       });
     }
@@ -1056,12 +1070,13 @@ function carregarDados() {
         const artista = card.dataset.artista;
         const album = card.dataset.album;
         const capaSalva = card.dataset.capa;
+        const discoId = card.dataset.id;
         const artWrap = card.querySelector('.art');
         const fallback = card.querySelector('.art-fallback');
         if (artista && album && artWrap && fallback) {
           const artId = artWrap.id;
           const fallbackId = fallback.id;
-          setTimeout(() => carregarCapaColecao(artista, album, capaSalva, artId, fallbackId), 100);
+          setTimeout(() => carregarCapaColecao(artista, album, capaSalva, artId, fallbackId, discoId), 100);
         }
       });
     }
@@ -1200,7 +1215,7 @@ function carregarDados() {
       }
     }
 
-    async function fetchAlbumArt(artist, album, artId, fallbackId) {
+    async function fetchAlbumArt(artist, album, artId, fallbackId, discoId) {
       const artWrap = document.getElementById(artId);
       const fallback = document.getElementById(fallbackId);
       if (!artWrap) return;
@@ -1218,6 +1233,13 @@ function carregarDados() {
               artWrap.style.backgroundPosition = 'center';
               artWrap.classList.add('has-image');
               if (fallback) fallback.style.opacity = '0';
+              if (discoId) {
+                apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa?user_id=${usuarioId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ capa_url: url })
+                }).catch(() => {});
+              }
               resolve();
             };
             img.onerror = () => {
@@ -1236,12 +1258,24 @@ function carregarDados() {
 
     // Prioriza a capa do Discogs (sem crop forçado) já salva no disco; se
     // não tiver, tenta buscar ao vivo; só usa Last.fm como último recurso.
-    function carregarCapaColecao(artista, album, capaSalva, artId, fallbackId) {
+    function carregarCapaColecao(artista, album, capaSalva, artId, fallbackId, discoId) {
       const artWrap = document.getElementById(artId);
       const fallback = document.getElementById(fallbackId);
       if (!artWrap) return;
 
-      function aplicar(url) {
+      function salvarCapaEncontrada(url) {
+        // Grava no banco pra nunca mais precisar buscar esse disco de
+        // novo — é isso que evita a lentidão de buscar ao vivo toda
+        // vez que a página carrega.
+        if (!discoId) return;
+        apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa?user_id=${usuarioId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ capa_url: url })
+        }).catch(() => {});
+      }
+
+      function aplicar(url, encontradaAgora) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
@@ -1250,6 +1284,7 @@ function carregarDados() {
           artWrap.style.backgroundPosition = 'center';
           artWrap.classList.add('has-image');
           if (fallback) fallback.style.opacity = '0';
+          if (encontradaAgora) salvarCapaEncontrada(url);
         };
         img.onerror = () => {
           if (fallback) fallback.style.opacity = '0.8';
@@ -1258,17 +1293,17 @@ function carregarDados() {
       }
 
       if (capaSalva) {
-        aplicar(capaSalva);
+        aplicar(capaSalva, false);
         return;
       }
 
       apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
         .then(r => r.json())
         .then(d => {
-          if (d.sucesso && d.capa_url) aplicar(d.capa_url);
-          else fetchAlbumArt(artista, album, artId, fallbackId);
+          if (d.sucesso && d.capa_url) aplicar(d.capa_url, true);
+          else fetchAlbumArt(artista, album, artId, fallbackId, discoId);
         })
-        .catch(() => fetchAlbumArt(artista, album, artId, fallbackId));
+        .catch(() => fetchAlbumArt(artista, album, artId, fallbackId, discoId));
     }
 
     function atualizarBotaoFavoritar() {

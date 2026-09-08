@@ -187,7 +187,6 @@
       </div>
       <form id="form-adicionar">
         <input type="hidden" id="campo-id" value="">
-        <input type="hidden" id="campo-ano" value="">
         <input type="hidden" id="campo-favorito" value="0">
         <div class="form-grid">
 
@@ -203,7 +202,7 @@
                 <input type="text" id="campo-album" placeholder="Ex: Master of Puppets" required>
               </div>
             </div>
-            <div class="form-row" style="margin-top:10px;">
+            <div class="form-row three" style="margin-top:10px;">
               <div class="form-group">
                 <label>Formato</label>
                 <select id="campo-formato">
@@ -217,6 +216,10 @@
                   <option value="DVD">DVD</option>
                   <option value="Blu-ray">Blu-ray</option>
                 </select>
+              </div>
+              <div class="form-group">
+                <label>Ano</label>
+                <input type="number" id="campo-ano" placeholder="Ex: 1988" min="1900" max="2100" step="1">
               </div>
               <div class="form-group">
                 <label>Preço (R$)</label>

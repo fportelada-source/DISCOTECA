@@ -493,7 +493,7 @@ async function getCoverUrl(artist, album) {
   }
 }
 
-async function fetchAlbumArt(artist, album, artId, fallbackId) {
+async function fetchAlbumArt(artist, album, artId, fallbackId, recId) {
   const artWrap = document.getElementById(artId);
   const fallback = document.getElementById(fallbackId);
   if (!artWrap) return;
@@ -511,6 +511,13 @@ async function fetchAlbumArt(artist, album, artId, fallbackId) {
           artWrap.style.backgroundPosition = 'center';
           artWrap.classList.add('has-image');
           if (fallback) fallback.style.opacity = '0';
+          if (recId) {
+            apiFetch(API_URL + `/recomendacoes/${recId}/atualizar_capa?user_id=${usuarioId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ capa_url: url })
+            }).catch(() => {});
+          }
           resolve();
         };
         img.onerror = () => {
@@ -534,7 +541,18 @@ function carregarCapa(item, artId, fallbackId) {
   const fallback = document.getElementById(fallbackId);
   if (!artWrap) return;
 
-  function aplicar(url) {
+  function salvarCapaEncontrada(url) {
+    // Grava no banco pra nunca mais buscar essa capa de novo — evita
+    // a lentidão de sair buscando ao vivo toda vez que a Wishlist carrega.
+    if (!item.id) return;
+    apiFetch(API_URL + `/recomendacoes/${item.id}/atualizar_capa?user_id=${usuarioId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ capa_url: url })
+    }).catch(() => {});
+  }
+
+  function aplicar(url, encontradaAgora) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
@@ -543,6 +561,7 @@ function carregarCapa(item, artId, fallbackId) {
       artWrap.style.backgroundPosition = 'center';
       artWrap.classList.add('has-image');
       if (fallback) fallback.style.opacity = '0';
+      if (encontradaAgora) salvarCapaEncontrada(url);
     };
     img.onerror = () => {
       if (fallback) fallback.style.opacity = '0.8';
@@ -551,17 +570,17 @@ function carregarCapa(item, artId, fallbackId) {
   }
 
   if (item.capa_url) {
-    aplicar(item.capa_url);
+    aplicar(item.capa_url, false);
     return;
   }
 
   apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(item.artista)}&album=${encodeURIComponent(item.album)}`)
     .then(r => r.json())
     .then(d => {
-      if (d.sucesso && d.capa_url) aplicar(d.capa_url);
-      else fetchAlbumArt(item.artista, item.album, artId, fallbackId);
+      if (d.sucesso && d.capa_url) aplicar(d.capa_url, true);
+      else fetchAlbumArt(item.artista, item.album, artId, fallbackId, item.id);
     })
-    .catch(() => fetchAlbumArt(item.artista, item.album, artId, fallbackId));
+    .catch(() => fetchAlbumArt(item.artista, item.album, artId, fallbackId, item.id));
 }
 
 // Busca o ano de lançamento (via Discogs, mesmo endpoint usado na Coleção)

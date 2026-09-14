@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=14" />
+  <link rel="stylesheet" href="style.css?v=15" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -69,6 +69,7 @@
           <a href="wishlist.html" title="Wishlist"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> <span class="badge-count" id="navWishlistCount" style="display:none;">0</span></a>
           <a href="colecao.html" title="Coleção"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></a>
           <a href="estatisticas.html" title="Estatísticas"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></a>
+          <a href="radar-musical.html" title="Radar Musical"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="3" x2="12" y2="7"/></svg></a>
           <a href="importar.html" class="active" title="Importar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></a>
           <a href="perfil.html" title="Configurações"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>
         </nav>
@@ -228,23 +229,6 @@
       </div>
     </div>
   </div><!-- /appScreen -->
-
-  <!-- ===== MODAL: AJUSTE FINO ===== -->
-  <div class="modal-overlay" id="modalAjusteFino">
-    <div class="modal" style="max-width:560px;">
-      <div class="modal-header">
-        <h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Ajuste Fino</h2>
-        <button class="modal-close" id="btnFecharAjusteFino"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <p style="font-size:13px; opacity:0.7; margin-bottom:20px;">Isso ajuda o algoritmo a acertar melhor suas prioridades.</p>
-      <div id="ajusteFinoContainer"></div>
-      <div style="display:flex; gap:12px; margin-top:24px;">
-        <button class="btn-confirm-cancel" id="btnPularAjusteFino">Pular</button>
-        <button class="form-btn" id="btnSalvarAjusteFino" style="margin:0;">Salvar Ajuste</button>
-      </div>
-      <div class="form-msg" id="ajuste-fino-msg"></div>
-    </div>
-  </div>
 
   <!-- ===== MODAL: CONFIRMAÇÃO ===== -->
   <div class="modal-overlay" id="modalConfirm">
@@ -715,98 +699,22 @@ function renderStatusImportacao(d) {
     }
 
     // ================================================================
-    // AJUSTE FINO
+    // AVISO PÓS-GERAÇÃO — leva pro Radar Musical em vez de abrir modal
     // ================================================================
-    // Perguntas com frases variadas, mas sempre com o mesmo sentido:
-    // entender qual é a relação atual do usuário com o artista.
-    const AJUSTE_PERGUNTAS = [
-      (artista) => `Ainda curte muito ${artista}?`,
-      (artista) => `Qual é a sua relação com ${artista} hoje?`,
-      (artista) => `${artista} apareceu bastante nas suas playlists — ainda faz sentido pra você?`
-    ];
-    // As 4 opções são sempre as mesmas, pra manter a resposta consistente.
-    const AJUSTE_OPCOES = [
-      { valor: 'amo', texto: 'Ainda curto muito' },
-      { valor: 'ok', texto: 'É bom, mas não ouço sempre' },
-      { valor: 'pouco', texto: 'Ainda gosto, mas bem menos' },
-      { valor: 'nao_quero', texto: 'Prefiro que não apareça' }
-    ];
-    let ajusteFinoRespostas = {};
-
-    function mostrarAjusteFino(artistas) {
-      const container = document.getElementById('ajusteFinoContainer');
-      if (!container || !artistas || artistas.length === 0) return;
-
-      ajusteFinoRespostas = {};
-      container.innerHTML = artistas.map((artistaOriginal, i) => {
-        const artista = escapeHtml(artistaOriginal);
-        const pergunta = AJUSTE_PERGUNTAS[i % AJUSTE_PERGUNTAS.length](artista);
-        const opcoesHtml = AJUSTE_OPCOES.map(op =>
-          `<button type="button" data-artista="${artista}" data-valor="${op.valor}" onclick="selecionarAjuste(this)">${op.texto}</button>`
-        ).join('');
-        return `
-          <div class="ajuste-fino-item">
-            <div class="ajuste-fino-pergunta">${pergunta}</div>
-            <div class="ajuste-opcoes">${opcoesHtml}</div>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('modalAjusteFino').classList.add('open');
+    // O ajuste fino em si (os 4 botões amo/ok/pouco/não quero) agora
+    // mora só dentro do Radar Musical, junto do resto da explicação —
+    // era um segundo lugar de ajustar a mesma coisa, sem o contexto
+    // que o Radar Musical dá.
+    function mostrarAvisoAjuste(artistas) {
+      const status = document.getElementById('status-gerar');
+      if (!status || !artistas || artistas.length === 0) return;
+      const foco = artistas.map(a => encodeURIComponent(a)).join(',');
+      const lista = artistas.length <= 3
+        ? artistas.join(', ')
+        : `${artistas.length} artistas`;
+      status.innerHTML = `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Recomendações geradas. ${escapeHtml(lista)} pronto${artistas.length > 1 ? 's' : ''} pra revisão no <a href="radar-musical.html?foco=${foco}" style="color:var(--terracotta); text-decoration:underline;">Radar Musical</a>.`;
+      status.className = 'upload-status success';
     }
-
-    function selecionarAjuste(btn) {
-      ajusteFinoRespostas[btn.dataset.artista] = btn.dataset.valor;
-      btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-    }
-
-    function enviarAjusteFino() {
-      const respostas = Object.keys(ajusteFinoRespostas).map(artista => ({
-        artista: artista,
-        relacao: ajusteFinoRespostas[artista]
-      }));
-
-      if (respostas.length === 0) {
-        document.getElementById('modalAjusteFino').classList.remove('open');
-        return;
-      }
-
-      apiFetch(API_URL + '/ajuste_fino?user_id=' + usuarioId, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ respostas: respostas })
-      })
-        .then(r => r.json())
-        .then(d => {
-          document.getElementById('modalAjusteFino').classList.remove('open');
-          const status = document.getElementById('status-gerar');
-          if (d.sucesso && status) {
-            status.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Ajuste fino aplicado! Suas prioridades foram atualizadas.';
-            status.className = 'upload-status success';
-          }
-        })
-        .catch(() => {
-          const msg = document.getElementById('ajuste-fino-msg');
-          if (msg) {
-            msg.textContent = 'Erro ao salvar ajuste. Tente novamente.';
-            msg.className = 'form-msg error';
-          }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const btnFechar = document.getElementById('btnFecharAjusteFino');
-      const btnPular = document.getElementById('btnPularAjusteFino');
-      const btnSalvar = document.getElementById('btnSalvarAjusteFino');
-      if (btnFechar) btnFechar.addEventListener('click', function() {
-        document.getElementById('modalAjusteFino').classList.remove('open');
-      });
-      if (btnPular) btnPular.addEventListener('click', function() {
-        document.getElementById('modalAjusteFino').classList.remove('open');
-      });
-      if (btnSalvar) btnSalvar.addEventListener('click', enviarAjusteFino);
-    });
 
     function gerarRecomendacoes() {
       const status = document.getElementById('status-gerar');
@@ -823,7 +731,7 @@ function renderStatusImportacao(d) {
             status.className = 'upload-status success';
             carregarDados();
             if (d.ajuste_necessario && d.artistas_para_ajuste && d.artistas_para_ajuste.length > 0) {
-              mostrarAjusteFino(d.artistas_para_ajuste);
+              mostrarAvisoAjuste(d.artistas_para_ajuste);
             }
           } else {
             status.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (d.erro || 'Erro');

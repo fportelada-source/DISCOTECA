@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=15" />
+  <link rel="stylesheet" href="style.css?v=16" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -63,7 +63,9 @@ function apiFetch(url, opcoes = {}) {
 
     function aplicarCapa(el, url) {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
+      // Sem crossOrigin — mesmo motivo do colecao.html: nada aqui lê
+      // pixel via canvas, e essa exigência derrubava capas de hosts
+      // sem cabeçalho CORS mesmo a imagem sendo válida.
       img.onload = () => {
         el.style.backgroundImage = `url('${url}')`;
         const icone = el.querySelector('.fallback-icon');
@@ -128,6 +130,54 @@ function apiFetch(url, opcoes = {}) {
           document.getElementById('perfil-content').innerHTML =
             `<div style="text-align:center; padding:80px 20px;">${err.message || 'Erro ao carregar perfil'}</div>`;
         });
+    }
+
+    // ================================================================
+    // WISHLIST PÚBLICA — paginada de 6 em 6, pra dar pra navegar a
+    // wishlist inteira (ex: alguém procurando ideia de presente).
+    // ================================================================
+    let ppWishlistCompleta = [];
+    let ppWishlistPagina = 0;
+    const PP_WISHLIST_POR_PAGINA = 6;
+
+    function montarWishlistCard(item) {
+      const cor = CORES_TIER[item.tier] || 'var(--c-color)';
+      return `
+        <div class="pp-wishlist-item">
+          <div class="cover" ${montarCoverDiv(item)}>
+            <span class="priority" style="background:${cor};">${item.tier}</span>
+            <span class="fallback-icon">◈</span>
+          </div>
+          <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
+        </div>
+      `;
+    }
+
+    function renderWishlistPagina() {
+      const grid = document.getElementById('ppWishlistGrid');
+      if (!grid) return;
+      const total = ppWishlistCompleta.length;
+      const totalPaginas = Math.max(1, Math.ceil(total / PP_WISHLIST_POR_PAGINA));
+      ppWishlistPagina = Math.min(ppWishlistPagina, totalPaginas - 1);
+      const inicio = ppWishlistPagina * PP_WISHLIST_POR_PAGINA;
+      const pagina = ppWishlistCompleta.slice(inicio, inicio + PP_WISHLIST_POR_PAGINA);
+
+      grid.innerHTML = pagina.map(montarWishlistCard).join('');
+
+      const contador = document.getElementById('ppWishlistContador');
+      const btnAnterior = document.getElementById('ppWishlistAnterior');
+      const btnProximo = document.getElementById('ppWishlistProximo');
+      if (contador) contador.textContent = `${ppWishlistPagina + 1} de ${totalPaginas} · ${total} ${total === 1 ? 'item' : 'itens'}`;
+      if (btnAnterior) btnAnterior.disabled = ppWishlistPagina === 0;
+      if (btnProximo) btnProximo.disabled = ppWishlistPagina >= totalPaginas - 1;
+
+      configurarLazyLoadCapas();
+    }
+
+    function mudarPaginaWishlist(delta) {
+      const totalPaginas = Math.max(1, Math.ceil(ppWishlistCompleta.length / PP_WISHLIST_POR_PAGINA));
+      ppWishlistPagina = Math.min(totalPaginas - 1, Math.max(0, ppWishlistPagina + delta));
+      renderWishlistPagina();
     }
 
     function montarCoverDiv(item) {
@@ -246,21 +296,16 @@ function apiFetch(url, opcoes = {}) {
 
       html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Wishlist atual</h2></div>`;
       if (data.wishlist && data.wishlist.length > 0) {
-        html += `<div class="pp-wishlist-grid">`;
-        data.wishlist.slice(0, 6).forEach(item => {
-          const cor = CORES_TIER[item.tier] || 'var(--c-color)';
-          html += `
-            <div class="pp-wishlist-item">
-              <div class="cover" ${montarCoverDiv(item)}>
-                <span class="priority" style="background:${cor};">${item.tier}</span>
-                <span class="fallback-icon">◈</span>
-              </div>
-              <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
-            </div>
-          `;
-        });
-        html += `</div>`;
+        ppWishlistCompleta = data.wishlist;
+        ppWishlistPagina = 0;
+        html += `<div class="pp-wishlist-wrap">
+          <button type="button" id="ppWishlistAnterior" class="pp-wishlist-arrow" onclick="mudarPaginaWishlist(-1)" aria-label="Página anterior"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div class="pp-wishlist-grid" id="ppWishlistGrid"></div>
+          <button type="button" id="ppWishlistProximo" class="pp-wishlist-arrow" onclick="mudarPaginaWishlist(1)" aria-label="Próxima página"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+        <div class="pp-wishlist-contador" id="ppWishlistContador"></div>`;
       } else {
+        ppWishlistCompleta = [];
         html += `<div class="pp-empty-note">Sem itens na wishlist no momento.</div>`;
       }
       html += `</div>`;
@@ -317,6 +362,7 @@ function apiFetch(url, opcoes = {}) {
       `;
 
       container.innerHTML = html;
+      renderWishlistPagina();
       configurarLazyLoadCapas();
     }
 

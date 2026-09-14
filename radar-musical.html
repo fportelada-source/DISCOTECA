@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Discoteca — Radar Musical</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=15" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b0b0b" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Discoteca" />
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-container">
+    <div class="login-mockup">
+
+      <!-- LADO ESQUERDO — MARCA -->
+      <div class="login-left">
+        <div class="brand">
+          <div class="mark">D</div>
+          <div class="logo-text">Discoteca<span>.</span></div>
+        </div>
+        <div class="content">
+          <div class="tagline">Bem-vindo de volta</div>
+          <h1>Sua coleção<br><span class="accent">está esperando.</span></h1>
+          <p class="desc">Um companheiro pra sua coleção física. Seu gosto, sua estante, sua próxima compra.</p>
+        </div>
+        <div class="grid-bg">
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="footer-note">Mídia física · inteligência digital</div>
+      </div>
+
+      <!-- LADO DIREITO — LOGIN -->
+      <div class="login-right">
+        <div class="welcome">Bem-vindo de volta</div>
+        <h2>Entrar</h2>
+        <p class="sub">Acesse sua coleção e recomendações.</p>
+        <button class="login-btn" id="btnLogin">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Entrar com Google
+        </button>
+        <div id="loginError" class="login-error">Erro ao fazer login. Tente novamente.</div>
+      </div>
+
+    </div>
+  </div>
+  <!-- ===== APP ===== -->
+  <div id="appScreen" style="display:none;">
+    <div class="app-shell">
+
+      <!-- SIDEBAR -->
+      <aside class="app-sidebar">
+        <a href="index.html" class="logo">D<span>.</span></a>
+        <nav class="nav-icons">
+          <a href="index.html" title="Início"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+          <a href="wishlist.html" title="Wishlist"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> <span class="badge-count" id="navWishlistCount" style="display:none;">0</span></a>
+          <a href="colecao.html" title="Coleção"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></a>
+          <a href="estatisticas.html" title="Estatísticas"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></a>
+          <a href="radar-musical.html" class="active" title="Radar Musical"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="3" x2="12" y2="7"/></svg></a>
+          <a href="importar.html" title="Importar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></a>
+          <a href="perfil.html" title="Configurações"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="app-main">
+
+        <!-- TOP BAR -->
+        <div class="app-topbar">
+          <a href="perfil.html" class="user" style="margin-left:auto;">
+            <span class="name" id="userNameDisplay">Carregando...</span>
+            <div class="avatar" id="userAvatar">?</div>
+          </a>
+        </div>
+        <!-- HERO -->
+        <div class="st-hero">
+          <div>
+            <h1><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="3" x2="12" y2="7"/></svg> Radar <span class="accent">Musical</span></h1>
+            <div class="sub"><span>Entenda por que cada disco aparece pra você.</span></div>
+          </div>
+        </div>
+
+        <!-- BUSCA LIVRE -->
+        <div class="radar-search">
+          <div class="radar-search-wrap">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="radarBuscaInput" placeholder="Buscar qualquer artista, mesmo fora da wishlist..." />
+          </div>
+          <button type="button" id="radarBuscaBtn">Buscar</button>
+        </div>
+
+        <!-- RESULTADO DA BUSCA (some quando não há busca ativa) -->
+        <div id="radarResultadoBusca" style="display:none; margin-bottom:22px;">
+          <div class="pp-empty-note" style="margin-bottom:8px;">Resultado da busca</div>
+          <div class="radar-list" id="radarListaBusca"></div>
+        </div>
+
+        <!-- LISTA PADRÃO -->
+        <div id="radarVazio" style="display:none;">
+          <div class="empty-state" style="padding:60px 20px;">
+            <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
+            <h3 style="font-size:20px;">Ainda não temos dados suficientes</h3>
+            <p style="font-size:13px;">Importe playlists ou gere recomendações pra começar a ver o que está por trás delas. Você ainda pode buscar qualquer artista acima pra explorar adjacências.</p>
+          </div>
+        </div>
+        <div class="radar-list" id="radarLista"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+// ================================================================
+// CONFIGURAÇÕES
+// ================================================================
+const API_URL = 'https://fportelada.pythonanywhere.com';
+
+function apiFetch(url, opcoes = {}) {
+  const sessaoToken = localStorage.getItem('discoteca_session_token');
+  const opcoesFinais = { ...opcoes };
+  opcoesFinais.headers = { ...(opcoes.headers || {}), 'X-Session-Token': sessaoToken || '' };
+  return fetch(url, opcoesFinais);
+}
+
+const DEV_MODE = false;
+const DEV_USER_ID = 1;
+const DEV_USER_NOME = 'Teste ID 1';
+
+let usuarioId = null;
+
+// ================================================================
+// SIDEBAR / TOP BAR (compartilhado — mesmo padrão do resto do app)
+// ================================================================
+function atualizarBadgeWishlist(n) {
+  const el = document.getElementById('navWishlistCount');
+  if (!el) return;
+  if (n > 0) { el.textContent = n; el.style.display = 'flex'; }
+  else { el.style.display = 'none'; }
+}
+
+function carregarAvatarTopo() {
+  if (!usuarioId) return;
+  apiFetch(API_URL + '/perfil/' + usuarioId)
+    .then(r => r.json())
+    .then(perfil => {
+      if (!perfil || perfil.erro) return;
+      const nome = perfil.nome_exibicao || perfil.nome || DEV_USER_NOME;
+      const nomeEl = document.getElementById('userNameDisplay');
+      if (nomeEl) nomeEl.textContent = nome;
+      const avatarEl = document.getElementById('userAvatar');
+      if (avatarEl) {
+        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nome}">`;
+        else avatarEl.textContent = nome.charAt(0).toUpperCase();
+      }
+    })
+    .catch(() => {});
+}
+
+function sincronizarBadge() {
+  if (!usuarioId) return;
+  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
+    .catch(() => {});
+}
+
+// ================================================================
+// LOGIN
+// ================================================================
+function salvarSessao(userId, nome, token) {
+  localStorage.setItem('discoteca_user_id', userId);
+  localStorage.setItem('discoteca_user_nome', nome);
+  if (token) localStorage.setItem('discoteca_session_token', token);
+}
+function carregarSessao() {
+  const userId = localStorage.getItem('discoteca_user_id');
+  const nome = localStorage.getItem('discoteca_user_nome');
+  const token = localStorage.getItem('discoteca_session_token');
+  if (userId && nome && token) return { userId, nome, token };
+  return null;
+}
+function limparSessao() {
+  localStorage.removeItem('discoteca_user_id');
+  localStorage.removeItem('discoteca_user_nome');
+  localStorage.removeItem('discoteca_session_token');
+}
+
+function ativarTelaApp(nome) {
+  const loginScreen = document.getElementById('loginScreen');
+  const appScreen = document.getElementById('appScreen');
+  if (loginScreen) loginScreen.style.display = 'none';
+  if (appScreen) appScreen.style.display = 'block';
+  const nomeDisplay = document.getElementById('userNameDisplay');
+  if (nomeDisplay) nomeDisplay.textContent = nome;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const btnLogin = document.getElementById('btnLogin');
+  if (btnLogin) {
+    btnLogin.addEventListener('click', function() {
+      const btn = this;
+      const error = document.getElementById('loginError');
+      btn.disabled = true;
+      if (error) error.style.display = 'none';
+      apiFetch(API_URL + '/login')
+        .then(r => r.json())
+        .then(d => {
+          if (d.auth_url) window.location.href = d.auth_url;
+          else throw new Error('URL não recebida');
+        })
+        .catch(() => {
+          if (error) error.style.display = 'block';
+          btn.disabled = false;
+        });
+    });
+  }
+});
+
+// ================================================================
+// VERIFICAR SESSÃO
+// ================================================================
+function verificarSessao() {
+  if (DEV_MODE) {
+    usuarioId = DEV_USER_ID;
+    salvarSessao(DEV_USER_ID, DEV_USER_NOME);
+    ativarTelaApp(DEV_USER_NOME);
+    if (typeof onPaginaPronta === 'function') onPaginaPronta();
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('user_id');
+  const nome = params.get('nome');
+  const token = params.get('token');
+
+  if (userId && nome && token) {
+    salvarSessao(userId, nome, token);
+    usuarioId = userId;
+    ativarTelaApp(nome);
+    window.history.replaceState({}, document.title, window.location.pathname);
+    if (typeof onPaginaPronta === 'function') onPaginaPronta();
+    return;
+  }
+
+  const sessao = carregarSessao();
+  if (sessao) {
+    usuarioId = sessao.userId;
+    ativarTelaApp(sessao.nome);
+    if (typeof onPaginaPronta === 'function') onPaginaPronta();
+    return;
+  }
+
+  apiFetch(API_URL + '/sessao')
+    .then(r => r.json())
+    .then(data => {
+      if (data.logado) {
+        usuarioId = data.usuario_id;
+        salvarSessao(data.usuario_id, data.nome || 'Usuário');
+        ativarTelaApp(data.nome || 'Usuário');
+        if (typeof onPaginaPronta === 'function') onPaginaPronta();
+      }
+    })
+    .catch(() => {});
+}
+
+function escapeHtml(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ================================================================
+// PÁGINA: RADAR MUSICAL — radar-musical.html
+// ================================================================
+const PREF_OPCOES = [
+  { valor: 'amo', texto: 'Ainda curto muito' },
+  { valor: 'ok', texto: 'É bom, mas não ouço sempre' },
+  { valor: 'pouco', texto: 'Ainda gosto, mas bem menos' },
+  { valor: 'nao_quero', texto: 'Prefiro que não apareça' }
+];
+
+// Cache local por artista (evita bater no back-end de novo se o
+// mesmo card for fechado e reaberto) — similares Last.fm já têm
+// cache de 90 dias no servidor; este aqui é só pra não repetir a
+// MESMA chamada de rede na mesma sessão de página.
+const radarSimilaresCache = {};
+let radarArtistasAtuais = [];
+let radarBuscaAtual = null;
+// Se a página abriu com ?foco=Artista1,Artista2 (vindo do aviso
+// pós "Gerar Recomendações"), começa esses artistas já expandidos.
+const radarFoco = new Set(
+  (new URLSearchParams(window.location.search).get('foco') || '')
+    .split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+);
+
+function onPaginaPronta() {
+  carregarAvatarTopo();
+  sincronizarBadge();
+  carregarRadarPadrao();
+
+  const btnBuscar = document.getElementById('radarBuscaBtn');
+  const inputBuscar = document.getElementById('radarBuscaInput');
+  if (btnBuscar) btnBuscar.addEventListener('click', executarBuscaLivre);
+  if (inputBuscar) inputBuscar.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') executarBuscaLivre();
+  });
+}
+
+function carregarRadarPadrao(manterAberto) {
+  if (!usuarioId) return;
+  const artistasAbertos = manterAberto ? new Set(
+    Array.from(document.querySelectorAll('#radarLista .radar-card.expanded')).map(c => c.dataset.artista)
+  ) : new Set();
+  const numerosAbertos = manterAberto ? new Set(
+    Array.from(document.querySelectorAll('#radarLista .radar-numbers-toggle.open')).map(t => t.closest('.radar-card').dataset.artista)
+  ) : new Set();
+
+  apiFetch(API_URL + '/radar_musical?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(d => {
+      radarArtistasAtuais = (d && Array.isArray(d.artistas)) ? d.artistas : [];
+      renderRadarLista(radarArtistasAtuais, 'radarLista', 'radarVazio');
+      artistasAbertos.forEach(artista => {
+        const card = document.querySelector(`#radarLista .radar-card[data-artista="${CSS.escape(artista)}"]`);
+        if (!card) return;
+        card.classList.add('expanded');
+        const chave = card.dataset.chave;
+        carregarSimilares(artista, chave);
+        if (numerosAbertos.has(artista)) toggleNumeros(chave);
+      });
+    })
+    .catch(() => {
+      radarArtistasAtuais = [];
+      renderRadarLista([], 'radarLista', 'radarVazio');
+    });
+}
+
+function executarBuscaLivre() {
+  const input = document.getElementById('radarBuscaInput');
+  const nome = (input.value || '').trim();
+  const container = document.getElementById('radarResultadoBusca');
+  const btn = document.getElementById('radarBuscaBtn');
+  if (!nome || !usuarioId) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Buscando...';
+
+  apiFetch(API_URL + '/radar_musical/artista?user_id=' + usuarioId + '&nome=' + encodeURIComponent(nome))
+    .then(r => r.json())
+    .then(item => {
+      if (!item || item.erro) {
+        container.style.display = 'none';
+        return;
+      }
+      radarBuscaAtual = item;
+      container.style.display = 'block';
+      renderRadarLista([item], 'radarListaBusca', null);
+      // Já deixa o resultado da busca expandido — foi um pedido explícito.
+      setTimeout(() => {
+        const card = document.querySelector('#radarListaBusca .radar-card');
+        if (card) card.click();
+      }, 0);
+    })
+    .catch(() => { container.style.display = 'none'; })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = 'Buscar';
+    });
+}
+
+function corTier(tier) {
+  return { S: 'var(--s-color)', A: 'var(--a-color)', B: 'var(--b-color)', C: 'var(--c-color)' }[tier] || 'var(--c-color)';
+}
+
+function montarResumoFechado(item) {
+  const s = item.sinal;
+  if (item.estado === 'somente_exploracao') return 'Sem sinal seu ainda — só exploração';
+  if (!s) return item.recomendacoes_ativas && item.recomendacoes_ativas.length ? 'Adicionado manualmente, sem sinal de escuta' : '';
+  const partes = [];
+  if (s.importacoes_distintas_qtd >= 2) partes.push(`${s.importacoes_distintas_qtd} importações diferentes`);
+  if (s.anos_diferentes_qtd >= 2) partes.push(`faixas de ${s.anos_diferentes_qtd} anos diferentes da carreira`);
+  if (partes.length === 0) partes.push(`pontuação ${s.pontuacao_total}`);
+  return partes.join(' • ');
+}
+
+function montarNarrativa(item) {
+  const s = item.sinal;
+  const recAtiva = item.recomendacoes_ativas && item.recomendacoes_ativas[0];
+  if (recAtiva && recAtiva.nota) {
+    // Reaproveita a explicação real já gerada pelo motor (ex: Adjacent
+    // Discovery) em vez de reconstruir uma frase nova por cima do mesmo dado.
+    return escapeHtml(recAtiva.nota);
+  }
+  if (!s) return 'Sem sinal de escuta pra esse artista ainda.';
+  const frases = [];
+  if (s.top > 0) frases.push(`apareceu <span class="hl">${s.top}</span> ${s.top === 1 ? 'vez' : 'vezes'} nas suas faixas mais ouvidas`);
+  if (s.favoritos > 0) frases.push(`está nos seus favoritos`);
+  if (s.descobertas > 0) frases.push(`veio de descobertas recentes`);
+  let texto = frases.length ? `Esse artista ${frases.join(', ')}.` : 'Sinal ainda fraco pra esse artista.';
+  if (s.anos_diferentes_qtd >= 3) {
+    texto += ` Você já ouviu faixas de pelo menos <span class="hl">${s.anos_diferentes_qtd} anos diferentes</span> da carreira dele — sinal de afinidade que atravessa fases, não só um hit isolado.`;
+  }
+  if (s.bonus_ao_vivo > 0) {
+    texto += ` Você também voltou mais de uma vez a um álbum ao vivo dele — sinal extra de afinidade contínua.`;
+  }
+  if (s.importacoes_distintas_qtd >= 2) {
+    texto += ` Ele apareceu em <span class="hl">${s.importacoes_distintas_qtd} importações</span> feitas em momentos diferentes, não só de uma vez.`;
+  }
+  return texto;
+}
+
+function montarNumeros(item) {
+  const s = item.sinal;
+  if (!s) return '';
+  const linhas = [];
+  if (s.top > 0) linhas.push(['Faixas mais ouvidas ×3', s.top * 3]);
+  if (s.descobertas > 0) linhas.push(['Descobertas ×2', s.descobertas * 2]);
+  if (s.favoritos > 0) linhas.push(['Favoritos ×1', s.favoritos * 1]);
+  if (s.bonus_anos_diferentes > 0) linhas.push([`Bônus: ${s.anos_diferentes_qtd} anos diferentes`, `+${s.bonus_anos_diferentes}`]);
+  if (s.bonus_ao_vivo > 0) linhas.push(['Bônus: álbum ao vivo repetido', `+${s.bonus_ao_vivo}`]);
+
+  const linhasHtml = linhas.map(([label, valor]) => `
+    <div class="row"><span class="label">${escapeHtml(label)}</span><span class="value">${valor}</span></div>
+  `).join('');
+
+  const posicaoTexto = s.tier_calculado
+    ? `Isso te colocou no tier <span class="value" style="color:${corTier(s.tier_calculado)};">${s.tier_calculado}</span> — posição relativa entre seus artistas mais fortes nesta leva, não um valor fixo.`
+    : `Sinal existe, mas não foi forte o suficiente pra entrar no top 15 desta leva.`;
+
+  return `
+    ${linhasHtml}
+    <div class="row total"><span class="label">Pontuação total</span><span class="value">${s.pontuacao_total}</span></div>
+    <div class="row" style="padding-top:8px; opacity:0.6; font-size:11.5px;"><span>${posicaoTexto}</span></div>
+  `;
+}
+
+function montarPreferencia(item) {
+  if (!item.recomendacoes_ativas || item.recomendacoes_ativas.length === 0) return '';
+  const atual = item.preferencia_atual;
+  const botoes = PREF_OPCOES.map(op => `
+    <button type="button" data-valor="${op.valor}" class="${atual === op.valor ? 'selected' : ''}">${escapeHtml(op.texto)}</button>
+  `).join('');
+  return `<div class="radar-pref">${botoes}</div>`;
+}
+
+function montarTierRow(item) {
+  const rec = item.recomendacoes_ativas && item.recomendacoes_ativas[0];
+  if (!rec) return '';
+  return `
+    <div class="radar-tier-row">
+      <span class="label">Tier atual</span>
+      <span class="priority-badge" style="background:${corTier(rec.tier)};">${rec.tier}</span>
+      <span style="opacity:0.4;">${escapeHtml(rec.album)}</span>
+    </div>
+  `;
+}
+
+function renderRadarLista(artistas, containerId, vazioId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (vazioId) {
+    const vazioEl = document.getElementById(vazioId);
+    if (vazioEl) vazioEl.style.display = artistas.length === 0 ? 'block' : 'none';
+  }
+  if (artistas.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+
+  el.innerHTML = artistas.map((item, i) => {
+    const s = item.sinal;
+    const pct = s ? Math.min(100, Math.round((s.pontuacao_total / 30) * 100)) : 0;
+    const chave = `${containerId}-${i}`;
+    const abrirDeFoco = radarFoco.has((item.artista || '').toLowerCase());
+    return `
+      <div class="radar-card${abrirDeFoco ? ' expanded' : ''}" data-chave="${chave}" data-artista="${escapeHtml(item.artista)}">
+        <div class="radar-top" onclick="toggleRadarCard('${chave}')">
+          <div class="left">
+            <div>
+              <div class="name">${escapeHtml(item.artista)}</div>
+              <div class="summary">${escapeHtml(montarResumoFechado(item))}</div>
+            </div>
+          </div>
+          <div class="right">
+            ${s ? `<div class="radar-signal-bar"><div class="fill" style="width:${pct}%;"></div></div>` : ''}
+            <span class="radar-chevron"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </div>
+        </div>
+        <div class="radar-body" id="body-${chave}">
+          <div class="radar-narrative">${montarNarrativa(item)}</div>
+          ${s ? `
+            <div class="radar-numbers-toggle" onclick="toggleNumeros('${chave}')">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Ver os números
+            </div>
+            <div class="radar-numbers" id="numeros-${chave}">${montarNumeros(item)}</div>
+          ` : ''}
+          <div class="radar-similar" id="similar-${chave}" style="display:none;">
+            <div class="title">Artistas parecidos</div>
+            <div class="radar-chips" id="chips-${chave}"><span class="radar-empty-artist">Carregando...</span></div>
+          </div>
+          ${montarPreferencia(item)}
+          ${montarTierRow(item)}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Liga os botões de preferência (delegação simples por card)
+  el.querySelectorAll('.radar-card').forEach(card => {
+    const artista = card.dataset.artista;
+    card.querySelectorAll('.radar-pref button').forEach(btn => {
+      btn.addEventListener('click', function(ev) {
+        ev.stopPropagation();
+        aplicarPreferencia(artista, btn.dataset.valor, card);
+      });
+    });
+  });
+
+  // Se algum card já abre por causa de ?foco=..., busca os similares dele também.
+  artistas.forEach((item, i) => {
+    const chave = `${containerId}-${i}`;
+    if (radarFoco.has((item.artista || '').toLowerCase())) {
+      carregarSimilares(item.artista, chave);
+    }
+  });
+}
+
+function toggleRadarCard(chave) {
+  const card = document.querySelector(`[data-chave="${chave}"]`);
+  if (!card) return;
+  const abrindo = !card.classList.contains('expanded');
+  card.classList.toggle('expanded');
+  if (abrindo) {
+    const artista = card.dataset.artista;
+    carregarSimilares(artista, chave);
+  }
+}
+
+function toggleNumeros(chave) {
+  const toggle = document.querySelectorAll(`#body-${chave} .radar-numbers-toggle`)[0];
+  const painel = document.getElementById(`numeros-${chave}`);
+  if (!toggle || !painel) return;
+  toggle.classList.toggle('open');
+  painel.classList.toggle('open');
+}
+
+function carregarSimilares(artista, chave) {
+  if (radarSimilaresCache[artista]) {
+    renderSimilares(radarSimilaresCache[artista], chave);
+    return;
+  }
+  apiFetch(API_URL + '/radar_musical/similares?user_id=' + usuarioId + '&artista=' + encodeURIComponent(artista))
+    .then(r => r.json())
+    .then(d => {
+      const similares = (d && Array.isArray(d.similares)) ? d.similares : [];
+      radarSimilaresCache[artista] = similares;
+      renderSimilares(similares, chave);
+    })
+    .catch(() => renderSimilares([], chave));
+}
+
+function renderSimilares(similares, chave) {
+  const bloco = document.getElementById(`similar-${chave}`);
+  const chips = document.getElementById(`chips-${chave}`);
+  if (!bloco || !chips) return;
+  if (!similares || similares.length === 0) {
+    bloco.style.display = 'none';
+    return;
+  }
+  bloco.style.display = 'block';
+  chips.innerHTML = similares.map(s => `
+    <span class="radar-chip${s.ja_conhece ? ' ja-conhece' : ''}">
+      <span class="name">${escapeHtml(s.artista)}</span>
+      <span class="match">${s.ja_conhece ? 'já conhece' : `<span class="accent">${Math.round((s.match || 0) * 100)}%</span> parecido`}</span>
+    </span>
+  `).join('');
+}
+
+function aplicarPreferencia(artista, relacao, cardEl) {
+  if (!usuarioId) return;
+  cardEl.querySelectorAll('.radar-pref button').forEach(b => b.classList.remove('selected'));
+  cardEl.querySelector(`.radar-pref button[data-valor="${relacao}"]`).classList.add('selected');
+
+  apiFetch(API_URL + '/ajuste_fino?user_id=' + usuarioId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ respostas: [{ artista: artista, relacao: relacao }] })
+  })
+    .then(r => r.json())
+    .then(() => {
+      // Recarrega a lista padrão em segundo plano pra refletir o tier
+      // atualizado, mantendo o card que a pessoa acabou de mexer aberto.
+      carregarRadarPadrao(true);
+      sincronizarBadge();
+    })
+    .catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  verificarSessao();
+});
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

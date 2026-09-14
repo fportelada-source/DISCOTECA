@@ -3297,3 +3297,82 @@
       .imp-how { flex-direction: column; align-items: stretch; text-align: center; }
       .imp-how .flow { justify-content: center; }
     }
+
+    /* ================================================================
+       RADAR MUSICAL — explica o Recommendation Engine pro usuário
+       ================================================================ */
+    .radar-search { display: flex; gap: 8px; align-items: center; margin-bottom: 22px; }
+    .radar-search-wrap { position: relative; flex: 1; }
+    .radar-search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.35; pointer-events: none; }
+    .radar-search input {
+      width: 100%; background: var(--card); border: 1px solid var(--card-line); border-radius: 12px;
+      padding: 11px 14px 11px 40px; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--paper); outline: none; transition: 0.2s;
+    }
+    .radar-search input:focus { border-color: var(--terracotta); }
+    .radar-search input::placeholder { color: #4a4a4a; }
+    .radar-search button {
+      background: var(--terracotta); color: var(--ink); border: none; padding: 11px 26px; border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s;
+    }
+    .radar-search button:hover { opacity: 0.85; }
+    .radar-search button:disabled { opacity: 0.4; cursor: default; }
+
+    .radar-list { display: flex; flex-direction: column; gap: 10px; }
+    .radar-card { background: var(--card); border-radius: 14px; border: 1px solid var(--card-line); padding: 15px 18px; transition: 0.2s; }
+    .radar-card.expanded { border-color: #3a3a3a; }
+    .radar-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; cursor: pointer; }
+    .radar-top .left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .radar-top .name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .radar-top .summary { font-size: 12px; opacity: 0.4; margin-top: 1px; }
+    .radar-top .right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .radar-signal-bar { width: 56px; height: 4px; background: #282828; border-radius: 20px; overflow: hidden; }
+    .radar-signal-bar .fill { height: 100%; border-radius: 20px; background: var(--terracotta); }
+    .radar-chevron { opacity: 0.3; transition: transform 0.2s; display: flex; }
+    .radar-card.expanded .radar-chevron { transform: rotate(90deg); opacity: 1; color: var(--terracotta); }
+
+    .radar-body { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--card-line); display: none; }
+    .radar-card.expanded .radar-body { display: block; }
+
+    .radar-narrative { background: #0f0f0f; border-radius: 10px; border: 1px solid var(--border-subtle); padding: 14px 16px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.5; color: #d0d0d0; }
+    .radar-narrative .hl { color: var(--terracotta); font-weight: 600; }
+
+    .radar-numbers-toggle { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; opacity: 0.5; cursor: pointer; padding: 4px 0 8px; user-select: none; }
+    .radar-numbers-toggle:hover { opacity: 0.85; }
+    .radar-numbers-toggle svg { transition: transform 0.2s; }
+    .radar-numbers-toggle.open svg { transform: rotate(90deg); }
+    .radar-numbers { background: #0f0f0f; border-radius: 10px; border: 1px solid var(--border-subtle); padding: 12px 16px; margin-bottom: 12px; display: none; }
+    .radar-numbers.open { display: block; }
+    .radar-numbers .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12.5px; }
+    .radar-numbers .row .label { opacity: 0.45; }
+    .radar-numbers .row .value { font-weight: 600; }
+    .radar-numbers .row.total { border-top: 1px solid var(--card-line); margin-top: 6px; padding-top: 8px; }
+    .radar-numbers .row.total .label { opacity: 1; font-weight: 600; }
+    .radar-numbers .row.total .value { color: var(--terracotta); font-size: 15px; }
+
+    .radar-similar { background: #0f0f0f; border-radius: 10px; border: 1px solid var(--border-subtle); padding: 12px 16px; margin-bottom: 12px; }
+    .radar-similar .title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.4; margin-bottom: 8px; }
+    .radar-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .radar-chip { background: var(--card); border: 1px solid var(--card-line); border-radius: 20px; padding: 4px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .radar-chip .match { opacity: 0.45; font-size: 11px; }
+    .radar-chip .match .accent { color: var(--terracotta); }
+    .radar-chip.ja-conhece { opacity: 0.45; }
+
+    .radar-pref { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .radar-pref button {
+      background: #0f0f0f; border: 1px solid var(--card-line); border-radius: 20px; padding: 6px 15px;
+      font-size: 12px; font-family: 'Inter', sans-serif; color: var(--paper); opacity: 0.55; cursor: pointer; transition: 0.2s;
+    }
+    .radar-pref button:hover { opacity: 0.9; border-color: #3a3a3a; }
+    .radar-pref button.selected { border-color: var(--terracotta); color: var(--terracotta); background: var(--terracotta-wash); opacity: 1; }
+
+    .radar-tier-row { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--card-line); font-size: 12.5px; }
+    .radar-tier-row .label { opacity: 0.4; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+
+    .radar-empty-artist { opacity: 0.5; font-size: 13px; padding: 4px 0; }
+
+    @media (max-width: 700px) {
+      .radar-search { flex-direction: column; align-items: stretch; }
+      .radar-top { flex-wrap: wrap; }
+      .radar-pref { flex-direction: column; }
+      .radar-pref button { text-align: center; }
+    }

@@ -507,7 +507,9 @@ async function fetchAlbumArt(artist, album, artId, fallbackId, recId) {
     const url = await getCoverUrl(artist, album);
     if (url) {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
+      // Sem crossOrigin — mesma causa raiz corrigida em colecao.html e
+      // perfil-publico.html: nada aqui lê pixel via canvas, e essa
+      // exigência derrubava capas de hosts sem cabeçalho CORS.
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('Timeout')), 10000);
         img.onload = () => {
@@ -560,7 +562,7 @@ function carregarCapa(item, artId, fallbackId) {
 
   function aplicar(url, encontradaAgora) {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    // Mesmo motivo do bloco acima.
     img.onload = () => {
       artWrap.style.backgroundImage = `url('${url}')`;
       artWrap.style.backgroundSize = 'cover';

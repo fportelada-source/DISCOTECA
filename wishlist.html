@@ -167,6 +167,11 @@
               <input type="text" id="wish-notas" placeholder="Ex: Versão japonesa">
             </div>
           </div>
+          <div class="form-group">
+            <label>URL da Capa (opcional)</label>
+            <input type="url" id="wish-capa-manual" placeholder="https://...">
+            <div class="cover-help">Deixe em branco pra buscar automático no Discogs/Last.fm. Preencher aqui sempre tem prioridade — útil quando a busca automática não acha o álbum certo.</div>
+          </div>
         </div>
         <div class="wish-modal-actions">
           <button type="button" class="btn btn-secondary" id="btnCancelarWishlist">Cancelar</button>
@@ -1184,6 +1189,7 @@ function renderRecomendacoes(dados) {
       document.getElementById('wish-album').value = '';
       document.getElementById('wish-tier').value = 'S';
       document.getElementById('wish-notas').value = '';
+      document.getElementById('wish-capa-manual').value = '';
       document.getElementById('wish-msg').textContent = '';
       document.getElementById('wish-msg').className = 'form-msg';
       modalWish.classList.add('open');
@@ -1206,7 +1212,8 @@ function renderRecomendacoes(dados) {
         artista: document.getElementById('wish-artista').value.trim(),
         album: document.getElementById('wish-album').value.trim(),
         tier: document.getElementById('wish-tier').value,
-        notas: document.getElementById('wish-notas').value.trim()
+        notas: document.getElementById('wish-notas').value.trim(),
+        capa_url: document.getElementById('wish-capa-manual').value.trim()
       };
 
       if (!dados.artista || !dados.album) {

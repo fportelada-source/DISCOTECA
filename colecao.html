@@ -289,6 +289,13 @@
                 <div class="cover-help">Deixe em branco pra buscar automático no Discogs/Last.fm. Preencher aqui sempre tem prioridade.</div>
               </div>
             </div>
+            <div class="form-row" style="margin-top:10px;">
+              <div class="form-group full">
+                <label>Gênero</label>
+                <input type="text" id="campo-genero" placeholder="Ex: Rock, Metal, Jazz...">
+                <div class="cover-help">Vem automático do Discogs ao adicionar (a categoria ampla deles, não o estilo específico — por isso às vezes sai diferente do esperado). Editável aqui.</div>
+              </div>
+            </div>
           </div>
 
           <div class="form-section">
@@ -1405,6 +1412,7 @@ function carregarDados() {
           document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
           document.getElementById('campo-favorito').value = disco.favorito ? '1' : '0';
           document.getElementById('campo-capa-manual').value = disco.capa_url || '';
+          document.getElementById('campo-genero').value = disco.genero || '';
           document.getElementById('campo-avaliacao').value = disco.avaliacao || 0;
           atualizarEstrelas(disco.avaliacao || 0);
           atualizarBotaoFavoritar();
@@ -1428,6 +1436,7 @@ function carregarDados() {
         document.getElementById('campo-codigo-barras').value = '';
         document.getElementById('campo-favorito').value = '0';
         document.getElementById('campo-capa-manual').value = '';
+        document.getElementById('campo-genero').value = '';
         document.getElementById('campo-avaliacao').value = 0;
         atualizarEstrelas(0);
         atualizarBotaoFavoritar();
@@ -1480,6 +1489,7 @@ function carregarDados() {
         codigo_barras: document.getElementById('campo-codigo-barras').value.trim(),
         favorito: document.getElementById('campo-favorito').value === '1',
         capa_url: document.getElementById('campo-capa-manual').value.trim(),
+        genero: document.getElementById('campo-genero').value.trim(),
         avaliacao: parseInt(document.getElementById('campo-avaliacao').value) || 0
       };
 

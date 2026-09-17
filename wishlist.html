@@ -1076,12 +1076,24 @@ function buscarDescobertas() {
   if (!el) return;
   apiFetch(API_URL + '/descobertas?user_id=' + usuarioId)
     .then(r => r.json())
-    .then(lista => {
-      if (!Array.isArray(lista) || lista.length === 0) {
-        el.innerHTML = '<div class="pp-empty-note">Você ainda não curte bandas que estão fora do streaming.</div>';
-        return;
+    .then(resposta => {
+      const lista = (resposta && Array.isArray(resposta.itens)) ? resposta.itens : [];
+      const pendentes = (resposta && Array.isArray(resposta.artistas_pendentes)) ? resposta.artistas_pendentes : [];
+
+      let html = '';
+      if (lista.length > 0) {
+        html += `<div class="wl-grid">${lista.map(renderCardDescoberta).join('')}</div>`;
       }
-      el.innerHTML = `<div class="wl-grid">${lista.map(renderCardDescoberta).join('')}</div>`;
+      if (pendentes.length > 0) {
+        html += `<div class="pp-empty-note" style="margin-top:${lista.length > 0 ? '14px' : '0'};">
+          <svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Verificando ${pendentes.length} artista${pendentes.length > 1 ? 's' : ''} da sua wishlist (${escapeHtml(pendentes.slice(0, 3).join(', '))}${pendentes.length > 3 ? '...' : ''}) — isso roda aos poucos em segundo plano, sem precisar fazer nada.
+        </div>`;
+      }
+      if (!html) {
+        html = '<div class="pp-empty-note">Você ainda não curte bandas que estão fora do streaming.</div>';
+      }
+      el.innerHTML = html;
       lista.forEach((item, idx) => {
         carregarCapa(item, 'art-descoberta-' + idx, 'fallback-descoberta-' + idx);
       });

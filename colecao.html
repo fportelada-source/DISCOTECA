@@ -1594,8 +1594,11 @@ function carregarDados() {
           Html5QrcodeSupportedFormats.UPC_E,
           Html5QrcodeSupportedFormats.CODE_128,
           Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.ISBN
+          Html5QrcodeSupportedFormats.EAN_8
+          // "ISBN" removido — não existe na biblioteca (bug real: virava
+          // undefined na lista e quebrava o leitor toda vez que abria).
+          // Código de barras de livro (ISBN) já é codificado como EAN-13,
+          // que já está coberto acima.
         ]
       };
 

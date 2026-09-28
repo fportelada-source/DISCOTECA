@@ -23,7 +23,7 @@
 // CACHE_NAME tem número de versão — se algum dia mudar o que entra
 // no "esqueleto" (nova página, etc.), sobe esse número, igual já
 // fazemos com style.css?v=N.
-const CACHE_NAME = 'discoteca-shell-v4';
+const CACHE_NAME = 'discoteca-shell-v5';
 
 const PAGINAS_HTML = [
   './index.html',
@@ -48,8 +48,22 @@ const ARQUIVOS_ESTATICOS = [
 ];
 
 self.addEventListener('install', (evento) => {
+  // NÃO usa cache.addAll() — é tudo-ou-nada: um único arquivo com 404
+  // (aconteceu de verdade: os ícones do PWA nunca tinham sido gerados)
+  // derruba a instalação INTEIRA do Service Worker, deixando a wishlist
+  // e a coleção sem carregar mesmo depois de reinstalar o app. Cada
+  // arquivo agora é tentado individualmente — um que falhar não afeta
+  // os outros nem impede a instalação de completar.
   evento.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll([...PAGINAS_HTML, ...ARQUIVOS_ESTATICOS]))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        [...PAGINAS_HTML, ...ARQUIVOS_ESTATICOS].map((url) =>
+          cache.add(url).catch((erro) => {
+            console.warn('[sw.js] Não consegui cachear (ignorado, não derruba o resto):', url, erro);
+          })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });

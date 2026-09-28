@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=19" />
+  <link rel="stylesheet" href="style.css?v=20" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -106,12 +106,64 @@ function apiFetch(url, opcoes = {}) {
       return CORES[hash % CORES.length];
     }
 
+
+    // ================================================================
+    // ÚLTIMAS AUDIÇÕES — janela pro histórico, não é feed social:
+    // sem curtida, sem comentário. Nunca mostra nota nem id interno
+    // (o endpoint público já não devolve). Sem audições: a seção nem aparece.
+    // ================================================================
+    let ppUserId = null;
+    window.ppPlaceholder = function() {
+      const s = document.createElement('span');
+      s.className = 'aud-ph';
+      s.setAttribute('aria-hidden', 'true');
+      s.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>';
+      return s;
+    };
+    function rotuloDataAudicao(iso, hora) {
+      const [y, m, d] = iso.split('-').map(Number);
+      const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+      const dia = new Date(y, m - 1, d);
+      const diff = Math.round((hoje - dia) / 86400000);
+      const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+      const base = diff === 0 ? 'Hoje' : diff === 1 ? 'Ontem' : `${d} ${meses[m - 1]}`;
+      return hora && diff <= 1 ? `${base} · ${hora}` : base;
+    }
+    async function carregarAudicoesPublicas() {
+      const box = document.getElementById('ppAudicoes');
+      if (!box || !ppUserId) return;
+      try {
+        const r = await apiFetch(API_URL + `/audicoes/publico/${ppUserId}?limite=5`);
+        if (!r.ok) return;
+        const d = await r.json();
+        const itens = Array.isArray(d.itens) ? d.itens : [];
+        if (!itens.length) return;
+        const cards = itens.map(it => {
+          const foto = (it.foto && /^[0-9a-f]{32}$/.test(it.foto)) ? `${API_URL}/audicoes/foto/${it.foto}_t.jpg` : (it.capa_url || null);
+          const img = foto
+            ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml((it.artista || '') + ' — ' + (it.album || ''))}" loading="lazy" onerror="this.replaceWith(ppPlaceholder())">`
+            : `<span class="aud-ph" aria-hidden="true"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span>`;
+          return `<div class="pp-aud-item">
+            <span class="pp-aud-img">${img}</span>
+            <strong>${escapeHtml(it.artista || '')}</strong>
+            <span class="alb">${escapeHtml(it.album || '')}</span>
+            <small>${escapeHtml(rotuloDataAudicao(it.data, it.hora))}</small>
+          </div>`;
+        }).join('');
+        box.innerHTML = `<div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Últimas audições</h2><a class="see-all" href="audicoes.html?u=${ppUserId}">Ver todas as audições &rarr;</a></div>
+          <div class="pp-aud-sub">Discos que passaram pela vitrola recentemente.</div>
+          <div class="pp-aud-strip">${cards}</div>`;
+        box.style.display = 'block';
+      } catch (e) { /* módulo é opcional: falhar não pode derrubar o perfil */ }
+    }
+
     // ================================================================
     // CARREGAR
     // ================================================================
     function carregarPerfil() {
       const params = new URLSearchParams(window.location.search);
       const userId = params.get('id');
+      ppUserId = (userId || '').replace(/[^0-9]/g, '');
       if (!userId) {
         document.getElementById('perfil-content').innerHTML =
           `<div style="text-align:center; padding:80px 20px;">Perfil não especificado. Use o link com <code>?id=</code>.</div>`;
@@ -294,6 +346,8 @@ function apiFetch(url, opcoes = {}) {
       }
       html += `</div>`;
 
+      html += `<div class="pp-section" id="ppAudicoes" style="display:none;"></div>`;
+
       html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Wishlist atual</h2></div>`;
       if (data.wishlist && data.wishlist.length > 0) {
         ppWishlistCompleta = data.wishlist;
@@ -362,6 +416,7 @@ function apiFetch(url, opcoes = {}) {
       `;
 
       container.innerHTML = html;
+      carregarAudicoesPublicas();
       renderWishlistPagina();
       configurarLazyLoadCapas();
     }

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=19" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -277,11 +277,10 @@
                 <div class="barcode-row">
                   <input type="text" id="campo-codigo-barras" placeholder="Ex: 042284834181">
                   <button type="button" class="btn-scan" id="btnBarcode"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Ler</button>
+                  <input type="file" id="inputFotoBarcode" accept="image/*" capture="environment" style="display:none;">
                 </div>
-                <div class="barcode-reader-container" id="barcode-reader-container">
-                  <div id="barcode-reader"></div>
-                  <button type="button" class="btn" style="margin-top:8px; background:var(--card-line); color:var(--paper);" id="btnBarcodeCancel">Cancelar</button>
-                </div>
+                <div class="cover-help" id="barcodeStatus" style="display:none;"></div>
+                <div id="barcode-reader-oculto" style="display:none;"></div>
               </div>
               <div class="form-group">
                 <label>URL da Capa (opcional)</label>
@@ -385,7 +384,6 @@ let usuarioId = null;
 let colecao = [];
 let recomendacoes = [];
 let editandoId = null;
-let barcodeScanner = null;
 let viewPreference = localStorage.getItem('discoteca_view') || 'cards';
 let groupPreference = localStorage.getItem('discoteca_group') || 'separado';
 let colecaoFiltrada = [];
@@ -1444,21 +1442,13 @@ function carregarDados() {
       }
 
       modal.classList.add('open');
-      document.getElementById('barcode-reader-container').classList.remove('active');
-      if (barcodeScanner) {
-        barcodeScanner.stop().catch(() => {});
-        barcodeScanner = null;
-      }
+      document.getElementById('barcodeStatus').style.display = 'none';
     }
     window.abrirModal = abrirModal;
 
     function fecharModal() {
       modal.classList.remove('open');
-      document.getElementById('barcode-reader-container').classList.remove('active');
-      if (barcodeScanner) {
-        barcodeScanner.stop().catch(() => {});
-        barcodeScanner = null;
-      }
+      document.getElementById('barcodeStatus').style.display = 'none';
     }
 
     btnAbrirModal.addEventListener('click', () => abrirModal(null));
@@ -1557,74 +1547,51 @@ function carregarDados() {
     }
     window.removerDisco = removerDisco;
 
+    // ================================================================
+    // LEITOR DE CÓDIGO DE BARRAS — via FOTO, não câmera ao vivo
+    // ================================================================
+    // Reescrito depois de achar múltiplos bugs conhecidos e NÃO
+    // resolvidos (issues abertas há meses no repositório oficial da
+    // biblioteca) especificamente com câmera ao vivo em iOS 17+: tela
+    // preta, câmera traseira não abre, só abre frontal sem trocar.
+    // Isso não é bug nosso — é a biblioteca brigando com o iOS
+    // moderno. A solução: em vez de controlar a câmera via JavaScript
+    // (getUserMedia), deixa o APP NATIVO de câmera do celular tirar a
+    // foto (100% confiável, é o mesmo app de câmera de sempre), e só
+    // decodifica o código de barras da foto já tirada — sem stream ao
+    // vivo, sem disputa de permissão, sem os bugs documentados acima.
     const btnBarcode = document.getElementById('btnBarcode');
-    const barcodeContainer = document.getElementById('barcode-reader-container');
-    const barcodeReaderDiv = document.getElementById('barcode-reader');
+    const inputFotoBarcode = document.getElementById('inputFotoBarcode');
+    const barcodeStatus = document.getElementById('barcodeStatus');
 
     btnBarcode.addEventListener('click', function() {
-      if (barcodeContainer.classList.contains('active')) {
-        barcodeContainer.classList.remove('active');
-        if (barcodeScanner) {
-          barcodeScanner.stop().catch(() => {});
-          barcodeScanner = null;
-        }
-        return;
-      }
-
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('Seu navegador não suporta acesso à câmera.');
-        return;
-      }
-
-      barcodeContainer.classList.add('active');
-      if (barcodeScanner) {
-        barcodeScanner.stop().catch(() => {});
-        barcodeScanner = null;
-      }
-
-      const html5QrCode = new Html5Qrcode("barcode-reader");
-      barcodeScanner = html5QrCode;
-
-      const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.EAN_8
-          // "ISBN" removido — não existe na biblioteca (bug real: virava
-          // undefined na lista e quebrava o leitor toda vez que abria).
-          // Código de barras de livro (ISBN) já é codificado como EAN-13,
-          // que já está coberto acima.
-        ]
-      };
-
-      html5QrCode.start({ facingMode: "environment" },
-        config,
-        (decodedText, decodedResult) => {
-          document.getElementById('campo-codigo-barras').value = decodedText;
-          barcodeContainer.classList.remove('active');
-          html5QrCode.stop().catch(() => {});
-          barcodeScanner = null;
-          buscarDiscoPorCodigo(decodedText);
-        },
-        (errorMessage) => {}
-      ).catch(err => {
-        alert('Erro ao acessar a câmera: ' + err.message);
-        barcodeContainer.classList.remove('active');
-        barcodeScanner = null;
-      });
+      inputFotoBarcode.click();
     });
 
-    document.getElementById('btnBarcodeCancel').addEventListener('click', function() {
-      barcodeContainer.classList.remove('active');
-      if (barcodeScanner) {
-        barcodeScanner.stop().catch(() => {});
-        barcodeScanner = null;
-      }
+    inputFotoBarcode.addEventListener('change', function(e) {
+      const arquivo = e.target.files && e.target.files[0];
+      if (!arquivo) return;
+
+      barcodeStatus.style.display = 'block';
+      barcodeStatus.textContent = 'Lendo código de barras da foto...';
+      btnBarcode.disabled = true;
+
+      // Instância nova a cada leitura — mais simples e seguro que
+      // reaproveitar estado entre fotos diferentes.
+      const html5QrCode = new Html5Qrcode("barcode-reader-oculto");
+      html5QrCode.scanFile(arquivo, false)
+        .then((decodedText) => {
+          document.getElementById('campo-codigo-barras').value = decodedText;
+          barcodeStatus.textContent = 'Código lido: ' + decodedText;
+          buscarDiscoPorCodigo(decodedText);
+        })
+        .catch(() => {
+          barcodeStatus.textContent = 'Não consegui ler um código de barras nessa foto. Tenta tirar de novo, mais perto e com boa luz, ou digita o código manualmente.';
+        })
+        .finally(() => {
+          btnBarcode.disabled = false;
+          inputFotoBarcode.value = ''; // permite tirar outra foto do mesmo jeito, se precisar
+        });
     });
 
     // Busca o ano automaticamente quando o usuário digita artista + álbum

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Discoteca — Audições</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=20" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b0b0b" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Discoteca" />
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-container">
+    <div class="login-mockup">
+
+      <!-- LADO ESQUERDO — MARCA -->
+      <div class="login-left">
+        <div class="brand">
+          <div class="mark">D</div>
+          <div class="logo-text">Discoteca<span>.</span></div>
+        </div>
+        <div class="content">
+          <div class="tagline">Bem-vindo de volta</div>
+          <h1>Sua coleção<br><span class="accent">está esperando.</span></h1>
+          <p class="desc">Um companheiro pra sua coleção física. Seu gosto, sua estante, sua próxima compra.</p>
+        </div>
+        <div class="grid-bg">
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="footer-note">Mídia física · inteligência digital</div>
+      </div>
+
+      <!-- LADO DIREITO — LOGIN -->
+      <div class="login-right">
+        <div class="welcome">Bem-vindo de volta</div>
+        <h2>Entrar</h2>
+        <p class="sub">Acesse sua coleção e recomendações.</p>
+        <button class="login-btn" id="btnLogin">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Entrar com Google
+        </button>
+        <div id="loginError" class="login-error">Erro ao fazer login. Tente novamente.</div>
+      </div>
+
+    </div>
+  </div>
+  <!-- ===== APP ===== -->
+  <div id="appScreen" style="display:none;">
+    <div class="app-shell">
+
+      <!-- SIDEBAR -->
+      <aside class="app-sidebar">
+        <a href="index.html" class="logo">D<span>.</span></a>
+        <nav class="nav-icons">
+          <a href="index.html" title="Início"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+          <a href="wishlist.html" title="Wishlist"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> <span class="badge-count" id="navWishlistCount" style="display:none;">0</span></a>
+          <a href="colecao.html" title="Coleção"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></a>
+          <a href="estatisticas.html" title="Estatísticas"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></a>
+          <a href="radar-musical.html" title="Radar Musical"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="3" x2="12" y2="7"/></svg></a>
+          <a href="audicoes.html" class="active" title="Audições" aria-label="Audições"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></a>
+          <a href="importar.html" title="Importar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></a>
+          <a href="perfil.html" title="Configurações"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="app-main">
+
+        <!-- TOP BAR -->
+        <div class="app-topbar">
+          <a href="perfil.html" class="user" style="margin-left:auto;">
+            <span class="name" id="userNameDisplay">Carregando...</span>
+            <div class="avatar" id="userAvatar">?</div>
+          </a>
+        </div>
+        <!-- HERO -->
+        <a class="aud-voltar" id="audVoltar" href="#" style="display:none;">&larr; Voltar ao perfil</a>
+        <div class="st-hero">
+          <div>
+            <h1><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Audições</h1>
+            <div class="sub"><span id="audSub">Seu histórico de discos ouvidos.</span></div>
+          </div>
+          <div class="stats-mini" id="audResumo" aria-live="polite"></div>
+        </div>
+
+        <!-- BARRA DO MÊS + AÇÃO PRINCIPAL -->
+        <div class="aud-toolbar">
+          <div class="aud-mes">
+            <button type="button" id="audMesAnt" aria-label="Mês anterior"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div class="lbl" id="audMesLabel" aria-live="polite"></div>
+            <button type="button" id="audMesProx" aria-label="Próximo mês"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+          <button type="button" class="aud-add" id="audBtnAdd" aria-label="Adicionar audição"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Adicionar audição</span></button>
+        </div>
+
+        <!-- CALENDÁRIO + DIA SELECIONADO -->
+        <div class="aud-layout">
+          <div class="aud-cal" aria-busy="false" id="audCalWrap">
+            <div class="aud-sem" aria-hidden="true"><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span><span>DOM</span></div>
+            <div class="aud-grid" id="audGrid" role="group"></div>
+          </div>
+          <aside class="aud-dia" id="audDia" aria-live="polite"></aside>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: ADICIONAR / EDITAR AUDIÇÃO ===== -->
+  <div class="modal-overlay" id="audModalAdd" role="dialog" aria-modal="true" aria-labelledby="audAddTitulo">
+    <div class="modal aud-modal">
+      <div class="modal-header">
+        <h2 id="audAddTitulo">Adicionar audição</h2>
+        <button type="button" class="modal-close" id="audAddFechar" aria-label="Fechar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <!-- Passo 1: como registrar -->
+      <div id="audPassoEscolha">
+        <button type="button" class="aud-opt aud-opt-destaque" id="audOptCamera">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span><strong>Tirar foto</strong><small>Abre a câmera do celular</small></span>
+        </button>
+        <button type="button" class="aud-opt" id="audOptGaleria">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span><strong>Escolher da galeria</strong><small>Uma foto que você já tem</small></span>
+        </button>
+        <button type="button" class="aud-opt" id="audOptColecao">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+          <span><strong>Adicionar da coleção</strong><small>Sem foto, só escolher o disco</small></span>
+        </button>
+        <div class="form-msg" id="audMsgEscolha" role="status"></div>
+      </div>
+
+      <!-- Passo 2: detalhes -->
+      <div id="audPassoForm" style="display:none;">
+        <div class="aud-foto-prev" id="audFotoPrev" style="display:none;">
+          <img id="audFotoPrevImg" alt="Pré-visualização da foto da audição">
+          <button type="button" class="aud-link" id="audFotoRemover">Remover foto</button>
+        </div>
+
+        <div class="form-group">
+          <label for="audBusca">Disco</label>
+          <div class="aud-disco-sel" id="audDiscoSel" style="display:none;"></div>
+          <div id="audBuscaBloco">
+            <input type="search" id="audBusca" placeholder="Buscar disco na sua coleção..." autocomplete="off">
+            <div class="aud-res" id="audRes" role="listbox" aria-label="Discos da coleção"></div>
+          </div>
+        </div>
+
+        <div class="aud-linha">
+          <div class="form-group">
+            <label for="audData">Data</label>
+            <input type="date" id="audData">
+          </div>
+          <div class="form-group">
+            <label for="audHora">Hora <span class="aud-opc">(opcional)</span></label>
+            <input type="time" id="audHora">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="audNota">Nota <span class="aud-opc">(opcional)</span></label>
+          <textarea id="audNota" maxlength="280" rows="2" placeholder="Como foi essa audição?"></textarea>
+        </div>
+
+        <div class="form-msg" id="audMsg" role="status"></div>
+        <button type="button" class="aud-salvar" id="audSalvar">Salvar audição</button>
+      </div>
+
+      <input type="file" id="audFotoCamera" accept="image/*" capture="environment" style="display:none;" aria-hidden="true" tabindex="-1">
+      <input type="file" id="audFotoGaleria" accept="image/*" style="display:none;" aria-hidden="true" tabindex="-1">
+    </div>
+  </div>
+
+  <!-- ===== MODAL: DETALHE DA AUDIÇÃO ===== -->
+  <div class="modal-overlay" id="audModalDet" role="dialog" aria-modal="true" aria-labelledby="audDetAlbum">
+    <div class="modal aud-modal">
+      <div class="modal-header">
+        <h2 id="audDetTitulo" style="font-size:12px; letter-spacing:.1em; opacity:.5; text-transform:uppercase;">Audição</h2>
+        <button type="button" class="modal-close" id="audDetFechar" aria-label="Fechar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="aud-det-img" id="audDetImg"></div>
+      <div class="aud-det-album" id="audDetAlbum"></div>
+      <div class="aud-det-artista" id="audDetArtista"></div>
+      <div class="aud-det-meta" id="audDetMeta"></div>
+      <div class="aud-det-nota" id="audDetNota" style="display:none;"></div>
+      <div class="form-msg" id="audDetMsg" role="status"></div>
+      <div class="aud-det-acoes" id="audDetAcoes">
+        <button type="button" class="aud-btn-sec" id="audDetEditar"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Editar</button>
+        <button type="button" class="aud-btn-sec aud-btn-perigo" id="audDetExcluir"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> <span>Excluir</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// ================================================================
+// CONFIGURAÇÕES
+// ================================================================
+const API_URL = 'https://fportelada.pythonanywhere.com';
+
+function apiFetch(url, opcoes = {}) {
+  const sessaoToken = localStorage.getItem('discoteca_session_token');
+  const opcoesFinais = { ...opcoes };
+  opcoesFinais.headers = { ...(opcoes.headers || {}), 'X-Session-Token': sessaoToken || '' };
+  return fetch(url, opcoesFinais);
+}
+
+const DEV_MODE = false;
+const DEV_USER_ID = 1;
+const DEV_USER_NOME = 'Teste ID 1';
+
+let usuarioId = null;
+
+// ================================================================
+// SIDEBAR / TOP BAR (compartilhado — mesmo padrão do resto do app)
+// ================================================================
+function atualizarBadgeWishlist(n) {
+  const el = document.getElementById('navWishlistCount');
+  if (!el) return;
+  if (n > 0) { el.textContent = n; el.style.display = 'flex'; }
+  else { el.style.display = 'none'; }
+}
+
+function carregarAvatarTopo() {
+  if (!usuarioId) return;
+  apiFetch(API_URL + '/perfil/' + usuarioId)
+    .then(r => r.json())
+    .then(perfil => {
+      if (!perfil || perfil.erro) return;
+      const nome = perfil.nome_exibicao || perfil.nome || DEV_USER_NOME;
+      const nomeEl = document.getElementById('userNameDisplay');
+      if (nomeEl) nomeEl.textContent = nome;
+      const avatarEl = document.getElementById('userAvatar');
+      if (avatarEl) {
+        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nome}">`;
+        else avatarEl.textContent = nome.charAt(0).toUpperCase();
+      }
+    })
+    .catch(() => {});
+}
+
+function sincronizarBadge() {
+  if (!usuarioId) return;
+  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
+    .catch(() => {});
+}
+
+// ================================================================
+// LOGIN
+// ================================================================
+function salvarSessao(userId, nome, token) {
+  localStorage.setItem('discoteca_user_id', userId);
+  localStorage.setItem('discoteca_user_nome', nome);
+  if (token) localStorage.setItem('discoteca_session_token', token);
+}
+function carregarSessao() {
+  const userId = localStorage.getItem('discoteca_user_id');
+  const nome = localStorage.getItem('discoteca_user_nome');
+  const token = localStorage.getItem('discoteca_session_token');
+  if (userId && nome && token) return { userId, nome, token };
+  return null;
+}
+function limparSessao() {
+  localStorage.removeItem('discoteca_user_id');
+  localStorage.removeItem('discoteca_user_nome');
+  localStorage.removeItem('discoteca_session_token');
+}
+
+function ativarTelaApp(nome) {
+  const loginScreen = document.getElementById('loginScreen');
+  const appScreen = document.getElementById('appScreen');
+  if (loginScreen) loginScreen.style.display = 'none';
+  if (appScreen) appScreen.style.display = 'block';
+  const nomeDisplay = document.getElementById('userNameDisplay');
+  if (nomeDisplay) nomeDisplay.textContent = nome;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const btnLogin = document.getElementById('btnLogin');
+  if (btnLogin) {
+    btnLogin.addEventListener('click', function() {
+      const btn = this;
+      const error = document.getElementById('loginError');
+      btn.disabled = true;
+      if (error) error.style.display = 'none';
+      apiFetch(API_URL + '/login')
+        .then(r => r.json())
+        .then(d => {
+          if (d.auth_url) window.location.href = d.auth_url;
+          else throw new Error('URL não recebida');
+        })
+        .catch(() => {
+          if (error) error.style.display = 'block';
+          btn.disabled = false;
+        });
+    });
+  }
+});
+
+// ================================================================
+// VERIFICAR SESSÃO
+// ================================================================
+function verificarSessao() {
+  if (DEV_MODE) {
+    usuarioId = DEV_USER_ID;
+    salvarSessao(DEV_USER_ID, DEV_USER_NOME);
+    ativarTelaApp(DEV_USER_NOME);
+    if (typeof onPaginaPronta === 'function') onPaginaPronta();
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('user_id');
+  const nome = params.get('nome');
+  const token = params.get('token');
+
+  if (userId && nome && token) {
+    salvarSessao(userId, nome, token);
+    usuarioId = userId;
+    ativarTelaApp(nome);
+    window.history.replaceState({}, document.title, window.location.pathname);
+    if (typeof onPaginaPronta === 'function') onPaginaPronta();
+    return;
+  }
+
+  const sessao = carregarSessao();
+  if (sessao) {
+    usuarioId = sessao.userId;
+    ativarTelaApp(sessao.nome);
+    if (typeof onPaginaPronta === 'function') onPaginaPronta();
+    return;
+  }
+
+  apiFetch(API_URL + '/sessao')
+    .then(r => r.json())
+    .then(data => {
+      if (data.logado) {
+        usuarioId = data.usuario_id;
+        salvarSessao(data.usuario_id, data.nome || 'Usuário');
+        ativarTelaApp(data.nome || 'Usuário');
+        if (typeof onPaginaPronta === 'function') onPaginaPronta();
+      }
+    })
+    .catch(() => {});
+}
+
+function escapeHtml(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ================================================================
+// PÁGINA: AUDIÇÕES — audicoes.html
+// ================================================================
+// Modo somente leitura: audicoes.html?u=<id> mostra as audições de
+// OUTRA pessoa (link "Ver todas as audições" do perfil público). Sem
+// login, sem botões de adicionar/editar/excluir.
+const PUBLICO_ID = (new URLSearchParams(window.location.search).get('u') || '').replace(/[^0-9]/g, '');
+const SOMENTE_LEITURA = !!PUBLICO_ID;
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const ICONE_DISCO = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>';
+const FOTO_NOME_RE = /^[0-9a-f]{32}$/;
+
+const agora = new Date();
+let audMes = { y: agora.getFullYear(), m: agora.getMonth() };  // m = 0..11
+let audItens = [];
+let audDiaSel = null;          // 'YYYY-MM-DD'
+let audColecao = null;         // cache da coleção (só dono)
+let audEditandoId = null;      // id da audição em edição (null = criando)
+let audFotoBlob = null;        // foto já reduzida, pronta pra enviar
+let audFotoUrlPrev = null;
+let audDiscoSel = null;        // { id, artista, album }
+let audDetIdx = null;          // índice em audItens do detalhe aberto
+let audSalvando = false;
+
+const el = (id) => document.getElementById(id);
+const pad = (n) => String(n).padStart(2, '0');
+const isoLocal = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const horaLocal = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const chaveMes = () => `${audMes.y}-${pad(audMes.m + 1)}`;
+const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+
+// "2026-09-28" -> "28 de setembro de 2026" (sem depender de locale do navegador)
+function dataExtenso(iso, comAno) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} de ${MESES[m - 1].toLowerCase()}${comAno ? ' de ' + y : ''}`;
+}
+
+// FOTO DA AUDIÇÃO > CAPA DO DISCO (fallback). Nome da foto é revalidado
+// aqui também (defesa em profundidade) antes de virar URL.
+function fonteImagem(it, miniatura) {
+  if (it.foto && FOTO_NOME_RE.test(it.foto)) {
+    return `${API_URL}/audicoes/foto/${it.foto}${miniatura ? '_t' : ''}.jpg`;
+  }
+  return it.capa_url || null;
+}
+window.audPlaceholder = function() {
+  const s = document.createElement('span');
+  s.className = 'aud-ph';
+  s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = ICONE_DISCO;
+  return s;
+};
+function imagemHtml(it, miniatura, alt) {
+  const src = fonteImagem(it, miniatura);
+  if (!src) return `<span class="aud-ph" aria-hidden="true">${ICONE_DISCO}</span>`;
+  return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" onerror="this.replaceWith(audPlaceholder())">`;
+}
+
+// ---------------------------------------------------------------
+// CARREGAR DADOS DO MÊS — 1 requisição por mês, agrupada por dia aqui
+// ---------------------------------------------------------------
+async function carregarMes(diaParaSelecionar) {
+  const wrap = el('audCalWrap');
+  wrap.setAttribute('aria-busy', 'true');
+  const url = SOMENTE_LEITURA
+    ? `${API_URL}/audicoes/publico/${PUBLICO_ID}?mes=${chaveMes()}`
+    : `${API_URL}/audicoes?mes=${chaveMes()}`;
+  try {
+    const r = await apiFetch(url);
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.erro || 'Não foi possível carregar as audições.');
+    audItens = Array.isArray(d.itens) ? d.itens : [];
+    if (SOMENTE_LEITURA && d.nome) {
+      el('audSub').textContent = `Histórico de discos ouvidos de ${d.nome}.`;
+    }
+    renderResumo(d.resumo || { audicoes: 0, discos: 0, artistas: 0 });
+  } catch (e) {
+    audItens = [];
+    renderResumo({ audicoes: 0, discos: 0, artistas: 0 });
+    el('audGrid').innerHTML = '';
+    el('audDia').innerHTML = `<div class="pp-empty-note">${escapeHtml(e.message || 'Erro ao carregar.')}</div>`;
+    wrap.setAttribute('aria-busy', 'false');
+    return;
+  }
+  wrap.setAttribute('aria-busy', 'false');
+
+  // Qual dia fica selecionado: o pedido (após salvar) > hoje (mês atual) >
+  // último dia com audições > nenhum.
+  const porDia = agruparPorDia();
+  const hojeIso = isoLocal(new Date());
+  const [ini, fim] = [`${chaveMes()}-01`, `${chaveMes()}-31`];
+  if (diaParaSelecionar && diaParaSelecionar >= ini && diaParaSelecionar <= fim) audDiaSel = diaParaSelecionar;
+  else if (hojeIso.startsWith(chaveMes())) audDiaSel = hojeIso;
+  else {
+    const dias = Object.keys(porDia).sort();
+    audDiaSel = dias.length ? dias[dias.length - 1] : null;
+  }
+  renderCalendario();
+  renderDia();
+}
+
+function agruparPorDia() {
+  const mapa = {};
+  audItens.forEach((it, idx) => { (mapa[it.data] = mapa[it.data] || []).push({ it, idx }); });
+  return mapa;
+}
+
+function renderResumo(r) {
+  el('audResumo').innerHTML = `
+    <div class="stat"><div class="num">${r.audicoes}</div><div class="label">${r.audicoes === 1 ? 'audição' : 'audições'}</div></div>
+    <div class="stat"><div class="num">${r.discos}</div><div class="label">${r.discos === 1 ? 'disco' : 'discos'}</div></div>
+    <div class="stat"><div class="num">${r.artistas}</div><div class="label">${r.artistas === 1 ? 'artista' : 'artistas'}</div></div>
+  `;
+}
+
+// ---------------------------------------------------------------
+// CALENDÁRIO — semana começa na SEGUNDA; nada hardcoded por mês
+// ---------------------------------------------------------------
+function renderCalendario() {
+  el('audMesLabel').textContent = `${MESES[audMes.m]} ${audMes.y}`;
+  el('audGrid').setAttribute('aria-label', `Calendário de ${MESES[audMes.m]} ${audMes.y}`);
+  const primeiroDiaSemana = (new Date(audMes.y, audMes.m, 1).getDay() + 6) % 7;  // 0 = segunda
+  const diasNoMes = new Date(audMes.y, audMes.m + 1, 0).getDate();
+  const porDia = agruparPorDia();
+  const hojeIso = isoLocal(new Date());
+  let html = '';
+
+  for (let i = 0; i < primeiroDiaSemana; i++) html += '<span class="aud-cel vazio" aria-hidden="true"></span>';
+
+  for (let dia = 1; dia <= diasNoMes; dia++) {
+    const iso = `${chaveMes()}-${pad(dia)}`;
+    const lista = porDia[iso] || [];
+    const n = lista.length;
+    const classes = ['aud-cel'];
+    if (n) classes.push('tem');
+    if (iso === audDiaSel) classes.push('sel');
+    if (iso === hojeIso) classes.push('hoje');
+    const rotulo = `${dataExtenso(iso)}${n ? ', ' + plural(n, 'audição', 'audições') : ', sem audições'}`;
+    const thumbs = lista.slice(0, 3).map(({ it }) => imagemHtml(it, true, '')).join('');
+    html += `<button type="button" class="${classes.join(' ')}" data-dia="${iso}" aria-pressed="${iso === audDiaSel}" aria-label="${escapeHtml(rotulo)}">
+      <span class="aud-num">${dia}</span>
+      ${n ? `<span class="aud-thumbs n${Math.min(n, 3)}">${thumbs}</span>` : ''}
+      ${n > 3 ? `<span class="aud-mais aud-mais-d">+${n - 3}</span>` : ''}
+      ${n > 2 ? `<span class="aud-mais aud-mais-m">+${n - 2}</span>` : ''}
+    </button>`;
+  }
+
+  const resto = (primeiroDiaSemana + diasNoMes) % 7;
+  if (resto) for (let i = 0; i < 7 - resto; i++) html += '<span class="aud-cel vazio" aria-hidden="true"></span>';
+  el('audGrid').innerHTML = html;
+}
+
+function renderDia() {
+  const box = el('audDia');
+  if (!audDiaSel) {
+    box.innerHTML = `<div class="pp-empty-note">Selecione um dia para ver as audições.</div>`;
+    return;
+  }
+  const lista = (agruparPorDia()[audDiaSel] || []);
+  const discos = new Set(lista.map(({ it }) => `${(it.artista || '').toLowerCase()}|${(it.album || '').toLowerCase()}`)).size;
+  let html = `<div class="aud-dia-topo">
+      <div class="aud-dia-titulo">${escapeHtml(dataExtenso(audDiaSel).toUpperCase())}</div>
+      <div class="aud-dia-sub">${lista.length ? `${plural(lista.length, 'audição', 'audições')} · ${plural(discos, 'disco', 'discos')}` : 'Nenhuma audição neste dia.'}</div>
+    </div>`;
+  html += lista.map(({ it, idx }) => `
+    <button type="button" class="aud-item" data-idx="${idx}" aria-label="${escapeHtml(`Abrir audição: ${it.album}, ${it.artista}`)}">
+      <span class="aud-item-img">${imagemHtml(it, true, `${it.artista} — ${it.album}`)}</span>
+      <span class="aud-item-txt">
+        <strong>${escapeHtml(it.artista || '')}</strong>
+        <span>${escapeHtml(it.album || '')}</span>
+        <small>${it.hora ? escapeHtml(it.hora) : 'Sem hora'}${it.foto ? ' · com foto' : ''}</small>
+      </span>
+    </button>`).join('');
+  if (!SOMENTE_LEITURA) {
+    html += `<button type="button" class="aud-add-dia" id="audAddDia"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Adicionar audição neste dia</button>`;
+  }
+  box.innerHTML = html;
+}
+
+// ---------------------------------------------------------------
+// DETALHE DE UMA AUDIÇÃO
+// ---------------------------------------------------------------
+function abrirDetalhe(idx) {
+  const it = audItens[idx];
+  if (!it) return;
+  audDetIdx = idx;
+  el('audDetImg').innerHTML = imagemHtml(it, false, `${it.artista} — ${it.album}${it.foto ? ' (foto da audição)' : ''}`);
+  el('audDetAlbum').textContent = it.album || '';
+  el('audDetArtista').textContent = it.artista || '';
+  el('audDetMeta').textContent = `${dataExtenso(it.data, true)}${it.hora ? ' · ' + it.hora : ''}`;
+  const notaEl = el('audDetNota');
+  if (!SOMENTE_LEITURA && it.nota) { notaEl.textContent = it.nota; notaEl.style.display = 'block'; }
+  else { notaEl.style.display = 'none'; notaEl.textContent = ''; }
+  el('audDetMsg').textContent = ''; el('audDetMsg').className = 'form-msg';
+  el('audDetAcoes').style.display = SOMENTE_LEITURA ? 'none' : 'flex';
+  const btnEx = el('audDetExcluir');
+  btnEx.dataset.confirmando = '0';
+  btnEx.querySelector('span').textContent = 'Excluir';
+  el('audModalDet').classList.add('open');
+  el('audDetFechar').focus();
+}
+function fecharDetalhe() { el('audModalDet').classList.remove('open'); audDetIdx = null; }
+
+async function excluirAudicao() {
+  const it = audItens[audDetIdx];
+  if (!it || SOMENTE_LEITURA) return;
+  const btn = el('audDetExcluir');
+  if (btn.dataset.confirmando !== '1') {          // 1º toque só pede confirmação
+    btn.dataset.confirmando = '1';
+    btn.querySelector('span').textContent = 'Toque de novo para excluir';
+    return;
+  }
+  btn.disabled = true;
+  try {
+    const r = await apiFetch(`${API_URL}/audicoes/${it.id}`, { method: 'DELETE' });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.erro || 'Erro ao excluir.');
+    const dia = it.data;
+    fecharDetalhe();
+    await carregarMes(dia);
+  } catch (e) {
+    const m = el('audDetMsg'); m.textContent = e.message; m.className = 'form-msg error';
+    btn.dataset.confirmando = '0'; btn.querySelector('span').textContent = 'Excluir';
+  } finally { btn.disabled = false; }
+}
+
+// ---------------------------------------------------------------
+// ADICIONAR / EDITAR
+// ---------------------------------------------------------------
+function irParaPasso(passo) {
+  el('audPassoEscolha').style.display = passo === 'escolha' ? 'block' : 'none';
+  el('audPassoForm').style.display = passo === 'form' ? 'block' : 'none';
+}
+
+function abrirAdd(diaIso, editarIdx) {
+  audEditandoId = null; audFotoBlob = null; audDiscoSel = null;
+  if (audFotoUrlPrev) { URL.revokeObjectURL(audFotoUrlPrev); audFotoUrlPrev = null; }
+  el('audMsg').textContent = ''; el('audMsg').className = 'form-msg';
+  el('audMsgEscolha').textContent = ''; el('audMsgEscolha').className = 'form-msg';
+  el('audBusca').value = ''; el('audNota').value = '';
+  atualizarPrevFoto();
+
+  const agoraLocal = new Date();
+  const dia = diaIso || isoLocal(agoraLocal);
+  el('audData').value = dia;
+  el('audData').max = isoLocal(new Date(agoraLocal.getTime() + 86400000));
+  el('audHora').value = (dia === isoLocal(agoraLocal)) ? horaLocal(agoraLocal) : '';
+
+  if (typeof editarIdx === 'number') {
+    const it = audItens[editarIdx];
+    audEditandoId = it.id;
+    el('audAddTitulo').textContent = 'Editar audição';
+    el('audData').value = it.data; el('audHora').value = it.hora || ''; el('audNota').value = it.nota || '';
+    audDiscoSel = { id: it.colecao_id, artista: it.artista, album: it.album, editando: true };
+    irParaPasso('form');
+  } else {
+    el('audAddTitulo').textContent = 'Adicionar audição';
+    irParaPasso('escolha');
+  }
+  renderDiscoSel();
+  el('audSalvar').textContent = audEditandoId ? 'Salvar alterações' : 'Salvar audição';
+  el('audModalAdd').classList.add('open');
+}
+function fecharAdd() { el('audModalAdd').classList.remove('open'); }
+
+async function garantirColecao() {
+  if (audColecao) return audColecao;
+  const r = await apiFetch(`${API_URL}/colecao?user_id=${usuarioId}`);
+  const d = await r.json();
+  audColecao = Array.isArray(d) ? d.slice().sort((a, b) => (a.artista || '').localeCompare(b.artista || '') || (a.album || '').localeCompare(b.album || '')) : [];
+  return audColecao;
+}
+
+async function renderResultadosBusca() {
+  const box = el('audRes');
+  let col;
+  try { col = await garantirColecao(); } catch { box.innerHTML = '<div class="aud-res-vazio">Não consegui carregar sua coleção.</div>'; return; }
+  if (!col.length) {
+    box.innerHTML = '<div class="aud-res-vazio">Sua coleção está vazia. <a href="colecao.html">Adicione discos na Coleção</a> primeiro.</div>';
+    return;
+  }
+  const q = el('audBusca').value.trim().toLowerCase();
+  const achados = col.filter(d => !q || `${d.artista} ${d.album}`.toLowerCase().includes(q)).slice(0, 40);
+  if (!achados.length) { box.innerHTML = '<div class="aud-res-vazio">Nenhum disco encontrado.</div>'; return; }
+  box.innerHTML = achados.map(d => `
+    <button type="button" class="aud-res-item" role="option" data-id="${d.id}">
+      <span class="aud-res-img">${imagemHtml({ capa_url: d.capa_url }, false, '')}</span>
+      <span class="aud-item-txt"><strong>${escapeHtml(d.artista || '')}</strong><span>${escapeHtml(d.album || '')}</span></span>
+    </button>`).join('');
+}
+
+function renderDiscoSel() {
+  const box = el('audDiscoSel'), busca = el('audBuscaBloco');
+  if (audDiscoSel) {
+    box.style.display = 'flex'; busca.style.display = 'none';
+    box.innerHTML = `<span class="aud-item-txt"><strong>${escapeHtml(audDiscoSel.artista || '')}</strong><span>${escapeHtml(audDiscoSel.album || '')}</span></span>
+      <button type="button" class="aud-link" id="audTrocarDisco">Trocar</button>`;
+  } else {
+    box.style.display = 'none'; busca.style.display = 'block';
+    renderResultadosBusca();
+  }
+}
+
+function atualizarPrevFoto() {
+  const prev = el('audFotoPrev');
+  if (audFotoBlob) {
+    if (audFotoUrlPrev) URL.revokeObjectURL(audFotoUrlPrev);
+    audFotoUrlPrev = URL.createObjectURL(audFotoBlob);
+    el('audFotoPrevImg').src = audFotoUrlPrev;
+    prev.style.display = 'block';
+  } else { prev.style.display = 'none'; el('audFotoPrevImg').removeAttribute('src'); }
+}
+
+// Reduz a foto NO CELULAR antes de enviar (lado maior 1024px, JPEG):
+// upload de ~150KB em vez de 4MB, e o navegador (não o servidor) é quem
+// decodifica HEIC do iPhone. O servidor revalida e recodifica de novo —
+// nunca confia no que o cliente mandou.
+async function reduzirFoto(arquivo) {
+  const LADO = 1024;
+  try {
+    const url = URL.createObjectURL(arquivo);
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    const escala = Math.min(1, LADO / Math.max(img.naturalWidth, img.naturalHeight));
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(img.naturalWidth * escala);
+    cv.height = Math.round(img.naturalHeight * escala);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    URL.revokeObjectURL(url);
+    const blob = await new Promise(res => cv.toBlob(res, 'image/jpeg', 0.8));
+    if (blob && blob.size < arquivo.size) return blob;
+    return blob || arquivo;
+  } catch { return arquivo; }   // não deu pra decodificar aqui: manda original e o servidor decide
+}
+
+async function aoEscolherFoto(ev) {
+  const arquivo = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if (!arquivo) return;
+  const msg = el('audMsgEscolha');
+  if (!arquivo.type.startsWith('image/') && arquivo.type !== '') { msg.textContent = 'Esse arquivo não parece ser uma imagem.'; msg.className = 'form-msg error'; return; }
+  msg.textContent = 'Preparando foto...'; msg.className = 'form-msg';
+  audFotoBlob = await reduzirFoto(arquivo);
+  if (audFotoBlob.size > 8 * 1024 * 1024) { audFotoBlob = null; msg.textContent = 'Foto muito grande (máximo 8MB).'; msg.className = 'form-msg error'; return; }
+  msg.textContent = '';
+  atualizarPrevFoto();
+  irParaPasso('form');
+  renderDiscoSel();
+}
+
+async function salvarAudicao() {
+  if (audSalvando) return;
+  const msg = el('audMsg');
+  const erro = (t) => { msg.textContent = t; msg.className = 'form-msg error'; };
+  if (!audDiscoSel) return erro('Escolha um disco da sua coleção.');
+  const data = el('audData').value;
+  if (!data) return erro('Informe a data.');
+  audSalvando = true;
+  const btn = el('audSalvar'); btn.disabled = true; msg.textContent = 'Salvando...'; msg.className = 'form-msg';
+  try {
+    let r;
+    if (audEditandoId) {
+      r = await apiFetch(`${API_URL}/audicoes/${audEditandoId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign(
+          { data, hora: el('audHora').value, nota: el('audNota').value },
+          // só reenvia o disco se a pessoa TROCOU — se o disco original já
+          // saiu da Coleção, editar data/hora/nota continua funcionando
+          audDiscoSel.editando ? {} : { colecao_id: audDiscoSel.id }
+        ))
+      });
+    } else {
+      const fd = new FormData();
+      fd.append('colecao_id', audDiscoSel.id);
+      fd.append('data', data);
+      fd.append('hora', el('audHora').value);
+      fd.append('nota', el('audNota').value);
+      if (audFotoBlob) fd.append('foto', audFotoBlob, 'foto.jpg');
+      r = await apiFetch(`${API_URL}/audicoes`, { method: 'POST', body: fd });   // sem Content-Type: o navegador põe o boundary
+    }
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.erro || 'Erro ao salvar.');
+    fecharAdd();
+    const [y, m] = data.split('-').map(Number);
+    audMes = { y, m: m - 1 };
+    await carregarMes(data);
+  } catch (e) {
+    erro(e.message || 'Erro de conexão. Tente de novo.');
+  } finally { audSalvando = false; btn.disabled = false; }
+}
+
+// ---------------------------------------------------------------
+// LIGAÇÕES
+// ---------------------------------------------------------------
+function mudarMes(delta) {
+  const d = new Date(audMes.y, audMes.m + delta, 1);
+  audMes = { y: d.getFullYear(), m: d.getMonth() };
+  carregarMes();
+}
+
+function ligarEventos() {
+  el('audMesAnt').addEventListener('click', () => mudarMes(-1));
+  el('audMesProx').addEventListener('click', () => mudarMes(1));
+
+  el('audGrid').addEventListener('click', (ev) => {
+    const cel = ev.target.closest('.aud-cel[data-dia]');
+    if (!cel) return;
+    audDiaSel = cel.dataset.dia;
+    renderCalendario(); renderDia();
+  });
+  el('audDia').addEventListener('click', (ev) => {
+    const item = ev.target.closest('.aud-item');
+    if (item) return abrirDetalhe(Number(item.dataset.idx));
+    if (ev.target.closest('#audAddDia')) abrirAdd(audDiaSel);
+  });
+
+  if (SOMENTE_LEITURA) { el('audBtnAdd').style.display = 'none'; }
+  else {
+    el('audBtnAdd').addEventListener('click', () => abrirAdd(null));   // "+" principal: sempre começa em HOJE
+    el('audOptCamera').addEventListener('click', () => el('audFotoCamera').click());
+    el('audOptGaleria').addEventListener('click', () => el('audFotoGaleria').click());
+    el('audOptColecao').addEventListener('click', () => { irParaPasso('form'); renderDiscoSel(); });
+    el('audFotoCamera').addEventListener('change', aoEscolherFoto);
+    el('audFotoGaleria').addEventListener('change', aoEscolherFoto);
+    el('audFotoRemover').addEventListener('click', () => { audFotoBlob = null; atualizarPrevFoto(); });
+    el('audBusca').addEventListener('input', renderResultadosBusca);
+    el('audRes').addEventListener('click', (ev) => {
+      const b = ev.target.closest('.aud-res-item');
+      if (!b) return;
+      const d = (audColecao || []).find(x => String(x.id) === b.dataset.id);
+      if (d) { audDiscoSel = { id: d.id, artista: d.artista, album: d.album }; renderDiscoSel(); }
+    });
+    el('audDiscoSel').addEventListener('click', (ev) => {
+      if (ev.target.id === 'audTrocarDisco') { audDiscoSel = null; renderDiscoSel(); el('audBusca').focus(); }
+    });
+    el('audSalvar').addEventListener('click', salvarAudicao);
+    el('audDetEditar').addEventListener('click', () => { const i = audDetIdx; fecharDetalhe(); abrirAdd(null, i); });
+    el('audDetExcluir').addEventListener('click', excluirAudicao);
+    el('audAddFechar').addEventListener('click', fecharAdd);
+    el('audModalAdd').addEventListener('click', (ev) => { if (ev.target === el('audModalAdd')) fecharAdd(); });
+  }
+  el('audDetFechar').addEventListener('click', fecharDetalhe);
+  el('audModalDet').addEventListener('click', (ev) => { if (ev.target === el('audModalDet')) fecharDetalhe(); });
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Escape') return;
+    if (el('audModalAdd').classList.contains('open')) fecharAdd();
+    else if (el('audModalDet').classList.contains('open')) fecharDetalhe();
+  });
+}
+
+function onPaginaPronta() {
+  ligarEventos();
+  if (!SOMENTE_LEITURA) { carregarAvatarTopo(); sincronizarBadge(); }
+  carregarMes();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (SOMENTE_LEITURA) {
+    // Visita ao histórico de outra pessoa: não pede login nem mostra a
+    // navegação do dono; volta pro perfil público de quem está sendo visto.
+    document.body.classList.add('aud-publico');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    const voltar = document.getElementById('audVoltar');
+    voltar.href = `perfil-publico.html?id=${PUBLICO_ID}`;
+    voltar.style.display = 'inline-block';
+    onPaginaPronta();
+  } else {
+    verificarSessao();
+  }
+});
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

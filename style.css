@@ -1,4 +1,4 @@
-* {
+    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -3909,3 +3909,46 @@
     .imp-hero .icon-big { display: none; }
     .imp-hero .sub { margin: 10px 0 0; max-width: 560px; font-size: 14px; opacity: 0.5; }
     @media (max-width: 900px) { .lg-grid { align-content: start; gap: 28px; padding-top: 12px; } }
+
+    /* ---------- Início: deck de próximas compras (toque passa a carta) ---------- */
+    .dash { overflow-x: clip; }   /* a carta que sai pro lado não pode criar rolagem lateral */
+    .dash-deck-wrap { width: 100%; max-width: 320px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .dash-deck { position: relative; width: 100%; aspect-ratio: 1 / 1; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; border-radius: 26px; }
+    .dash-deck:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 6px; }
+    .dash-deck .dash-card {
+      position: absolute; inset: 0; aspect-ratio: auto;
+      transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.32s ease;
+      box-shadow: 0 24px 50px -28px rgba(0, 0, 0, 0.85);
+    }
+    .dash-deck .dash-card[data-pos="0"] { transform: none; z-index: 5; opacity: 1; }
+    .dash-deck .dash-card[data-pos="1"] { transform: translate(8px, 8px) rotate(2deg) scale(0.98); z-index: 4; opacity: 0.75; }
+    .dash-deck .dash-card[data-pos="2"] { transform: translate(16px, 16px) rotate(4deg) scale(0.96); z-index: 3; opacity: 0.45; }
+    .dash-deck .dash-card[data-pos="3"], .dash-deck .dash-card[data-pos="4"] { transform: translate(16px, 16px) rotate(4deg) scale(0.96); z-index: 1; opacity: 0; }
+    .dash-deck .dash-card:not([data-pos="0"]) { pointer-events: none; }
+    .dash-deck .dash-card:not([data-pos="0"]) .dash-stack-info, .dash-deck .dash-card:not([data-pos="0"]) .dash-stack-go { visibility: hidden; }
+    .dash-deck:hover .dash-card[data-pos="0"] { transform: translateY(-3px); }
+    .dash-deck .dash-card.sai-esq { transform: translateX(-75%) rotate(-10deg) !important; opacity: 0 !important; z-index: 6 !important; }
+    .dash-deck .dash-card.sai-dir { transform: translateX(75%) rotate(10deg) !important; opacity: 0 !important; z-index: 6 !important; }
+    .dash-deck .dash-card.sem-transicao { transition: none !important; }
+    .dash-deck .dash-stack-go { z-index: 2; transition: transform 0.15s ease; }
+    .dash-deck .dash-stack-go:hover { transform: scale(1.08); }
+    .dash-deck .dash-stack-go:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+    .dash-deck-dots { display: flex; gap: 2px; }
+    .dash-deck-dots button { width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .dash-deck-dots button::before { content: ""; width: 7px; height: 7px; border-radius: 4px; background: #3a3a3a; transition: width 0.2s ease, background 0.2s ease; }
+    .dash-deck-dots button.on::before { width: 18px; background: var(--terracotta); }
+    .dash-deck-dots button:focus-visible { outline: 2px solid var(--terracotta); border-radius: 6px; }
+    @media (prefers-reduced-motion: reduce) {
+      .dash-deck .dash-card, .dash-deck-dots button::before { transition: none; }
+    }
+    @media (max-width: 600px) {
+      .dash-deck-wrap { max-width: none; }
+      .dash-deck .dash-card[data-pos="1"] { transform: translateY(8px) scale(0.97); }
+      .dash-deck .dash-card[data-pos="2"] { transform: translateY(16px) scale(0.94); }
+      .dash-deck .dash-card[data-pos="3"], .dash-deck .dash-card[data-pos="4"] { transform: translateY(16px) scale(0.94); }
+      .dash-deck:hover .dash-card[data-pos="0"] { transform: none; }
+    }
+    /* trajeto curto e sumiço rápido: a carta que sai não atravessa os atalhos nem o título */
+    .dash-deck .dash-card.sai-esq { transform: translateX(-38%) rotate(-7deg) !important; transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.2s ease !important; }
+    .dash-deck .dash-card.sai-dir { transform: translateX(38%) rotate(7deg) !important; transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.2s ease !important; }
+    .dash-shortcuts { position: relative; z-index: 7; }

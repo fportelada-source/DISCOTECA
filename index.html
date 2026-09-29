@@ -7,13 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=24" />
+  <link rel="stylesheet" href="style.css?v=25" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=2" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Discoteca" />
@@ -539,6 +539,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       </div>
     </div>`;
 
+  const deckItens = wishlist.slice(0, 5);
   if (hero) {
     const capaHero = hero.capa_url ? ` style="background-image:url('${escapeHtml(hero.capa_url)}');"` : '';
     html += `
@@ -548,19 +549,24 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
         <a href="wishlist.html" title="Wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></a>
         <a href="audicoes.html" title="Audições" aria-label="Audições"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></a>
       </div>
-      <a href="wishlist.html" class="dash-stack" aria-label="Ver ${escapeHtml(hero.album || 'álbum')} na Wishlist">
-        <span class="layer"></span><span class="layer"></span>
-        <span class="dash-stack-top">
-          <span class="cover" id="dashHeroCover" data-artista="${escapeHtml(hero.artista || '')}" data-album="${escapeHtml(hero.album || '')}" data-id="${hero.id || ''}" data-tipo="recomendacao"${hero.capa_url ? ' data-has-capa="1"' : ''}${capaHero}>${hero.capa_url ? '' : `<span class="fallback-icon">${svgDisco}</span>`}</span>
-          <span class="dash-stack-info">
-            <span class="dash-stack-tag" style="color:${corTier(hero.tier)};border-color:${corTier(hero.tier)};">Próxima compra · Tier ${escapeHtml(hero.tier)}</span>
-            <span class="t">${escapeHtml(hero.album) || 'Álbum'}</span>
-            <span class="artist">${escapeHtml(hero.artista) || 'Artista'}</span>
-            <span class="desc">${escapeHtml(hero.nota || hero.estrategia) || 'Complementa bem sua coleção atual.'}</span>
-          </span>
-          <span class="dash-stack-go" aria-hidden="true">${svgSeta}</span>
-        </span>
-      </a>
+      <div class="dash-deck-wrap">
+      <div class="dash-deck" id="dashDeck" tabindex="0" role="group" aria-roledescription="carrossel" aria-label="Próximas compras — toque na carta para ver a próxima">
+        ${deckItens.map((it, k) => {
+          const capa = it.capa_url ? ` style="background-image:url('${escapeHtml(it.capa_url)}');"` : '';
+          return `<div class="dash-card dash-stack-top" data-pos="${k}" aria-hidden="${k === 0 ? 'false' : 'true'}">
+            <span class="cover" id="${k === 0 ? 'dashHeroCover' : 'dashDeckCover-' + k}" data-artista="${escapeHtml(it.artista || '')}" data-album="${escapeHtml(it.album || '')}" data-id="${it.id || ''}" data-tipo="recomendacao"${it.capa_url ? ' data-has-capa="1"' : ''}${capa}>${it.capa_url ? '' : `<span class="fallback-icon">${svgDisco}</span>`}</span>
+            <span class="dash-stack-info">
+              <span class="dash-stack-tag" style="color:${corTier(it.tier)};border-color:${corTier(it.tier)};">Próxima compra · Tier ${escapeHtml(it.tier)}</span>
+              <span class="t">${escapeHtml(it.album) || 'Álbum'}</span>
+              <span class="artist">${escapeHtml(it.artista) || 'Artista'}</span>
+              <span class="desc">${escapeHtml(it.nota || it.estrategia) || 'Complementa bem sua coleção atual.'}</span>
+            </span>
+            <a href="wishlist.html" class="dash-stack-go" tabindex="${k === 0 ? '0' : '-1'}" aria-label="Ver ${escapeHtml(it.album || 'álbum')} na Wishlist">${svgSeta}</a>
+          </div>`;
+        }).join('')}
+      </div>
+      ${deckItens.length > 1 ? `<div class="dash-deck-dots" role="tablist" aria-label="Cartas">${deckItens.map((it, k) => `<button type="button" class="${k === 0 ? 'on' : ''}" data-ir="${k}" aria-label="Carta ${k + 1} de ${deckItens.length}: ${escapeHtml(it.album || '')}"></button>`).join('')}</div>` : ''}
+      </div>
     </div>`;
   } else {
     html += `
@@ -688,9 +694,75 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   document.getElementById('dashContent').innerHTML = html;
   carregarCapasFaltantesDashboard();
+  iniciarDeck();
 
   buscarLacunasColecao();
 }
+
+
+// ================================================================
+// DECK DE PRÓXIMAS COMPRAS — tocar/clicar passa pra próxima carta,
+// arrastar pro lado também; setas do teclado e pontinhos idem.
+// Só apresentação: usa a wishlist que o Dashboard já carregou.
+// ================================================================
+function iniciarDeck() {
+  const deck = document.getElementById('dashDeck');
+  if (!deck) return;
+  const cartas = [...deck.querySelectorAll('.dash-card')];
+  const pontos = [...document.querySelectorAll('.dash-deck-dots button')];
+  const n = cartas.length;
+  if (n === 0) return;
+  let atual = 0, animando = false;
+  const semMovimento = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function posicionar() {
+    cartas.forEach((c, k) => {
+      const pos = (k - atual + n) % n;
+      c.dataset.pos = pos;
+      c.setAttribute('aria-hidden', pos === 0 ? 'false' : 'true');
+      const link = c.querySelector('.dash-stack-go');
+      if (link) link.tabIndex = pos === 0 ? 0 : -1;
+    });
+    pontos.forEach((b, k) => { b.classList.toggle('on', k === atual); b.setAttribute('aria-selected', k === atual ? 'true' : 'false'); });
+  }
+  function ir(destino, direcao) {
+    if (n < 2 || animando || destino === atual) return;
+    const topo = cartas[atual];
+    if (semMovimento) { atual = destino; posicionar(); return; }
+    animando = true;
+    topo.classList.add(direcao < 0 ? 'sai-dir' : 'sai-esq');
+    setTimeout(() => {
+      topo.classList.add('sem-transicao');
+      topo.classList.remove('sai-esq', 'sai-dir');
+      atual = destino; posicionar();
+      void topo.offsetWidth;            // aplica a nova posição antes de religar a transição
+      topo.classList.remove('sem-transicao');
+      animando = false;
+    }, 320);
+  }
+  const proxima = () => ir((atual + 1) % n, 1);
+  const anterior = () => ir((atual - 1 + n) % n, -1);
+
+  let inicioX = null, arrastou = false;
+  deck.addEventListener('pointerdown', e => { inicioX = e.clientX; arrastou = false; });
+  deck.addEventListener('pointerup', e => {
+    if (inicioX === null) return;
+    const dx = e.clientX - inicioX; inicioX = null;
+    if (Math.abs(dx) > 40) { arrastou = true; dx < 0 ? proxima() : anterior(); }
+  });
+  deck.addEventListener('click', e => {
+    if (e.target.closest('.dash-stack-go')) return;   // a seta leva pra Wishlist
+    if (arrastou) { arrastou = false; return; }
+    proxima();
+  });
+  deck.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); proxima(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); anterior(); }
+  });
+  pontos.forEach(b => b.addEventListener('click', () => { const k = Number(b.dataset.ir); ir(k, k > atual ? 1 : -1); }));
+  posicionar();
+}
+window.iniciarDeck = iniciarDeck;
 
 document.addEventListener('DOMContentLoaded', function() {
   verificarSessao();

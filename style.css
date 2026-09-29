@@ -11,10 +11,15 @@
       --card: #1A1A1A;
       --card-line: #282828;
       --border-subtle: #262626;
-      --terracotta: #B86B5C;
-      --terracotta-light: #C97B6B;
-      --terracotta-dark: #A85A4B;
-      --terracotta-wash: rgba(184, 107, 92, 0.12);
+      /* v2 "Musadio" (identidade atual): dourado envelhecido, não mais
+         terracota. O NOME da variável ficou como estava de propósito —
+         é usado 162x em style.css e em toda página via var(--terracotta),
+         renomear exigiria tocar nos 8 arquivos HTML pra zero ganho
+         funcional. O nome descreve a origem histórica, não a cor atual. */
+      --terracotta: #C9A24C;
+      --terracotta-light: #D9B968;
+      --terracotta-dark: #A9843A;
+      --terracotta-wash: rgba(201, 162, 76, 0.12);
 
       /* Cores funcionais mantidas (tier da wishlist / formato da coleção —
          carregam significado, não são só estética, por isso não viraram terracota) */
@@ -625,7 +630,7 @@
     }
 
     .form-btn {
-      background: var(--s-color);
+      background: var(--terracotta);
       color: var(--ink);
       border: none;
       padding: 14px 28px;

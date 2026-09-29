@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=22" />
+  <link rel="stylesheet" href="style.css?v=23" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -24,7 +24,7 @@
     <div style="text-align:center; padding:80px 20px; opacity:0.4; font-size:13px;">Carregando perfil...</div>
   </div>
 
-  <footer>Discoteca — Sua coleção, suas recomendações.</footer>
+  <footer class="app-footer app-footer-min"><div class="app-nav-logo">D<span>iscoteca</span></div><p>Sua coleção, suas recomendações.</p></footer>
 
   <script>
     const API_URL = 'https://fportelada.pythonanywhere.com';
@@ -198,7 +198,7 @@ function apiFetch(url, opcoes = {}) {
         <div class="pp-wishlist-item">
           <div class="cover" ${montarCoverDiv(item)}>
             <span class="priority" style="background:${cor};">${item.tier}</span>
-            <span class="fallback-icon">◈</span>
+            <span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span>
           </div>
           <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
         </div>
@@ -331,7 +331,7 @@ function apiFetch(url, opcoes = {}) {
         data.recentes.forEach(item => {
           html += `
             <div class="pp-recent-item">
-              <div class="cover" ${montarCoverDiv(item)}><span class="fallback-icon">◈</span></div>
+              <div class="cover" ${montarCoverDiv(item)}><span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span></div>
               <div class="info">
                 <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
                 <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>

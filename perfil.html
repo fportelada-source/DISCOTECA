@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=27" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -125,10 +125,6 @@
                 <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="name">Last.fm</div><div class="status">Em breve</div></div></div>
                 <span class="set-badge pending">Em breve</span>
               </div>
-              <div class="set-service-card">
-                <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span><div><div class="name">MusicBrainz</div><div class="status">Integração futura</div></div></div>
-                <span class="set-badge pending">Em breve</span>
-              </div>
             </div>
             <div class="pp-empty-note" style="margin-top:10px;">Login direto com Spotify/Discogs (OAuth) ainda não existe — hoje a importação é via CSV, na aba Importar.</div>
           </div>
@@ -143,18 +139,6 @@
               </div>
             </div>
             <div class="set-selector-row">
-              <div class="left"><div class="title">Moeda</div><div class="sub">Moeda padrão pros preços</div></div>
-              <div class="options" id="optMoeda">
-                <span class="opt" data-valor="BRL">BRL (R$)</span><span class="opt" data-valor="USD">USD ($)</span><span class="opt" data-valor="EUR">EUR (€)</span>
-              </div>
-            </div>
-            <div class="set-selector-row">
-              <div class="left"><div class="title">Marketplace padrão</div><div class="sub">Onde você prefere comprar · ainda só placeholder</div></div>
-              <div class="options" id="optMarketplace">
-                <span class="opt" data-valor="Discogs">Discogs</span><span class="opt" data-valor="Amazon">Amazon</span><span class="opt" data-valor="Mercado Livre">Mercado Livre</span><span class="opt" data-valor="Shopee">Shopee</span>
-              </div>
-            </div>
-            <div class="set-selector-row">
               <div class="left"><div class="title">Visualização padrão</div><div class="sub">Layout da Coleção ao abrir</div></div>
               <div class="options" id="optVisualizacao">
                 <span class="opt" data-valor="cards">Cards</span><span class="opt" data-valor="list">Lista</span>
@@ -166,7 +150,6 @@
           <div class="set-card">
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notificações</h3><span class="sub">fica sabendo</span></div>
             <div class="pp-empty-note" style="margin-bottom:6px;">Envio real (e-mail/push) ainda não existe — suas preferências já ficam salvas pra quando chegar.</div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Queda de preço</div><div class="sub">Mudanças de preço na wishlist</div></div><button class="set-toggle" data-campo="notif_price_drop"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Alertas de wishlist</div><div class="sub">Novos matches e reposições</div></div><button class="set-toggle" data-campo="notif_wishlist"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Novos lançamentos</div><div class="sub">Artistas que você segue</div></div><button class="set-toggle" data-campo="notif_novidades"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Discografia completa</div><div class="sub">Marcos de artistas</div></div><button class="set-toggle" data-campo="notif_discografia"><div class="dot"></div></button></div>
@@ -217,18 +200,6 @@
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar wishlist</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_wishlist"><div class="dot"></div></button></div>
           </div>
 
-          <!-- APARÊNCIA -->
-          <div class="set-card">
-            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Aparência</h3><span class="sub">preferências visuais</span></div>
-            <div class="set-selector-row">
-              <div class="left"><div class="title">Tema</div><div class="sub">Só temos escuro por enquanto</div></div>
-              <div class="options"><span class="opt active disabled">Escuro</span><span class="opt disabled">Claro</span></div>
-            </div>
-            <div class="set-selector-row">
-              <div class="left"><div class="title">Idioma</div><div class="sub">Só temos português por enquanto</div></div>
-              <div class="options"><span class="opt active disabled">Português</span><span class="opt disabled">English</span></div>
-            </div>
-          </div>
 
           <!-- ZONA DE PERIGO -->
           <div class="set-card set-danger">
@@ -535,8 +506,6 @@ function preencherPagina(data) {
   document.getElementById('campo-instagram').value = data.instagram_url || '';
 
   selecionarOpcao('optFormato', data.formato_preferido || 'Vinil');
-  selecionarOpcao('optMoeda', data.moeda_preferida || 'BRL');
-  selecionarOpcao('optMarketplace', data.marketplace_preferido || 'Discogs');
   selecionarOpcao('optVisualizacao', data.visualizacao_padrao || 'cards');
 
   ['notif_price_drop', 'notif_wishlist', 'notif_novidades', 'notif_discografia', 'notif_email',
@@ -579,10 +548,10 @@ function coletarConfiguracoes() {
     discogs_url: document.getElementById('campo-discogs').value.trim(),
     instagram_url: document.getElementById('campo-instagram').value.trim(),
     formato_preferido: pegarOpcaoAtiva('optFormato'),
-    moeda_preferida: pegarOpcaoAtiva('optMoeda'),
-    marketplace_preferido: pegarOpcaoAtiva('optMarketplace'),
+    moeda_preferida: 'BRL',                 // sempre real (seleção removida)
+    marketplace_preferido: 'Discogs',       // sem compra no app por enquanto (seleção removida)
     visualizacao_padrao: pegarOpcaoAtiva('optVisualizacao'),
-    notif_price_drop: pegarToggle('notif_price_drop'),
+    notif_price_drop: false,                // preço saiu do produto
     notif_wishlist: pegarToggle('notif_wishlist'),
     notif_novidades: pegarToggle('notif_novidades'),
     notif_discografia: pegarToggle('notif_discografia'),

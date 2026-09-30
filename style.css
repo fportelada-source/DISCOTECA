@@ -3962,3 +3962,8 @@
        As miniaturas do calendário continuam quadradas e cheias de propósito. */
     .aud-det-img { background: #0d0d0d; display: flex; align-items: center; justify-content: center; }
     .aud-det-img img { width: 100%; height: auto; max-height: min(62vh, 560px); object-fit: contain; }
+
+    /* Texto só para leitor de tela (ex.: "Carta 2 de 5: …" no deck do Início) */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    /* Em tela de toque o "hover" fica preso depois do toque: sem levantar a carta */
+    @media (hover: none) { .dash-deck:hover .dash-card[data-pos="0"] { transform: none; } }

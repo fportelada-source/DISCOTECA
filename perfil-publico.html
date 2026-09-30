@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=27" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -48,6 +48,7 @@ function apiFetch(url, opcoes = {}) {
     // ================================================================
     const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
     async function getCoverUrlLastfm(artist, album) {
+      const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
       if (!artist || !album) return null;
       try {
         const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=27" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -386,7 +386,8 @@ let usuarioId = null;
 let colecao = [];
 let recomendacoes = [];
 let editandoId = null;
-let viewPreference = localStorage.getItem('discoteca_view') || 'cards';
+let viewPreference = 'cards';   // vem da Configuração "Visualização padrão" (ver carregarPreferenciasColecao)
+let formatoPreferidoForm = '';   // idem, "Formato preferido"
 let groupPreference = localStorage.getItem('discoteca_group') || 'separado';
 let colecaoFiltrada = [];
 let confirmCallback = null;
@@ -624,8 +625,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // PÁGINA: COLEÇÃO — colecao.html
 // ================================================================
 function onPaginaPronta() {
+  carregarPreferenciasColecao();
   carregarDados();
   carregarAvatarTopo();
+}
+
+// Aplica as preferências de Configurações: layout ao abrir e formato já
+// marcado ao adicionar disco. Antes eram salvas mas a Coleção ignorava.
+function carregarPreferenciasColecao() {
+  if (!usuarioId) return;
+  apiFetch(API_URL + '/configuracoes?user_id=' + usuarioId)
+    .then(r => r.json())
+    .then(cfg => {
+      if (!cfg || cfg.erro) return;
+      if (cfg.visualizacao_padrao === 'cards' || cfg.visualizacao_padrao === 'list') setView(cfg.visualizacao_padrao);
+      const mapa = { 'Vinil': 'LP', 'CD': 'CD', 'Cassete': 'Cassete', 'DVD/Blu-ray': 'DVD' };
+      formatoPreferidoForm = mapa[cfg.formato_preferido || 'Vinil'] || '';
+    })
+    .catch(() => {});
 }
 
 function carregarDados() {
@@ -773,6 +790,7 @@ function carregarDados() {
     // já usado no Perfil Público, aplicado aos containers desta página.
     const LASTFM_KEY_COL = 'b25b959554ed76058ac220b7b2e0a026';
     async function getCoverUrlLastfmCol(artist, album) {
+      const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
       if (!artist || !album) return null;
       try {
         const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY_COL}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
@@ -869,8 +887,7 @@ function carregarDados() {
     }
 
     function setView(view) {
-      viewPreference = view;
-      localStorage.setItem('discoteca_view', view);
+      viewPreference = view;   // troca vale pra esta visita; o padrão de abertura fica em Configurações
       document.querySelectorAll('#viewToggle button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === view);
       });
@@ -1205,6 +1222,7 @@ function carregarDados() {
     };
 
     async function getCoverUrl(artist, album) {
+      const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
       if (!artist || !album) return null;
       const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
       if (MANUAL_COVERS[key]) return MANUAL_COVERS[key];
@@ -1425,7 +1443,7 @@ function carregarDados() {
         btnSubmit.textContent = 'Salvar Disco';
         document.getElementById('campo-artista').value = '';
         document.getElementById('campo-album').value = '';
-        document.getElementById('campo-formato').value = '';
+        document.getElementById('campo-formato').value = formatoPreferidoForm;   // padrão de Configurações
         document.getElementById('campo-ano').value = '';
         document.getElementById('grupoPrensagem').style.display = 'none';
         document.getElementById('campo-condicao-midia').value = '';

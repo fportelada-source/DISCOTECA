@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=27" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -417,6 +417,7 @@ function corTier(tier) {
 // principal, mas o Dashboard não tinha rede de segurança nenhuma até agora).
 const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
 async function getCoverUrlLastfm(artist, album) {
+  const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
   if (!artist || !album) return null;
   try {
     const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
@@ -436,13 +437,23 @@ async function getCoverUrlLastfm(artist, album) {
 // então buscar a capa que ainda não veio salva é seguro aqui — diferente
 // da geração em massa de recomendações, que evita isso de propósito.
 function carregarCapasFaltantesDashboard() {
+  // Cartas do deck e a lista "Próximas compras" mostram os MESMOS discos:
+  // agrupa por disco e faz UM pedido por disco (antes eram 2, e cada um
+  // entrava na fila do limitador do Discogs). A capa achada vai pra todas
+  // as imagens do mesmo disco e é salva uma vez só.
+  const grupos = new Map();
   document.querySelectorAll('.dash-feature .cover[data-artista], .dash-track .thumb[data-artista], .dash-wishlist-item .cover[data-artista]').forEach(el => {
-    if (el.dataset.hasCapa) return; // já tem capa
+    if (el.dataset.hasCapa || !el.dataset.artista || !el.dataset.album) return;
+    const k = (el.dataset.artista + '|' + el.dataset.album).toLowerCase();
+    if (!grupos.has(k)) grupos.set(k, []);
+    grupos.get(k).push(el);
+  });
+  grupos.forEach(elementos => {
+    const el = elementos[0];
     const artista = el.dataset.artista;
     const album = el.dataset.album;
     const id = el.dataset.id;
     const tipo = el.dataset.tipo; // 'recomendacao' — tudo que aparece aqui vem da wishlist
-    if (!artista || !album) return;
 
     function salvarCapaEncontrada(url) {
       // Grava no banco pra nunca mais precisar buscar de novo — evita
@@ -456,12 +467,14 @@ function carregarCapasFaltantesDashboard() {
     }
 
     function aplicar(url, encontradaAgora) {
-      el.style.backgroundImage = `url('${url}')`;
-      el.style.backgroundSize = 'cover';
-      el.style.backgroundPosition = 'center';
-      const icone = el.querySelector('.fallback-icon');
-      if (icone) icone.style.display = 'none';
-      else el.textContent = '';
+      elementos.forEach(alvo => {
+        alvo.style.backgroundImage = `url('${url}')`;
+        alvo.style.backgroundSize = 'cover';
+        alvo.style.backgroundPosition = 'center';
+        const icone = alvo.querySelector('.fallback-icon');
+        if (icone) icone.style.display = 'none';
+        else alvo.textContent = '';
+      });
       if (encontradaAgora) salvarCapaEncontrada(url);
     }
 
@@ -565,6 +578,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
           </div>`;
         }).join('')}
       </div>
+      <div class="sr-only" id="dashDeckStatus" aria-live="polite"></div>
       ${deckItens.length > 1 ? `<div class="dash-deck-dots" role="tablist" aria-label="Cartas">${deckItens.map((it, k) => `<button type="button" class="${k === 0 ? 'on' : ''}" data-ir="${k}" aria-label="Carta ${k + 1} de ${deckItens.length}: ${escapeHtml(it.album || '')}"></button>`).join('')}</div>` : ''}
       </div>
     </div>`;
@@ -725,16 +739,33 @@ function iniciarDeck() {
     });
     pontos.forEach((b, k) => { b.classList.toggle('on', k === atual); b.setAttribute('aria-selected', k === atual ? 'true' : 'false'); });
   }
+  const status = document.getElementById('dashDeckStatus');
+  function anunciar() {
+    const c = cartas[atual];
+    if (status && c) status.textContent = `Carta ${atual + 1} de ${n}: ${c.querySelector('.t').textContent} — ${c.querySelector('.artist').textContent}`;
+  }
+  let focoNaCarta = false;
+  function lembrarFoco() {
+    // anotado ANTES da troca: quando a carta vai pro fundo o navegador já
+    // tira o foco da seta sozinho, e depois não dá mais pra saber onde estava
+    const ativo = document.activeElement;
+    focoNaCarta = !!ativo && deck.contains(ativo) && ativo !== deck;
+  }
+  function manterFoco() {
+    if (focoNaCarta) deck.focus();   // volta pro deck em vez de se perder
+    focoNaCarta = false;
+  }
   function ir(destino, direcao) {
     if (n < 2 || animando || destino === atual) return;
     const topo = cartas[atual];
-    if (semMovimento) { atual = destino; posicionar(); return; }
+    lembrarFoco();
+    if (semMovimento) { atual = destino; posicionar(); manterFoco(); anunciar(); return; }
     animando = true;
     topo.classList.add(direcao < 0 ? 'sai-dir' : 'sai-esq');
     setTimeout(() => {
       topo.classList.add('sem-transicao');
       topo.classList.remove('sai-esq', 'sai-dir');
-      atual = destino; posicionar();
+      atual = destino; posicionar(); manterFoco(); anunciar();
       void topo.offsetWidth;            // aplica a nova posição antes de religar a transição
       topo.classList.remove('sem-transicao');
       animando = false;

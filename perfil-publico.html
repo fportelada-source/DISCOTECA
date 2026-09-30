@@ -8,6 +8,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=27" />
+  <style>
+    /* Barras das faixas horizontais no visual escuro (antes: barra branca padrão do sistema).
+       Fica aqui pra não precisar subir as 9 páginas; vai pro style.css na próxima mudança de CSS. */
+    .pp-recent-scroll, .pp-aud-strip { scrollbar-width: thin; scrollbar-color: #3a3a3a transparent; }
+    .pp-recent-scroll::-webkit-scrollbar, .pp-aud-strip::-webkit-scrollbar { height: 6px; }
+    .pp-recent-scroll::-webkit-scrollbar-track, .pp-aud-strip::-webkit-scrollbar-track { background: transparent; }
+    .pp-recent-scroll::-webkit-scrollbar-thumb, .pp-aud-strip::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 3px; }
+  </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -134,7 +142,7 @@ function apiFetch(url, opcoes = {}) {
       const box = document.getElementById('ppAudicoes');
       if (!box || !ppUserId) return;
       try {
-        const r = await apiFetch(API_URL + `/audicoes/publico/${ppUserId}?limite=5`);
+        const r = await apiFetch(API_URL + `/audicoes/publico/${ppUserId}?limite=10`);
         if (!r.ok) return;
         const d = await r.json();
         const itens = Array.isArray(d.itens) ? d.itens : [];

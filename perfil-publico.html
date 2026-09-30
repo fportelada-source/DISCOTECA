@@ -365,12 +365,21 @@ function apiFetch(url, opcoes = {}) {
       }
       html += `</div>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da coleção</h2></div><div class="pp-highlights-grid">`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da coleção</h2></div><div class="pp-highlights-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">`;
       if (data.genero_predominante) {
         html += `<div class="pp-highlight-card"><div class="value">${data.genero_predominante_pct}%</div><div class="label">${data.genero_predominante}</div><div class="sub">gênero predominante</div></div>`;
       }
       if (data.decada_favorita) {
         html += `<div class="pp-highlight-card"><div class="value">${data.decada_favorita.nome}</div><div class="label">década favorita</div><div class="sub">${data.decada_favorita.contagem} discos</div></div>`;
+      }
+      // Formato favorito: calculado dos grupos que o perfil já recebe (Vinil = LP/2xLP/EP...)
+      const _nomesFmt = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/Blu-ray' };
+      const _porFmt = data.colecao_por_formato || {};
+      const _contFmt = Object.keys(_nomesFmt).map(k => [k, (_porFmt[k] || []).length]).filter(x => x[1] > 0);
+      const _totFmt = _contFmt.reduce((s, x) => s + x[1], 0);
+      if (_totFmt) {
+        const [kFmt, nFmt] = _contFmt.reduce((a, b) => (b[1] > a[1] ? b : a));
+        html += `<div class="pp-highlight-card"><div class="value">${Math.round(nFmt / _totFmt * 100)}%</div><div class="label">${_nomesFmt[kFmt]}</div><div class="sub">formato favorito</div></div>`;
       }
       if (data.valor_total) {
         html += `<div class="pp-highlight-card"><div class="value">R$ ${data.valor_total}</div><div class="label">valor da coleção</div><div class="sub">estimado</div></div>`;

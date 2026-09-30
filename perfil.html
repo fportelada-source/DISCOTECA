@@ -114,19 +114,19 @@
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8z"/></svg> Serviços conectados</h3><span class="sub">integrações</span></div>
             <div class="set-service-grid">
               <div class="set-service-card">
-                <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><div><div class="name">Spotify</div><div class="status">Nunca sincronizado</div></div></div>
-                <span class="set-badge disconnected">Não conectado</span>
+                <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><div><div class="name">Spotify</div><div class="status">Pela planilha (CSV) exportada</div></div></div>
+                <a class="set-badge pending" href="importar.html" style="text-decoration:none;">Importar</a>
               </div>
               <div class="set-service-card">
-                <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><div><div class="name">Discogs</div><div class="status">Nunca sincronizado</div></div></div>
-                <span class="set-badge disconnected">Não conectado</span>
+                <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><div><div class="name">Discogs</div><div class="status">Importação da coleção ainda não existe</div></div></div>
+                <span class="set-badge disconnected">Indisponível</span>
               </div>
               <div class="set-service-card">
-                <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="name">Last.fm</div><div class="status">Em breve</div></div></div>
-                <span class="set-badge pending">Em breve</span>
+                <div class="left"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="name">Last.fm</div><div class="status">Pelo seu nome de usuário</div></div></div>
+                <a class="set-badge pending" href="importar.html" style="text-decoration:none;">Importar</a>
               </div>
             </div>
-            <div class="pp-empty-note" style="margin-top:10px;">Login direto com Spotify/Discogs (OAuth) ainda não existe — hoje a importação é via CSV, na aba Importar.</div>
+            <div class="pp-empty-note" style="margin-top:10px;">Spotify (planilha CSV) e Last.fm (nome de usuário) entram pela aba Importar. Conexão com login direto ainda não existe.</div>
           </div>
 
           <!-- PREFERÊNCIAS DA COLEÇÃO -->
@@ -151,7 +151,6 @@
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notificações</h3><span class="sub">fica sabendo</span></div>
             <div class="pp-empty-note" style="margin-bottom:6px;">Envio real (e-mail/push) ainda não existe — suas preferências já ficam salvas pra quando chegar.</div>
             <div class="set-toggle-item"><div class="left"><div class="title">Alertas de wishlist</div><div class="sub">Novos matches e reposições</div></div><button class="set-toggle" data-campo="notif_wishlist"><div class="dot"></div></button></div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Novos lançamentos</div><div class="sub">Artistas que você segue</div></div><button class="set-toggle" data-campo="notif_novidades"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Discografia completa</div><div class="sub">Marcos de artistas</div></div><button class="set-toggle" data-campo="notif_discografia"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">E-mail</div><div class="sub">Resumo semanal</div></div><button class="set-toggle" data-campo="notif_email"><div class="dot"></div></button></div>
           </div>
@@ -195,7 +194,6 @@
           <div class="set-card">
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Privacidade</h3><span class="sub">controle sua visibilidade</span></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Perfil público</div><div class="sub">Visível pra qualquer pessoa com o link</div></div><button class="set-toggle" data-campo="privacidade_perfil_publico"><div class="dot"></div></button></div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Visível em buscas</div><div class="sub">Ainda não temos indexação — sem efeito real por enquanto</div></div><button class="set-toggle" data-campo="privacidade_busca"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar valor da coleção</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_valor"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar wishlist</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_wishlist"><div class="dot"></div></button></div>
           </div>
@@ -553,11 +551,11 @@ function coletarConfiguracoes() {
     visualizacao_padrao: pegarOpcaoAtiva('optVisualizacao'),
     notif_price_drop: false,                // preço saiu do produto
     notif_wishlist: pegarToggle('notif_wishlist'),
-    notif_novidades: pegarToggle('notif_novidades'),
+    notif_novidades: false,                 // opção removida (não existia envio)
     notif_discografia: pegarToggle('notif_discografia'),
     notif_email: pegarToggle('notif_email'),
     privacidade_perfil_publico: pegarToggle('privacidade_perfil_publico'),
-    privacidade_busca: pegarToggle('privacidade_busca'),
+    privacidade_busca: false,               // opção removida (não existe busca)
     privacidade_valor: pegarToggle('privacidade_valor'),
     privacidade_wishlist: pegarToggle('privacidade_wishlist'),
     tema: 'dark',

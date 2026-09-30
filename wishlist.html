@@ -257,11 +257,15 @@ function apiFetch(url, opcoes = {}) {
   return fetch(url, opcoesFinais);
 }
 
-// Capas pedidas ao servidor: só quando o disco chega perto da tela e no
-// máximo 2 por vez. Antes a página pedia todas de uma vez; numa conta nova
-// (dezenas de capas sem salvar) isso enchia a fila do Discogs e travava o
-// servidor. Sem IntersectionObserver (navegador antigo), pede na hora.
-const _filaCapas = { ativos: 0, max: 2, espera: [] };
+// Capas: pedidas só quando o disco chega perto da tela, nesta ordem:
+//  1) repositório compartilhado (servidor responde na hora, sem Discogs);
+//  2) Last.fm direto do navegador (sem fila, várias ao mesmo tempo);
+//  3) Discogs pelo servidor — fila de 1 consulta a cada 2,5s pro app
+//     inteiro, então fica só pro que os dois primeiros não acharem.
+// Antes era Discogs primeiro: numa conta nova cada capa esperava a fila.
+// Mesmo disco em dois lugares da página = uma busca só.
+const _filaRapida = { ativos: 0, max: 4, espera: [] };   // repositório
+const _filaLenta = { ativos: 0, max: 2, espera: [] };    // Discogs
 function _quandoVisivel(el) {
   return new Promise(res => {
     if (!el || !('IntersectionObserver' in window)) return res();
@@ -271,25 +275,49 @@ function _quandoVisivel(el) {
     io.observe(el);
   });
 }
-function _vagaCapa() {
+function _vaga(fila) {
   return new Promise(res => {
-    if (_filaCapas.ativos < _filaCapas.max) { _filaCapas.ativos++; res(); }
-    else _filaCapas.espera.push(res);
+    if (fila.ativos < fila.max) { fila.ativos++; res(); }
+    else fila.espera.push(res);
   });
 }
-function _liberaCapa() {
-  const prox = _filaCapas.espera.shift();
-  if (prox) prox(); else _filaCapas.ativos--;
+function _libera(fila) {
+  const prox = fila.espera.shift();
+  if (prox) prox(); else fila.ativos--;
 }
-const _capasPedidas = new Map();   // mesmo disco em dois lugares da página = um pedido só
+async function _naFila(fila, fn) {
+  await _vaga(fila);
+  try { return await fn(); } finally { _libera(fila); }
+}
+async function _capaLastfm(artista, album) {
+  const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
+  artista = _n(artista); album = _n(album);
+  if (!artista || !album) return null;
+  try {
+    const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&format=json`);
+    const d = await r.json();
+    const img = d && d.album && Array.isArray(d.album.image) ? d.album.image.find(i => i.size === 'extralarge') : null;
+    return img && img['#text'] ? img['#text'] : null;
+  } catch { return null; }
+}
+const _capasPedidas = new Map();
 async function pedirCapa(el, url) {
   await _quandoVisivel(el);
   if (!_capasPedidas.has(url)) {
     _capasPedidas.set(url, (async () => {
-      await _vagaCapa();
-      try { const r = await apiFetch(url); return await r.json(); }
-      catch (e) { _capasPedidas.delete(url); throw e; }   // falhou: deixa tentar de novo depois
-      finally { _liberaCapa(); }
+      const q = new URL(url, location.href).searchParams;
+      let respostaServidorAntigo = null;
+      try {
+        const d = await _naFila(_filaRapida, async () => (await apiFetch(url + '&so_repositorio=1')).json());
+        if (d && d.sucesso && d.capa_url) return d;
+        if (d && !('repositorio' in d)) respostaServidorAntigo = d;   // servidor sem o app.py novo: já fez a busca completa
+      } catch (e) { /* segue pro Last.fm */ }
+      const lf = await _capaLastfm(q.get('artista'), q.get('album'));
+      if (lf) return { sucesso: true, capa_url: lf };
+      if (respostaServidorAntigo) return respostaServidorAntigo;      // não repete a busca no Discogs
+      try {
+        return await _naFila(_filaLenta, async () => (await apiFetch(url)).json());
+      } catch (e) { _capasPedidas.delete(url); throw e; }            // falhou: deixa tentar de novo depois
     })());
   }
   const dados = await _capasPedidas.get(url);

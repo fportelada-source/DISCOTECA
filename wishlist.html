@@ -257,6 +257,45 @@ function apiFetch(url, opcoes = {}) {
   return fetch(url, opcoesFinais);
 }
 
+// Capas pedidas ao servidor: só quando o disco chega perto da tela e no
+// máximo 2 por vez. Antes a página pedia todas de uma vez; numa conta nova
+// (dezenas de capas sem salvar) isso enchia a fila do Discogs e travava o
+// servidor. Sem IntersectionObserver (navegador antigo), pede na hora.
+const _filaCapas = { ativos: 0, max: 2, espera: [] };
+function _quandoVisivel(el) {
+  return new Promise(res => {
+    if (!el || !('IntersectionObserver' in window)) return res();
+    const io = new IntersectionObserver(ents => {
+      if (ents.some(e => e.isIntersecting)) { io.disconnect(); res(); }
+    }, { rootMargin: '400px 0px' });
+    io.observe(el);
+  });
+}
+function _vagaCapa() {
+  return new Promise(res => {
+    if (_filaCapas.ativos < _filaCapas.max) { _filaCapas.ativos++; res(); }
+    else _filaCapas.espera.push(res);
+  });
+}
+function _liberaCapa() {
+  const prox = _filaCapas.espera.shift();
+  if (prox) prox(); else _filaCapas.ativos--;
+}
+const _capasPedidas = new Map();   // mesmo disco em dois lugares da página = um pedido só
+async function pedirCapa(el, url) {
+  await _quandoVisivel(el);
+  if (!_capasPedidas.has(url)) {
+    _capasPedidas.set(url, (async () => {
+      await _vagaCapa();
+      try { const r = await apiFetch(url); return await r.json(); }
+      catch (e) { _capasPedidas.delete(url); throw e; }   // falhou: deixa tentar de novo depois
+      finally { _liberaCapa(); }
+    })());
+  }
+  const dados = await _capasPedidas.get(url);
+  return { ok: true, json: async () => dados };
+}
+
 // DEV_MODE: quando true, pula o login do Google inteiramente e usa
 // o usuario de teste (Teste ID 1). Usar SOMENTE no ambiente de teste.
 // Isso espelha o bypass que o back-end tambem precisa ter (ver app.py).
@@ -588,7 +627,7 @@ function carregarCapa(item, artId, fallbackId) {
     return;
   }
 
-  apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(item.artista)}&album=${encodeURIComponent(item.album)}`)
+  pedirCapa(artWrap, API_URL + `/buscar_capa?artista=${encodeURIComponent(item.artista)}&album=${encodeURIComponent(item.album)}`)
     .then(r => r.json())
     .then(d => {
       if (d.sucesso && d.capa_url) aplicar(d.capa_url, true);

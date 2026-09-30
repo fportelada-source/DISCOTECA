@@ -3952,3 +3952,13 @@
     .dash-deck .dash-card.sai-esq { transform: translateX(-38%) rotate(-7deg) !important; transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.2s ease !important; }
     .dash-deck .dash-card.sai-dir { transform: translateX(38%) rotate(7deg) !important; transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.2s ease !important; }
     .dash-shortcuts { position: relative; z-index: 7; }
+
+    /* Início: título maior (versão 3 aprovada) — até 68px no desktop, diminui aos poucos em telas menores */
+    .dash-title { font-size: clamp(32px, 5.2vw, 68px); }
+    .dash-lede { font-size: 17px; max-width: 520px; }
+    @media (max-width: 600px) { .dash-lede { font-size: 15px; } }
+
+    /* Audições: na janela de detalhe a foto aparece INTEIRA (antes era cortada pra preencher 340px de altura).
+       As miniaturas do calendário continuam quadradas e cheias de propósito. */
+    .aud-det-img { background: #0d0d0d; display: flex; align-items: center; justify-content: center; }
+    .aud-det-img img { width: 100%; height: auto; max-height: min(62vh, 560px); object-fit: contain; }

@@ -672,9 +672,11 @@ async function fetchAnoLancamento(artist, album, spanId) {
   const el = document.getElementById(spanId);
   if (!el || !artist || !album) return;
   try {
-    const url = API_URL + `/buscar_por_artista_album?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&user_id=${usuarioId}`;
-    const res = await apiFetch(url);
-    const data = await res.json();
+    // Só quando o disco aparece na tela e no máximo 2 por vez (mesma fila das
+    // capas): antes a página pedia o ano de TODOS os discos de uma vez.
+    await _quandoVisivel(el);
+    const url = API_URL + `/buscar_por_artista_album?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}`;
+    const data = await _naFila(_filaLenta, async () => (await apiFetch(url)).json());
     if (data.sucesso && data.ano) {
       el.textContent = `(${data.ano})`;
     }

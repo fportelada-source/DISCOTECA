@@ -665,6 +665,8 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   }
   html += `</div>`;
 
+  html += `<div id="dashNesteDia"></div>`;   // card "Neste dia" (preenchido por notificacoes.js)
+
   // ===== BARRA DE NÚMEROS =====
   html += `<div class="dash-stats">`;
   html += `<a href="colecao.html" class="dash-stat-item"><div class="number">${totalDiscos}</div><div class="label">Discos</div></a>`;
@@ -778,6 +780,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   document.getElementById('dashContent').innerHTML = html;
   carregarCapasFaltantesDashboard();
   iniciarDeck();
+  if (window.DiscotecaNotificacoes) DiscotecaNotificacoes.preencherNesteDia();
 
   buscarLacunasColecao();
 }
@@ -894,5 +897,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="onboarding.js?v=1" data-auto="1"></script>
+  <script src="notificacoes.js?v=1"></script>
 </body>
 </html>

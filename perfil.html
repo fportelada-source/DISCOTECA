@@ -149,12 +149,14 @@
           </div>
 
           <!-- NOTIFICAÇÕES -->
-          <div class="set-card">
+          <div class="set-card" id="notifPrefs">
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notificações</h3><span class="sub">fica sabendo</span></div>
-            <div class="pp-empty-note" style="margin-bottom:6px;">Envio real (e-mail/push) ainda não existe — suas preferências já ficam salvas pra quando chegar.</div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Alertas de wishlist</div><div class="sub">Novos matches e reposições</div></div><button class="set-toggle" data-campo="notif_wishlist"><div class="dot"></div></button></div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Discografia completa</div><div class="sub">Marcos de artistas</div></div><button class="set-toggle" data-campo="notif_discografia"><div class="dot"></div></button></div>
-            <div class="set-toggle-item"><div class="left"><div class="title">E-mail</div><div class="sub">Resumo semanal</div></div><button class="set-toggle" data-campo="notif_email"><div class="dot"></div></button></div>
+            <div class="pp-empty-note" style="margin-bottom:6px;">Avisos dentro do app, no sino do topo (até 3 por dia).</div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Aniversário na coleção</div><div class="sub">Faz 3 meses, 6 meses, 1 ano... que um disco chegou</div></div><button class="set-toggle" data-notif="notif_aniversario" aria-label="Aniversário na coleção"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Lembranças</div><div class="sub">O que você ouviu neste dia, anos atrás</div></div><button class="set-toggle" data-notif="notif_lembrancas" aria-label="Lembranças"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Faz tempo que você não escuta</div><div class="sub">Uma sugestão por dia de disco esquecido</div></div><button class="set-toggle" data-notif="notif_faz_tempo" aria-label="Faz tempo que você não escuta"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Lançamentos</div><div class="sub">Álbuns novos de artistas com disco favorito na sua coleção</div></div><button class="set-toggle" data-notif="notif_lancamentos" aria-label="Lançamentos"><div class="dot"></div></button></div>
+            <div class="pp-empty-note" id="notifFavoritosNota" style="display:none; margin-top:6px;">Para receber lançamentos, marque como favorito (estrela) pelo menos um disco do artista na Coleção.</div>
           </div>
 
           <!-- IMPORTAR E EXPORTAR -->
@@ -563,10 +565,10 @@ function coletarConfiguracoes() {
     marketplace_preferido: 'Discogs',       // sem compra no app por enquanto (seleção removida)
     visualizacao_padrao: pegarOpcaoAtiva('optVisualizacao'),
     notif_price_drop: false,                // preço saiu do produto
-    notif_wishlist: pegarToggle('notif_wishlist'),
+    notif_wishlist: false,                  // opção antiga sem efeito (substituída pelas notificações reais)
     notif_novidades: false,                 // opção removida (não existia envio)
-    notif_discografia: pegarToggle('notif_discografia'),
-    notif_email: pegarToggle('notif_email'),
+    notif_discografia: false,               // idem
+    notif_email: false,                     // e-mail não existe
     privacidade_perfil_publico: pegarToggle('privacidade_perfil_publico'),
     privacidade_busca: false,               // opção removida (não existe busca)
     privacidade_valor: pegarToggle('privacidade_valor'),
@@ -835,5 +837,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="onboarding.js?v=1"></script>
+  <script src="notificacoes.js?v=1"></script>
 </body>
 </html>

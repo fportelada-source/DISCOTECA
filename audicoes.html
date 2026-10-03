@@ -825,7 +825,24 @@ function ligarEventos() {
 function onPaginaPronta() {
   ligarEventos();
   if (!SOMENTE_LEITURA) { carregarAvatarTopo(); sincronizarBadge(); }
-  carregarMes();
+  // Vindo das notificações: ?dia=AAAA-MM-DD abre o calendário nesse dia;
+  // ?ouvir=<id do disco> abre o registro de audição com o disco já escolhido.
+  const qs = new URLSearchParams(window.location.search);
+  const dia = qs.get('dia');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dia || '')) {
+    audMes = { y: Number(dia.slice(0, 4)), m: Number(dia.slice(5, 7)) - 1 };
+    carregarMes(dia);
+  } else {
+    carregarMes();
+  }
+  const ouvir = qs.get('ouvir');
+  if (!SOMENTE_LEITURA && /^\d+$/.test(ouvir || '')) {
+    abrirAdd(null);
+    garantirColecao().then(col => {
+      const d = (col || []).find(x => String(x.id) === ouvir);
+      if (d) { audDiscoSel = { id: d.id, artista: d.artista, album: d.album }; renderDiscoSel(); irParaPasso('form'); }
+    }).catch(() => {});
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -851,5 +868,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   </script>
+  <script src="notificacoes.js?v=1"></script>
 </body>
 </html>

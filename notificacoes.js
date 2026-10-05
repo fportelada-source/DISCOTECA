@@ -54,9 +54,10 @@
     aniversario: SVG('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>'),
     lembranca: SVG('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
     faz_tempo: SVG('<polygon points="6 4 20 12 6 20 6 4"/>'),
-    lancamento: SVG('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/>')
+    lancamento: SVG('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/>'),
+    conquista: SVG('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>')
   };
-  const ACAO = { lembranca: 'Ver no calendário', lancamento: 'Ouvir no Spotify' };
+  const ACAO = { lembranca: 'Ver no calendário', lancamento: 'Ouvir no Spotify', conquista: 'Ver conquistas' };
   // botão de ouvir: varia por aviso (fixo pro mesmo aviso)
   const ACAO_PLAY = ['Vamos dar o play?', 'Que tal ouvir agora?', 'Bora girar esse disco?', 'Hora de colocar pra tocar?', 'Merece um play hoje?', 'Que tal uma audição?'];
   let dados = null;
@@ -81,7 +82,7 @@
   function linkAcao(item) {
     if (!item.link) return '';
     const externo = /^https?:\/\//.test(item.link);
-    if (!externo && !/^[a-z-]+\.html(\?[\w=&.-]*)?$/.test(item.link)) return '';   // só links internos conhecidos ou http(s)
+    if (!externo && !/^[a-z-]+\.html(\?[\w=&.-]*)?(#[\w-]*)?$/.test(item.link)) return '';   // só links internos conhecidos ou http(s)
     const rotulo = (item.tipo === 'aniversario' || item.tipo === 'faz_tempo') ? ACAO_PLAY[Number(item.id || 0) % ACAO_PLAY.length] : (ACAO[item.tipo] || 'Abrir');
     return `<a class="sino-acao" href="${esc(item.link)}"${externo ? ' target="_blank" rel="noopener"' : ''}>${rotulo}</a>`;
   }

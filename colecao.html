@@ -18,6 +18,15 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Discoteca" />
+  <style>
+    /* Atalhos de tags no cadastro (liberam conquistas: Primeira Prensagem, Ao Vivo, Trilha Sonora, Coletanista) */
+    .tag-atalhos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag-atalho { background: transparent; border: 1px solid var(--card-line); color: var(--paper); opacity: 0.7; border-radius: 20px; padding: 5px 11px; font: 500 12px 'Inter', sans-serif; cursor: pointer; transition: 0.15s; }
+    .tag-atalho:hover { opacity: 1; }
+    .tag-atalho.sugerido { opacity: 1; border-color: var(--terracotta); border-style: dashed; }
+    .tag-atalho.on { opacity: 1; background: var(--terracotta); border-color: var(--terracotta); border-style: solid; color: var(--ink); font-weight: 700; }
+    .tag-atalho:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
+  </style>
 </head>
 <body>
 
@@ -311,6 +320,16 @@
               <div class="form-group full">
                 <label>Notas</label>
                 <textarea id="campo-notas" rows="2" placeholder="Ex: Edição limitada, prensagem alemã..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="campo-tags">Tags</label>
+                <input type="text" id="campo-tags" maxlength="300" placeholder="Separe por vírgula" />
+                <div class="tag-atalhos" id="tagAtalhos" aria-label="Atalhos de tags">
+                  <button type="button" class="tag-atalho" data-tipo="primeira_prensagem" data-tag="Primeira prensagem" aria-pressed="false">Primeira prensagem</button>
+                  <button type="button" class="tag-atalho" data-tipo="ao_vivo" data-tag="Ao vivo" aria-pressed="false">Ao vivo</button>
+                  <button type="button" class="tag-atalho" data-tipo="trilha_sonora" data-tag="Trilha sonora" aria-pressed="false">Trilha sonora</button>
+                  <button type="button" class="tag-atalho" data-tipo="coletanista" data-tag="Coletânea" aria-pressed="false">Coletânea</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1496,6 +1515,8 @@ function carregarDados() {
           document.getElementById('campo-preco').value = disco.preco || '';
           document.getElementById('campo-data').value = disco.data_adicao || '';
           document.getElementById('campo-notas').value = disco.notas || '';
+          document.getElementById('campo-tags').value = disco.tags || '';
+          atualizarAtalhosTags();
           document.getElementById('campo-codigo-barras').value = disco.codigo_barras || '';
           document.getElementById('campo-favorito').value = disco.favorito ? '1' : '0';
           document.getElementById('campo-capa-manual').value = disco.capa_url || '';
@@ -1520,6 +1541,8 @@ function carregarDados() {
         document.getElementById('campo-preco').value = '';
         document.getElementById('campo-data').value = '';
         document.getElementById('campo-notas').value = '';
+        document.getElementById('campo-tags').value = '';
+        atualizarAtalhosTags();
         document.getElementById('campo-codigo-barras').value = '';
         document.getElementById('campo-favorito').value = '0';
         document.getElementById('campo-capa-manual').value = '';
@@ -1565,6 +1588,7 @@ function carregarDados() {
         preco: parseFloat(document.getElementById('campo-preco').value) || null,
         data_aquisicao: document.getElementById('campo-data').value || null,
         notas: document.getElementById('campo-notas').value.trim(),
+        tags: lerTagsCampo(),
         codigo_barras: document.getElementById('campo-codigo-barras').value.trim(),
         favorito: document.getElementById('campo-favorito').value === '1',
         capa_url: document.getElementById('campo-capa-manual').value.trim(),
@@ -1741,6 +1765,50 @@ function carregarDados() {
       setGroup(groupPreference);
       verificarSessao();
     });
+
+    // ===== Tags do disco (atalhos que liberam conquistas) =====
+    const TAGS_SINONIMOS = {
+      primeira_prensagem: ['primeira prensagem', '1a prensagem', 'first press', 'first pressing'],
+      ao_vivo: ['ao vivo', 'live'],
+      trilha_sonora: ['trilha sonora', 'soundtrack', 'ost'],
+      coletanista: ['coletanea', 'compilation']
+    };
+    function tagNormal(s) { return (s || '').replace(/ª/g, 'a').replace(/º/g, 'o').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+    function tagsDoCampo() { return document.getElementById('campo-tags').value.split(',').map(t => t.trim()).filter(Boolean); }
+    function lerTagsCampo() {
+      const vistas = new Set(), saida = [];
+      tagsDoCampo().forEach(t => { const k = tagNormal(t); if (!vistas.has(k)) { vistas.add(k); saida.push(t); } });
+      return saida.join(', ');
+    }
+    function sugestaoTag(tipo) {
+      const album = tagNormal(document.getElementById('campo-album').value);
+      const genero = tagNormal((document.getElementById('campo-genero') || {}).value);
+      if (tipo === 'ao_vivo') return /\b(live|ao vivo|unplugged|alive)\b/.test(album);
+      if (tipo === 'coletanista') return /(greatest hits|best of|the very best|coletanea|anthology|essentials?)\b/.test(album);
+      if (tipo === 'trilha_sonora') return /(soundtrack|trilha sonora|\bost\b)/.test(album) || /(stage & screen|soundtrack|trilha)/.test(genero);
+      return false;
+    }
+    function atualizarAtalhosTags() {
+      const atuais = new Set(tagsDoCampo().map(tagNormal));
+      document.querySelectorAll('#tagAtalhos .tag-atalho').forEach(b => {
+        const on = TAGS_SINONIMOS[b.dataset.tipo].some(s => atuais.has(s));
+        b.classList.toggle('on', on);
+        b.classList.toggle('sugerido', !on && sugestaoTag(b.dataset.tipo));
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      const campo = document.getElementById('campo-tags');
+      if (!campo) return;
+      document.querySelectorAll('#tagAtalhos .tag-atalho').forEach(b => b.addEventListener('click', () => {
+        const sinonimos = TAGS_SINONIMOS[b.dataset.tipo];
+        const lista = tagsDoCampo();
+        const sem = lista.filter(t => !sinonimos.includes(tagNormal(t)));
+        campo.value = (sem.length === lista.length ? [...lista, b.dataset.tag] : sem).join(', ');   // liga ou desliga
+        atualizarAtalhosTags();
+      }));
+      ['campo-tags', 'campo-album', 'campo-genero'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', atualizarAtalhosTags); });
+    });
   </script>
   <script>
     if ('serviceWorker' in navigator) {
@@ -1749,6 +1817,6 @@ function carregarDados() {
       });
     }
   </script>
-  <script src="notificacoes.js?v=1"></script>
+  <script src="notificacoes.js?v=3"></script>
 </body>
 </html>

@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=28" />
+  <style>.nov-data { font-size: 12px; font-weight: 500; letter-spacing: 0; opacity: 0.45; margin-left: 10px; white-space: nowrap; }</style>
 </head>
 <body>
   <header class="app-nav">
@@ -36,7 +37,15 @@
       <h1>Novidades</h1>
       <p class="legal-data">Tudo que mudou no Discoteca, da versão mais nova para a mais antiga.</p>
 
-      <h2>v1.22 — Notificações</h2>
+      <h2>v1.23 — Conquistas <span class="nov-data">05/10/2026</span></h2>
+      <ul>
+        <li>24 conquistas para descobrir — da coleção à escuta — em quatro raridades: comum, incomum, rara e lendária. E o Fundador, só para os 20 primeiros a usarem todas as funções do Discoteca.</li>
+        <li>Veja as suas em Configurações e escolha uma como título no seu perfil. As 5 mais recentes aparecem no perfil público.</li>
+        <li>Novo campo de tags no cadastro de disco, com atalhos para primeira prensagem, ao vivo, trilha sonora e coletânea.</li>
+        <li>Cada conquista desbloqueada chega como aviso no sino.</li>
+      </ul>
+
+      <h2>v1.22 — Notificações <span class="nov-data">02/10/2026</span></h2>
       <ul>
         <li>Novo sino no topo com avisos do Discoteca.</li>
         <li>Aniversário na coleção ("faz 3 meses que você adicionou esse disco"), com um convite para colocar pra tocar. E lembranças do que você ouviu neste dia, anos atrás.</li>
@@ -55,7 +64,7 @@
         <li>O ano de lançamento aparece aos poucos, conforme você rola a página, e fica guardado para as próximas visitas.</li>
       </ul>
 
-      <h2>v1.19 — Política e Termos completos</h2>
+      <h2>v1.19 — Política e Termos completos <span class="nov-data">01/10/2026</span></h2>
       <ul>
         <li>Política de Privacidade e Termos de Uso com todas as informações preenchidas.</li>
         <li>Créditos do Discogs, Last.fm e Spotify no rodapé.</li>
@@ -179,6 +188,6 @@
       else { pill.href = 'index.html'; pill.setAttribute('aria-label', 'Entrar no Discoteca'); n.textContent = 'Entrar'; av.style.display = 'none'; }
     })();
   </script>
-  <script src="notificacoes.js?v=2"></script>
+  <script src="notificacoes.js?v=3"></script>
 </body>
 </html>

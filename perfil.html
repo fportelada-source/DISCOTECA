@@ -151,10 +151,10 @@
           <!-- NOTIFICAÇÕES -->
           <div class="set-card" id="notifPrefs">
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notificações</h3><span class="sub">fica sabendo</span></div>
-            <div class="pp-empty-note" style="margin-bottom:6px;">Avisos dentro do app, no sino do topo (até 3 por dia).</div>
+            <div class="pp-empty-note" style="margin-bottom:6px;">Avisos dentro do app, no sino do topo.</div>
             <div class="set-toggle-item"><div class="left"><div class="title">Aniversário na coleção</div><div class="sub">Faz 3 meses, 6 meses, 1 ano... que um disco chegou</div></div><button class="set-toggle" data-notif="notif_aniversario" aria-label="Aniversário na coleção"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Lembranças</div><div class="sub">O que você ouviu neste dia, anos atrás</div></div><button class="set-toggle" data-notif="notif_lembrancas" aria-label="Lembranças"><div class="dot"></div></button></div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Faz tempo que você não escuta</div><div class="sub">Uma sugestão por dia de disco esquecido</div></div><button class="set-toggle" data-notif="notif_faz_tempo" aria-label="Faz tempo que você não escuta"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Faz tempo que você não escuta</div><div class="sub">Sugestões de discos esquecidos na estante</div></div><button class="set-toggle" data-notif="notif_faz_tempo" aria-label="Faz tempo que você não escuta"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Lançamentos</div><div class="sub">Álbuns novos de artistas com disco favorito na sua coleção</div></div><button class="set-toggle" data-notif="notif_lancamentos" aria-label="Lançamentos"><div class="dot"></div></button></div>
             <div class="pp-empty-note" id="notifFavoritosNota" style="display:none; margin-top:6px;">Para receber lançamentos, marque como favorito (estrela) pelo menos um disco do artista na Coleção.</div>
           </div>
@@ -202,6 +202,15 @@
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar wishlist</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_wishlist"><div class="dot"></div></button></div>
           </div>
 
+
+          <!-- CONQUISTAS -->
+          <div class="set-card" id="conquistasCard">
+            <span id="conquistas"></span>
+            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg> Conquistas</h3><span class="sub">o que você já alcançou</span></div>
+            <div class="cq-acoes"><span class="cq-resumo" id="cqResumo">Carregando…</span><button type="button" class="set-acao" id="cqVerTodos" aria-expanded="false" aria-controls="cqGrade">Ver todos</button></div>
+            <div class="cq-grade" id="cqGrade" hidden></div>
+            <div class="set-toggle-item cq-titulo-linha"><div class="left"><div class="title">Título no perfil</div><div class="sub">Aparece abaixo do seu nome no perfil público</div></div><select id="cqTitulo" aria-label="Título no perfil" disabled><option value="">Sem título</option></select></div>
+          </div>
 
           <!-- PRIVACIDADE E DADOS (LGPD) -->
           <div class="set-card" id="setPrivacidadeDados">
@@ -837,6 +846,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="onboarding.js?v=1"></script>
-  <script src="notificacoes.js?v=1"></script>
+  <script src="notificacoes.js?v=3"></script>
+  <script src="conquistas.js?v=1"></script>
 </body>
 </html>

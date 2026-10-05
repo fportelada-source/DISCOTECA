@@ -427,7 +427,7 @@ function apiFetch(url, opcoes = {}) {
       `;
 
       container.innerHTML = html;
-      if (window.DiscotecaConquistas) { DiscotecaConquistas.estilo(); DiscotecaConquistas.renderPublico(document.getElementById('ppConquistas'), data.conquistas_recentes); }
+      if (window.DiscotecaConquistas) { DiscotecaConquistas.estilo(); DiscotecaConquistas.renderPublico(document.getElementById('ppConquistas'), data.conquistas_vitrine); }
       carregarAudicoesPublicas();
       renderWishlistPagina();
       configurarLazyLoadCapas();
@@ -442,6 +442,6 @@ function apiFetch(url, opcoes = {}) {
       });
     }
   </script>
-  <script src="conquistas.js?v=1"></script>
+  <script src="conquistas.js?v=2"></script>
 </body>
 </html>

@@ -35,6 +35,12 @@
   "fundador": "<circle cx=\"50\" cy=\"50\" r=\"38\" stroke-width=\"2\" /> <polygon points=\"50,24 72,66 28,66\" stroke-width=\"2\" fill=\"none\" /> <line x1=\"36\" y1=\"55\" x2=\"64\" y2=\"55\" stroke-width=\"1.5\" /> <circle cx=\"50\" cy=\"45\" r=\"5\" fill=\"currentColor\" /> <circle cx=\"50\" cy=\"45\" r=\"10\" stroke-width=\"1\" opacity=\"0.6\" />"
 };
   const RARIDADE = { comum: 'Comum', incomum: 'Incomum', rara: 'Rara', lendaria: 'Lendária' };
+  const COR = { comum: '#9A9A9A', incomum: '#D0D0D0', rara: '#C9A24C', lendaria: '#E39A2E' };
+  const UNIDADE = { colecao_crescente: 'itens', mestre_do_vinil: 'vinis', mestre_do_cd: 'CDs', mestre_do_cassete: 'cassetes', mestre_do_dvd: 'DVDs',
+    completista: 'artistas completos', superfa: 'discos do mesmo artista', mago_da_wishlist: 'itens da wishlist na coleção', a_caca: 'itens na wishlist',
+    vintage: 'anos', ao_vivo: 'álbuns ao vivo', trilha_sonora: 'trilhas sonoras', coletanista: 'coletâneas', viajante_do_tempo: 'décadas',
+    multiformato: 'formatos', maratona: 'discos no mesmo dia', fiel: 'audições do mesmo disco', fotografo: 'audições com foto', arquivista: 'discos catalogados' };
+  const DADOS = new WeakMap();   // elemento do selo -> { conquista, comProgresso }
   const CSS = `
     .cq-grade[hidden] { display: none; }   /* sem isto o display:grid vence o atributo hidden */
     .cq-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 14px; margin-top: 14px; }
@@ -56,8 +62,44 @@
     .cq-titulo-linha select { background: var(--ink); color: var(--paper); border: 1px solid var(--card-line); border-radius: 12px; padding: 8px 12px; font: 500 13px 'Inter', sans-serif; max-width: 100%; }
     .cq-vazio { font-size: 13px; opacity: 0.55; margin-top: 10px; }
     .pp-titulo { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--terracotta); margin-top: 4px; }
-    @media (max-width: 600px) { .cq-grade { grid-template-columns: repeat(2, 1fr); } }
-    @media (prefers-reduced-motion: reduce) { .cq-selo { transition: none; } }
+    .cq-selo { cursor: default; outline: none; }
+    .cq-selo:focus-visible { box-shadow: 0 0 0 2px var(--paper); }
+    .cq-mini { border-radius: 16px; padding: 10px 6px; }
+    .cq-mini::before { inset: 5px; border-radius: 11px; } .cq-mini::after { inset: 9px; border-radius: 8px; }
+    .cq-mini .cq-rotulo { font-size: 9px; margin-top: 7px; } .cq-mini .cq-meta { display: none; }
+    #cqBalao { position: fixed; z-index: 90; max-width: 280px; background: #141414; border: 1px solid var(--cqb, #9A9A9A); border-radius: 14px;
+      padding: 12px 14px; box-shadow: 0 18px 40px -12px rgba(0,0,0,0.85); font-family: 'Inter', sans-serif; color: var(--paper); pointer-events: none;
+      opacity: 0; transform: translateY(4px); transition: opacity 0.15s ease, transform 0.15s ease; }
+    #cqBalao.visivel { opacity: 1; transform: none; }
+    #cqBalao .b-nome { font-size: 14px; font-weight: 700; }
+    #cqBalao .b-rar { font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cqb); margin-top: 2px; }
+    #cqBalao .b-desc { font-size: 12.5px; line-height: 1.45; opacity: 0.75; margin-top: 8px; }
+    #cqBalao .b-linha { font-size: 11.5px; opacity: 0.5; margin-top: 6px; }
+    #cqBalao .b-prox { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--card-line); font-size: 12px; }
+    #cqBalao .b-barra { height: 5px; border-radius: 3px; background: #262626; margin-top: 6px; overflow: hidden; }
+    #cqBalao .b-barra span { display: block; height: 100%; background: var(--cqb); border-radius: 3px; }
+    .cq-vitrine-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .cq-vitrine-resumo { font-size: 13px; opacity: 0.55; }
+    .cq-vitrine { display: grid; grid-template-columns: minmax(300px, 1.1fr) 1fr; gap: 28px; align-items: center; margin-top: 18px; }
+    .cq-vitrine.so-destaque { grid-template-columns: 1fr; justify-items: center; }   /* só uma conquista: cartão centralizado, sem buraco */
+    .cq-vitrine.so-destaque .cq-destaque-texto .d-desc { max-width: 420px; }
+    .cq-outras .cq-selo { max-width: 150px; width: 100%; }
+    .cq-destaque { display: flex; align-items: center; gap: 22px; }
+    .cq-destaque .cq-selo { width: 168px; flex-shrink: 0; }
+    .cq-destaque-texto .d-nome { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+    .cq-destaque-texto .d-rar { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+    .cq-destaque-texto .d-desc { font-size: 14px; line-height: 1.5; opacity: 0.65; margin-top: 10px; max-width: 360px; }
+    .cq-destaque-texto .d-data { font-size: 12px; opacity: 0.45; margin-top: 8px; }
+    .cq-outras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 860px) {
+      .cq-vitrine { grid-template-columns: 1fr; gap: 18px; }
+      .cq-outras { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 104px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: #3a3a3a transparent; }
+    }
+    @media (max-width: 600px) {
+      .cq-grade { grid-template-columns: repeat(2, 1fr); }
+      .cq-destaque .cq-selo { width: 128px; } .cq-destaque { gap: 16px; } .cq-destaque-texto .d-nome { font-size: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .cq-selo, #cqBalao { transition: none; } }
   `;
   function estilo() {
     if (document.getElementById('cqEstilo')) return;
@@ -65,13 +107,62 @@
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
   function dataCurta(d) { const p = (d || '').slice(0, 10).split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : ''; }
-  function selo(c) {
+  let FILA = [];   // conquistas desenhadas, na ordem (o selo guarda o índice e o balão lê daqui)
+  function selo(c, extra) {
     const raridade = RARIDADE[c.raridade] ? c.raridade : 'comum';
-    return `<div class="cq-selo ${raridade}" title="${esc(c.descricao)} — ${RARIDADE[raridade]}" role="img" aria-label="${esc(c.rotulo)}, conquista ${RARIDADE[raridade].toLowerCase()}">
+    FILA.push(c);
+    return `<div class="cq-selo ${raridade}${extra ? ' ' + extra : ''}" data-cq="${FILA.length - 1}" tabindex="0" role="img" aria-label="${esc(c.rotulo)}, conquista ${RARIDADE[raridade].toLowerCase()}. ${esc(c.descricao)}">
       <svg viewBox="0 0 100 100" aria-hidden="true">${ICONES[c.id] || ''}</svg>
       <div class="cq-rotulo">${esc(c.rotulo)}</div>
       <div class="cq-meta">${RARIDADE[raridade]}${c.desbloqueada_em ? ' · ' + dataCurta(c.desbloqueada_em) : ''}</div>
     </div>`;
+  }
+  let balao = null, ancora = null, abertoEm = 0;
+  function textoBalao(c, comProgresso) {
+    const unid = UNIDADE[c.id], unico = !unid || (c.niveis || 1) === 1;
+    let html = `<div class="b-nome">${esc(c.rotulo)}</div><div class="b-rar">${RARIDADE[c.raridade] || ''}</div><div class="b-desc">${esc(c.descricao)}</div>`;
+    if (!unico && c.alvo) html += `<div class="b-linha">Meta deste nível: ${c.alvo} ${unid}</div>`;
+    if (c.desbloqueada_em) html += `<div class="b-linha">Desbloqueada em ${dataCurta(c.desbloqueada_em)}</div>`;
+    if (comProgresso && c.proximo && unid) {
+      const v = Math.min(Number(c.valor) || 0, c.proximo.alvo), pct = Math.round(v / c.proximo.alvo * 100);
+      html += `<div class="b-prox">Próximo: <strong>${esc(c.proximo.rotulo)}</strong> — ${v} de ${c.proximo.alvo} ${unid}<div class="b-barra"><span style="width:${pct}%"></span></div></div>`;
+    } else if (comProgresso && !c.proximo && (c.niveis || 1) > 1) {
+      html += `<div class="b-prox">Nível máximo alcançado.</div>`;
+    }
+    return html;
+  }
+  function mostrarBalao(el) {
+    const c = FILA[Number(el.dataset.cq)]; if (!c) return;
+    if (!balao) { balao = document.createElement('div'); balao.id = 'cqBalao'; balao.setAttribute('role', 'tooltip'); document.body.appendChild(balao); }
+    ancora = el;
+    balao.style.setProperty('--cqb', COR[c.raridade] || COR.comum);
+    balao.innerHTML = textoBalao(c, el.closest('#conquistasCard') !== null);
+    const r = el.getBoundingClientRect(), b = balao.getBoundingClientRect();
+    let top = r.top - b.height - 10;                         // em cima; sem espaço, embaixo
+    if (top < 8) top = r.bottom + 10;
+    let left = r.left + r.width / 2 - b.width / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - b.width - 8));
+    balao.style.top = Math.round(top) + 'px'; balao.style.left = Math.round(left) + 'px';
+    balao.classList.add('visivel');
+    abertoEm = Date.now();
+  }
+  function esconderBalao() { if (balao) balao.classList.remove('visivel'); ancora = null; }
+  function ligarBalao() {
+    if (document.documentElement.dataset.cqBalao) return;
+    document.documentElement.dataset.cqBalao = '1';
+    const alvo = e => e.target.closest && e.target.closest('.cq-selo[data-cq]');
+    document.addEventListener('mouseover', e => { const s = alvo(e); if (s) mostrarBalao(s); });
+    document.addEventListener('mouseout', e => { const s = alvo(e); if (s && !s.contains(e.relatedTarget)) esconderBalao(); });
+    document.addEventListener('focusin', e => { const s = alvo(e); if (s) mostrarBalao(s); });
+    document.addEventListener('focusout', e => { if (alvo(e)) esconderBalao(); });
+    document.addEventListener('click', e => {   // toque no celular: abre; tocar de novo (ou fora) fecha
+      const s = alvo(e);
+      if (!s) return esconderBalao();
+      if (Date.now() - abertoEm < 400) return;   // o próprio toque já abriu (via mouseover/foco): não fecha
+      (ancora === s && balao && balao.classList.contains('visivel')) ? esconderBalao() : mostrarBalao(s);
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') esconderBalao(); });
+    window.addEventListener('scroll', esconderBalao, { passive: true });
   }
   function chamar(caminho, opcoes) {
     if (typeof apiFetch === 'function' && typeof API_URL !== 'undefined') return apiFetch(API_URL + caminho, opcoes || {});
@@ -81,7 +172,7 @@
   function iniciarConfiguracoes() {
     const card = document.getElementById('conquistasCard');
     if (!card) return;
-    estilo();
+    estilo(); ligarBalao();
     const resumo = card.querySelector('#cqResumo'), grade = card.querySelector('#cqGrade'), botao = card.querySelector('#cqVerTodos'), sel = card.querySelector('#cqTitulo');
     const abrirGrade = (abrir) => { grade.hidden = !abrir; botao.textContent = abrir ? 'Esconder' : 'Ver todos'; botao.setAttribute('aria-expanded', abrir ? 'true' : 'false'); };
     botao.addEventListener('click', () => abrirGrade(grade.hidden));
@@ -94,7 +185,7 @@
     const carregar = () => chamar('/conquistas').then(r => r.json()).then(d => {
       const lista = (d && d.conquistas) || [];
       resumo.textContent = lista.length ? `${lista.length} de ${d.total_catalogo} conquistas desbloqueadas` : 'Nenhuma conquista ainda';
-      grade.innerHTML = lista.length ? lista.map(selo).join('') : '<div class="cq-vazio">Use o Discoteca — coleção, wishlist, audições — e as conquistas aparecem aqui.</div>';
+      grade.innerHTML = lista.length ? lista.map(c => selo(c)).join('') : '<div class="cq-vazio">Use o Discoteca — coleção, wishlist, audições — e as conquistas aparecem aqui.</div>';
       sel.innerHTML = '<option value="">Sem título</option>' + lista.map(c => `<option value="${esc(c.id)}"${d.titulo === c.id ? ' selected' : ''}>${esc(c.nome)}</option>`).join('');
       sel.disabled = !lista.length;
       if (location.hash === '#conquistas') { abrirGrade(true); card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
@@ -106,12 +197,23 @@
     obs.observe(app, { attributes: true, attributeFilter: ['style'] });
   }
   // ---------- Perfil público ----------
-  function renderPublico(el, lista) {
+  // Vitrine: destaque (a do título ou a mais rara) + até 6 outras + resumo por raridade
+  function renderPublico(el, vitrine) {
     if (!el) return;
-    if (!lista || !lista.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
-    estilo();
+    if (!vitrine || !vitrine.destaque) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    estilo(); ligarBalao();
+    const d = vitrine.destaque, r = vitrine.resumo || {}, outras = vitrine.outras || [];
+    const partes = [`${r.total} ${r.total === 1 ? 'conquista' : 'conquistas'}`];
+    [['lendaria', 'lendária', 'lendárias'], ['rara', 'rara', 'raras']].forEach(([k, s, pl]) => { if (r[k]) partes.push(`${r[k]} ${r[k] === 1 ? s : pl}`); });
     el.style.display = '';
-    el.innerHTML = `<div class="pp-section-header"><h2>Conquistas</h2></div><div class="cq-grade">${lista.map(selo).join('')}</div>`;
+    el.innerHTML = `<div class="cq-vitrine-topo"><h2 style="margin:0">Conquistas</h2><span class="cq-vitrine-resumo">${partes.join(' · ')}</span></div>
+      <div class="cq-vitrine${outras.length ? '' : ' so-destaque'}">
+        <div class="cq-destaque">${selo(d)}<div class="cq-destaque-texto">
+          <div class="d-nome">${esc(d.rotulo)}</div><div class="d-rar" style="color:${COR[d.raridade] || COR.comum}">${RARIDADE[d.raridade] || ''}</div>
+          <div class="d-desc">${esc(d.descricao)}</div>${d.desbloqueada_em ? `<div class="d-data">Desbloqueada em ${dataCurta(d.desbloqueada_em)}</div>` : ''}
+        </div></div>
+        ${outras.length ? `<div class="cq-outras">${outras.map(c => selo(c, 'cq-mini')).join('')}</div>` : ''}
+      </div>`;
   }
   window.DiscotecaConquistas = { renderPublico, selo, estilo };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciarConfiguracoes); else iniciarConfiguracoes();

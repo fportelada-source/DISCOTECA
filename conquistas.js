@@ -66,7 +66,7 @@
     .cq-selo:focus-visible { box-shadow: 0 0 0 2px var(--paper); }
     .cq-mini { border-radius: 16px; padding: 10px 6px; }
     .cq-mini::before { inset: 5px; border-radius: 11px; } .cq-mini::after { inset: 9px; border-radius: 8px; }
-    .cq-mini .cq-rotulo { font-size: 9px; margin-top: 7px; } .cq-mini .cq-meta { display: none; }
+    .cq-mini .cq-rotulo { font-size: 8.5px; letter-spacing: 0.04em; margin-top: 6px; } .cq-mini .cq-meta { display: none; }
     #cqBalao { position: fixed; z-index: 90; max-width: 280px; background: #141414; border: 1px solid var(--cqb, #9A9A9A); border-radius: 14px;
       padding: 12px 14px; box-shadow: 0 18px 40px -12px rgba(0,0,0,0.85); font-family: 'Inter', sans-serif; color: var(--paper); pointer-events: none;
       opacity: 0; transform: translateY(4px); transition: opacity 0.15s ease, transform 0.15s ease; }
@@ -80,24 +80,26 @@
     #cqBalao .b-barra span { display: block; height: 100%; background: var(--cqb); border-radius: 3px; }
     .cq-vitrine-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
     .cq-vitrine-resumo { font-size: 13px; opacity: 0.55; }
-    .cq-vitrine { display: grid; grid-template-columns: minmax(300px, 1.1fr) 1fr; gap: 28px; align-items: center; margin-top: 18px; }
+    .cq-vitrine { display: grid; grid-template-columns: minmax(280px, 1fr) auto; gap: 28px; align-items: center; margin-top: 16px; }
     .cq-vitrine.so-destaque { grid-template-columns: 1fr; justify-items: center; }   /* só uma conquista: cartão centralizado, sem buraco */
     .cq-vitrine.so-destaque .cq-destaque-texto .d-desc { max-width: 420px; }
-    .cq-outras .cq-selo { max-width: 150px; width: 100%; }
-    .cq-destaque { display: flex; align-items: center; gap: 22px; }
-    .cq-destaque .cq-selo { width: 168px; flex-shrink: 0; }
-    .cq-destaque-texto .d-nome { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+    .cq-outras .cq-selo { width: 96px; flex: 0 0 96px; }
+    .cq-destaque { display: flex; align-items: center; gap: 18px; }
+    .cq-destaque .cq-selo { width: 124px; flex-shrink: 0; padding: 10px 8px; }
+    .cq-destaque .cq-selo .cq-rotulo { font-size: 9.5px; margin-top: 8px; } .cq-destaque .cq-selo .cq-meta { font-size: 9px; }
+    .cq-destaque-texto .d-nome { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
     .cq-destaque-texto .d-rar { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
-    .cq-destaque-texto .d-desc { font-size: 14px; line-height: 1.5; opacity: 0.65; margin-top: 10px; max-width: 360px; }
+    .cq-destaque-texto .d-desc { font-size: 13px; line-height: 1.5; opacity: 0.65; margin-top: 8px; max-width: 320px; }
     .cq-destaque-texto .d-data { font-size: 12px; opacity: 0.45; margin-top: 8px; }
-    .cq-outras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .cq-outras { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; max-width: 626px; }   /* só o espaço dos selos que existem; 6 cabem numa linha */
     @media (max-width: 860px) {
-      .cq-vitrine { grid-template-columns: 1fr; gap: 18px; }
-      .cq-outras { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 104px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: #3a3a3a transparent; }
+      .cq-vitrine { grid-template-columns: 1fr; gap: 16px; }
+      .cq-outras { justify-content: flex-start; max-width: none; }
+      .cq-outras { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: #3a3a3a transparent; }
     }
     @media (max-width: 600px) {
       .cq-grade { grid-template-columns: repeat(2, 1fr); }
-      .cq-destaque .cq-selo { width: 128px; } .cq-destaque { gap: 16px; } .cq-destaque-texto .d-nome { font-size: 18px; }
+      .cq-destaque .cq-selo { width: 108px; } .cq-destaque { gap: 14px; } .cq-destaque-texto .d-nome { font-size: 16px; }
     }
     @media (prefers-reduced-motion: reduce) { .cq-selo, #cqBalao { transition: none; } }
   `;

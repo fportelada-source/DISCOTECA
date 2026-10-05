@@ -56,15 +56,21 @@
     faz_tempo: SVG('<polygon points="6 4 20 12 6 20 6 4"/>'),
     lancamento: SVG('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/>')
   };
-  const ACAO = { aniversario: 'Vamos dar o play?', faz_tempo: 'Vamos dar o play?', lembranca: 'Ver no calendário', lancamento: 'Ouvir no Spotify' };
+  const ACAO = { lembranca: 'Ver no calendário', lancamento: 'Ouvir no Spotify' };
+  // botão de ouvir: varia por aviso (fixo pro mesmo aviso)
+  const ACAO_PLAY = ['Vamos dar o play?', 'Que tal ouvir agora?', 'Bora girar esse disco?', 'Hora de colocar pra tocar?', 'Merece um play hoje?', 'Que tal uma audição?'];
   let dados = null;
 
   const pad = n => String(n).padStart(2, '0');
   function hojeLocal() { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])); }
   function chamar(caminho, opcoes) {
-    if (typeof apiFetch !== 'function' || typeof API_URL === 'undefined') return Promise.reject(new Error('sem API'));
-    return apiFetch(API_URL + caminho, opcoes || {});
+    if (typeof apiFetch === 'function' && typeof API_URL !== 'undefined') return apiFetch(API_URL + caminho, opcoes || {});
+    // Páginas públicas (Privacidade, Termos, Novidades) não têm apiFetch:
+    // chama o servidor direto, com o mesmo token de sessão do navegador.
+    const o = Object.assign({}, opcoes || {});
+    o.headers = Object.assign({}, o.headers || {}, { 'X-Session-Token': localStorage.getItem('discoteca_session_token') || '' });
+    return fetch('https://fportelada.pythonanywhere.com' + caminho, o);
   }
   function quandoDia(dia) {
     const hoje = hojeLocal();
@@ -76,7 +82,8 @@
     if (!item.link) return '';
     const externo = /^https?:\/\//.test(item.link);
     if (!externo && !/^[a-z-]+\.html(\?[\w=&.-]*)?$/.test(item.link)) return '';   // só links internos conhecidos ou http(s)
-    return `<a class="sino-acao" href="${esc(item.link)}"${externo ? ' target="_blank" rel="noopener"' : ''}>${ACAO[item.tipo] || 'Abrir'}</a>`;
+    const rotulo = (item.tipo === 'aniversario' || item.tipo === 'faz_tempo') ? ACAO_PLAY[Number(item.id || 0) % ACAO_PLAY.length] : (ACAO[item.tipo] || 'Abrir');
+    return `<a class="sino-acao" href="${esc(item.link)}"${externo ? ' target="_blank" rel="noopener"' : ''}>${rotulo}</a>`;
   }
 
   function montarSino() {
@@ -135,7 +142,7 @@
     atualizarContador();
     const painel = document.getElementById('sinoPainel'); if (!painel) return;
     const itens = dados ? dados.itens : [];
-    painel.innerHTML = `<div class="sino-topo"><strong>Notificações</strong><span>até 3 por dia</span></div>` + (itens.length
+    painel.innerHTML = `<div class="sino-topo"><strong>Notificações</strong></div>` + (itens.length
       ? itens.map(i => `
         <div class="sino-item${i.lida ? '' : ' nova'}">
           <span class="sino-ico">${ICONES[i.tipo] || ICONES.lembranca}</span>
@@ -189,7 +196,11 @@
 
   function quandoLogado(fn) {
     const app = document.getElementById('appScreen');
-    if (!app) return;
+    if (!app) {
+      // página sem a tela do app (Privacidade, Termos, Novidades): basta estar logado neste navegador
+      if (localStorage.getItem('discoteca_session_token') && document.querySelector('.app-nav-right')) fn();
+      return;
+    }
     const ok = () => app.style.display === 'block' && localStorage.getItem('discoteca_session_token') && !document.body.classList.contains('aud-publico');
     if (ok()) return fn();
     const obs = new MutationObserver(() => { if (ok()) { obs.disconnect(); fn(); } });

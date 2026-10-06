@@ -2,6 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://ws.audioscrobbler.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
+  <style id="antiFrame">html { display: none !important; }</style>
+  <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Wishlist</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -207,7 +211,12 @@
             <option value="C">C (Baixa)</option>
           </select>
         </div>
-        <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar Tier</button>
+        <div class="form-group">
+          <label for="edit-tier-capa">Capa (endereço da imagem)</label>
+          <input type="url" id="edit-tier-capa" placeholder="https://..." autocomplete="off">
+          <button type="button" id="btn-edit-buscar-capa" style="margin-top:8px; background:transparent; border:1px solid var(--card-line); color:var(--paper); border-radius:10px; padding:8px 12px; font:500 12.5px 'Inter',sans-serif; cursor:pointer;">Buscar capa automaticamente</button>
+        </div>
+        <button type="submit" class="form-btn" id="btn-edit-tier-submit">Salvar</button>
         <div class="form-msg" id="edit-tier-msg"></div>
       </form>
     </div>
@@ -363,7 +372,7 @@ function carregarAvatarTopo() {
       if (nomeEl) nomeEl.textContent = nome;
       const avatarEl = document.getElementById('userAvatar');
       if (avatarEl) {
-        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nome}">`;
+        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${escapeHtml(perfil.foto_url)}" alt="${escapeHtml(nome)}">`;
         else avatarEl.textContent = nome.charAt(0).toUpperCase();
       }
     })
@@ -419,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
       apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
-          if (d.auth_url) window.location.href = d.auth_url;
+          if (d.auth_url) { sessionStorage.setItem('discoteca_login_pendente', String(Date.now())); window.location.href = d.auth_url; }
           else throw new Error('URL não recebida');
         })
         .catch(() => {
@@ -457,7 +466,13 @@ function verificarSessao() {
   const nome = params.get('nome');
   const token = params.get('token');
 
-  if (userId && nome && token) {
+  // A sessão vinda no endereço só vale se ESTE navegador acabou de iniciar o login com o
+  // Google (marca guardada no clique de "Entrar"). Link montado por outra pessoa é ignorado.
+  const pendente = Number(sessionStorage.getItem('discoteca_login_pendente') || 0);
+  sessionStorage.removeItem('discoteca_login_pendente');
+  const loginLegitimo = pendente > 0 && (Date.now() - pendente) < 15 * 60 * 1000;
+  if ((userId || token) && !loginLegitimo) window.history.replaceState({}, document.title, window.location.pathname);
+  if (userId && nome && token && loginLegitimo) {
     salvarSessao(userId, nome, token);
     usuarioId = userId;
     ativarTelaApp(nome);
@@ -1365,6 +1380,10 @@ function renderRecomendacoes(dados) {
       document.getElementById('edit-tier-artista').value = artista;
       document.getElementById('edit-tier-album').value = album;
       document.getElementById('edit-tier-select').value = tierAtual || 'A';
+      const itemAtual = (recomendacoes || []).find(r => String(r.id) === String(id));
+      const campoCapa = document.getElementById('edit-tier-capa');
+      campoCapa.value = (itemAtual && itemAtual.capa_url) || '';
+      campoCapa.dataset.original = campoCapa.value;
 
       modalEditTier.classList.add('open');
     }
@@ -1377,22 +1396,49 @@ function renderRecomendacoes(dados) {
       if (e.target === this) modalEditTier.classList.remove('open');
     });
 
+    // Editar item: buscar a capa de novo (repositório, Discogs pelo servidor e Last.fm)
+    document.addEventListener('DOMContentLoaded', function () {
+      const botao = document.getElementById('btn-edit-buscar-capa');
+      if (!botao) return;
+      botao.addEventListener('click', async function () {
+        const artista = document.getElementById('edit-tier-artista').value, album = document.getElementById('edit-tier-album').value;
+        const campo = document.getElementById('edit-tier-capa'), msg = document.getElementById('edit-tier-msg');
+        botao.disabled = true; botao.textContent = 'Buscando...'; msg.textContent = ''; msg.className = 'form-msg';
+        let url = null;
+        try {
+          const r = await apiFetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`);
+          const d = await r.json(); url = d.capa_url || d.url || null;
+        } catch (e) {}
+        if (!url && typeof _capaLastfm === 'function') { try { url = await _capaLastfm(artista, album); } catch (e) {} }
+        if (url) { campo.value = url; msg.textContent = 'Capa encontrada. Clique em Salvar para guardar.'; msg.className = 'form-msg success'; }
+        else { msg.textContent = 'Não achei a capa. Você pode colar o endereço de uma imagem.'; msg.className = 'form-msg error'; }
+        botao.disabled = false; botao.textContent = 'Buscar capa automaticamente';
+      });
+    });
     formEditTier.addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-edit-tier-submit');
       const msg = document.getElementById('edit-tier-msg');
       const id = document.getElementById('edit-tier-id').value;
       const novoTier = document.getElementById('edit-tier-select').value;
+      const campoCapa = document.getElementById('edit-tier-capa');
+      const novaCapa = campoCapa.value.trim();
 
       btn.disabled = true;
       msg.textContent = 'Salvando...';
       msg.className = 'form-msg';
 
-      apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
+      // Capa manual (ou a que o "Buscar" achou): salva primeiro, se mudou
+      const salvarCapa = (novaCapa && novaCapa !== campoCapa.dataset.original)
+        ? apiFetch(API_URL + `/recomendacoes/${id}/atualizar_capa`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: novaCapa }) })
+            .then(r => r.json()).then(d => { if (d.erro) throw new Error(d.erro); })
+        : Promise.resolve();
+
+      salvarCapa.then(() => apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tier: novoTier })
-        })
+        }))
         .then(r => r.json())
         .then(data => {
           if (data.sucesso) {
@@ -1409,6 +1455,9 @@ function renderRecomendacoes(dados) {
           }
         })
         .catch((err) => {
+          if (err && err.message && !/fetch|network|Failed/i.test(err.message)) {   // erro da capa (ex.: endereço inválido): mostra o motivo
+            msg.textContent = err.message; msg.className = 'form-msg error'; btn.disabled = false; return;
+          }
           msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (err.message || 'Erro de conexão');
           msg.className = 'form-msg error';
           btn.disabled = false;

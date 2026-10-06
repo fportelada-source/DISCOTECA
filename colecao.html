@@ -2,6 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://ws.audioscrobbler.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
+  <style id="antiFrame">html { display: none !important; }</style>
+  <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Coleção</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -428,6 +432,7 @@ async function _naFila(fila, fn) {
   try { return await fn(); } finally { _libera(fila); }
 }
 async function _capaLastfm(artista, album) {
+  return null;   // o SERVIDOR busca no Last.fm agora (o navegador levava bloqueio por excesso, erro 29)
   const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
   artista = _n(artista); album = _n(album);
   if (!artista || !album) return null;
@@ -502,7 +507,7 @@ function carregarAvatarTopo() {
       const nome = perfil.nome_exibicao || perfil.nome || DEV_USER_NOME;
       document.getElementById('userNameDisplay').textContent = nome;
       const avatarEl = document.getElementById('userAvatar');
-      if (perfil.foto_url) avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nome}">`;
+      if (perfil.foto_url) avatarEl.innerHTML = `<img src="${escapeHtml(perfil.foto_url)}" alt="${escapeHtml(nome)}">`;
       else avatarEl.textContent = nome.charAt(0).toUpperCase();
     })
     .catch(() => {});
@@ -590,7 +595,7 @@ function ativarTelaApp(nome) {
   if (loginScreen) loginScreen.style.display = 'none';
   if (appScreen) appScreen.style.display = 'block';
   const nomeDisplay = document.getElementById('userNameDisplay');
-  if (nomeDisplay) nomeDisplay.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ' + nome;
+  if (nomeDisplay) nomeDisplay.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ' + escapeHtml(nome);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -604,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
       apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
-          if (d.auth_url) window.location.href = d.auth_url;
+          if (d.auth_url) { sessionStorage.setItem('discoteca_login_pendente', String(Date.now())); window.location.href = d.auth_url; }
           else throw new Error('URL não recebida');
         })
         .catch(() => {
@@ -642,7 +647,13 @@ function verificarSessao() {
   const nome = params.get('nome');
   const token = params.get('token');
 
-  if (userId && nome && token) {
+  // A sessão vinda no endereço só vale se ESTE navegador acabou de iniciar o login com o
+  // Google (marca guardada no clique de "Entrar"). Link montado por outra pessoa é ignorado.
+  const pendente = Number(sessionStorage.getItem('discoteca_login_pendente') || 0);
+  sessionStorage.removeItem('discoteca_login_pendente');
+  const loginLegitimo = pendente > 0 && (Date.now() - pendente) < 15 * 60 * 1000;
+  if ((userId || token) && !loginLegitimo) window.history.replaceState({}, document.title, window.location.pathname);
+  if (userId && nome && token && loginLegitimo) {
     salvarSessao(userId, nome, token);
     usuarioId = userId;
     ativarTelaApp(nome);
@@ -770,7 +781,7 @@ function carregarDados() {
         <span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> ${total} discos</span>
         <span class="dot">·</span>
         <span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> ${artistasUnicos} artistas</span>
-        ${generoTop ? `<span class="dot">·</span><span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="6" cy="18" r="3"/><path d="M9 15L18 6"/><path d="M15 3l6 6"/><path d="M13 9l4 4"/></svg> ${generoTop}</span>` : ''}
+        ${generoTop ? `<span class="dot">·</span><span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="6" cy="18" r="3"/><path d="M9 15L18 6"/><path d="M15 3l6 6"/><path d="M13 9l4 4"/></svg> ${escapeHtml(generoTop)}</span>` : ''}
       `;
 
       statsEl.innerHTML = `
@@ -791,7 +802,7 @@ function carregarDados() {
         const contagem = generos.reduce((acc, g) => (acc[g] = (acc[g] || 0) + 1, acc), {});
         const [nome, qtd] = Object.entries(contagem).sort((a, b) => b[1] - a[1])[0];
         const pct = Math.round(qtd / generos.length * 100);
-        html += `<div class="col-insight-card"><div class="value">${pct}% <span class="sub">${nome}</span></div><div class="label">gênero predominante</div></div>`;
+        html += `<div class="col-insight-card"><div class="value">${pct}% <span class="sub">${escapeHtml(nome)}</span></div><div class="label">gênero predominante</div></div>`;
       }
 
       const anos = colecao.map(d => d.ano_lancamento).filter(Boolean);

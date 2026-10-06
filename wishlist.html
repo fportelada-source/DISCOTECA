@@ -130,8 +130,7 @@
         <!-- ALÉM DO STREAMING (antes "Descobertas" / Adjacent Discovery — nomes internos de função continuam usando "descoberta" por trás, só o texto visível mudou) -->
         <div class="col-section">
           <div class="col-section-header">
-            <h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Além do <span class="accent">streaming</span> <span class="col-section-sub">Álbuns que não existem em nenhum streaming</span></h3>
-            <button type="button" class="col-section-refresh" id="btnAlemRecolher" onclick="alternarAlem()" aria-expanded="true" aria-controls="wlDescobertas"><svg id="alemSeta" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform 0.2s;" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg> <span class="label">Recolher</span></button>
+            <h3 id="alemTitulo" role="button" tabindex="0" style="cursor:pointer;" onclick="alternarAlem()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();alternarAlem();}" aria-expanded="true" aria-controls="wlDescobertas"><svg id="alemSeta" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform 0.2s;margin-right:4px;" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Além do <span class="accent">streaming</span> <span class="col-section-sub">Álbuns que não existem em nenhum streaming</span></h3>
             <button type="button" class="col-section-refresh" onclick="atualizarAlemDoStreaming(this)"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> <span class="label">Atualizar</span></button>
           </div>
           <div id="wlDescobertas"></div>
@@ -214,11 +213,11 @@
         <input type="hidden" id="edit-tier-id" value="">
         <div class="form-group">
           <label>Artista</label>
-          <input type="text" id="edit-tier-artista" disabled style="opacity:0.6;">
+          <input type="text" id="edit-tier-artista" maxlength="200" required>
         </div>
         <div class="form-group">
           <label>Álbum</label>
-          <input type="text" id="edit-tier-album" disabled style="opacity:0.6;">
+          <input type="text" id="edit-tier-album" maxlength="200" required>
         </div>
         <div class="form-group">
           <label>Nova Prioridade</label>
@@ -358,6 +357,7 @@ function _alemMarcarSemCapa(artista, album) {
   try { const m = JSON.parse(localStorage.getItem(_ALEM_SEM_CAPA) || '{}'); m[_alemChave(artista, album)] = Date.now(); localStorage.setItem(_ALEM_SEM_CAPA, JSON.stringify(m)); } catch (e) {}
 }
 async function _capaLastfm(artista, album) {
+  return null;   // o SERVIDOR busca no Last.fm agora (o navegador levava bloqueio por excesso, erro 29)
   const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
   artista = _n(artista); album = _n(album);
   if (!artista || !album) return null;
@@ -742,7 +742,7 @@ function carregarCapa(item, artId, fallbackId, alem) {
     .then(r => r.json())
     .then(d => {
       if (d.sucesso && d.capa_url) aplicar(d.capa_url, true);
-      else fetchAlbumArt(item.artista, item.album, artId, fallbackId, item.id);
+      // sem capa: o servidor já tentou Last.fm e Discogs; não repete no navegador
     })
     .catch(() => fetchAlbumArt(item.artista, item.album, artId, fallbackId, item.id));
 }
@@ -907,10 +907,10 @@ window.setViewWishlist = setViewWishlist;
 // Além do Streaming: recolher/expandir (lembrado neste navegador)
 function aplicarEstadoAlem() {
   const aberto = localStorage.getItem('discoteca_alem_aberto') !== '0';
-  const corpo = document.getElementById('wlDescobertas'), btn = document.getElementById('btnAlemRecolher'), seta = document.getElementById('alemSeta');
+  const corpo = document.getElementById('wlDescobertas'), titulo = document.getElementById('alemTitulo'), seta = document.getElementById('alemSeta');
   if (corpo) corpo.style.display = aberto ? '' : 'none';
-  if (btn) { btn.setAttribute('aria-expanded', aberto ? 'true' : 'false'); const l = btn.querySelector('.label'); if (l) l.textContent = aberto ? 'Recolher' : 'Expandir'; }
-  if (seta) seta.style.transform = aberto ? 'rotate(180deg)' : 'rotate(0deg)';
+  if (titulo) titulo.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+  if (seta) seta.style.transform = aberto ? 'rotate(0deg)' : 'rotate(-90deg)';   // igual aos tiers
 }
 function alternarAlem() {
   localStorage.setItem('discoteca_alem_aberto', localStorage.getItem('discoteca_alem_aberto') === '0' ? '1' : '0');
@@ -1519,7 +1519,7 @@ function renderRecomendacoes(dados) {
       salvarCapa.then(() => apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tier: novoTier })
+          body: JSON.stringify({ tier: novoTier, artista: document.getElementById('edit-tier-artista').value.trim(), album: document.getElementById('edit-tier-album').value.trim() })
         }))
         .then(r => r.json())
         .then(data => {

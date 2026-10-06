@@ -21,6 +21,23 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Discoteca" />
+  <style>
+    /* Além do Streaming em modo lista: o próprio cartão vira linha compacta */
+    .wl-grid.alem-lista { display: flex; flex-direction: column; gap: 8px; }
+    .alem-lista .wl-card { display: flex; flex-direction: row; align-items: center; gap: 14px; padding: 10px 14px; }
+    .alem-lista .wl-card .art { flex: 0 0 64px; width: 64px; height: 64px; aspect-ratio: 1 / 1; border-radius: 10px; overflow: hidden; }
+    .alem-lista .wl-card .art-fallback { font-size: 0 !important; color: transparent !important; }   /* na lista, o nome já está ao lado */
+    .alem-lista .wl-card .art-fallback > * { display: none; }
+    .alem-lista .wl-card .priority-badge, .alem-lista .wl-card .note { display: none; }
+    .alem-lista .wl-card .info { flex: 1; min-width: 0; padding: 0; display: grid; grid-template-columns: 1fr auto; column-gap: 16px; align-items: center; }
+    .alem-lista .wl-card .info > * { grid-column: 1; justify-self: start; }
+    .alem-lista .wl-card .info > .actions { justify-self: stretch; }
+    .alem-lista .wl-card .info > .actions { grid-column: 2; grid-row: 1 / span 4; width: 150px; margin: 0; }
+    @media (max-width: 600px) { .alem-lista .wl-card .info { grid-template-columns: 1fr; } .alem-lista .wl-card .info > .actions { grid-column: 1; grid-row: auto; width: 100%; margin-top: 8px; } }
+    /* "procurei e não achei" (só Além do Streaming) */
+    .art-fallback[data-sem-capa]::after { content: "capa não encontrada"; display: block; margin-top: 8px; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
+    .alem-lista .art-fallback[data-sem-capa]::after { display: none; }
+  </style>
 </head>
 <body>
 
@@ -114,6 +131,7 @@
         <div class="col-section">
           <div class="col-section-header">
             <h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Além do <span class="accent">streaming</span> <span class="col-section-sub">Álbuns que não existem em nenhum streaming</span></h3>
+            <button type="button" class="col-section-refresh" id="btnAlemRecolher" onclick="alternarAlem()" aria-expanded="true" aria-controls="wlDescobertas"><svg id="alemSeta" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform 0.2s;" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg> <span class="label">Recolher</span></button>
             <button type="button" class="col-section-refresh" onclick="atualizarAlemDoStreaming(this)"><svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> <span class="label">Atualizar</span></button>
           </div>
           <div id="wlDescobertas"></div>
@@ -299,13 +317,52 @@ async function _naFila(fila, fn) {
   await _vaga(fila);
   try { return await fn(); } finally { _libera(fila); }
 }
+// ===== Fila única do Last.fm =====
+// O Last.fm aceita ~5 pedidos/s por IP; a página disparava dezenas de uma vez
+// e levava "Rate Limit Exceeded" (erro 29) — que antes virava "sem capa".
+// Agora: um pedido por vez (250 ms entre eles), Wishlist ('alta') sempre na
+// frente do Além do Streaming ('baixa'); no erro 29 pausa 1 min e tenta de novo.
+const _lfFila = { alta: [], baixa: [], ativo: false, pausaAte: 0 };
+function _lastfmJson(url, prioridade) {
+  return new Promise(res => {
+    _lfFila[prioridade === 'baixa' ? 'baixa' : 'alta'].push({ url, res, prioridade, tentativas: 0 });
+    _lfRodar();
+  });
+}
+async function _lfRodar() {
+  if (_lfFila.ativo) return;
+  _lfFila.ativo = true;
+  while (_lfFila.alta.length || _lfFila.baixa.length) {
+    const espera = _lfFila.pausaAte - Date.now();
+    if (espera > 0) await new Promise(r => setTimeout(r, espera));
+    const job = _lfFila.alta.shift() || _lfFila.baixa.shift();
+    let d = null;
+    try { d = await (await fetch(job.url)).json(); } catch (e) { d = null; }
+    if (d && d.error === 29) {                      // limite do Last.fm: espera e tenta de novo
+      _lfFila.pausaAte = Date.now() + 60000;
+      if (job.tentativas++ < 2) { _lfFila[job.prioridade === 'baixa' ? 'baixa' : 'alta'].unshift(job); continue; }
+      d = null;
+    }
+    job.res(d);
+    await new Promise(r => setTimeout(r, 250));   // 4 por segundo: abaixo do limite (~5/s)
+  }
+  _lfFila.ativo = false;
+}
+// "Procurei e não achei" — só no Além do Streaming (14 dias, neste navegador)
+const _ALEM_SEM_CAPA = 'discoteca_alem_sem_capa';
+function _alemChave(artista, album) { return `${artista}|${album}`.toLowerCase(); }
+function _alemSemCapa(artista, album) {
+  try { const t = JSON.parse(localStorage.getItem(_ALEM_SEM_CAPA) || '{}')[_alemChave(artista, album)]; return !!t && Date.now() - t < 14 * 864e5; } catch (e) { return false; }
+}
+function _alemMarcarSemCapa(artista, album) {
+  try { const m = JSON.parse(localStorage.getItem(_ALEM_SEM_CAPA) || '{}'); m[_alemChave(artista, album)] = Date.now(); localStorage.setItem(_ALEM_SEM_CAPA, JSON.stringify(m)); } catch (e) {}
+}
 async function _capaLastfm(artista, album) {
   const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
   artista = _n(artista); album = _n(album);
   if (!artista || !album) return null;
   try {
-    const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&format=json`);
-    const d = await r.json();
+    const d = await _lastfmJson(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&format=json`, 'alta');
     const img = d && d.album && Array.isArray(d.album.image) ? d.album.image.find(i => i.size === 'extralarge') : null;
     return img && img['#text'] ? img['#text'] : null;
   } catch { return null; }
@@ -569,7 +626,7 @@ const MANUAL_COVERS = {
   'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
 };
 
-async function getCoverUrl(artist, album) {
+async function getCoverUrl(artist, album, prioridade) {
   const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
   if (!artist || !album) return null;
   const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
@@ -577,8 +634,7 @@ async function getCoverUrl(artist, album) {
   try {
     const url =
       `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = (await _lastfmJson(url, prioridade)) || {};
     if (data.album && data.album.image) {
       const img = data.album.image.find(i => i.size === 'extralarge');
       return img && img['#text'] ? img['#text'] : null;
@@ -589,12 +645,17 @@ async function getCoverUrl(artist, album) {
   }
 }
 
-async function fetchAlbumArt(artist, album, artId, fallbackId, recId) {
+async function fetchAlbumArt(artist, album, artId, fallbackId, recId, prioridade, alem) {
   const artWrap = document.getElementById(artId);
   const fallback = document.getElementById(fallbackId);
   if (!artWrap) return;
+  if (alem) await _quandoVisivel(artWrap);   // Além do Streaming: só procura o que aparece na tela
   try {
-    const url = await getCoverUrl(artist, album);
+    const url = await getCoverUrl(artist, album, prioridade || 'alta');
+    if (!url && alem && Date.now() >= _lfFila.pausaAte) {   // procurei e não achei (sem contar recusa por limite)
+      _alemMarcarSemCapa(artist, album);
+      if (fallback) fallback.setAttribute('data-sem-capa', '1');
+    }
     if (url) {
       const img = new Image();
       // Sem crossOrigin — mesma causa raiz corrigida em colecao.html e
@@ -634,7 +695,7 @@ async function fetchAlbumArt(artist, album, artId, fallbackId, recId) {
 
 // Prioriza a capa do Discogs (sem crop forçado) já salva no item; se não
 // tiver, tenta buscar ao vivo; só usa Last.fm como último recurso.
-function carregarCapa(item, artId, fallbackId) {
+function carregarCapa(item, artId, fallbackId, alem) {
   const artWrap = document.getElementById(artId);
   const fallback = document.getElementById(fallbackId);
   if (!artWrap) return;
@@ -669,6 +730,11 @@ function carregarCapa(item, artId, fallbackId) {
 
   if (item.capa_url) {
     aplicar(item.capa_url, false);
+    return;
+  }
+  if (alem) {   // Além do Streaming: nunca vai ao Discogs (não congestiona o servidor) e não insiste no que não existe
+    if (_alemSemCapa(item.artista, item.album)) { if (fallback) fallback.setAttribute('data-sem-capa', '1'); return; }
+    fetchAlbumArt(item.artista, item.album, artId, fallbackId, item.id, 'baixa', true);
     return;
   }
 
@@ -834,8 +900,24 @@ function setViewWishlist(view) {
     btn.classList.toggle('active', btn.dataset.view === view);
   });
   renderWishlistGrid(recomendacoes);
+  buscarDescobertas();   // o Além do Streaming acompanha o modo (cards/lista)
 }
 window.setViewWishlist = setViewWishlist;
+
+// Além do Streaming: recolher/expandir (lembrado neste navegador)
+function aplicarEstadoAlem() {
+  const aberto = localStorage.getItem('discoteca_alem_aberto') !== '0';
+  const corpo = document.getElementById('wlDescobertas'), btn = document.getElementById('btnAlemRecolher'), seta = document.getElementById('alemSeta');
+  if (corpo) corpo.style.display = aberto ? '' : 'none';
+  if (btn) { btn.setAttribute('aria-expanded', aberto ? 'true' : 'false'); const l = btn.querySelector('.label'); if (l) l.textContent = aberto ? 'Recolher' : 'Expandir'; }
+  if (seta) seta.style.transform = aberto ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+function alternarAlem() {
+  localStorage.setItem('discoteca_alem_aberto', localStorage.getItem('discoteca_alem_aberto') === '0' ? '1' : '0');
+  aplicarEstadoAlem();
+}
+window.alternarAlem = alternarAlem;
+document.addEventListener('DOMContentLoaded', aplicarEstadoAlem);
 
 function gerarCardWishlist(item, id) {
   const cor = corTierWishlist(item.tier);
@@ -1171,7 +1253,7 @@ function buscarDescobertas() {
 
       let html = '';
       if (lista.length > 0) {
-        html += `<div class="wl-grid">${lista.map(renderCardDescoberta).join('')}</div>`;
+        html += `<div class="wl-grid${viewPreference === 'list' ? ' alem-lista' : ''}">${lista.map(renderCardDescoberta).join('')}</div>`;
       }
       if (pendentes.length > 0) {
         html += `<div class="pp-empty-note" style="margin-top:${lista.length > 0 ? '14px' : '0'};">
@@ -1184,7 +1266,7 @@ function buscarDescobertas() {
       }
       el.innerHTML = html;
       lista.forEach((item, idx) => {
-        carregarCapa(item, 'art-descoberta-' + idx, 'fallback-descoberta-' + idx);
+        carregarCapa(item, 'art-descoberta-' + idx, 'fallback-descoberta-' + idx, true);
       });
     })
     .catch(() => {

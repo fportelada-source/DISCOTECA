@@ -2,6 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://ws.audioscrobbler.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
+  <style id="antiFrame">html { display: none !important; }</style>
+  <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Início</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -146,6 +150,7 @@ async function _naFila(fila, fn) {
   try { return await fn(); } finally { _libera(fila); }
 }
 async function _capaLastfm(artista, album) {
+  return null;   // o SERVIDOR busca no Last.fm agora (o navegador levava bloqueio por excesso, erro 29)
   const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
   artista = _n(artista); album = _n(album);
   if (!artista || !album) return null;
@@ -225,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
       apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
-          if (d.auth_url) window.location.href = d.auth_url;
+          if (d.auth_url) { sessionStorage.setItem('discoteca_login_pendente', String(Date.now())); window.location.href = d.auth_url; }
           else throw new Error('URL não recebida');
         })
         .catch(() => {
@@ -252,7 +257,13 @@ function verificarSessao() {
   const userId = params.get('user_id');
   const nome = params.get('nome');
   const token = params.get('token');
-  if (userId && nome && token) {
+  // A sessão vinda no endereço só vale se ESTE navegador acabou de iniciar o login com o
+  // Google (marca guardada no clique de "Entrar"). Link montado por outra pessoa é ignorado.
+  const pendente = Number(sessionStorage.getItem('discoteca_login_pendente') || 0);
+  sessionStorage.removeItem('discoteca_login_pendente');
+  const loginLegitimo = pendente > 0 && (Date.now() - pendente) < 15 * 60 * 1000;
+  if ((userId || token) && !loginLegitimo) window.history.replaceState({}, document.title, window.location.pathname);
+  if (userId && nome && token && loginLegitimo) {
     salvarSessao(userId, nome, token);
     usuarioId = userId;
     ativarTelaApp(nome);
@@ -582,7 +593,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
   const nomeExibicao = perfil.nome_exibicao || perfil.nome || DEV_USER_NOME;
   document.getElementById('userNameDisplay').textContent = nomeExibicao;
   if (perfil.foto_url) {
-    avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nomeExibicao}">`;
+    avatarEl.innerHTML = `<img src="${escapeHtml(perfil.foto_url)}" alt="${nomeExibicao}">`;
   } else {
     avatarEl.textContent = nomeExibicao.charAt(0).toUpperCase();
   }

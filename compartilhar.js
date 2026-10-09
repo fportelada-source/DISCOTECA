@@ -97,6 +97,19 @@
     if (capa.startsWith(API)) return capa;
     return API + '/capa_proxy?url=' + encodeURIComponent(capa);
   }
+  // Capa pra imagem: 1) direto do Discogs/Last.fm (eles liberam CORS na maioria das vezes),
+  // 2) pelo repasse do servidor, 3) sem capa salva (ou as duas falharam): pede a capa ao
+  // servidor (/buscar_capa) e tenta de novo. Só então desiste (fica o título).
+  async function carregarCapa(capa, artista, album) {
+    const tentar = async (u) => (u && /^https:\/\//.test(u)) ? (await carregarImagem(u)) || (await carregarImagem(urlCapa(u))) : null;
+    let img = await tentar(capa);
+    if (img || !artista || !album) return img;
+    try {
+      const d = await (await chamar(`/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)).json();
+      if (d && d.capa_url && d.capa_url !== capa) img = await tentar(d.capa_url);
+    } catch (e) {}
+    return img;
+  }
   async function fontesProntas() {
     try { await Promise.all(['900 40px Inter', '800 40px Inter', '700 40px Inter', '500 40px Inter', '400 40px Inter'].map(f => document.fonts.load(f))); } catch (e) {}
   }
@@ -354,7 +367,7 @@
         alt: `${a.album} — ${a.artista}`, nomeArquivo: `discoteca-audicao-${a.data || ''}.png`,
         texto: `Ouvindo ${a.album} — ${a.artista} no Discoteca.`, link: `${API}/compartilhar/a/${a.id}`,
         async preparar() {
-          const [f, c] = await Promise.all([carregarImagem(a.foto ? `${API}/audicoes/foto/${a.foto}.jpg` : null), carregarImagem(urlCapa(a.capa_url))]);
+          const [f, c] = await Promise.all([carregarImagem(a.foto ? `${API}/audicoes/foto/${a.foto}.jpg` : null), carregarCapa(a.capa_url, a.artista, a.album)]);
           this.imgFoto = f; this.imgCapa = c;
         }
       });
@@ -367,7 +380,7 @@
         tipo: 'wishlist', dados: { usuario: arroba(), discos: nove, total: lista.length },
         titulo: 'Compartilhar wishlist', sub: 'Os discos que ainda faltam na coleção.', alt: 'Na mira da agulha — wishlist',
         nomeArquivo: 'discoteca-wishlist.png', texto: 'Na mira da agulha: minha wishlist no Discoteca.', link: `${API}/compartilhar/w/${usuarioId}`,
-        async preparar() { this.capas = await Promise.all(nove.map(d => carregarImagem(urlCapa(d.capa_url)))); }
+        async preparar() { this.capas = await Promise.all(nove.map(d => carregarCapa(d.capa_url, d.artista, d.album))); }
       });
     },
     _desenhar: { desenharAudicao, desenharWishlist }   // usado nos testes

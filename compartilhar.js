@@ -74,11 +74,22 @@
     if (typeof apiFetch === 'function') return apiFetch(API + caminho, opcoes || {});
     return fetch(API + caminho, opcoes || {});
   }
-  function arroba() {
+  function limparArroba(n) {
+    n = (n || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9._]/g, '');
+    return n ? '@' + n : '';
+  }
+  function arroba() {   // reserva: primeiro nome do login
     let n = '';
     try { n = localStorage.getItem('discoteca_user_nome') || ''; } catch (e) {}
-    n = (n.trim().split(/\s+/)[0] || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9._]/g, '');
-    return n ? '@' + n : '';
+    return limparArroba(n.trim().split(/\s+/)[0]);
+  }
+  async function arrobaPerfil(usuarioId) {   // nome de exibição do perfil
+    try {
+      const d = await (await chamar(`/perfil/${usuarioId}`)).json();
+      const a = limparArroba(d && d.nome_exibicao);
+      if (a) return a;
+    } catch (e) {}
+    return arroba();
   }
 
   // ---------- imagens ----------
@@ -392,7 +403,7 @@
         tipo: 'wishlist', dados: { usuario: arroba(), discos: nove, total: lista.length },
         titulo: 'Compartilhar wishlist', sub: 'Os discos que ainda faltam na coleção.', alt: 'Na mira da agulha — wishlist',
         nomeArquivo: 'discoteca-wishlist.png', texto: 'Na mira da agulha: minha wishlist no Discoteca.', link: `${API}/compartilhar/w/${usuarioId}`,
-        async preparar() { this.capas = await Promise.all(nove.map(d => carregarCapa(d.capa_url, d.artista, d.album))); }
+        async preparar() { [this.dados.usuario, this.capas] = await Promise.all([arrobaPerfil(usuarioId), Promise.all(nove.map(d => carregarCapa(d.capa_url, d.artista, d.album)))]); }
       });
     },
     _desenhar: { desenharAudicao, desenharWishlist }   // usado nos testes

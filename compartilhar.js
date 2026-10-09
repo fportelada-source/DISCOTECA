@@ -22,6 +22,7 @@
     story: '<rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
     instagram: '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>',
     threads: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+    baixar: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
     copiar: '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
     compartilhar: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',
     editar: '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>'
@@ -262,6 +263,7 @@
           <button type="button" class="sh-canal" id="shInstagram" aria-label="Instagram">${SVG(IC.instagram, 20)}</button>
           <button type="button" class="sh-canal" id="shThreads" aria-label="Threads">${SVG(IC.threads, 20)}</button>
           <button type="button" class="sh-canal" id="shCopiar" aria-label="Copiar link">${SVG(IC.copiar, 20)}</button>
+          <button type="button" class="sh-canal" id="shBaixar" aria-label="Baixar imagem" title="Baixar imagem">${SVG(IC.baixar, 20)}</button>
         </div>
         <div class="sh-acoes">
           <button type="button" class="sh-btn sec" id="shCancelar">Cancelar</button>
@@ -284,6 +286,12 @@
     $('shThreads').addEventListener('click', () => {
       contar();
       window.open('https://www.threads.net/intent/post?text=' + encodeURIComponent(estado.texto + ' ' + estado.link), '_blank', 'noopener');
+    });
+    $('shBaixar').addEventListener('click', () => {
+      if (!estado || !estado.blob) return;
+      contar();
+      const a = document.createElement('a'); a.href = estado.urlPrevia; a.download = estado.nomeArquivo; document.body.appendChild(a); a.click(); a.remove();
+      msg('Imagem baixada.');
     });
     $('shCopiar').addEventListener('click', async () => {
       contar();
@@ -372,7 +380,11 @@
         }
       });
     },
-    wishlist(itens, usuarioId) {   // itens: recomendações (já em ordem de prioridade)
+    async wishlist(itens, usuarioId) {   // itens: recomendações (já em ordem de prioridade)
+      if (!Array.isArray(itens) || !itens.length) {   // lista ainda não carregada: busca agora
+        try { const d = await (await chamar('/recomendacoes')).json(); itens = Array.isArray(d) ? d : []; } catch (e) { itens = []; }
+      }
+      if (!itens.filter(i => !i.comprado).length) { alert('Sua wishlist está vazia. Adicione discos para compartilhar.'); return; }
       const ordem = { S: 1, A: 2, B: 3, C: 4 };
       const lista = (itens || []).filter(i => !i.comprado).slice().sort((x, y) => (ordem[x.tier] || 9) - (ordem[y.tier] || 9));
       const nove = lista.slice(0, 9);

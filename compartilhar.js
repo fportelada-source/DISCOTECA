@@ -165,7 +165,8 @@
   // Audição (mockup "imagem social": foto em cima, divisor dourado, bloco editorial)
   function desenharAudicao(ctx, W, H, a, img, opc) {
     ctx.fillStyle = '#0f0f0f'; ctx.fillRect(0, 0, W, H);
-    const infoH = 400, fotoH = H - infoH;
+    const seguro = H > 1500 ? 300 : 0;   // Story: o Instagram cobre a base com "Diga algo…"
+    const infoH = 400, fotoH = H - infoH - seguro;
     const fundo = ctx.createRadialGradient(W / 2, fotoH * 0.4, 0, W / 2, fotoH * 0.4, W * 0.7);
     fundo.addColorStop(0, 'rgba(201,162,76,0.06)'); fundo.addColorStop(1, 'rgba(201,162,76,0)');
     ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, W, fotoH); ctx.fillStyle = fundo; ctx.fillRect(0, 0, W, fotoH);
@@ -179,7 +180,7 @@
     y += (quebrar(ctx, (a.artista || '').toUpperCase(), W - px * 2, 2).length - 1) * 62 + 56;
     ctx.fillStyle = '#9A9A9A'; ctx.font = '400 36px Inter, sans-serif';
     quebrar(ctx, a.album || '', W - px * 2, 2).forEach((l, i) => ctx.fillText(l, px, y + i * 46));
-    const metaY = H - 74;
+    const metaY = H - seguro - 74;
     ctx.fillStyle = '#1e1e1e'; ctx.fillRect(px, metaY - 52, W - px * 2, 2);
     if (opc.data && a.data) {
       ctx.fillStyle = '#7a7a7a'; ctx.font = '500 26px Inter, sans-serif'; ctx.textBaseline = 'middle';

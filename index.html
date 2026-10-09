@@ -2,16 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://ws.audioscrobbler.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Início</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link href="fonts.css?v=1" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=29" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -150,16 +148,7 @@ async function _naFila(fila, fn) {
   try { return await fn(); } finally { _libera(fila); }
 }
 async function _capaLastfm(artista, album) {
-  return null;   // o SERVIDOR busca no Last.fm agora (o navegador levava bloqueio por excesso, erro 29)
-  const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
-  artista = _n(artista); album = _n(album);
-  if (!artista || !album) return null;
-  try {
-    const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&format=json`);
-    const d = await r.json();
-    const img = d && d.album && Array.isArray(d.album.image) ? d.album.image.find(i => i.size === 'extralarge') : null;
-    return img && img['#text'] ? img['#text'] : null;
-  } catch { return null; }
+  return null;   // capas vêm do servidor (/buscar_capa)
 }
 const _capasPedidas = new Map();
 async function pedirCapa(el, url) {
@@ -340,7 +329,7 @@ function buscarLacunasColecao() {
   const el = document.getElementById('dashLacunas');
   if (!el) return;
   el.innerHTML = `<div class="dash-placeholder-note">Analisando lacunas...</div>`;
-  apiFetch(API_URL + '/lacunas_colecao?user_id=' + usuarioId)
+  apiFetch(API_URL + '/lacunas_colecao')
     .then(r => r.json())
     .then(d => {
       if (!d.sucesso) {
@@ -361,7 +350,7 @@ function buscarLacunasColecao() {
 
 function ocultarArtistaLacuna(artista, btnEl) {
   btnEl.disabled = true;
-  apiFetch(API_URL + '/lacunas_colecao/ocultar?user_id=' + usuarioId, {
+  apiFetch(API_URL + '/lacunas_colecao/ocultar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ artista })
@@ -430,7 +419,7 @@ function adicionarLacunaWishlist(indice, idxAlbum, btnEl) {
   btnEl.disabled = true;
   btnEl.textContent = 'Adicionando...';
 
-  apiFetch(API_URL + '/adicionar_recomendacao?user_id=' + usuarioId, {
+  apiFetch(API_URL + '/adicionar_recomendacao', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ artista: a.artista, album: album.album, tier: 'B', notas: 'Álbum popular do artista, ainda fora da coleção' })
@@ -470,9 +459,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function carregarDashboard() {
   Promise.all([
-    apiFetch(API_URL + '/colecao?user_id=' + usuarioId).then(r => r.json()),
-    apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId).then(r => r.json()),
-    apiFetch(API_URL + '/estatisticas_colecao?user_id=' + usuarioId).then(r => r.json()),
+    apiFetch(API_URL + '/colecao').then(r => r.json()),
+    apiFetch(API_URL + '/recomendacoes').then(r => r.json()),
+    apiFetch(API_URL + '/estatisticas_colecao').then(r => r.json()),
     apiFetch(API_URL + '/perfil/' + usuarioId).then(r => r.json())
   ]).then(([colecao, wishlist, stats, perfil]) => {
     dashColecao = Array.isArray(colecao) ? colecao : [];
@@ -495,22 +484,14 @@ function corTier(tier) {
 
 // Last.fm como último recurso, igual às outras páginas (Discogs é a fonte
 // principal, mas o Dashboard não tinha rede de segurança nenhuma até agora).
-const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
 async function getCoverUrlLastfm(artist, album) {
-  const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
+  // Capa pelo SERVIDOR (Last.fm com a chave do servidor + Discogs). O navegador não
+  // consulta mais o Last.fm direto: a chave pública levou bloqueio (erro 29).
   if (!artist || !album) return null;
   try {
-    const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.album && data.album.image) {
-      const img = data.album.image.find(i => i.size === 'extralarge');
-      return img && img['#text'] ? img['#text'] : null;
-    }
-    return null;
-  } catch {
-    return null;
-  }
+    const d = await (await fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}`)).json();
+    return (d && d.capa_url) || null;
+  } catch { return null; }
 }
 
 // O dashboard só mostra ~7 itens no máximo (hero + 3 compras + 3 wishlist),
@@ -539,7 +520,7 @@ function carregarCapasFaltantesDashboard() {
       // Grava no banco pra nunca mais precisar buscar de novo — evita
       // a lentidão de buscar ao vivo toda vez que o Dashboard carrega.
       if (!id || tipo !== 'recomendacao') return;
-      apiFetch(API_URL + `/recomendacoes/${id}/atualizar_capa?user_id=${usuarioId}`, {
+      apiFetch(API_URL + `/recomendacoes/${id}/atualizar_capa`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ capa_url: url })

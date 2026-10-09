@@ -2,12 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
+  <style id="antiFrame">html { display: none !important; }</style>
+  <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Perfil</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link href="fonts.css?v=1" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=29" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -340,7 +342,7 @@ function carregarAvatarTopo() {
       if (nomeEl) nomeEl.textContent = nome;
       const avatarEl = document.getElementById('userAvatar');
       if (avatarEl) {
-        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nome}">`;
+        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${escapeHtml(perfil.foto_url)}" alt="${escapeHtml(nome)}">`;
         else avatarEl.textContent = nome.charAt(0).toUpperCase();
       }
     })
@@ -349,7 +351,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes')
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -422,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
       apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
-          if (d.auth_url) window.location.href = d.auth_url;
+          if (d.auth_url) { sessionStorage.setItem('discoteca_login_pendente', String(Date.now())); window.location.href = d.auth_url; }
           else throw new Error('URL não recebida');
         })
         .catch(() => {
@@ -456,7 +458,13 @@ function verificarSessao() {
   const userId = params.get('user_id');
   const nome = params.get('nome');
   const token = params.get('token');
-  if (userId && nome && token) {
+  // A sessão vinda no endereço só vale se ESTE navegador acabou de iniciar o login com o
+  // Google (marca guardada no clique de "Entrar"). Link montado por outra pessoa é ignorado.
+  const pendente = Number(sessionStorage.getItem('discoteca_login_pendente') || 0);
+  sessionStorage.removeItem('discoteca_login_pendente');
+  const loginLegitimo = pendente > 0 && (Date.now() - pendente) < 15 * 60 * 1000;
+  if ((userId || token) && !loginLegitimo) window.history.replaceState({}, document.title, window.location.pathname);
+  if (userId && nome && token && loginLegitimo) {
     salvarSessao(userId, nome, token);
     usuarioId = userId;
     ativarTelaApp(nome);
@@ -495,7 +503,7 @@ function onPaginaPronta() {
 
 function carregarConfiguracoes() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/configuracoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/configuracoes')
     .then(r => r.json())
     .then(data => preencherPagina(data))
     .catch(() => mostrarMsg('Erro ao carregar configurações.', 'error'));
@@ -591,7 +599,7 @@ function salvarConfiguracoes() {
   const btn = document.getElementById('btnSalvarTudo');
   btn.disabled = true;
   btn.textContent = 'Salvando...';
-  apiFetch(API_URL + '/configuracoes?user_id=' + usuarioId, {
+  apiFetch(API_URL + '/configuracoes', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(coletarConfiguracoes())
@@ -620,7 +628,7 @@ function uploadCsv(inputId, statusId, tipo) {
   formData.append('tipo', tipo);
   formData.append('arquivo', input.files[0]);
   status.textContent = 'Enviando...';
-  return apiFetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: formData })
+  return apiFetch(API_URL + '/importar_playlist', { method: 'POST', body: formData })
     .then(r => r.json())
     .then(d => {
       status.innerHTML = d.sucesso ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Enviado' : (d.erro || 'Erro');
@@ -682,10 +690,10 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btnEnviarCsv').addEventListener('click', enviarImportacaoCsv);
 
   document.getElementById('btnExportarCsv').addEventListener('click', function() {
-    window.location.href = API_URL + '/exportar_colecao?user_id=' + usuarioId;
+    window.location.href = API_URL + '/exportar_colecao';
   });
   document.getElementById('btnBackup').addEventListener('click', function() {
-    window.location.href = API_URL + '/backup_dados?user_id=' + usuarioId;
+    window.location.href = API_URL + '/backup_dados';
   });
 
   document.getElementById('inputRestaurarBackup').addEventListener('change', function() {
@@ -700,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const formData = new FormData();
     formData.append('arquivo', arquivo);
 
-    apiFetch(API_URL + '/restaurar_backup?user_id=' + usuarioId, { method: 'POST', body: formData })
+    apiFetch(API_URL + '/restaurar_backup', { method: 'POST', body: formData })
       .then(r => r.json())
       .then(d => {
         label.disabled = false;
@@ -722,7 +730,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnLimparImportados').addEventListener('click', function() {
     abrirConfirm('Limpar todos os dados de playlists importadas? A coleção e a wishlist não são afetadas.', function() {
-      apiFetch(API_URL + '/zerar_playlists?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_playlists', { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Dados importados limpos!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -731,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnZerarColecao').addEventListener('click', function() {
     abrirConfirm('Apagar TODOS os discos da sua coleção física? Essa ação é permanente.', function() {
-      apiFetch(API_URL + '/zerar_colecao?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_colecao', { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Coleção zerada!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -740,7 +748,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnZerarWishlist').addEventListener('click', function() {
     abrirConfirm('Apagar toda a sua wishlist atual? Essa ação é permanente.', function() {
-      apiFetch(API_URL + '/zerar_wishlist?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_wishlist', { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Wishlist zerada!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -749,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnZerarTudo').addEventListener('click', function() {
     abrirConfirm('<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ Isso apaga playlists, coleção E wishlist de uma vez. Seu perfil (bio, foto, preferências) é mantido. Essa ação é permanente. Confirmar?', function() {
-      apiFetch(API_URL + '/zerar_tudo?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/zerar_tudo', { method: 'DELETE' })
         .then(r => r.json())
         .then(d => mostrarMsg(d.sucesso ? 'Tudo zerado! Pode começar a importar de novo.' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error'))
         .catch(() => mostrarMsg('Erro de conexão.', 'error'));
@@ -758,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnResetarPrefs').addEventListener('click', function() {
     abrirConfirm('Restaurar todas as preferências desta página para o padrão?', function() {
-      apiFetch(API_URL + '/configuracoes/resetar?user_id=' + usuarioId, { method: 'POST' })
+      apiFetch(API_URL + '/configuracoes/resetar', { method: 'POST' })
         .then(r => r.json())
         .then(d => {
           mostrarMsg(d.sucesso ? 'Preferências restauradas!' : (d.erro || 'Erro.'), d.sucesso ? 'success' : 'error');
@@ -790,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('btnExcluirConta').addEventListener('click', function() {
     abrirConfirm('Excluir sua conta apaga permanentemente TODOS os seus dados: perfil, coleção, wishlist, histórico importado, audições (com notas e fotos) e preferências. Não dá para desfazer nem recuperar depois. Se quiser guardar uma cópia, use "Exportar meus dados" antes. Excluir mesmo assim?', function() {
-      apiFetch(API_URL + '/excluir_conta?user_id=' + usuarioId, { method: 'DELETE' })
+      apiFetch(API_URL + '/excluir_conta', { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
           if (d.sucesso) {
@@ -847,6 +855,6 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
   <script src="onboarding.js?v=1"></script>
   <script src="notificacoes.js?v=3"></script>
-  <script src="conquistas.js?v=3"></script>
+  <script src="conquistas.js?v=4"></script>
 </body>
 </html>

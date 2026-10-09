@@ -2,12 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
+  <style id="antiFrame">html { display: none !important; }</style>
+  <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Perfil · Discoteca</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link href="fonts.css?v=1" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=29" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -46,19 +48,13 @@ function apiFetch(url, opcoes = {}) {
     // ================================================================
     // LAST.FM — só como último recurso (Discogs é a fonte principal)
     // ================================================================
-    const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
     async function getCoverUrlLastfm(artist, album) {
-      const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
+      // Capa pelo SERVIDOR (Last.fm com a chave do servidor + Discogs). O navegador não
+      // consulta mais o Last.fm direto: a chave pública levou bloqueio (erro 29).
       if (!artist || !album) return null;
       try {
-        const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.album && data.album.image) {
-          const img = data.album.image.find(i => i.size === 'extralarge');
-          return img && img['#text'] ? img['#text'] : null;
-        }
-        return null;
+        const d = await (await fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}`)).json();
+        return (d && d.capa_url) || null;
       } catch { return null; }
     }
 
@@ -243,6 +239,12 @@ function apiFetch(url, opcoes = {}) {
     // álbum, etc.) antes de inserir no HTML — sem isso, alguém poderia
     // colocar <script> na própria bio e rodar código no navegador de
     // QUALQUER visitante do perfil público (sem precisar estar logado).
+    // Link do perfil: só https:// e sempre tratado (o servidor também valida)
+    function linkPerfil(url, rotulo) {
+      url = (url || '').trim();
+      if (!/^https:\/\/[^\s"'<>`]+$/i.test(url)) return '';
+      return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${rotulo}</a>`;
+    }
     function escapeHtml(texto) {
       if (texto === null || texto === undefined) return '';
       return String(texto)
@@ -257,7 +259,7 @@ function apiFetch(url, opcoes = {}) {
       const container = document.getElementById('perfil-content');
       const nome = escapeHtml(data.nome_exibicao || data.nome || 'Colecionador');
       const ano = data.data_criacao ? data.data_criacao.split('-')[0] : '';
-      const avatarHtml = data.foto_url ? `<img src="${data.foto_url}" alt="${nome}">` : nome.charAt(0).toUpperCase();
+      const avatarHtml = data.foto_url ? `<img src="${escapeHtml(data.foto_url)}" alt="${nome}">` : nome.charAt(0).toUpperCase();
       const formatosBadge = (data.formatos_possuidos || []).map(f => NOME_FORMATO[f] || f).join(' · ');
 
       let html = `
@@ -274,9 +276,9 @@ function apiFetch(url, opcoes = {}) {
               </div>
               ${(data.spotify_url || data.discogs_url || data.instagram_url) ? `
                 <div class="pp-social-links">
-                  ${data.spotify_url ? `<a href="${data.spotify_url}" target="_blank" rel="noopener">Spotify</a>` : ''}
-                  ${data.discogs_url ? `<a href="${data.discogs_url}" target="_blank" rel="noopener">Discogs</a>` : ''}
-                  ${data.instagram_url ? `<a href="${data.instagram_url}" target="_blank" rel="noopener">Instagram</a>` : ''}
+                  ${linkPerfil(data.spotify_url, 'Spotify')}
+                  ${linkPerfil(data.discogs_url, 'Discogs')}
+                  ${linkPerfil(data.instagram_url, 'Instagram')}
                 </div>
               ` : ''}
               ${data.generos_favoritos && data.generos_favoritos.length > 0 ? `
@@ -368,7 +370,7 @@ function apiFetch(url, opcoes = {}) {
 
       html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da coleção</h2></div><div class="pp-highlights-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">`;
       if (data.genero_predominante) {
-        html += `<div class="pp-highlight-card"><div class="value">${data.genero_predominante_pct}%</div><div class="label">${data.genero_predominante}</div><div class="sub">gênero predominante</div></div>`;
+        html += `<div class="pp-highlight-card"><div class="value">${data.genero_predominante_pct}%</div><div class="label">${escapeHtml(data.genero_predominante)}</div><div class="sub">gênero predominante</div></div>`;
       }
       if (data.decada_favorita) {
         html += `<div class="pp-highlight-card"><div class="value">${data.decada_favorita.nome}</div><div class="label">década favorita</div><div class="sub">${data.decada_favorita.contagem} discos</div></div>`;
@@ -442,6 +444,6 @@ function apiFetch(url, opcoes = {}) {
       });
     }
   </script>
-  <script src="conquistas.js?v=3"></script>
+  <script src="conquistas.js?v=4"></script>
 </body>
 </html>

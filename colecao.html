@@ -2,17 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://ws.audioscrobbler.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Coleção</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link href="fonts.css?v=1" rel="stylesheet">
+  <script src="html5-qrcode.min.js?v=2.3.8"></script>
+  <link rel="stylesheet" href="style.css?v=29" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -432,16 +430,7 @@ async function _naFila(fila, fn) {
   try { return await fn(); } finally { _libera(fila); }
 }
 async function _capaLastfm(artista, album) {
-  return null;   // o SERVIDOR busca no Last.fm agora (o navegador levava bloqueio por excesso, erro 29)
-  const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
-  artista = _n(artista); album = _n(album);
-  if (!artista || !album) return null;
-  try {
-    const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&format=json`);
-    const d = await r.json();
-    const img = d && d.album && Array.isArray(d.album.image) ? d.album.image.find(i => i.size === 'extralarge') : null;
-    return img && img['#text'] ? img['#text'] : null;
-  } catch { return null; }
+  return null;   // capas vêm do servidor (/buscar_capa)
 }
 const _capasPedidas = new Map();
 async function pedirCapa(el, url) {
@@ -515,7 +504,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes')
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -733,7 +722,7 @@ function onPaginaPronta() {
 // marcado ao adicionar disco. Antes eram salvas mas a Coleção ignorava.
 function carregarPreferenciasColecao() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/configuracoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/configuracoes')
     .then(r => r.json())
     .then(cfg => {
       if (!cfg || cfg.erro) return;
@@ -746,7 +735,7 @@ function carregarPreferenciasColecao() {
 
 function carregarDados() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/colecao?user_id=' + usuarioId)
+  apiFetch(API_URL + '/colecao')
     .then(r => r.json())
     .then(data => {
       colecao = Array.isArray(data) ? data : [];
@@ -887,19 +876,13 @@ function carregarDados() {
 
     // Reaproveita o mesmo padrão de carregamento sob demanda (Discogs <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> Last.fm)
     // já usado no Perfil Público, aplicado aos containers desta página.
-    const LASTFM_KEY_COL = 'b25b959554ed76058ac220b7b2e0a026';
     async function getCoverUrlLastfmCol(artist, album) {
-      const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
+      // Capa pelo SERVIDOR (Last.fm com a chave do servidor + Discogs). O navegador não
+      // consulta mais o Last.fm direto: a chave pública levou bloqueio (erro 29).
       if (!artist || !album) return null;
       try {
-        const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY_COL}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.album && data.album.image) {
-          const img = data.album.image.find(i => i.size === 'extralarge');
-          return img && img['#text'] ? img['#text'] : null;
-        }
-        return null;
+        const d = await (await fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}`)).json();
+        return (d && d.capa_url) || null;
       } catch { return null; }
     }
 
@@ -915,7 +898,7 @@ function carregarDados() {
           // sem isso, "Adicionados recentemente"/Favoritos/Prateleira
           // buscavam capa ao vivo toda vez que a página carregava.
           if (!discoId) return;
-          apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa?user_id=${usuarioId}`, {
+          apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ capa_url: url })
@@ -1076,7 +1059,7 @@ function carregarDados() {
         ? `Corrigindo... ${totalCorrigidoAteAgora} de ${totalVerificadoAteAgora} já ajustados até agora.`
         : 'Corrigindo, isso pode levar um tempinho (fazemos 2 buscas no Discogs por disco)...';
 
-      apiFetch(API_URL + '/preencher_anos_faltantes?user_id=' + usuarioId, { method: 'POST' })
+      apiFetch(API_URL + '/preencher_anos_faltantes', { method: 'POST' })
         .then(r => {
           if (!r.ok) throw new Error('status ' + r.status);
           return r.json();
@@ -1314,30 +1297,21 @@ function carregarDados() {
       return html;
     }
 
-    const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
     const MANUAL_COVERS = {
       'basttardz_brasil com z / auschwitz tropical': 'https://i.imgur.com/nlcvybH.jpeg',
       'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
     };
 
     async function getCoverUrl(artist, album) {
-      const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
+      // Capa pelo SERVIDOR (Last.fm com a chave do servidor + Discogs). O navegador não
+      // consulta mais o Last.fm direto: a chave pública levou bloqueio (erro 29).
       if (!artist || !album) return null;
       const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
       if (MANUAL_COVERS[key]) return MANUAL_COVERS[key];
       try {
-        const url =
-          `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.album && data.album.image) {
-          const img = data.album.image.find(i => i.size === 'extralarge');
-          return img && img['#text'] ? img['#text'] : null;
-        }
-        return null;
-      } catch {
-        return null;
-      }
+        const d = await (await fetch(API_URL + `/buscar_capa?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}`)).json();
+        return (d && d.capa_url) || null;
+      } catch { return null; }
     }
 
     async function fetchAlbumArt(artist, album, artId, fallbackId, discoId) {
@@ -1363,7 +1337,7 @@ function carregarDados() {
               artWrap.classList.add('has-image');
               if (fallback) fallback.style.opacity = '0';
               if (discoId) {
-                apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa?user_id=${usuarioId}`, {
+                apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ capa_url: url })
@@ -1397,7 +1371,7 @@ function carregarDados() {
         // novo — é isso que evita a lentidão de buscar ao vivo toda
         // vez que a página carrega.
         if (!discoId) return;
-        apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa?user_id=${usuarioId}`, {
+        apiFetch(API_URL + `/colecao/${discoId}/atualizar_capa`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ capa_url: url })
@@ -1616,10 +1590,10 @@ function carregarDados() {
 
       let url, method;
       if (id) {
-        url = API_URL + `/editar_disco/${id}?user_id=${usuarioId}`;
+        url = API_URL + `/editar_disco/${id}`;
         method = 'PUT';
       } else {
-        url = API_URL + '/adicionar_disco?user_id=' + usuarioId;
+        url = API_URL + '/adicionar_disco';
         method = 'POST';
       }
 
@@ -1657,7 +1631,7 @@ function carregarDados() {
 
     function removerDisco(id) {
       abrirConfirm('Tem certeza que deseja remover este disco da coleção?', function() {
-        apiFetch(API_URL + `/remover_disco/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
+        apiFetch(API_URL + `/remover_disco/${id}`, { method: 'DELETE' })
           .then(r => r.json())
           .then(data => {
             if (data.sucesso) {
@@ -1725,7 +1699,7 @@ function carregarDados() {
       const album = document.getElementById('campo-album').value.trim();
       const campoAno = document.getElementById('campo-ano');
       if (!artista || !album || campoAno.value) return; // já tem ano, não sobrescreve
-      apiFetch(API_URL + `/buscar_por_artista_album?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&user_id=${usuarioId}`)
+      apiFetch(API_URL + `/buscar_por_artista_album?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
         .then(r => r.json())
         .then(d => {
           if (d.sucesso && d.ano && !campoAno.value) {
@@ -1738,7 +1712,7 @@ function carregarDados() {
 
     function buscarDiscoPorCodigo(codigo) {
       if (!codigo || codigo.length < 8) return;
-      apiFetch(API_URL + `/buscar_por_codigo_barras?codigo=${codigo}&user_id=${usuarioId}`)
+      apiFetch(API_URL + `/buscar_por_codigo_barras?codigo=${codigo}`)
         .then(r => r.json())
         .then(data => {
           if (data.sucesso && data.disco) {

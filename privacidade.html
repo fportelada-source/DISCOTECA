@@ -2,16 +2,18 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
+  <style id="antiFrame">html { display: none !important; }</style>
+  <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Política de Privacidade — Discoteca</title>
   <meta name="theme-color" content="#0b0b0b" />
   <link rel="icon" href="favicon.ico?v=2" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link href="fonts.css?v=1" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=29" />
 </head>
 <body>
   <header class="app-nav">
@@ -34,7 +36,7 @@
     <main>
       <div class="page-eyebrow">Seus dados, explicados</div>
       <h1>Política de Privacidade</h1>
-      <p class="legal-data">Última atualização: 5 de outubro de 2026</p>
+      <p class="legal-data">Última atualização: 9 de outubro de 2026</p>
 
       <div class="resumo">
         <p><strong>Em resumo:</strong> o Discoteca guarda o que você cadastra (coleção, wishlist, audições, perfil) e o que você importa (histórico de escuta), para organizar sua coleção e recomendar discos. Não vendemos seus dados, não mostramos anúncios e não usamos seus dados para nada além do funcionamento do app. Você pode baixar ou apagar tudo a qualquer momento em <a href="perfil.html">Configurações → Privacidade e dados</a>.</p>
@@ -57,7 +59,7 @@
           <tr><td>Histórico de escuta (artista, álbum, gênero, ano, se é explícita, duração)</td><td>Planilhas que você importa e o Last.fm</td><td>Gerar recomendações e estatísticas</td><td>Execução de contrato (art. 7º, V)</td></tr>
           <tr><td>Audições: disco, data, hora, nota e foto</td><td>Você</td><td>Seu diário de escuta</td><td>Execução de contrato (art. 7º, V)</td></tr>
           <tr><td>Notificações: avisos gerados a partir da sua coleção, das suas audições e dos artistas com disco favorito (e desde quando cada artista é acompanhado)</td><td>Gerado pelo app</td><td>Lembranças, sugestões de escuta e avisos de lançamentos dentro do app</td><td>Execução de contrato (art. 7º, V) — cada tipo pode ser desligado em Configurações</td></tr>
-          <tr><td>Conquistas desbloqueadas (com data) e o título escolhido; quantos itens já entraram na sua wishlist</td><td>Gerado pelo app a partir do que você faz no Discoteca</td><td>Mostrar suas conquistas e o título no perfil</td><td>Execução de contrato (art. 7º, V)</td></tr>
+          <tr><td>Conquistas desbloqueadas (com data) e o título escolhido; quantos itens já entraram na sua wishlist; quantas vezes você usou os botões de compartilhar</td><td>Gerado pelo app a partir do que você faz no Discoteca</td><td>Mostrar suas conquistas e o título no perfil</td><td>Execução de contrato (art. 7º, V)</td></tr>
           <tr><td>Preferências e escolhas de privacidade</td><td>Você</td><td>Lembrar suas configurações</td><td>Execução de contrato (art. 7º, V)</td></tr>
           <tr><td>Dados do perfil público (quando ligado)</td><td>Você</td><td>Mostrar sua coleção para quem tiver o link</td><td>Consentimento (art. 7º, I) — você liga e desliga quando quiser</td></tr>
           <tr><td>Sessões de login (data de início e de expiração) e controle de excesso de acessos por endereço IP</td><td>Gerado pelo app</td><td>Manter você conectado com segurança e evitar abuso</td><td>Legítimo interesse (art. 7º, IX)</td></tr>
@@ -76,7 +78,7 @@
       </ul>
 
       <h2>4. Perfil público</h2>
-      <p>Contas novas começam com o perfil público <strong>desligado</strong>. Se você ligar, qualquer pessoa com o link pode ver: seu nome de exibição (ou só o primeiro nome, se você não definir um), sua foto, bio, localização e links que você preencheu, mês e ano em que entrou, seu título e suas 5 conquistas mais recentes, sua coleção, suas últimas audições (disco, data e hora, e a foto, se houver) e, se você permitir, sua wishlist e o valor estimado da coleção.</p>
+      <p>Contas novas começam com o perfil público <strong>desligado</strong>. Se você ligar, qualquer pessoa com o link pode ver: seu nome de exibição (ou só o primeiro nome, se você não definir um), sua foto, bio, localização e links que você preencheu, mês e ano em que entrou, seu título e suas conquistas em destaque, sua coleção, suas últimas audições (disco, data e hora, e a foto, se houver) e, se você permitir, sua wishlist e o valor estimado da coleção.</p>
       <p><strong>Nunca são públicos:</strong> seu e-mail, as notas das audições e da coleção, suas configurações e seu histórico de escuta importado.</p>
       <p>As fotos de audições ficam guardadas no servidor com um endereço impossível de adivinhar e sem metadados (como localização GPS). Quem tiver o endereço de uma foto consegue abri-la. Elas são apagadas quando você apaga a audição ou a conta.</p>
 
@@ -86,9 +88,8 @@
         <tbody>
           <tr><td>PythonAnywhere</td><td>Hospeda o servidor e o banco de dados</td><td>Todos os dados descritos acima e registros de acesso (como endereço IP)</td></tr>
           <tr><td>GitHub Pages</td><td>Hospeda as páginas do site</td><td>Registros de acesso às páginas (como endereço IP)</td></tr>
-          <tr><td>Google</td><td>Login; fontes do site; sua foto de perfil</td><td>No login, os dados da sua conta Google; ao carregar as páginas, seu endereço IP</td></tr>
-          <tr><td>unpkg.com</td><td>Entrega a biblioteca do leitor de código de barras (página Coleção)</td><td>Seu endereço IP</td></tr>
-          <tr><td>Last.fm</td><td>Importação e busca de capas</td><td>Seu nome de usuário do Last.fm (só na importação), nomes de discos buscados e seu endereço IP</td></tr>
+          <tr><td>Google</td><td>Login; sua foto de perfil</td><td>No login, os dados da sua conta Google</td></tr>
+          <tr><td>Last.fm</td><td>Importação e busca de capas (feitas pelo servidor do Discoteca)</td><td>Seu nome de usuário do Last.fm (só na importação) e nomes de discos buscados</td></tr>
           <tr><td>Discogs e Spotify</td><td>Catálogo de discos</td><td>Só nomes de artistas, álbuns e códigos de barras (pelo servidor)</td></tr>
           <tr><td>Servidores de imagem do Discogs, Last.fm e Google</td><td>Exibir capas e fotos de perfil</td><td>Seu endereço IP, ao carregar as imagens</td></tr>
         </tbody>
@@ -120,6 +121,7 @@
       <p>Hoje o Discoteca não mantém cópias de segurança (backups) do banco de dados. Se passar a manter, esta política informará por quanto tempo as cópias são guardadas.</p>
 
       <h2>9. Seus direitos</h2>
+      <p><strong>Compartilhamento.</strong> As imagens de compartilhamento são geradas no seu próprio aparelho. Os links de compartilhamento só mostram algo (disco, artista, data da audição e seu primeiro nome, ou as capas da sua wishlist) quando o seu perfil público está ligado; com o perfil privado, o link abre uma página genérica do Discoteca. A nota pessoal da audição nunca aparece.</p>
       <p>Pela LGPD (art. 18), você pode: confirmar se tratamos seus dados; acessá-los; corrigi-los; pedir anonimização, bloqueio ou eliminação de dados desnecessários; levá-los para outro serviço (portabilidade); pedir a eliminação dos dados tratados com seu consentimento; saber com quem os compartilhamos; ser informado sobre a possibilidade de não consentir e suas consequências; e revogar o consentimento. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).</p>
 
       <h2>10. Como exercer seus direitos</h2>

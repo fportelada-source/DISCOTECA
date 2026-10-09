@@ -32,6 +32,7 @@
   "coruja": "<path d=\"M 60 20 A 30 30 0 1 0 80 65 A 25 25 0 0 1 60 20 Z\" stroke-width=\"2\" />",
   "fotografo": "<circle cx=\"50\" cy=\"50\" r=\"38\" stroke-width=\"2\" /> <rect x=\"35\" y=\"35\" width=\"30\" height=\"30\" rx=\"2\" stroke-width=\"1.5\" />",
   "arquivista": "<rect x=\"20\" y=\"20\" width=\"60\" height=\"60\" rx=\"3\" stroke-width=\"2\" /> <line x1=\"40\" y1=\"20\" x2=\"40\" y2=\"80\" stroke-width=\"1.5\" /> <line x1=\"60\" y1=\"20\" x2=\"60\" y2=\"80\" stroke-width=\"1.5\" /> <line x1=\"20\" y1=\"40\" x2=\"80\" y2=\"40\" stroke-width=\"1.5\" /> <line x1=\"20\" y1=\"60\" x2=\"80\" y2=\"60\" stroke-width=\"1.5\" />",
+  "divulgador": "<circle cx=\"34\" cy=\"50\" r=\"9\" stroke-width=\"2\" /> <circle cx=\"68\" cy=\"30\" r=\"9\" stroke-width=\"2\" /> <circle cx=\"68\" cy=\"70\" r=\"9\" stroke-width=\"2\" /> <line x1=\"42\" y1=\"45.5\" x2=\"60\" y2=\"34.5\" stroke-width=\"1.5\" /> <line x1=\"42\" y1=\"54.5\" x2=\"60\" y2=\"65.5\" stroke-width=\"1.5\" />",
   "fundador": "<circle cx=\"50\" cy=\"50\" r=\"38\" stroke-width=\"2\" /> <polygon points=\"50,24 72,66 28,66\" stroke-width=\"2\" fill=\"none\" /> <line x1=\"36\" y1=\"55\" x2=\"64\" y2=\"55\" stroke-width=\"1.5\" /> <circle cx=\"50\" cy=\"45\" r=\"5\" fill=\"currentColor\" /> <circle cx=\"50\" cy=\"45\" r=\"10\" stroke-width=\"1\" opacity=\"0.6\" />"
 };
   const RARIDADE = { comum: 'Comum', incomum: 'Incomum', rara: 'Rara', lendaria: 'Lendária' };
@@ -39,7 +40,7 @@
   const UNIDADE = { colecao_crescente: 'itens', mestre_do_vinil: 'vinis', mestre_do_cd: 'CDs', mestre_do_cassete: 'cassetes', mestre_do_dvd: 'DVDs',
     completista: 'artistas completos', superfa: 'discos do mesmo artista', mago_da_wishlist: 'itens da wishlist na coleção', a_caca: 'itens na wishlist',
     vintage: 'anos', ao_vivo: 'álbuns ao vivo', trilha_sonora: 'trilhas sonoras', coletanista: 'coletâneas', viajante_do_tempo: 'décadas',
-    multiformato: 'formatos', maratona: 'discos no mesmo dia', fiel: 'audições do mesmo disco', fotografo: 'audições com foto', arquivista: 'discos catalogados' };
+    multiformato: 'formatos', divulgador: 'compartilhamentos', maratona: 'discos no mesmo dia', fiel: 'audições do mesmo disco', fotografo: 'audições com foto', arquivista: 'discos catalogados' };
   const DADOS = new WeakMap();   // elemento do selo -> { conquista, comProgresso }
   const CSS = `
     .cq-grade[hidden] { display: none; }   /* sem isto o display:grid vence o atributo hidden */

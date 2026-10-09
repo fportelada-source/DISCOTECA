@@ -2,12 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
+  <style id="antiFrame">html { display: none !important; }</style>
+  <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Importar</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link href="fonts.css?v=1" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=29" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -305,7 +307,7 @@ function carregarAvatarTopo() {
       if (nomeEl) nomeEl.textContent = nome;
       const avatarEl = document.getElementById('userAvatar');
       if (avatarEl) {
-        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${perfil.foto_url}" alt="${nome}">`;
+        if (perfil.foto_url) avatarEl.innerHTML = `<img src="${escapeHtml(perfil.foto_url)}" alt="${escapeHtml(nome)}">`;
         else avatarEl.textContent = nome.charAt(0).toUpperCase();
       }
     })
@@ -314,7 +316,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes')
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -361,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
       apiFetch(API_URL + '/login')
         .then(r => r.json())
         .then(d => {
-          if (d.auth_url) window.location.href = d.auth_url;
+          if (d.auth_url) { sessionStorage.setItem('discoteca_login_pendente', String(Date.now())); window.location.href = d.auth_url; }
           else throw new Error('URL não recebida');
         })
         .catch(() => {
@@ -399,7 +401,13 @@ function verificarSessao() {
   const nome = params.get('nome');
   const token = params.get('token');
 
-  if (userId && nome && token) {
+  // A sessão vinda no endereço só vale se ESTE navegador acabou de iniciar o login com o
+  // Google (marca guardada no clique de "Entrar"). Link montado por outra pessoa é ignorado.
+  const pendente = Number(sessionStorage.getItem('discoteca_login_pendente') || 0);
+  sessionStorage.removeItem('discoteca_login_pendente');
+  const loginLegitimo = pendente > 0 && (Date.now() - pendente) < 15 * 60 * 1000;
+  if ((userId || token) && !loginLegitimo) window.history.replaceState({}, document.title, window.location.pathname);
+  if (userId && nome && token && loginLegitimo) {
     salvarSessao(userId, nome, token);
     usuarioId = userId;
     ativarTelaApp(nome);
@@ -530,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       btnLastfm.disabled = true;
       status.textContent = 'Buscando seus dados no Last.fm...';
-      apiFetch(API_URL + '/importar_lastfm?user_id=' + usuarioId, {
+      apiFetch(API_URL + '/importar_lastfm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: usuario })
@@ -559,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function carregarStatusImportacao() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/status_importacao?user_id=' + usuarioId)
+  apiFetch(API_URL + '/status_importacao')
     .then(r => r.json())
     .then(renderStatusImportacao)
     .catch(() => {});
@@ -648,7 +656,7 @@ function renderStatusImportacao(d) {
       const fd = new FormData();
       fd.append('tipo', tipo);
       fd.append('arquivo', file);
-      apiFetch(API_URL + '/importar_playlist?user_id=' + usuarioId, { method: 'POST', body: fd })
+      apiFetch(API_URL + '/importar_playlist', { method: 'POST', body: fd })
         .then(r => r.json())
         .then(d => {
           if (d.sucesso) {
@@ -680,7 +688,7 @@ function renderStatusImportacao(d) {
       statusEl.className = 'upload-status';
       const fd = new FormData();
       fd.append('arquivo', file);
-      apiFetch(API_URL + '/importar_colecao?user_id=' + usuarioId, { method: 'POST', body: fd })
+      apiFetch(API_URL + '/importar_colecao', { method: 'POST', body: fd })
         .then(r => r.json())
         .then(d => {
           if (d.sucesso) {
@@ -723,7 +731,7 @@ function renderStatusImportacao(d) {
       btn.textContent = 'Gerando...';
       status.textContent = 'Processando...';
       status.className = 'upload-status';
-      apiFetch(API_URL + '/gerar_recomendacoes?user_id=' + usuarioId, { method: 'POST' })
+      apiFetch(API_URL + '/gerar_recomendacoes', { method: 'POST' })
         .then(r => r.json())
         .then(d => {
           if (d.sucesso) {

@@ -2,16 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://ws.audioscrobbler.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Discoteca — Wishlist</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link href="fonts.css?v=1" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=29" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
@@ -118,6 +116,7 @@
         <!-- PRIORIDADE -->
         <div class="wl-priority-row" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
           <div class="wl-priority-nav" id="wlPriorityNav" style="flex:1;"></div>
+          <button type="button" class="col-section-refresh sh-botao-abrir" id="btnCompartilharWishlist" onclick="if (window.DiscotecaCompartilhar) DiscotecaCompartilhar.wishlist(recomendacoes, usuarioId)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> <span class="label">Compartilhar</span></button>
           <div class="col-view-toggle" id="wlViewToggle">
             <button class="active" data-view="cards" onclick="setViewWishlist('cards')" title="Cards" aria-label="Ver em cards"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
             <button data-view="list" onclick="setViewWishlist('list')" title="Lista"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
@@ -348,7 +347,8 @@ async function _lfRodar() {
   _lfFila.ativo = false;
 }
 // "Procurei e não achei" — só no Além do Streaming (14 dias, neste navegador)
-const _ALEM_SEM_CAPA = 'discoteca_alem_sem_capa';
+const _ALEM_SEM_CAPA = 'discoteca_alem_sem_capa_v2';   // v2: descarta o que foi marcado durante o bloqueio do Last.fm
+try { localStorage.removeItem('discoteca_alem_sem_capa'); } catch (e) {}
 function _alemChave(artista, album) { return `${artista}|${album}`.toLowerCase(); }
 function _alemSemCapa(artista, album) {
   try { const t = JSON.parse(localStorage.getItem(_ALEM_SEM_CAPA) || '{}')[_alemChave(artista, album)]; return !!t && Date.now() - t < 14 * 864e5; } catch (e) { return false; }
@@ -357,15 +357,7 @@ function _alemMarcarSemCapa(artista, album) {
   try { const m = JSON.parse(localStorage.getItem(_ALEM_SEM_CAPA) || '{}'); m[_alemChave(artista, album)] = Date.now(); localStorage.setItem(_ALEM_SEM_CAPA, JSON.stringify(m)); } catch (e) {}
 }
 async function _capaLastfm(artista, album) {
-  return null;   // o SERVIDOR busca no Last.fm agora (o navegador levava bloqueio por excesso, erro 29)
-  const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' ');
-  artista = _n(artista); album = _n(album);
-  if (!artista || !album) return null;
-  try {
-    const d = await _lastfmJson(`https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}&format=json`, 'alta');
-    const img = d && d.album && Array.isArray(d.album.image) ? d.album.image.find(i => i.size === 'extralarge') : null;
-    return img && img['#text'] ? img['#text'] : null;
-  } catch { return null; }
+  return null;   // capas vêm do servidor (/buscar_capa)
 }
 const _capasPedidas = new Map();
 async function pedirCapa(el, url) {
@@ -438,7 +430,7 @@ function carregarAvatarTopo() {
 
 function sincronizarBadge() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes')
     .then(r => r.json())
     .then(data => atualizarBadgeWishlist(Array.isArray(data) ? data.length : 0))
     .catch(() => {});
@@ -607,7 +599,7 @@ function onPaginaPronta() {
 
 function carregarDados() {
   if (!usuarioId) return;
-  apiFetch(API_URL + '/recomendacoes?user_id=' + usuarioId)
+  apiFetch(API_URL + '/recomendacoes')
     .then(r => r.json())
     .then(data => {
       recomendacoes = Array.isArray(data) ? data : [];
@@ -620,29 +612,21 @@ function carregarDados() {
 // ================================================================
 // LAST.FM (capas dos álbuns)
 // ================================================================
-const LASTFM_KEY = 'b25b959554ed76058ac220b7b2e0a026';
 const MANUAL_COVERS = {
   'basttardz_brasil com z / auschwitz tropical': 'https://i.imgur.com/nlcvybH.jpeg',
   'bullet for my valentine_bullet for my valentine': 'https://i.imgur.com/KaLt40C.jpeg'
 };
 
 async function getCoverUrl(artist, album, prioridade) {
-  const _n = s => (s || '').replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[\u2018\u2019\u201A\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"').replace(/\u2026/g, '...').replace(/\u00A0/g, ' '); artist = _n(artist); album = _n(album);   // travessão/aspas tipográficas -> ASCII (ex.: 2005–2013 vs 2005-2013)
+  // Capa pelo SERVIDOR (Last.fm com a chave do servidor + Discogs). O navegador não
+  // consulta mais o Last.fm direto: a chave pública levou bloqueio (erro 29).
   if (!artist || !album) return null;
   const key = `${artist.toLowerCase()}_${album.toLowerCase()}`;
   if (MANUAL_COVERS[key]) return MANUAL_COVERS[key];
   try {
-    const url =
-      `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${LASTFM_KEY}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`;
-    const data = (await _lastfmJson(url, prioridade)) || {};
-    if (data.album && data.album.image) {
-      const img = data.album.image.find(i => i.size === 'extralarge');
-      return img && img['#text'] ? img['#text'] : null;
-    }
-    return null;
-  } catch {
-    return null;
-  }
+    const d = (await _lastfmJson(API_URL + `/buscar_capa?artista=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}`, prioridade)) || {};
+    return (d && d.capa_url) || null;
+  } catch { return null; }
 }
 
 async function fetchAlbumArt(artist, album, artId, fallbackId, recId, prioridade, alem) {
@@ -671,7 +655,7 @@ async function fetchAlbumArt(artist, album, artId, fallbackId, recId, prioridade
           artWrap.classList.add('has-image');
           if (fallback) fallback.style.opacity = '0';
           if (recId) {
-            apiFetch(API_URL + `/recomendacoes/${recId}/atualizar_capa?user_id=${usuarioId}`, {
+            apiFetch(API_URL + `/recomendacoes/${recId}/atualizar_capa`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ capa_url: url })
@@ -704,7 +688,7 @@ function carregarCapa(item, artId, fallbackId, alem) {
     // Grava no banco pra nunca mais buscar essa capa de novo — evita
     // a lentidão de sair buscando ao vivo toda vez que a Wishlist carrega.
     if (!item.id) return;
-    apiFetch(API_URL + `/recomendacoes/${item.id}/atualizar_capa?user_id=${usuarioId}`, {
+    apiFetch(API_URL + `/recomendacoes/${item.id}/atualizar_capa`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ capa_url: url })
@@ -803,7 +787,7 @@ function atualizarAlemDoStreaming(elBtn) {
   elBtn.style.pointerEvents = 'none';
   elBtn.style.opacity = '0.5';
 
-  apiFetch(API_URL + '/alem_do_streaming/atualizar?user_id=' + usuarioId, { method: 'POST' })
+  apiFetch(API_URL + '/alem_do_streaming/atualizar', { method: 'POST' })
     .then(r => r.json())
     .then(d => {
       buscarDescobertas();
@@ -1086,7 +1070,7 @@ function renderCardLacuna(a, indice) {
 
 function ocultarArtistaLacuna(artista, btnEl) {
   btnEl.disabled = true;
-  apiFetch(API_URL + '/lacunas_colecao/ocultar?user_id=' + usuarioId, {
+  apiFetch(API_URL + '/lacunas_colecao/ocultar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ artista })
@@ -1155,7 +1139,7 @@ function adicionarLacunaWishlist(indice, idxAlbum, btnEl) {
   btnEl.disabled = true;
   btnEl.textContent = 'Adicionando...';
 
-  apiFetch(API_URL + '/adicionar_recomendacao?user_id=' + usuarioId, {
+  apiFetch(API_URL + '/adicionar_recomendacao', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ artista: a.artista, album: album.album, tier: 'B', notas: 'Álbum popular do artista, ainda fora da coleção' })
@@ -1200,7 +1184,7 @@ function buscarLacunasColecao() {
   const el = document.getElementById('wlGaps');
   if (!el) return Promise.resolve([]);
   el.innerHTML = `<div class="dash-placeholder-note">Analisando lacunas...</div>`;
-  return apiFetch(API_URL + '/lacunas_colecao?user_id=' + usuarioId)
+  return apiFetch(API_URL + '/lacunas_colecao')
     .then(r => r.json())
     .then(d => {
       if (!d.sucesso) {
@@ -1245,7 +1229,7 @@ function renderCardDescoberta(item, idx) {
 function buscarDescobertas() {
   const el = document.getElementById('wlDescobertas');
   if (!el) return;
-  apiFetch(API_URL + '/descobertas?user_id=' + usuarioId)
+  apiFetch(API_URL + '/descobertas')
     .then(r => r.json())
     .then(resposta => {
       const lista = (resposta && Array.isArray(resposta.itens)) ? resposta.itens : [];
@@ -1276,7 +1260,7 @@ function buscarDescobertas() {
 
 function confirmarDescoberta(id, btnEl) {
   btnEl.disabled = true;
-  apiFetch(API_URL + `/descobertas/${id}/adicionar?user_id=${usuarioId}`, { method: 'POST' })
+  apiFetch(API_URL + `/descobertas/${id}/adicionar`, { method: 'POST' })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1292,7 +1276,7 @@ window.confirmarDescoberta = confirmarDescoberta;
 
 function dispensarDescoberta(id, btnEl) {
   btnEl.disabled = true;
-  apiFetch(API_URL + `/descobertas/${id}/dispensar?user_id=${usuarioId}`, { method: 'POST' })
+  apiFetch(API_URL + `/descobertas/${id}/dispensar`, { method: 'POST' })
     .then(r => r.json())
     .then(d => {
       if (d.sucesso) {
@@ -1341,7 +1325,7 @@ function renderRecomendacoes(dados) {
         return;
       }
       abrirConfirm(`Marcar "${artista} - ${album}" como JÁ TENHO?`, function() {
-        apiFetch(API_URL + `/marcar_como_tenho/${id}?user_id=${usuarioId}`, { method: 'POST' })
+        apiFetch(API_URL + `/marcar_como_tenho/${id}`, { method: 'POST' })
           .then(r => r.json())
           .then(data => {
             if (data.sucesso) {
@@ -1361,7 +1345,7 @@ function renderRecomendacoes(dados) {
         return;
       }
       abrirConfirm(`Remover "${artista} - ${album}" da lista de compras?`, function() {
-        apiFetch(API_URL + `/wishlist/remove/${id}?user_id=${usuarioId}`, { method: 'DELETE' })
+        apiFetch(API_URL + `/wishlist/remove/${id}`, { method: 'DELETE' })
           .then(r => r.json())
           .then(data => {
             if (data.sucesso) {
@@ -1418,7 +1402,7 @@ function renderRecomendacoes(dados) {
         return;
       }
 
-      apiFetch(API_URL + '/adicionar_recomendacao?user_id=' + usuarioId, {
+      apiFetch(API_URL + '/adicionar_recomendacao', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dados)
@@ -1516,7 +1500,7 @@ function renderRecomendacoes(dados) {
             .then(r => r.json()).then(d => { if (d.erro) throw new Error(d.erro); })
         : Promise.resolve();
 
-      salvarCapa.then(() => apiFetch(API_URL + `/wishlist/update_tier/${id}?user_id=${usuarioId}`, {
+      salvarCapa.then(() => apiFetch(API_URL + `/wishlist/update_tier/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tier: novoTier, artista: document.getElementById('edit-tier-artista').value.trim(), album: document.getElementById('edit-tier-album').value.trim() })
@@ -1576,5 +1560,6 @@ function renderRecomendacoes(dados) {
   </div>
 
   <script src="notificacoes.js?v=3"></script>
+  <script src="compartilhar.js?v=1"></script>
 </body>
 </html>

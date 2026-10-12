@@ -163,32 +163,101 @@
   }
 
   // Audição (mockup "imagem social": foto em cima, divisor dourado, bloco editorial)
+  // Listening Card (mockup aprovado, 460 px de largura → escala k). A foto entra INTEIRA
+  // (object-fit: contain): sem corte, sem zoom, sem distorcer — vertical, horizontal,
+  // quadrada ou extrema, ela ocupa o maior tamanho que cabe no espaço livre.
+  function espacar(ctx, px) { if (ctx.letterSpacing !== undefined) ctx.letterSpacing = px + 'px'; }
   function desenharAudicao(ctx, W, H, a, img, opc) {
-    ctx.fillStyle = '#0f0f0f'; ctx.fillRect(0, 0, W, H);
-    const seguro = H > 1500 ? 300 : 0;   // Story: o Instagram cobre a base com "Diga algo…"
-    const infoH = 400, fotoH = H - infoH - seguro;
-    const fundo = ctx.createRadialGradient(W / 2, fotoH * 0.4, 0, W / 2, fotoH * 0.4, W * 0.7);
-    fundo.addColorStop(0, 'rgba(201,162,76,0.06)'); fundo.addColorStop(1, 'rgba(201,162,76,0)');
-    ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, W, fotoH); ctx.fillStyle = fundo; ctx.fillRect(0, 0, W, fotoH);
-    if (img) cobrir(ctx, img, 0, 0, W, fotoH); else vinil(ctx, W / 2, fotoH / 2, Math.min(W, fotoH) * 0.29);
-    const div = ctx.createLinearGradient(0, 0, W, 0);
-    div.addColorStop(0, 'rgba(201,162,76,0)'); div.addColorStop(0.3, 'rgba(201,162,76,0.55)'); div.addColorStop(0.7, 'rgba(201,162,76,0.55)'); div.addColorStop(1, 'rgba(201,162,76,0)');
-    ctx.fillStyle = div; ctx.fillRect(0, fotoH, W, 3);
-    const px = 78; let y = fotoH + 96;
-    ctx.fillStyle = TEXTO; ctx.font = '800 58px Inter, sans-serif';
-    quebrar(ctx, (a.artista || '').toUpperCase(), W - px * 2, 2).forEach((l, i) => ctx.fillText(l, px, y + i * 62));
-    y += (quebrar(ctx, (a.artista || '').toUpperCase(), W - px * 2, 2).length - 1) * 62 + 56;
-    ctx.fillStyle = '#9A9A9A'; ctx.font = '400 36px Inter, sans-serif';
-    quebrar(ctx, a.album || '', W - px * 2, 2).forEach((l, i) => ctx.fillText(l, px, y + i * 46));
-    const metaY = H - seguro - 74;
-    ctx.fillStyle = '#1e1e1e'; ctx.fillRect(px, metaY - 52, W - px * 2, 2);
-    if (opc.data && a.data) {
-      ctx.fillStyle = '#7a7a7a'; ctx.font = '500 26px Inter, sans-serif'; ctx.textBaseline = 'middle';
-      if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '2.6px';
-      ctx.fillText(dataCurta(a.data), px, metaY); ctx.textBaseline = 'alphabetic';
-      if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
+    const k = W / 460, story = H / W > 1.5;
+    // fundo + sulcos + vinheta + brilho (como o CSS do mockup)
+    ctx.fillStyle = FUNDO; ctx.fillRect(0, 0, W, H);
+    const cx = W / 2, cy = H * 0.45, alcance = Math.hypot(W, H) / 2;
+    ctx.save();
+    const sulcos = [[3, 'rgba(201,162,76,0.04)'], [7, 'rgba(240,240,240,0.04)'], [23, 'rgba(240,240,240,0.015)']];
+    sulcos.forEach(([passo, cor]) => {
+      for (let r = passo * k; r < alcance; r += passo * k) {
+        const t = r / alcance, mascara = t < 0.6 ? 1 : t < 0.8 ? 1 - (t - 0.6) / 0.2 * 0.4 : 0.6 * (1 - (t - 0.8) / 0.2);
+        ctx.globalAlpha = 0.85 * Math.max(0, mascara);
+        ctx.strokeStyle = cor; ctx.lineWidth = k; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      }
+    });
+    ctx.globalAlpha = 1;
+    const vin = ctx.createRadialGradient(cx, cy, 0, cx, cy, alcance);
+    vin.addColorStop(0.3, 'rgba(0,0,0,0)'); vin.addColorStop(1, 'rgba(0,0,0,0.35)');
+    ctx.fillStyle = vin; ctx.fillRect(0, 0, W, H);
+    const amb = ctx.createRadialGradient(cx, H * 0.42, 0, cx, H * 0.42, alcance * 0.55);
+    amb.addColorStop(0, 'rgba(201,162,76,0.06)'); amb.addColorStop(1, 'rgba(201,162,76,0)');
+    ctx.fillStyle = amb; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    // áreas seguras: no Story o Instagram cobre o topo (perfil) e a base ("Diga algo…")
+    const topoH = H * (story ? 0.15 : 0.08), baseH = H * (story ? 0.22 : 0.09);
+    const px = W * 0.08, larg = W - px * 2;
+
+    // D. no topo
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left'; espacar(ctx, -1 * k);
+    ctx.font = `900 ${20 * k}px Inter, sans-serif`;
+    ctx.globalAlpha = 0.7; ctx.fillStyle = TEXTO; ctx.fillText('D', px, 28 * k);
+    const dW = ctx.measureText('D').width; ctx.globalAlpha = 1; ctx.fillStyle = OURO; ctx.fillText('.', px + dW + k, 28 * k);
+    espacar(ctx, 0);
+
+    // metadados (medidos antes, pra saber quanto sobra pra foto)
+    ctx.font = `900 ${26 * k}px Inter, sans-serif`; espacar(ctx, -0.9 * k);
+    const ladoW = 90 * k;
+    const linhasAlbum = quebrar(ctx, (a.album || '').toUpperCase(), larg - ladoW - 16 * k, 2);
+    espacar(ctx, 0);
+    const metaH = linhasAlbum.length * 26 * k + 8 * k + 13 * k * 1.2 + 4 * k;
+    const metaBase = H - baseH;                 // fim do bloco de conteúdo
+    const metaTopo = metaBase - metaH;
+
+    // FOTO — caixa livre entre o topo seguro e os metadados
+    const caixa = { x: px, y: topoH, w: larg, h: metaTopo - 28 * k - topoH };
+    let fw, fh;
+    if (img && img.width && img.height) {
+      const r = Math.min(caixa.w / img.width, caixa.h / img.height);   // contain
+      fw = img.width * r; fh = img.height * r;
+    } else {                                    // sem foto/capa: o placeholder 3:4 do mockup
+      fh = Math.min(caixa.h, caixa.w * 4 / 3); fw = fh * 3 / 4;
     }
-    marca(ctx, W - px, metaY, 32, 'right');
+    const fx = caixa.x + (caixa.w - fw) / 2, fy = caixa.y + (caixa.h - fh) / 2;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 40 * k; ctx.shadowOffsetY = 12 * k;
+    ctx.fillStyle = '#121212'; ctx.fillRect(fx, fy, fw, fh);
+    ctx.restore();
+    if (img && img.width) {
+      ctx.drawImage(img, fx, fy, fw, fh);
+    } else {
+      const g = ctx.createLinearGradient(fx, fy, fx + fw, fy + fh);
+      g.addColorStop(0, '#242424'); g.addColorStop(1, '#121212');
+      ctx.fillStyle = g; ctx.fillRect(fx, fy, fw, fh);
+      vinil(ctx, fx + fw / 2, fy + fh / 2, fw * 0.31);
+    }
+    ctx.strokeStyle = 'rgba(240,240,240,0.05)'; ctx.lineWidth = Math.max(1, k); ctx.strokeRect(fx, fy, fw, fh);
+
+    // álbum + artista
+    let y = metaTopo;
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left'; ctx.fillStyle = TEXTO;
+    ctx.font = `900 ${26 * k}px Inter, sans-serif`; espacar(ctx, -0.9 * k);
+    linhasAlbum.forEach((l, i) => ctx.fillText(l, px, y + i * 26 * k));
+    y += linhasAlbum.length * 26 * k + 8 * k;
+    ctx.font = `500 ${13 * k}px Inter, sans-serif`; espacar(ctx, 0.78 * k); ctx.fillStyle = '#7a7a7a';
+    ctx.fillText(quebrar(ctx, (a.artista || '').toUpperCase(), larg - ladoW - 16 * k, 1)[0] || '', px, y);
+    // lado direito: fio dourado + data
+    const dir = W - px, baseMeta = metaBase - 4 * k;
+    if (opc.data && a.data) {
+      ctx.font = `500 ${10 * k}px Inter, sans-serif`; espacar(ctx, 1.4 * k); ctx.fillStyle = '#5a5a5a';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(dataCurta(a.data), dir, baseMeta);
+      ctx.globalAlpha = 0.85; ctx.fillStyle = OURO; ctx.fillRect(dir - 24 * k, baseMeta - 12 * k - 6 * k - 1.5 * k, 24 * k, 1.5 * k); ctx.globalAlpha = 1;
+    } else {
+      ctx.globalAlpha = 0.85; ctx.fillStyle = OURO; ctx.fillRect(dir - 24 * k, baseMeta - 1.5 * k, 24 * k, 1.5 * k); ctx.globalAlpha = 1;
+    }
+
+    // marca na base
+    ctx.font = `700 ${11 * k}px Inter, sans-serif`; espacar(ctx, 2 * k); ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+    const nome = 'DISCOTECA', nW = ctx.measureText(nome).width, pW = ctx.measureText('.').width;
+    const bx = (W - nW - pW) / 2, by = metaBase + 24 * k;
+    ctx.fillStyle = '#3a3a3a'; ctx.fillText(nome, bx, by); ctx.fillStyle = OURO; ctx.fillText('.', bx + nW, by);
+    espacar(ctx, 0); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
 
   // Wishlist (mockup do dono: D. + @usuário, "Na mira da agulha", grade 3 × 3, rodapé)

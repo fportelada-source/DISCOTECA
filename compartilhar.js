@@ -155,10 +155,11 @@
     ctx.fillText('D.', cx, cy); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
   // logotipo "hilla" com os dois ls em ouro (Inter 900). x é a borda esquerda, ou a direita/centro conforme alinhar
-  function logoHilla(ctx, x, y, tamanho, alinhar, cor, alfa) {
+  function logoHilla(ctx, x, y, tamanho, alinhar, cor, alfa, sufixo) {
     ctx.save(); ctx.font = `900 ${tamanho}px Inter, sans-serif`; ctx.textAlign = 'left';
     if (ctx.letterSpacing !== undefined) ctx.letterSpacing = `${-0.06 * tamanho}px`;
     const partes = [['hi', cor || TEXTO, alfa == null ? 1 : alfa], ['ll', OURO, 1], ['a', cor || TEXTO, alfa == null ? 1 : alfa]];
+    if (sufixo) partes.push([sufixo, cor || TEXTO, alfa == null ? 1 : alfa]);
     const larg = partes.reduce((t, p) => t + ctx.measureText(p[0]).width, 0);
     let cx = alinhar === 'right' ? x - larg : alinhar === 'center' ? x - larg / 2 : x;
     partes.forEach(([t, c, al]) => { ctx.globalAlpha = al; ctx.fillStyle = c; ctx.fillText(t, cx, y); cx += ctx.measureText(t).width; });
@@ -202,19 +203,25 @@
 
     // logotipo no topo
     ctx.textBaseline = 'top'; ctx.textAlign = 'left';
-    logoHilla(ctx, px, 28 * k, 22 * k, 'left', TEXTO, 0.7);
+    logoHilla(ctx, px, story ? 250 : 28 * k, 22 * k, 'left', TEXTO, 0.7);   // Story: abaixo da faixa do perfil do Instagram
 
     // metadados (medidos antes, pra saber quanto sobra pra foto)
-    ctx.font = `900 ${26 * k}px Inter, sans-serif`; espacar(ctx, -0.9 * k);
-    const ladoW = 90 * k;
-    const linhasAlbum = quebrar(ctx, (a.album || '').toUpperCase(), larg - ladoW - 16 * k, 2);
+    // nome do álbum: 26 → 22 → 19 até caber inteiro em 2 linhas; no menor, até 3 linhas
+    const ladoW = 90 * k, largAlbum = larg - ladoW - 16 * k, textoAlbum = (a.album || '').toUpperCase();
+    let tamAlbum = 26 * k, linhasAlbum = [];
+    for (const [t, max] of [[26, 2], [22, 2], [19, 3]]) {
+      tamAlbum = t * k; ctx.font = `900 ${tamAlbum}px Inter, sans-serif`; espacar(ctx, -0.035 * tamAlbum);
+      linhasAlbum = quebrar(ctx, textoAlbum, largAlbum, max);
+      if (!linhasAlbum.some(l => l.endsWith('…'))) break;
+    }
     espacar(ctx, 0);
-    const metaH = linhasAlbum.length * 26 * k + 8 * k + 13 * k * 1.2 + 4 * k;
+    const metaH = linhasAlbum.length * tamAlbum + 8 * k + 13 * k * 1.2 + 4 * k;
     const metaBase = H - baseH;                 // fim do bloco de conteúdo
     const metaTopo = metaBase - metaH;
 
     // FOTO — caixa livre entre o topo seguro e os metadados
-    const caixa = { x: px, y: topoH, w: larg, h: metaTopo - 28 * k - topoH };
+    const fotoTopo = story ? 250 + 22 * k + 16 * k : topoH;   // Story: a foto começa abaixo do logotipo
+    const caixa = { x: px, y: fotoTopo, w: larg, h: metaTopo - 28 * k - fotoTopo };
     let fw, fh;
     if (img && img.width && img.height) {
       const r = Math.min(caixa.w / img.width, caixa.h / img.height);   // contain
@@ -240,9 +247,9 @@
     // álbum + artista
     let y = metaTopo;
     ctx.textBaseline = 'top'; ctx.textAlign = 'left'; ctx.fillStyle = TEXTO;
-    ctx.font = `900 ${26 * k}px Inter, sans-serif`; espacar(ctx, -0.9 * k);
-    linhasAlbum.forEach((l, i) => ctx.fillText(l, px, y + i * 26 * k));
-    y += linhasAlbum.length * 26 * k + 8 * k;
+    ctx.font = `900 ${tamAlbum}px Inter, sans-serif`; espacar(ctx, -0.035 * tamAlbum);
+    linhasAlbum.forEach((l, i) => ctx.fillText(l, px, y + i * tamAlbum));
+    y += linhasAlbum.length * tamAlbum + 8 * k;
     ctx.font = `500 ${13 * k}px Inter, sans-serif`; espacar(ctx, 0.78 * k); ctx.fillStyle = '#7a7a7a';
     ctx.fillText(quebrar(ctx, (a.artista || '').toUpperCase(), larg - ladoW - 16 * k, 1)[0] || '', px, y);
     // lado direito: fio dourado + data
@@ -257,7 +264,7 @@
 
     // marca na base
     ctx.textBaseline = 'top';
-    logoHilla(ctx, W / 2, metaBase + 24 * k, 15 * k, 'center', '#5a5a5a');
+    logoHilla(ctx, W / 2, metaBase + 24 * k, 15 * k, 'center', '#5a5a5a', null, '.com.br');
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
 
@@ -313,7 +320,7 @@
     if (ctx.letterSpacing !== undefined) ctx.letterSpacing = `${1.6 * s}px`;
     ctx.fillText(`${w.total} ${w.total === 1 ? 'DISCO' : 'DISCOS'}`, pad, ry);
     if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
-    logoHilla(ctx, W - pad, ry, 16 * s, 'right', '#5a5a5a');
+    logoHilla(ctx, W - pad, ry, 16 * s, 'right', '#5a5a5a', null, '.com.br');
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
 

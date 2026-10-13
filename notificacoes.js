@@ -1,10 +1,10 @@
 /* ================================================================
-   NOTIFICAÇÕES — Discoteca
+   NOTIFICAÇÕES — Hilla
    ================================================================
    Sino na navegação (com contador de não lidas), painel com a lista,
    card "Neste dia" no Início e os interruptores de Configurações.
    Os avisos são gerados no servidor ao abrir o app (rota /notificacoes):
-   aniversário na coleção, lembranças de audição, "faz tempo que você
+   aniversário na prateleira, lembranças de audição, "faz tempo que você
    não escuta" e lançamentos de artistas com disco favorito (checados
    aos poucos, em segundo plano, sem atrasar a página). Máx. 3 por dia.
    Reaproveita os tokens visuais do style.css; o CSS daqui é só do sino,
@@ -153,7 +153,7 @@
             <div class="sino-meta"><span class="sino-dia">${quandoDia(i.dia)}</span>${linkAcao(i)}</div>
           </div>
         </div>`).join('')
-      : `<div class="sino-vazio">Nada por aqui ainda. Lembranças da coleção, das suas audições e lançamentos dos artistas que você favoritou aparecem aqui.</div>`);
+      : `<div class="sino-vazio">Nada por aqui ainda. Lembranças da prateleira, das suas audições e lançamentos dos artistas que você favoritou aparecem aqui.</div>`);
   }
   function preencherNesteDia() {
     const el = document.getElementById('dashNesteDia');

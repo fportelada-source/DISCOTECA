@@ -3272,7 +3272,7 @@
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-subtle);
     }
-    .app-nav-logo { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; color: var(--paper); text-decoration: none; flex-shrink: 0; }
+    .app-nav-logo { font-size: 22px; font-weight: 900; letter-spacing: -0.06em; line-height: 1; color: var(--paper); text-decoration: none; flex-shrink: 0; }
     .app-nav-logo span { color: var(--terracotta); }
     .app-nav-links { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
     .app-nav-links a {
@@ -3326,6 +3326,7 @@
     .app-footer-col a { display: block; font-size: 13px; color: var(--paper); opacity: 0.55; text-decoration: none; margin-bottom: 8px; }
     .app-footer-col a:hover { opacity: 1; color: var(--terracotta); }
     .app-footer-min { text-align: center; }
+    .app-footer-min .app-footer-marca { justify-content: center; }
 
     /* ---------- Cabeçalhos das páginas ---------- */
     .st-hero, .col-hero, .wl-hero, .set-hero { margin-bottom: 30px; align-items: flex-end; }
@@ -3479,7 +3480,9 @@
 
     /* Rodapé: a regra antiga de `footer` (maiúsculas, 11px) vazava pro novo */
     .app-footer { text-transform: none; letter-spacing: normal; color: var(--paper); }
-    .app-footer .app-nav-logo { font-size: 17px; }
+    .app-footer .app-nav-logo { font-size: 20px; }
+    .app-footer-marca { display: flex; align-items: center; gap: 8px; }
+    .app-footer-drupa { flex-shrink: 0; }
 
     /* Linha de contexto dourada acima do título (padrão do mockup) */
     .page-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 12px; }

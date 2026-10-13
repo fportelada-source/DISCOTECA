@@ -1,5 +1,5 @@
 /* ================================================================
-   COMPARTILHAR — Discoteca
+   COMPARTILHAR — Hilla
    ================================================================
    Modal de compartilhamento (mockup do dono, 09/10) e as imagens:
    - Audição: foto da audição > capa > vinil; artista, álbum, data, marca.
@@ -154,12 +154,18 @@
     ctx.fillStyle = 'rgba(201,162,76,0.55)'; ctx.font = `700 ${Math.round(r * 0.13)}px Inter, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('D.', cx, cy); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
+  // logotipo "hilla" com os dois ls em ouro (Inter 900). x é a borda esquerda, ou a direita/centro conforme alinhar
+  function logoHilla(ctx, x, y, tamanho, alinhar, cor, alfa) {
+    ctx.save(); ctx.font = `900 ${tamanho}px Inter, sans-serif`; ctx.textAlign = 'left';
+    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = `${-0.06 * tamanho}px`;
+    const partes = [['hi', cor || TEXTO, alfa == null ? 1 : alfa], ['ll', OURO, 1], ['a', cor || TEXTO, alfa == null ? 1 : alfa]];
+    const larg = partes.reduce((t, p) => t + ctx.measureText(p[0]).width, 0);
+    let cx = alinhar === 'right' ? x - larg : alinhar === 'center' ? x - larg / 2 : x;
+    partes.forEach(([t, c, al]) => { ctx.globalAlpha = al; ctx.fillStyle = c; ctx.fillText(t, cx, y); cx += ctx.measureText(t).width; });
+    ctx.restore();
+  }
   function marca(ctx, x, y, tamanho, alinhar, cor) {
-    ctx.font = `800 ${tamanho}px Inter, sans-serif`; ctx.textBaseline = 'middle';
-    const w1 = ctx.measureText('Discoteca').width, w2 = ctx.measureText('.').width;
-    const x0 = alinhar === 'right' ? x - w1 - w2 : x;
-    ctx.fillStyle = cor || TEXTO; ctx.textAlign = 'left'; ctx.fillText('Discoteca', x0, y);
-    ctx.fillStyle = OURO; ctx.fillText('.', x0 + w1, y); ctx.textBaseline = 'alphabetic';
+    const base = ctx.textBaseline; ctx.textBaseline = 'middle'; logoHilla(ctx, x, y, tamanho, alinhar, cor); ctx.textBaseline = base;
   }
 
   // Audição (mockup "imagem social": foto em cima, divisor dourado, bloco editorial)
@@ -194,12 +200,9 @@
     const topoH = H * (story ? 0.15 : 0.08), baseH = H * (story ? 0.22 : 0.09);
     const px = W * 0.08, larg = W - px * 2;
 
-    // D. no topo
-    ctx.textBaseline = 'top'; ctx.textAlign = 'left'; espacar(ctx, -1 * k);
-    ctx.font = `900 ${20 * k}px Inter, sans-serif`;
-    ctx.globalAlpha = 0.7; ctx.fillStyle = TEXTO; ctx.fillText('D', px, 28 * k);
-    const dW = ctx.measureText('D').width; ctx.globalAlpha = 1; ctx.fillStyle = OURO; ctx.fillText('.', px + dW + k, 28 * k);
-    espacar(ctx, 0);
+    // logotipo no topo
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+    logoHilla(ctx, px, 28 * k, 22 * k, 'left', TEXTO, 0.7);
 
     // metadados (medidos antes, pra saber quanto sobra pra foto)
     ctx.font = `900 ${26 * k}px Inter, sans-serif`; espacar(ctx, -0.9 * k);
@@ -253,11 +256,9 @@
     }
 
     // marca na base
-    ctx.font = `700 ${11 * k}px Inter, sans-serif`; espacar(ctx, 2 * k); ctx.textBaseline = 'top'; ctx.textAlign = 'left';
-    const nome = 'DISCOTECA', nW = ctx.measureText(nome).width, pW = ctx.measureText('.').width;
-    const bx = (W - nW - pW) / 2, by = metaBase + 24 * k;
-    ctx.fillStyle = '#3a3a3a'; ctx.fillText(nome, bx, by); ctx.fillStyle = OURO; ctx.fillText('.', bx + nW, by);
-    espacar(ctx, 0); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.textBaseline = 'top';
+    logoHilla(ctx, W / 2, metaBase + 24 * k, 15 * k, 'center', '#5a5a5a');
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
 
   // Wishlist (mockup do dono: D. + @usuário, "Na mira da agulha", grade 3 × 3, rodapé)
@@ -276,8 +277,8 @@
     ctx.fillStyle = brilho; ctx.fillRect(0, 0, W, H); ctx.restore();
     const pad = 56 * s;
     let y = oy + 44 * s;
-    ctx.textBaseline = 'top'; ctx.font = `900 ${22 * s}px Inter, sans-serif`; ctx.fillStyle = TEXTO;
-    ctx.fillText('D', pad, y); const wd = ctx.measureText('D').width; ctx.fillStyle = OURO; ctx.fillText('.', pad + wd * 0.95, y);
+    ctx.textBaseline = 'top';
+    logoHilla(ctx, pad, y, 24 * s, 'left', TEXTO);
     ctx.font = `400 ${13 * s}px Inter, sans-serif`; ctx.fillStyle = '#7a7a7a'; ctx.textAlign = 'right'; ctx.fillText(w.usuario || '', W - pad, y + 7 * s); ctx.textAlign = 'left';
     y += 22 * s + 20 * s;
     ctx.textAlign = 'center'; ctx.font = `800 ${22 * s}px Inter, sans-serif`;
@@ -286,7 +287,7 @@
     ctx.textAlign = 'left'; ctx.fillStyle = TEXTO; ctx.fillText(t1, cx - (w1 + w2) / 2, y); ctx.fillStyle = OURO; ctx.fillText(t2, cx - (w1 + w2) / 2 + w1, y);
     if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
     y += 22 * s + 4 * s;
-    ctx.textAlign = 'center'; ctx.font = `400 ${13 * s}px Inter, sans-serif`; ctx.fillStyle = '#7a7a7a'; ctx.fillText('Discos que ainda faltam na coleção.', cx, y);
+    ctx.textAlign = 'center'; ctx.font = `400 ${13 * s}px Inter, sans-serif`; ctx.fillStyle = '#7a7a7a'; ctx.fillText('Discos que ainda faltam na prateleira.', cx, y);
     ctx.textAlign = 'left';
     const rodapeH = (28 + 10 + 40) * s, gradeTopo = y + 18 * s + 32 * s, gradeBase = oy + artH - rodapeH, gap = 8 * s;
     const lado = Math.min((W - pad * 2 - gap * 2) / 3, (gradeBase - gradeTopo - gap * 2) / 3);
@@ -311,10 +312,9 @@
     ctx.textBaseline = 'middle'; ctx.font = `500 ${10 * s}px Inter, sans-serif`; ctx.fillStyle = '#5a5a5a';
     if (ctx.letterSpacing !== undefined) ctx.letterSpacing = `${1.6 * s}px`;
     ctx.fillText(`${w.total} ${w.total === 1 ? 'DISCO' : 'DISCOS'}`, pad, ry);
-    ctx.textAlign = 'right'; const assin = 'DISCOTECA', wa = ctx.measureText(assin).width, wp = ctx.measureText('.').width;
-    ctx.fillText(assin, W - pad - wp, ry); ctx.fillStyle = OURO; ctx.fillText('.', W - pad, ry);
     if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; void wa;
+    logoHilla(ctx, W - pad, ry, 16 * s, 'right', '#5a5a5a');
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
 
   // ---------- modal ----------
@@ -453,8 +453,8 @@
       if (!a || !a.id) return;
       abrir({
         tipo: 'audicao', dados: a, titulo: 'Compartilhar audição', sub: 'Mostre o que está tocando agora.',
-        alt: `${a.album} — ${a.artista}`, nomeArquivo: `discoteca-audicao-${a.data || ''}.png`,
-        texto: `Ouvindo ${a.album} — ${a.artista} no Discoteca.`, link: `${API}/compartilhar/a/${a.id}`,
+        alt: `${a.album} — ${a.artista}`, nomeArquivo: `hilla-audicao-${a.data || ''}.png`,
+        texto: `Ouvindo ${a.album} — ${a.artista} na Hilla.`, link: `${API}/compartilhar/a/${a.id}`,
         async preparar() {
           const [f, c] = await Promise.all([carregarImagem(a.foto ? `${API}/audicoes/foto/${a.foto}.jpg` : null), carregarCapa(a.capa_url, a.artista, a.album)]);
           this.imgFoto = f; this.imgCapa = c;
@@ -471,8 +471,8 @@
       const nove = lista.slice(0, 9);
       abrir({
         tipo: 'wishlist', dados: { usuario: arroba(), discos: nove, total: lista.length },
-        titulo: 'Compartilhar wishlist', sub: 'Os discos que ainda faltam na coleção.', alt: 'Na mira da agulha — wishlist',
-        nomeArquivo: 'discoteca-wishlist.png', texto: 'Na mira da agulha: minha wishlist no Discoteca.', link: `${API}/compartilhar/w/${usuarioId}`,
+        titulo: 'Compartilhar wishlist', sub: 'Os discos que ainda faltam na prateleira.', alt: 'Na mira da agulha — wishlist',
+        nomeArquivo: 'hilla-wishlist.png', texto: 'Na mira da agulha: minha wishlist na Hilla.', link: `${API}/compartilhar/w/${usuarioId}`,
         async preparar() { [this.dados.usuario, this.capas] = await Promise.all([arrobaPerfil(usuarioId), Promise.all(nove.map(d => carregarCapa(d.capa_url, d.artista, d.album)))]); }
       });
     },

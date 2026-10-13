@@ -1,5 +1,5 @@
 /* ================================================================
-   APRESENTAÇÃO (onboarding) — Discoteca
+   APRESENTAÇÃO (onboarding) — Hilla
    ================================================================
    Um painel grande (quase tela cheia) com os 3 tópicos lado a lado;
    no celular, tela cheia com os tópicos empilhados. Reaproveita o
@@ -21,15 +21,15 @@
    ================================================================ */
 (function () {
   const PASSOS = [
-    { n: '01', pergunta: 'O que é o Discoteca?',
-      titulo: 'Transforme suas playlists em uma coleção de mídias físicas.',
-      texto: 'Um companion app para organizar sua coleção, gerenciar sua wishlist e descobrir música nova.' },
+    { n: '01', pergunta: 'O que é a Hilla?',
+      titulo: 'Transforme suas playlists em uma prateleira de mídias físicas.',
+      texto: 'Um companion app para organizar sua prateleira, gerenciar sua wishlist e descobrir música nova.' },
     { n: '02', pergunta: 'Por que usar?',
       titulo: 'Tudo em um só lugar.',
       texto: 'Chega de ficar pulando de um lugar para outro. Uma experiência simples, bonita e fácil de usar.' },
     { n: '03', pergunta: 'Como começar?',
-      titulo: 'Importe suas playlists. Descubra o que comprar. Construa sua coleção.',
-      texto: 'O Discoteca transforma seu gosto musical em uma experiência de colecionismo personalizada.' }
+      titulo: 'Importe suas playlists. Descubra o que comprar. Construa sua prateleira.',
+      texto: 'A Hilla transforma seu gosto musical em uma experiência de colecionismo personalizada.' }
   ];
 
   const CSS = `
@@ -40,7 +40,8 @@
     #onbOverlay.open .onb-modal { animation: onbEntra 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
     @keyframes onbEntra { from { opacity: 0; transform: translateY(12px) scale(0.985); } to { opacity: 1; transform: none; } }
     .onb-topo { display: flex; justify-content: space-between; align-items: center; padding: 22px 28px 0 36px; flex-shrink: 0; }
-    .onb-marca { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--paper); }
+    .onb-marca { display: flex; align-items: center; gap: 10px; color: var(--paper); }
+    .onb-marca b { font-size: 24px; font-weight: 900; letter-spacing: -0.06em; line-height: 1; }
     .onb-marca span { color: var(--terracotta); }
     #onbOverlay .modal-close { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
     #onbOverlay .modal-close:focus-visible, #onbAvancar:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
@@ -105,13 +106,13 @@
     overlay.innerHTML = `
       <div class="modal onb-modal" tabindex="-1">
         <div class="onb-topo">
-          <div class="onb-marca" aria-hidden="true">D<span>iscoteca</span></div>
+          <div class="onb-marca" aria-hidden="true"><svg viewBox="0 0 64 70" width="34" height="37"><path d="M30 20 C31 13 36 6 50 4 C49 15 41 21 30 20Z" fill="#7E9A6A"/><circle cx="32" cy="43" r="25" fill="#C9A24C"/><circle cx="32" cy="43" r="17" fill="none" stroke="#9E7A2E" stroke-width="3"/><circle cx="32" cy="43" r="8" fill="#0B0B0B"/></svg><b>hi<span>ll</span>a</b></div>
           <button type="button" class="modal-close" id="onbFechar" aria-label="Fechar apresentação">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="onb-corpo">
-          <h2 class="onb-intro" id="onbTitulo">Bem-vindo ao Discoteca</h2>
+          <h2 class="onb-intro" id="onbTitulo">Bem-vindo à Hilla · Tudo que vale guardar.</h2>
           <div class="onb-grade">
             ${PASSOS.map(p => `
               <section class="onb-topico" aria-label="${p.n} — ${p.pergunta}">
@@ -123,7 +124,7 @@
           </div>
         </div>
         <div class="onb-rodape">
-          <button type="button" class="form-btn" id="onbAvancar">Começar a usar o Discoteca</button>
+          <button type="button" class="form-btn" id="onbAvancar">Começar a usar a Hilla</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);

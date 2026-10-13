@@ -7,18 +7,18 @@
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Perfil · Discoteca</title>
+  <title>Perfil · Hilla</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=29" />
+  <link rel="stylesheet" href="style.css?v=30" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2" />
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=2" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico?v=3" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=3" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=3" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=3" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Discoteca" />
+  <meta name="apple-mobile-web-app-title" content="Hilla" />
 </head>
 <body>
 
@@ -26,7 +26,7 @@
     <div style="text-align:center; padding:80px 20px; opacity:0.4; font-size:13px;">Carregando perfil...</div>
   </div>
 
-  <footer class="app-footer app-footer-min"><div class="app-nav-logo">D<span>iscoteca</span></div><p>Sua coleção, suas recomendações.</p><p class="app-footer-legal"><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos de Uso</a> · <a href="novidades.html">Novidades</a></p><p class="app-footer-legal">Dados de discos: <a href="https://www.discogs.com/">Discogs</a> · <a href="https://www.last.fm/">Last.fm</a> · Spotify. Sem afiliação.</p></footer>
+  <footer class="app-footer app-footer-min"><div class="app-footer-marca"><svg class="app-footer-drupa" viewBox="0 0 64 70" width="22" height="24" aria-hidden="true"><path d="M30 20 C31 13 36 6 50 4 C49 15 41 21 30 20Z" fill="#7E9A6A"/><circle cx="32" cy="43" r="25" fill="#C9A24C"/><circle cx="32" cy="43" r="17" fill="none" stroke="#9E7A2E" stroke-width="3"/><circle cx="32" cy="43" r="8" fill="#0B0B0B"/></svg><div class="app-nav-logo">hi<span>ll</span>a</div></div><p>Tudo que vale guardar.</p><p class="app-footer-legal"><a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos de Uso</a> · <a href="novidades.html">Novidades</a></p><p class="app-footer-legal">Dados de discos: <a href="https://www.discogs.com/">Discogs</a> · <a href="https://www.last.fm/">Last.fm</a> · Spotify. Sem afiliação.</p></footer>
 
   <script>
     const API_URL = 'https://fportelada.pythonanywhere.com';
@@ -72,7 +72,7 @@ function apiFetch(url, opcoes = {}) {
     }
 
     // Prioridade: capa já salva <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> Discogs sob demanda <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> Last.fm por último.
-    // Lazy (só busca quando o card entra na tela) — importante pra coleções grandes.
+    // Lazy (só busca quando o card entra na tela) — importante pra prateleiras grandes.
     function configurarLazyLoadCapas() {
       const itens = document.querySelectorAll('[data-artista][data-album]');
       const carregar = (el) => {
@@ -368,7 +368,7 @@ function apiFetch(url, opcoes = {}) {
       }
       html += `</div>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da coleção</h2></div><div class="pp-highlights-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">`;
+      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da prateleira</h2></div><div class="pp-highlights-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">`;
       if (data.genero_predominante) {
         html += `<div class="pp-highlight-card"><div class="value">${data.genero_predominante_pct}%</div><div class="label">${escapeHtml(data.genero_predominante)}</div><div class="sub">gênero predominante</div></div>`;
       }
@@ -385,14 +385,14 @@ function apiFetch(url, opcoes = {}) {
         html += `<div class="pp-highlight-card"><div class="value">${Math.round(nFmt / _totFmt * 100)}%</div><div class="label">${_nomesFmt[kFmt]}</div><div class="sub">formato favorito</div></div>`;
       }
       if (data.valor_total) {
-        html += `<div class="pp-highlight-card"><div class="value">R$ ${data.valor_total}</div><div class="label">valor da coleção</div><div class="sub">estimado</div></div>`;
+        html += `<div class="pp-highlight-card"><div class="value">R$ ${data.valor_total}</div><div class="label">valor da prateleira</div><div class="sub">estimado</div></div>`;
       }
       html += `</div></div>`;
 
       html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Linha do tempo</h2></div><div class="pp-timeline">`;
       if (data.recentes && data.recentes.length > 0) {
         data.recentes.slice(0, 5).forEach(item => {
-          html += `<div class="pp-timeline-item"><span class="icon">+</span><span class="text"><strong>${escapeHtml(item.album) || 'Álbum'}</strong> — ${escapeHtml(item.artista) || 'Artista'} adicionado à coleção</span><span class="time">${item.data_adicao || ''}</span></div>`;
+          html += `<div class="pp-timeline-item"><span class="icon">+</span><span class="text"><strong>${escapeHtml(item.album) || 'Álbum'}</strong> — ${escapeHtml(item.artista) || 'Artista'} adicionado à prateleira</span><span class="time">${item.data_adicao || ''}</span></div>`;
         });
       } else {
         html += `<div class="pp-empty-note">Nenhuma atividade ainda.</div>`;
@@ -422,7 +422,7 @@ function apiFetch(url, opcoes = {}) {
             <div class="info">
               <div class="label">compatibilidade com</div>
               <div class="name">Em breve — comparação entre colecionadores</div>
-              <div class="tags"><span>Chega quando o Discoteca tiver mais de um usuário ativo</span></div>
+              <div class="tags"><span>Chega quando a Hilla tiver mais de um usuário ativo</span></div>
             </div>
           </div>
         </div>
@@ -444,6 +444,6 @@ function apiFetch(url, opcoes = {}) {
       });
     }
   </script>
-  <script src="conquistas.js?v=4"></script>
+  <script src="conquistas.js?v=5"></script>
 </body>
 </html>

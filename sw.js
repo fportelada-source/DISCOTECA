@@ -1,10 +1,10 @@
-// Service Worker da Discoteca — Fase 1 do PWA (app instalável).
+// Service Worker da Hilla — Fase 1 do PWA (app instalável).
 //
 // O que isso faz: guarda uma cópia do "esqueleto" do site (páginas,
 // CSS, ícones) no dispositivo, pra abrir mais rápido e não ficar em
 // branco numa queda de internet rápida.
 //
-// O que isso NUNCA faz: cachear resposta da API (coleção, wishlist,
+// O que isso NUNCA faz: cachear resposta da API (prateleira, wishlist,
 // preço, login). Esses dados são dinâmicos, dependem de quem está
 // logado, e sempre precisam vir frescos do servidor. Cachear isso por
 // engano seria mostrar dado velho ou, pior, de outra pessoa.
@@ -23,7 +23,7 @@
 // CACHE_NAME tem número de versão — se algum dia mudar o que entra
 // no "esqueleto" (nova página, etc.), sobe esse número, igual já
 // fazemos com style.css?v=N.
-const CACHE_NAME = 'discoteca-shell-v9';
+const CACHE_NAME = 'discoteca-shell-v10';
 
 const PAGINAS_HTML = [
   './index.html',
@@ -52,7 +52,7 @@ self.addEventListener('install', (evento) => {
   // NÃO usa cache.addAll() — é tudo-ou-nada: um único arquivo com 404
   // (aconteceu de verdade: os ícones do PWA nunca tinham sido gerados)
   // derruba a instalação INTEIRA do Service Worker, deixando a wishlist
-  // e a coleção sem carregar mesmo depois de reinstalar o app. Cada
+  // e a prateleira sem carregar mesmo depois de reinstalar o app. Cada
   // arquivo agora é tentado individualmente — um que falhar não afeta
   // os outros nem impede a instalação de completar.
   evento.waitUntil(

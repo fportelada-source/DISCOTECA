@@ -1,5 +1,5 @@
 /* ================================================================
-   CONQUISTAS — Discoteca
+   CONQUISTAS — Hilla
    ================================================================
    Selos (ícones do board, traço em currentColor; a cor vem da raridade),
    a seção de Configurações ("Ver todos" + título no perfil) e as 5
@@ -38,7 +38,7 @@
   const RARIDADE = { comum: 'Comum', incomum: 'Incomum', rara: 'Rara', lendaria: 'Lendária' };
   const COR = { comum: '#9A9A9A', incomum: '#D0D0D0', rara: '#C9A24C', lendaria: '#E39A2E' };
   const UNIDADE = { colecao_crescente: 'itens', mestre_do_vinil: 'vinis', mestre_do_cd: 'CDs', mestre_do_cassete: 'cassetes', mestre_do_dvd: 'DVDs',
-    completista: 'artistas completos', superfa: 'discos do mesmo artista', mago_da_wishlist: 'itens da wishlist na coleção', a_caca: 'itens na wishlist',
+    completista: 'artistas completos', superfa: 'discos do mesmo artista', mago_da_wishlist: 'itens da wishlist na prateleira', a_caca: 'itens na wishlist',
     vintage: 'anos', ao_vivo: 'álbuns ao vivo', trilha_sonora: 'trilhas sonoras', coletanista: 'coletâneas', viajante_do_tempo: 'décadas',
     multiformato: 'formatos', divulgador: 'compartilhamentos', maratona: 'discos no mesmo dia', fiel: 'audições do mesmo disco', fotografo: 'audições com foto', arquivista: 'discos catalogados' };
   const DADOS = new WeakMap();   // elemento do selo -> { conquista, comProgresso }
@@ -188,7 +188,7 @@
     const carregar = () => chamar('/conquistas').then(r => r.json()).then(d => {
       const lista = (d && d.conquistas) || [];
       resumo.textContent = lista.length ? `${lista.length} de ${d.total_catalogo} conquistas desbloqueadas` : 'Nenhuma conquista ainda';
-      grade.innerHTML = lista.length ? lista.map(c => selo(c)).join('') : '<div class="cq-vazio">Use o Discoteca — coleção, wishlist, audições — e as conquistas aparecem aqui.</div>';
+      grade.innerHTML = lista.length ? lista.map(c => selo(c)).join('') : '<div class="cq-vazio">Use a Hilla — prateleira, wishlist, audições — e as conquistas aparecem aqui.</div>';
       sel.innerHTML = '<option value="">Sem título</option>' + lista.map(c => `<option value="${esc(c.id)}"${d.titulo === c.id ? ' selected' : ''}>${esc(c.nome)}</option>`).join('');
       sel.disabled = !lista.length;
       if (location.hash === '#conquistas') { abrirGrade(true); card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }

@@ -130,6 +130,17 @@
 
         <!-- PAINEL CSV -->
         <div id="painelCsv" style="display:none;">
+        <!-- GUIA EXPORTIFY (curto; o passo a passo completo fica no modal "Como usar") -->
+        <div class="imp-upload-card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <div><div class="title">Importar pelo Exportify</div></div>
+          </div>
+          <div class="desc">Exporte suas playlists do Spotify em CSV pelo exportify.net e suba cada uma no card certo abaixo.</div>
+          <div class="btn-group">
+            <a class="imp-btn primary" href="https://exportify.net" target="_blank" rel="noopener" style="text-decoration:none;">Abrir o Exportify</a>
+            <button class="imp-btn" type="button" id="btnComoUsarExportify">Como usar</button>
+          </div>
+        </div>
         <div class="imp-upload-grid">
           <div class="imp-upload-card">
             <div class="card-header">
@@ -223,6 +234,29 @@
       </div>
     </div>
   </div><!-- /appScreen -->
+
+  <!-- ===== MODAL: COMO USAR O EXPORTIFY ===== -->
+  <div class="modal-overlay" id="modalExportify">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h2>Como usar o Exportify</h2>
+        <button class="modal-close" id="btnFecharExportify" aria-label="Fechar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <ol style="margin:4px 0 0 0; padding-left:20px; line-height:1.7; font-size:14px;">
+        <li>Acesse <a href="https://exportify.net" target="_blank" rel="noopener">exportify.net</a> e clique em <strong>Get Started</strong>.</li>
+        <li>Entre com a sua conta do Spotify.</li>
+        <li>Ache a playlist e clique em <strong>Export</strong>. Um arquivo .csv é baixado.</li>
+        <li>Volte aqui e suba o arquivo no card certo:
+          <ul style="margin:4px 0; padding-left:18px;">
+            <li><strong>Top do Ano</strong>: a playlist com as suas mais ouvidas do ano.</li>
+            <li><strong>Favoritos</strong>: as suas Músicas Curtidas.</li>
+            <li><strong>Descobertas</strong>: uma playlist de descobertas.</li>
+          </ul>
+        </li>
+        <li>Pronto: a Hilla lê os álbuns e atualiza a sua wishlist.</li>
+      </ol>
+    </div>
+  </div>
 
   <!-- ===== MODAL: CONFIRMAÇÃO ===== -->
   <div class="modal-overlay" id="modalConfirm">
@@ -775,5 +809,16 @@ function renderStatusImportacao(d) {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
+<script>
+// Modal "Como usar" do Exportify
+(function () {
+  const ov = document.getElementById('modalExportify');
+  if (!ov) return;
+  document.getElementById('btnComoUsarExportify').addEventListener('click', () => ov.classList.add('open'));
+  document.getElementById('btnFecharExportify').addEventListener('click', () => ov.classList.remove('open'));
+  ov.addEventListener('click', (e) => { if (e.target === ov) ov.classList.remove('open'); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') ov.classList.remove('open'); });
+})();
+</script>
 </body>
 </html>

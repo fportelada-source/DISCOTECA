@@ -1395,7 +1395,8 @@ function carregarDados() {
           } catch (e) { ok(); }
         };
         img.onerror = () => ok();
-        img.src = url;
+        // o site da capa não libera CORS (Discogs, Amazon): passa pelo wsrv.nl, que libera
+        img.src = url.indexOf('https://wsrv.nl/') === 0 ? url : 'https://wsrv.nl/?w=600&output=jpg&url=' + encodeURIComponent(url);
       });
     }
 

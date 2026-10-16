@@ -3200,6 +3200,15 @@
     .aud-res-vazio a { color: var(--terracotta); }
     .aud-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .aud-opc { opacity: 0.4; font-weight: 400; }
+    /* First spin: botão que liga/desliga no formulário + selo na lista e no detalhe */
+    .aud-fs { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 14px; padding: 7px 14px; border-radius: 999px;
+      border: 1px solid var(--card-line); background: transparent; color: var(--paper); opacity: 0.65; font: 600 12px 'Inter', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+    .aud-fs::before { content: ""; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid currentColor; }
+    .aud-fs[aria-pressed="true"] { opacity: 1; background: var(--terracotta); border-color: var(--terracotta); color: #0B0B0B; }
+    .aud-fs[aria-pressed="true"]::before { background: #0B0B0B; border-color: #0B0B0B; }
+    .aud-fs:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
+    .aud-fs-tag { display: inline-block; margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: var(--terracotta); color: #0B0B0B;
+      font: 700 9.5px 'Inter', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; vertical-align: 2px; }
     .aud-salvar { width: 100%; height: 46px; border: 0; border-radius: 12px; background: var(--terracotta); color: var(--ink); font: 700 14px 'Inter', sans-serif; cursor: pointer; margin-top: 6px; transition: 0.15s; }
     .aud-salvar:hover { opacity: 0.88; }
     .aud-salvar:disabled { opacity: 0.4; cursor: not-allowed; }

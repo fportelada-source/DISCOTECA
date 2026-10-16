@@ -254,6 +254,12 @@
     ctx.fillText(quebrar(ctx, (a.artista || '').toUpperCase(), larg - ladoW - 16 * k, 1)[0] || '', px, y);
     // lado direito: fio dourado + data
     const dir = W - px, baseMeta = metaBase - 4 * k;
+    if (a.first_spin) {   // selo "FIRST SPIN" acima do fio dourado
+      ctx.save(); ctx.font = `700 ${10 * k}px Inter, sans-serif`; espacar(ctx, 1.4 * k);
+      ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillStyle = OURO;
+      const topoFio = (opc.data && a.data) ? baseMeta - 12 * k - 6 * k - 1.5 * k : baseMeta - 1.5 * k;
+      ctx.fillText('FIRST SPIN', dir, topoFio - 8 * k); ctx.restore(); espacar(ctx, 0);
+    }
     if (opc.data && a.data) {
       ctx.font = `500 ${10 * k}px Inter, sans-serif`; espacar(ctx, 1.4 * k); ctx.fillStyle = '#5a5a5a';
       ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(dataCurta(a.data), dir, baseMeta);

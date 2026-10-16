@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Hilla — Audições</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=30" />
+  <link rel="stylesheet" href="style.css?v=31" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=3" />
@@ -163,6 +163,8 @@
             <input type="time" id="audHora">
           </div>
         </div>
+
+        <button type="button" class="aud-fs" id="audFirstSpin" aria-pressed="false">First spin</button>
 
         <div class="form-group">
           <label for="audNota">Nota <span class="aud-opc">(opcional)</span></label>
@@ -548,7 +550,7 @@ function renderDia() {
     <button type="button" class="aud-item" data-idx="${idx}" aria-label="${escapeHtml(`Abrir audição: ${it.album}, ${it.artista}`)}">
       <span class="aud-item-img">${imagemHtml(it, true, `${it.artista} — ${it.album}`)}</span>
       <span class="aud-item-txt">
-        <strong>${escapeHtml(it.artista || '')}</strong>
+        <strong>${escapeHtml(it.artista || '')}${it.first_spin ? ' <span class="aud-fs-tag">First spin</span>' : ''}</strong>
         <span>${escapeHtml(it.album || '')}</span>
         <small>${it.hora ? escapeHtml(it.hora) : 'Sem hora'}${it.foto ? ' · com foto' : ''}</small>
       </span>
@@ -569,7 +571,7 @@ function abrirDetalhe(idx) {
   el('audDetImg').innerHTML = imagemHtml(it, false, `${it.artista} — ${it.album}${it.foto ? ' (foto da audição)' : ''}`);
   el('audDetAlbum').textContent = it.album || '';
   el('audDetArtista').textContent = it.artista || '';
-  el('audDetMeta').textContent = `${dataExtenso(it.data, true)}${it.hora ? ' · ' + it.hora : ''}`;
+  el('audDetMeta').innerHTML = `${escapeHtml(dataExtenso(it.data, true))}${it.hora ? ' · ' + escapeHtml(it.hora) : ''}${it.first_spin ? ' <span class="aud-fs-tag">First spin</span>' : ''}`;
   const notaEl = el('audDetNota');
   if (!SOMENTE_LEITURA && it.nota) { notaEl.textContent = it.nota; notaEl.style.display = 'block'; }
   else { notaEl.style.display = 'none'; notaEl.textContent = ''; }
@@ -620,6 +622,7 @@ function abrirAdd(diaIso, editarIdx) {
   el('audMsg').textContent = ''; el('audMsg').className = 'form-msg';
   el('audMsgEscolha').textContent = ''; el('audMsgEscolha').className = 'form-msg';
   el('audBusca').value = ''; el('audNota').value = '';
+  el('audFirstSpin').setAttribute('aria-pressed', 'false');
   atualizarPrevFoto();
 
   const agoraLocal = new Date();
@@ -633,6 +636,7 @@ function abrirAdd(diaIso, editarIdx) {
     audEditandoId = it.id;
     el('audAddTitulo').textContent = 'Editar audição';
     el('audData').value = it.data; el('audHora').value = it.hora || ''; el('audNota').value = it.nota || '';
+    el('audFirstSpin').setAttribute('aria-pressed', it.first_spin ? 'true' : 'false');
     audDiscoSel = { id: it.colecao_id, artista: it.artista, album: it.album, editando: true };
     irParaPasso('form');
   } else {
@@ -746,7 +750,7 @@ async function salvarAudicao() {
       r = await apiFetch(`${API_URL}/audicoes/${audEditandoId}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(Object.assign(
-          { data, hora: el('audHora').value, nota: el('audNota').value },
+          { data, hora: el('audHora').value, nota: el('audNota').value, first_spin: el('audFirstSpin').getAttribute('aria-pressed') === 'true' },
           // só reenvia o disco se a pessoa TROCOU — se o disco original já
           // saiu da Prateleira, editar data/hora/nota continua funcionando
           audDiscoSel.editando ? {} : { colecao_id: audDiscoSel.id }
@@ -758,6 +762,7 @@ async function salvarAudicao() {
       fd.append('data', data);
       fd.append('hora', el('audHora').value);
       fd.append('nota', el('audNota').value);
+      fd.append('first_spin', el('audFirstSpin').getAttribute('aria-pressed') === 'true' ? '1' : '0');
       if (audFotoBlob) fd.append('foto', audFotoBlob, 'foto.jpg');
       r = await apiFetch(`${API_URL}/audicoes`, { method: 'POST', body: fd });   // sem Content-Type: o navegador põe o boundary
     }
@@ -817,6 +822,7 @@ function ligarEventos() {
       if (ev.target.id === 'audTrocarDisco') { audDiscoSel = null; renderDiscoSel(); el('audBusca').focus(); }
     });
     el('audSalvar').addEventListener('click', salvarAudicao);
+    el('audFirstSpin').addEventListener('click', function () { this.setAttribute('aria-pressed', this.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
     el('audDetEditar').addEventListener('click', () => { const i = audDetIdx; fecharDetalhe(); abrirAdd(null, i); });
     el('audDetCompartilhar').addEventListener('click', () => { const it = audItens[audDetIdx]; if (it && window.DiscotecaCompartilhar) DiscotecaCompartilhar.audicao(it); });
     el('audDetExcluir').addEventListener('click', excluirAudicao);
@@ -879,6 +885,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
-  <script src="compartilhar.js?v=9"></script>
+  <script src="compartilhar.js?v=10"></script>
 </body>
 </html>

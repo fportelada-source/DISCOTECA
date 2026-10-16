@@ -1373,7 +1373,7 @@ function carregarDados() {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: url })
       })
         .then(r => r.json())
-        .then(d => { if (!d || !d.sucesso) return enviarCapaDoNavegador(discoId, url); })
+        .then(d => { if (!d || !d.sucesso) { console.warn('[capa] servidor não guardou:', url, d && d.motivo); return enviarCapaDoNavegador(discoId, url); } })
         .catch(() => {});
     }
     function enviarCapaDoNavegador(discoId, url) {

@@ -660,6 +660,7 @@ async function fetchAlbumArt(artist, album, artId, fallbackId, recId, prioridade
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ capa_url: url })
             }).catch(() => {});
+            guardarCapaWish(recId, url);
           }
           resolve();
         };
@@ -675,6 +676,40 @@ async function fetchAlbumArt(artist, album, artId, fallbackId, recId, prioridade
   } catch {
     if (fallback) fallback.style.opacity = '0.8';
   }
+}
+
+// Guarda no servidor uma cópia da capa (o link de fora pode morrer; a cópia não).
+const _capasGuardandoW = new Set();
+function guardarCapaWish(recId, url) {
+  if (!recId || !url || url.indexOf(API_URL + '/capas/') === 0 || _capasGuardandoW.has(recId)) return;
+  _capasGuardandoW.add(recId);
+  apiFetch(API_URL + `/recomendacoes/${recId}/guardar_capa`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: url })
+  })
+    .then(r => r.json())
+    .then(d => { if (!d || !d.sucesso) { console.warn('[capa] servidor não guardou:', url, d && d.motivo); return enviarCapaWishDoNavegador(recId, url); } })
+    .catch(() => {});
+}
+function enviarCapaWishDoNavegador(recId, url) {
+  return new Promise((ok) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';   // só funciona se o site da capa liberar; se não, desiste quieto
+    img.onload = () => {
+      try {
+        const esc = Math.min(1, 600 / Math.max(img.naturalWidth, img.naturalHeight));
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(img.naturalWidth * esc); cv.height = Math.round(img.naturalHeight * esc);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        cv.toBlob((blob) => {
+          if (!blob) return ok();
+          const fd = new FormData(); fd.append('imagem', blob, 'capa.jpg');
+          apiFetch(API_URL + `/recomendacoes/${recId}/guardar_capa`, { method: 'POST', body: fd }).catch(() => {}).finally(ok);
+        }, 'image/jpeg', 0.85);
+      } catch (e) { ok(); }
+    };
+    img.onerror = () => ok();
+    img.src = url;
+  });
 }
 
 // Prioriza a capa do Discogs (sem crop forçado) já salva no item; se não
@@ -705,6 +740,7 @@ function carregarCapa(item, artId, fallbackId, alem) {
       artWrap.classList.add('has-image');
       if (fallback) fallback.style.opacity = '0';
       if (encontradaAgora) salvarCapaEncontrada(url);
+      guardarCapaWish(item.id, url);
     };
     img.onerror = () => {
       if (fallback) fallback.style.opacity = '0.8';

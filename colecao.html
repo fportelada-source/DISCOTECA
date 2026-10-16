@@ -10,7 +10,7 @@
   <title>Hilla — Prateleira</title>
   <link href="fonts.css?v=1" rel="stylesheet">
   <script src="html5-qrcode.min.js?v=2.3.8"></script>
-  <link rel="stylesheet" href="style.css?v=30" />
+  <link rel="stylesheet" href="style.css?v=31" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=3" />
@@ -1391,23 +1391,30 @@ function carregarDados() {
           if (encontradaAgora) salvarCapaEncontrada(url);
         };
         img.onerror = () => {
+          // A capa salva no disco pode deixar de existir no site de origem
+          // (Discogs/Last.fm trocam o endereço). Aí busca de novo, uma vez só.
+          if (!encontradaAgora) { buscarNova(url); return; }
           if (fallback) fallback.style.opacity = '0.8';
         };
         img.src = url;
+      }
+
+      function buscarNova(quebrada) {
+        pedirCapa(artWrap, API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
+          .then(r => r.json())
+          .then(d => {
+            if (d.sucesso && d.capa_url && d.capa_url !== quebrada) aplicar(d.capa_url, true);
+            else if (quebrada) { if (fallback) fallback.style.opacity = '0.8'; }
+            else fetchAlbumArt(artista, album, artId, fallbackId, discoId);
+          })
+          .catch(() => { if (quebrada) { if (fallback) fallback.style.opacity = '0.8'; } else fetchAlbumArt(artista, album, artId, fallbackId, discoId); });
       }
 
       if (capaSalva) {
         aplicar(capaSalva, false);
         return;
       }
-
-      pedirCapa(artWrap, API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
-        .then(r => r.json())
-        .then(d => {
-          if (d.sucesso && d.capa_url) aplicar(d.capa_url, true);
-          else fetchAlbumArt(artista, album, artId, fallbackId, discoId);
-        })
-        .catch(() => fetchAlbumArt(artista, album, artId, fallbackId, discoId));
+      buscarNova(null);
     }
 
     function atualizarBotaoFavoritar() {

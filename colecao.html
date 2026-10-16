@@ -1342,6 +1342,7 @@ function carregarDados() {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ capa_url: url })
                 }).catch(() => {});
+                guardarCapa(discoId, url);
               }
               resolve();
             };
@@ -1361,6 +1362,43 @@ function carregarDados() {
 
     // Prioriza a capa do Discogs (sem crop forçado) já salva no disco; se
     // não tiver, tenta buscar ao vivo; só usa Last.fm como último recurso.
+    // Guarda uma CÓPIA da capa no servidor da Hilla (não só o link). Primeiro o
+    // servidor tenta baixar; se o site de origem não deixar, o navegador manda o
+    // arquivo da imagem que ele mesmo já carregou. Uma vez por disco por visita.
+    const _capasGuardando = new Set();
+    function guardarCapa(discoId, url) {
+      if (!discoId || !url || url.indexOf(API_URL + '/capas/') === 0 || _capasGuardando.has(discoId)) return;
+      _capasGuardando.add(discoId);
+      apiFetch(API_URL + `/colecao/${discoId}/guardar_capa`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: url })
+      })
+        .then(r => r.json())
+        .then(d => { if (!d || !d.sucesso) return enviarCapaDoNavegador(discoId, url); })
+        .catch(() => {});
+    }
+    function enviarCapaDoNavegador(discoId, url) {
+      return new Promise((ok) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';   // só funciona se o site da capa liberar; se não, desiste quieto
+        img.onload = () => {
+          try {
+            const lado = Math.min(600, Math.max(img.naturalWidth, img.naturalHeight));
+            const esc = lado / Math.max(img.naturalWidth, img.naturalHeight);
+            const cv = document.createElement('canvas');
+            cv.width = Math.round(img.naturalWidth * esc); cv.height = Math.round(img.naturalHeight * esc);
+            cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+            cv.toBlob((blob) => {
+              if (!blob) return ok();
+              const fd = new FormData(); fd.append('imagem', blob, 'capa.jpg');
+              apiFetch(API_URL + `/colecao/${discoId}/guardar_capa`, { method: 'POST', body: fd }).catch(() => {}).finally(ok);
+            }, 'image/jpeg', 0.85);
+          } catch (e) { ok(); }
+        };
+        img.onerror = () => ok();
+        img.src = url;
+      });
+    }
+
     function carregarCapaColecao(artista, album, capaSalva, artId, fallbackId, discoId) {
       const artWrap = document.getElementById(artId);
       const fallback = document.getElementById(fallbackId);
@@ -1378,7 +1416,7 @@ function carregarDados() {
         }).catch(() => {});
       }
 
-      function aplicar(url, encontradaAgora) {
+      function aplicar(url, encontradaAgora, jaSemLastfm) {
         const img = new Image();
         // Mesmo motivo do fetchAlbumArt acima — crossOrigin não tem
         // função nenhuma aqui e só derrubava capas sem CORS.
@@ -1389,21 +1427,24 @@ function carregarDados() {
           artWrap.classList.add('has-image');
           if (fallback) fallback.style.opacity = '0';
           if (encontradaAgora) salvarCapaEncontrada(url);
+          guardarCapa(discoId, url);   // capa abriu: guarda uma cópia no servidor (se ainda for link de fora)
         };
         img.onerror = () => {
           // A capa salva no disco pode deixar de existir no site de origem
           // (Discogs/Last.fm trocam o endereço). Aí busca de novo, uma vez só.
           if (!encontradaAgora) { buscarNova(url); return; }
+          // a capa nova também não abriu (Last.fm com imagem apagada): pede direto ao Discogs, uma vez
+          if (!jaSemLastfm) { buscarNova(url, true); return; }
           if (fallback) fallback.style.opacity = '0.8';
         };
         img.src = url;
       }
 
-      function buscarNova(quebrada) {
-        pedirCapa(artWrap, API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}`)
+      function buscarNova(quebrada, semLastfm) {
+        pedirCapa(artWrap, API_URL + `/buscar_capa?artista=${encodeURIComponent(artista)}&album=${encodeURIComponent(album)}${semLastfm ? '&sem_lastfm=1' : ''}`)
           .then(r => r.json())
           .then(d => {
-            if (d.sucesso && d.capa_url && d.capa_url !== quebrada) aplicar(d.capa_url, true);
+            if (d.sucesso && d.capa_url && d.capa_url !== quebrada) aplicar(d.capa_url, true, semLastfm);
             else if (quebrada) { if (fallback) fallback.style.opacity = '0.8'; }
             else fetchAlbumArt(artista, album, artId, fallbackId, discoId);
           })

@@ -680,15 +680,34 @@ async function fetchAlbumArt(artist, album, artId, fallbackId, recId, prioridade
 
 // Guarda no servidor uma cópia da capa (o link de fora pode morrer; a cópia não).
 const _capasGuardandoW = new Set();
+// Fila: no máximo 2 capas por vez pro servidor (perfil com 500 discos não trava a Hilla).
+const _filaCapasW = [];
+let _capasAtivasW = 0;
+function _rodarFilaW() {
+  while (_capasAtivasW < 2 && _filaCapasW.length) {
+    const [id, url] = _filaCapasW.shift();
+    _capasAtivasW++;
+    apiFetch(API_URL + `/recomendacoes/${id}/guardar_capa`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: url })
+    })
+      .then(r => {
+        if (r.status === 429) {   // servidor pediu calma: devolve pra fila e espera 30 s
+          _filaCapasW.push([id, url]);
+          return new Promise(ok => setTimeout(ok, 30000));
+        }
+        return r.json().then(d => {
+          if (!d || !d.sucesso) { console.warn('[capa] servidor não guardou:', url, d && d.motivo); return enviarCapaWishDoNavegador(id, url); }
+        });
+      })
+      .catch(() => {})
+      .finally(() => { _capasAtivasW--; _rodarFilaW(); });
+  }
+}
 function guardarCapaWish(recId, url) {
   if (!recId || !url || url.indexOf(API_URL + '/capas/') === 0 || _capasGuardandoW.has(recId)) return;
   _capasGuardandoW.add(recId);
-  apiFetch(API_URL + `/recomendacoes/${recId}/guardar_capa`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: url })
-  })
-    .then(r => r.json())
-    .then(d => { if (!d || !d.sucesso) { console.warn('[capa] servidor não guardou:', url, d && d.motivo); return enviarCapaWishDoNavegador(recId, url); } })
-    .catch(() => {});
+  _filaCapasW.push([recId, url]);
+  _rodarFilaW();
 }
 function enviarCapaWishDoNavegador(recId, url) {
   return new Promise((ok) => {

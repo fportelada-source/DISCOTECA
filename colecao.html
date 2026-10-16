@@ -1366,15 +1366,34 @@ function carregarDados() {
     // servidor tenta baixar; se o site de origem não deixar, o navegador manda o
     // arquivo da imagem que ele mesmo já carregou. Uma vez por disco por visita.
     const _capasGuardando = new Set();
+    // Fila: no máximo 2 capas por vez pro servidor (perfil com 500 discos não trava a Hilla).
+    const _filaCapas = [];
+    let _capasAtivas = 0;
+    function _rodarFila() {
+      while (_capasAtivas < 2 && _filaCapas.length) {
+        const [id, url] = _filaCapas.shift();
+        _capasAtivas++;
+        apiFetch(API_URL + `/colecao/${id}/guardar_capa`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: url })
+        })
+          .then(r => {
+            if (r.status === 429) {   // servidor pediu calma: devolve pra fila e espera 30 s
+              _filaCapas.push([id, url]);
+              return new Promise(ok => setTimeout(ok, 30000));
+            }
+            return r.json().then(d => {
+              if (!d || !d.sucesso) { console.warn('[capa] servidor não guardou:', url, d && d.motivo); return enviarCapaDoNavegador(id, url); }
+            });
+          })
+          .catch(() => {})
+          .finally(() => { _capasAtivas--; _rodarFila(); });
+      }
+    }
     function guardarCapa(discoId, url) {
       if (!discoId || !url || url.indexOf(API_URL + '/capas/') === 0 || _capasGuardando.has(discoId)) return;
       _capasGuardando.add(discoId);
-      apiFetch(API_URL + `/colecao/${discoId}/guardar_capa`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ capa_url: url })
-      })
-        .then(r => r.json())
-        .then(d => { if (!d || !d.sucesso) { console.warn('[capa] servidor não guardou:', url, d && d.motivo); return enviarCapaDoNavegador(discoId, url); } })
-        .catch(() => {});
+      _filaCapas.push([discoId, url]);
+      _rodarFila();
     }
     function enviarCapaDoNavegador(discoId, url) {
       return new Promise((ok) => {

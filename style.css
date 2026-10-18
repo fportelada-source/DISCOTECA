@@ -3731,3 +3731,6 @@
     .pp-recent-scroll::-webkit-scrollbar, .pp-aud-strip::-webkit-scrollbar { height: 6px; }
     .pp-recent-scroll::-webkit-scrollbar-track, .pp-aud-strip::-webkit-scrollbar-track { background: transparent; }
     .pp-recent-scroll::-webkit-scrollbar-thumb, .pp-aud-strip::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 3px; }
+
+/* símbolo (cacho de hilla) ao lado do nome no topo */
+a.app-nav-logo::before { content: ""; display: inline-block; width: 26px; height: 26px; margin-right: 8px; vertical-align: -5px; background: url("simbolo-mini.svg") center / contain no-repeat; }

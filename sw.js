@@ -23,7 +23,7 @@
 // CACHE_NAME tem número de versão — se algum dia mudar o que entra
 // no "esqueleto" (nova página, etc.), sobe esse número, igual já
 // fazemos com style.css?v=N.
-const CACHE_NAME = 'discoteca-shell-v10';
+const CACHE_NAME = 'discoteca-shell-v11';
 
 const PAGINAS_HTML = [
   './index.html',
@@ -45,7 +45,9 @@ const ARQUIVOS_ESTATICOS = [
   './apple-touch-icon.png',
   './favicon.ico',
   './favicon-32.png',
-  './favicon-16.png'
+  './favicon-16.png',
+  './simbolo.svg',
+  './simbolo-mini.svg'
 ];
 
 self.addEventListener('install', (evento) => {

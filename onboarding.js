@@ -106,7 +106,7 @@
     overlay.innerHTML = `
       <div class="modal onb-modal" tabindex="-1">
         <div class="onb-topo">
-          <div class="onb-marca" aria-hidden="true"><svg viewBox="0 0 64 70" width="34" height="37"><path d="M30 20 C31 13 36 6 50 4 C49 15 41 21 30 20Z" fill="#7E9A6A"/><circle cx="32" cy="43" r="25" fill="#C9A24C"/><circle cx="32" cy="43" r="17" fill="none" stroke="#9E7A2E" stroke-width="3"/><circle cx="32" cy="43" r="8" fill="#0B0B0B"/></svg><b>hi<span>ll</span>a</b></div>
+          <div class="onb-marca" aria-hidden="true"><img src="simbolo.svg" width="40" height="40" alt=""><b>hi<span>ll</span>a</b></div>
           <button type="button" class="modal-close" id="onbFechar" aria-label="Fechar apresentação">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>

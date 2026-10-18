@@ -8,6 +8,8 @@
    ================================================================ */
 (function () {
   const ICONES = {
+  "volta_ao_mundo": "<circle cx=\"50\" cy=\"50\" r=\"32\" stroke-width=\"2\" /><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"13\" transform=\"rotate(-30 50 50)\" stroke-width=\"1.5\" /><circle cx=\"84.6\" cy=\"30\" r=\"4\" fill=\"currentColor\" />",
+  "sem_parar": "<path d=\"M50 50 C62 32 86 32 86 50 C86 68 62 68 50 50 C38 32 14 32 14 50 C14 68 38 68 50 50 Z\" stroke-width=\"2\" /><circle cx=\"86\" cy=\"50\" r=\"4\" fill=\"currentColor\" />",
   "colecao_crescente": "<rect x=\"15\" y=\"60\" width=\"10\" height=\"25\" stroke-width=\"2\" /> <rect x=\"30\" y=\"48\" width=\"10\" height=\"37\" stroke-width=\"2\" /> <rect x=\"45\" y=\"36\" width=\"10\" height=\"49\" stroke-width=\"2\" /> <rect x=\"60\" y=\"24\" width=\"10\" height=\"61\" stroke-width=\"2\" /> <rect x=\"75\" y=\"12\" width=\"10\" height=\"73\" stroke-width=\"2\" />",
   "mestre_do_vinil": "<circle cx=\"50\" cy=\"50\" r=\"38\" stroke-width=\"2\" /> <circle cx=\"50\" cy=\"50\" r=\"28\" stroke-width=\"1.5\" /> <circle cx=\"50\" cy=\"50\" r=\"18\" stroke-width=\"1.5\" /> <circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"currentColor\" />",
   "mestre_do_cd": "<circle cx=\"50\" cy=\"50\" r=\"36\" stroke-width=\"2\" /> <circle cx=\"50\" cy=\"50\" r=\"14\" stroke-width=\"1.5\" /> <circle cx=\"50\" cy=\"50\" r=\"4\" fill=\"currentColor\" />",

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://musicbrainz.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
@@ -1871,5 +1871,42 @@ function carregarDados() {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
+<script>
+// Volta ao Mundo: descobre, aos poucos e por trás, o país dos artistas da prateleira.
+(function () {
+  let rodando = false;
+  const pausa = (ms) => new Promise(ok => setTimeout(ok, ms));
+  async function pelosNavegador(artistas) {
+    const itens = [];
+    for (const artista of artistas) {
+      try {
+        const r = await fetch('https://musicbrainz.org/ws/2/artist/?fmt=json&limit=3&query=' + encodeURIComponent('artist:"' + artista + '"'));
+        if (r.ok) itens.push({ artista, resposta: await r.json() });
+      } catch (e) {}
+      await pausa(1100);   // MusicBrainz: 1 consulta por segundo
+    }
+    if (itens.length) await apiFetch(API_URL + '/conquistas/paises/salvar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ itens }) });
+    return itens.length;
+  }
+  async function preencher() {
+    if (rodando || typeof apiFetch !== 'function') return;
+    rodando = true;
+    try {
+      for (let volta = 0; volta < 200; volta++) {
+        const r = await apiFetch(API_URL + '/conquistas/paises/preencher', { method: 'POST' });
+        if (r.status === 429) { await pausa(30000); continue; }
+        if (!r.ok) break;
+        const d = await r.json();
+        if (!d.pendentes) break;
+        if (d.pelo_navegador && d.pelo_navegador.length) {
+          if (!(await pelosNavegador(d.pelo_navegador))) break;
+        }
+        await pausa(1500);
+      }
+    } catch (e) {} finally { rodando = false; }
+  }
+  window.addEventListener('load', () => setTimeout(preencher, 4000));
+})();
+</script>
 </body>
 </html>

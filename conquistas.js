@@ -8,6 +8,10 @@
    ================================================================ */
 (function () {
   const ICONES = {
+  "colecionador_completo": "<polygon points=\"50,8 79.7,20.3 92,50 79.7,79.7 50,92 20.3,79.7 8,50 20.3,20.3\" stroke-width=\"1.5\" opacity=\"0.55\" /><polygon points=\"50.0,20.0 78.5,40.7 67.6,74.3 32.4,74.3 21.5,40.7\" stroke-width=\"2\" /><line x1=\"50\" y1=\"50\" x2=\"50.0\" y2=\"20.0\" stroke-width=\"1.2\" opacity=\"0.5\" /><line x1=\"50\" y1=\"50\" x2=\"78.5\" y2=\"40.7\" stroke-width=\"1.2\" opacity=\"0.5\" /><line x1=\"50\" y1=\"50\" x2=\"67.6\" y2=\"74.3\" stroke-width=\"1.2\" opacity=\"0.5\" /><line x1=\"50\" y1=\"50\" x2=\"32.4\" y2=\"74.3\" stroke-width=\"1.2\" opacity=\"0.5\" /><line x1=\"50\" y1=\"50\" x2=\"21.5\" y2=\"40.7\" stroke-width=\"1.2\" opacity=\"0.5\" /><circle cx=\"50.0\" cy=\"20.0\" r=\"3.2\" fill=\"currentColor\" /><circle cx=\"78.5\" cy=\"40.7\" r=\"3.2\" fill=\"currentColor\" /><circle cx=\"67.6\" cy=\"74.3\" r=\"3.2\" fill=\"currentColor\" /><circle cx=\"32.4\" cy=\"74.3\" r=\"3.2\" fill=\"currentColor\" /><circle cx=\"21.5\" cy=\"40.7\" r=\"3.2\" fill=\"currentColor\" />",
+  "um_ano_de_hilla": "<polygon points=\"50,8 79.7,20.3 92,50 79.7,79.7 50,92 20.3,79.7 8,50 20.3,20.3\" stroke-width=\"1.5\" opacity=\"0.55\" /><line x1=\"50.0\" y1=\"30.0\" x2=\"50.0\" y2=\"19.0\" stroke-width=\"2.5\" /><line x1=\"60.0\" y1=\"32.7\" x2=\"65.5\" y2=\"23.2\" stroke-width=\"1.8\" /><line x1=\"67.3\" y1=\"40.0\" x2=\"76.8\" y2=\"34.5\" stroke-width=\"1.8\" /><line x1=\"70.0\" y1=\"50.0\" x2=\"81.0\" y2=\"50.0\" stroke-width=\"2.5\" /><line x1=\"67.3\" y1=\"60.0\" x2=\"76.8\" y2=\"65.5\" stroke-width=\"1.8\" /><line x1=\"60.0\" y1=\"67.3\" x2=\"65.5\" y2=\"76.8\" stroke-width=\"1.8\" /><line x1=\"50.0\" y1=\"70.0\" x2=\"50.0\" y2=\"81.0\" stroke-width=\"2.5\" /><line x1=\"40.0\" y1=\"67.3\" x2=\"34.5\" y2=\"76.8\" stroke-width=\"1.8\" /><line x1=\"32.7\" y1=\"60.0\" x2=\"23.2\" y2=\"65.5\" stroke-width=\"1.8\" /><line x1=\"30.0\" y1=\"50.0\" x2=\"19.0\" y2=\"50.0\" stroke-width=\"2.5\" /><line x1=\"32.7\" y1=\"40.0\" x2=\"23.2\" y2=\"34.5\" stroke-width=\"1.8\" /><line x1=\"40.0\" y1=\"32.7\" x2=\"34.5\" y2=\"23.2\" stroke-width=\"1.8\" /><circle cx=\"50\" cy=\"50\" r=\"4.5\" fill=\"currentColor\" />",
+  "ciclo_completo": "<polygon points=\"50,8 79.7,20.3 92,50 79.7,79.7 50,92 20.3,79.7 8,50 20.3,20.3\" stroke-width=\"1.5\" opacity=\"0.55\" /><path d=\"M59.7 25.9 A26 26 0 0 1 75.7 53.6\" stroke-width=\"2\" /><polyline points=\"81.0,50.0 75.7,53.6 71.0,50.0\" stroke-width=\"2\" /><path d=\"M66.0 70.5 A26 26 0 0 1 34.0 70.5\" stroke-width=\"2\" /><polyline points=\"34.5,76.8 34.0,70.5 39.5,68.2\" stroke-width=\"2\" /><path d=\"M24.3 53.6 A26 26 0 0 1 40.3 25.9\" stroke-width=\"2\" /><polyline points=\"34.5,23.2 40.3,25.9 39.5,31.8\" stroke-width=\"2\" /><circle cx=\"50.0\" cy=\"24.0\" r=\"5.5\" stroke-width=\"2\" /><circle cx=\"72.5\" cy=\"63.0\" r=\"5.5\" stroke-width=\"2\" /><circle cx=\"27.5\" cy=\"63.0\" r=\"5.5\" stroke-width=\"2\" /><circle cx=\"50\" cy=\"50\" r=\"3.5\" fill=\"currentColor\" />",
+  "prateleira_viva": "<polygon points=\"50,8 79.7,20.3 92,50 79.7,79.7 50,92 20.3,79.7 8,50 20.3,20.3\" stroke-width=\"1.5\" opacity=\"0.55\" /><rect x=\"27\" y=\"38\" width=\"9\" height=\"30\" rx=\"1.5\" stroke-width=\"2\" /><rect x=\"39\" y=\"32\" width=\"9\" height=\"36\" rx=\"1.5\" stroke-width=\"2\" /><rect x=\"51\" y=\"40\" width=\"9\" height=\"28\" rx=\"1.5\" stroke-width=\"2\" /><rect x=\"63\" y=\"35\" width=\"9\" height=\"33\" rx=\"1.5\" stroke-width=\"2\" /><circle cx=\"31.5\" cy=\"45\" r=\"2.4\" fill=\"currentColor\" /><circle cx=\"43.5\" cy=\"39\" r=\"2.4\" fill=\"currentColor\" /><circle cx=\"55.5\" cy=\"47\" r=\"2.4\" fill=\"currentColor\" /><line x1=\"22\" y1=\"68\" x2=\"78\" y2=\"68\" stroke-width=\"2\" />",
   "volta_ao_mundo": "<circle cx=\"50\" cy=\"50\" r=\"32\" stroke-width=\"2\" /><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"13\" transform=\"rotate(-30 50 50)\" stroke-width=\"1.5\" /><circle cx=\"84.6\" cy=\"30\" r=\"4\" fill=\"currentColor\" />",
   "sem_parar": "<path d=\"M50 50 C62 32 86 32 86 50 C86 68 62 68 50 50 C38 32 14 32 14 50 C14 68 38 68 50 50 Z\" stroke-width=\"2\" /><circle cx=\"86\" cy=\"50\" r=\"4\" fill=\"currentColor\" />",
   "colecao_crescente": "<rect x=\"15\" y=\"60\" width=\"10\" height=\"25\" stroke-width=\"2\" /> <rect x=\"30\" y=\"48\" width=\"10\" height=\"37\" stroke-width=\"2\" /> <rect x=\"45\" y=\"36\" width=\"10\" height=\"49\" stroke-width=\"2\" /> <rect x=\"60\" y=\"24\" width=\"10\" height=\"61\" stroke-width=\"2\" /> <rect x=\"75\" y=\"12\" width=\"10\" height=\"73\" stroke-width=\"2\" />",
@@ -37,8 +41,8 @@
   "divulgador": "<circle cx=\"34\" cy=\"50\" r=\"9\" stroke-width=\"2\" /> <circle cx=\"68\" cy=\"30\" r=\"9\" stroke-width=\"2\" /> <circle cx=\"68\" cy=\"70\" r=\"9\" stroke-width=\"2\" /> <line x1=\"42\" y1=\"45.5\" x2=\"60\" y2=\"34.5\" stroke-width=\"1.5\" /> <line x1=\"42\" y1=\"54.5\" x2=\"60\" y2=\"65.5\" stroke-width=\"1.5\" />",
   "fundador": "<circle cx=\"50\" cy=\"50\" r=\"38\" stroke-width=\"2\" /> <polygon points=\"50,24 72,66 28,66\" stroke-width=\"2\" fill=\"none\" /> <line x1=\"36\" y1=\"55\" x2=\"64\" y2=\"55\" stroke-width=\"1.5\" /> <circle cx=\"50\" cy=\"45\" r=\"5\" fill=\"currentColor\" /> <circle cx=\"50\" cy=\"45\" r=\"10\" stroke-width=\"1\" opacity=\"0.6\" />"
 };
-  const RARIDADE = { comum: 'Comum', incomum: 'Incomum', rara: 'Rara', lendaria: 'Lendária' };
-  const COR = { comum: '#9A9A9A', incomum: '#D0D0D0', rara: '#C9A24C', lendaria: '#E39A2E' };
+  const RARIDADE = { comum: 'Comum', incomum: 'Incomum', rara: 'Rara', lendaria: 'Lendária', platina: 'Platina' };
+  const COR = { comum: '#9A9A9A', incomum: '#D0D0D0', rara: '#C9A24C', lendaria: '#E39A2E', platina: '#CFE6FF' };
   const UNIDADE = { colecao_crescente: 'itens', mestre_do_vinil: 'vinis', mestre_do_cd: 'CDs', mestre_do_cassete: 'cassetes', mestre_do_dvd: 'DVDs',
     completista: 'artistas completos', superfa: 'discos do mesmo artista', mago_da_wishlist: 'itens da wishlist na prateleira', a_caca: 'itens na wishlist',
     vintage: 'anos', ao_vivo: 'álbuns ao vivo', trilha_sonora: 'trilhas sonoras', coletanista: 'coletâneas', viajante_do_tempo: 'décadas',
@@ -56,6 +60,19 @@
     .cq-selo.incomum { --cq: #D0D0D0; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6); }
     .cq-selo.rara { --cq: #C9A24C; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 18px rgba(201, 162, 76, 0.12); }
     .cq-selo.lendaria { --cq: #E39A2E; border-width: 1.8px; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 26px rgba(227, 154, 46, 0.22), inset 0 0 10px rgba(227, 154, 46, 0.22); }
+    .cq-selo.platina { --cq: #EAF4FF; overflow: hidden; border: 2px solid transparent;
+      background: radial-gradient(120% 90% at 50% 0%, #24242c, #121216 65%) padding-box, conic-gradient(from var(--cq-ang), #9FE7F5, #F3F1FF, #F5C2E8, #C9A24C, #A9C8FF, #9FE7F5) border-box;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.9), 0 0 36px rgba(170, 210, 255, 0.32), 0 0 70px rgba(245, 194, 232, 0.16); animation: cqGira 6s linear infinite; }
+    .cq-selo.platina svg { stroke: url(#cqHolo); filter: drop-shadow(0 0 6px rgba(200, 230, 255, 0.55)); position: relative; z-index: 1; }
+    .cq-selo.platina .cq-rotulo, .cq-selo.platina .cq-meta { position: relative; z-index: 1; }
+    .cq-selo.platina .cq-meta { color: #CFE6FF; }
+    .cq-selo.platina::after { inset: -40%; border: 0; border-radius: 0; background: linear-gradient(115deg, transparent 44%, rgba(255, 255, 255, 0.22) 50%, transparent 56%); transform: translateX(-60%); animation: cqPassa 3.6s ease-in-out infinite; }
+    .cq-faisca { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px #fff; opacity: 0; animation: cqPisca 2.4s ease-in-out infinite; pointer-events: none; }
+    @property --cq-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+    @keyframes cqGira { to { --cq-ang: 360deg; } }
+    @keyframes cqPassa { 0%, 35% { transform: translateX(-60%); } 75%, 100% { transform: translateX(60%); } }
+    @keyframes cqPisca { 0%, 100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 0.9; transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .cq-selo.platina, .cq-selo.platina::after, .cq-faisca { animation: none; } }
     .cq-selo svg { width: 48%; height: auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)); }
     .cq-rotulo { margin-top: 10px; font: 700 10.5px 'Inter', sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: var(--paper); text-align: center; line-height: 1.25; }
     .cq-meta { margin-top: 4px; font: 500 10px 'Inter', sans-serif; color: var(--cq); opacity: 0.85; text-align: center; }
@@ -109,6 +126,10 @@
   function estilo() {
     if (document.getElementById('cqEstilo')) return;
     const st = document.createElement('style'); st.id = 'cqEstilo'; st.textContent = CSS; document.head.appendChild(st);
+    // degradê holográfico do ícone das platinas
+    const defs = document.createElement('div'); defs.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+    defs.innerHTML = '<svg width="0" height="0" aria-hidden="true"><defs><linearGradient id="cqHolo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9FE7F5"/><stop offset=".35" stop-color="#F3F1FF"/><stop offset=".65" stop-color="#F5C2E8"/><stop offset="1" stop-color="#A9C8FF"/></linearGradient></defs></svg>';
+    document.body.appendChild(defs);
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
   function dataCurta(d) { const p = (d || '').slice(0, 10).split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : ''; }
@@ -116,7 +137,7 @@
   function selo(c, extra) {
     const raridade = RARIDADE[c.raridade] ? c.raridade : 'comum';
     FILA.push(c);
-    return `<div class="cq-selo ${raridade}${extra ? ' ' + extra : ''}" data-cq="${FILA.length - 1}" tabindex="0" role="img" aria-label="${esc(c.rotulo)}, conquista ${RARIDADE[raridade].toLowerCase()}. ${esc(c.descricao)}">
+    return `<div class="cq-selo ${raridade}${extra ? ' ' + extra : ''}" data-cq="${FILA.length - 1}" tabindex="0" role="img" aria-label="${esc(c.rotulo)}, conquista ${RARIDADE[raridade].toLowerCase()}. ${esc(c.descricao)}">${raridade === 'platina' ? '<i class="cq-faisca" style="top:18%;left:22%"></i><i class="cq-faisca" style="top:30%;right:16%;animation-delay:.8s"></i><i class="cq-faisca" style="bottom:30%;left:14%;animation-delay:1.6s"></i>' : ''}
       <svg viewBox="0 0 100 100" aria-hidden="true">${ICONES[c.id] || ''}</svg>
       <div class="cq-rotulo">${esc(c.rotulo)}</div>
       <div class="cq-meta">${RARIDADE[raridade]}${c.desbloqueada_em ? ' · ' + dataCurta(c.desbloqueada_em) : ''}</div>
@@ -209,7 +230,7 @@
     estilo(); ligarBalao();
     const d = vitrine.destaque, r = vitrine.resumo || {}, outras = vitrine.outras || [];
     const partes = [`${r.total} ${r.total === 1 ? 'conquista' : 'conquistas'}`];
-    [['lendaria', 'lendária', 'lendárias'], ['rara', 'rara', 'raras']].forEach(([k, s, pl]) => { if (r[k]) partes.push(`${r[k]} ${r[k] === 1 ? s : pl}`); });
+    [['platina', 'platina', 'platinas'], ['lendaria', 'lendária', 'lendárias'], ['rara', 'rara', 'raras']].forEach(([k, s, pl]) => { if (r[k]) partes.push(`${r[k]} ${r[k] === 1 ? s : pl}`); });
     el.style.display = '';
     el.innerHTML = `<div class="cq-vitrine-topo"><h2 style="margin:0">Conquistas</h2><span class="cq-vitrine-resumo">${partes.join(' · ')}</span></div>
       <div class="cq-vitrine${outras.length ? '' : ' so-destaque'}">

@@ -23,7 +23,7 @@
 // CACHE_NAME tem número de versão — se algum dia mudar o que entra
 // no "esqueleto" (nova página, etc.), sobe esse número, igual já
 // fazemos com style.css?v=N.
-const CACHE_NAME = 'discoteca-shell-v11';
+const CACHE_NAME = 'discoteca-shell-v12';
 
 const PAGINAS_HTML = [
   './index.html',
@@ -94,7 +94,8 @@ function ehPaginaHtml(request) {
   // aqui também não tem custo real — só reforça que não fica preso).
   if (request.mode === 'navigate') return true;
   const url = new URL(request.url);
-  return url.pathname.endsWith('.html') || url.pathname.endsWith('.css');
+  // .js também: o app instalado ficava com o compartilhar.js antigo
+  return url.pathname.endsWith('.html') || url.pathname.endsWith('.css') || url.pathname.endsWith('.js');
 }
 
 self.addEventListener('fetch', (evento) => {
@@ -117,7 +118,8 @@ self.addEventListener('fetch', (evento) => {
     // REDE PRIMEIRO: tenta buscar a versão atual; só cai pro cache
     // se a rede genuinamente falhar (offline de verdade).
     evento.respondWith(
-      fetch(evento.request)
+      // cache: 'no-cache' = sempre pergunta ao servidor se mudou (não usa a cópia de 10 min do navegador)
+      fetch(evento.request, { cache: 'no-cache' })
         .then((respostaRede) => {
           if (respostaRede && respostaRede.status === 200) {
             const copia = respostaRede.clone();

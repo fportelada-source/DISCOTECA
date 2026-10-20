@@ -219,23 +219,31 @@
     const metaBase = H - baseH;                 // fim do bloco de conteúdo
     const metaTopo = metaBase - metaH;
 
-    // FOTO — caixa livre entre o topo seguro e os metadados
+    // FOTO — ganha destaque: a caixa desce até a base dos metadados (o texto passa
+    // por cima da parte de baixo dela, com um degradê escuro) e a foto pode ser
+    // levemente ampliada além do "contain" pra ocupar mais largura (corte máximo controlado).
+    const ZOOM = { contain: 1, leve: 1.25, cheio: 99 }[opc.layoutFoto || 'contain'];
     const fotoTopo = story ? 250 + 22 * k + 16 * k : topoH;   // Story: a foto começa abaixo do logotipo
-    const caixa = { x: px, y: fotoTopo, w: larg, h: metaTopo - 28 * k - fotoTopo };
+    const caixa = { x: px, y: fotoTopo, w: larg, h: metaBase - 6 * k - fotoTopo };
     let fw, fh;
     if (img && img.width && img.height) {
-      const r = Math.min(caixa.w / img.width, caixa.h / img.height);   // contain
-      fw = img.width * r; fh = img.height * r;
+      const contem = Math.min(caixa.w / img.width, caixa.h / img.height);
+      const cobre = Math.max(caixa.w / img.width, caixa.h / img.height);
+      const r = Math.min(cobre, contem * ZOOM);
+      fw = Math.min(caixa.w, img.width * r); fh = Math.min(caixa.h, img.height * r);
+      var escala = r;
     } else {                                    // sem foto/capa: o placeholder 3:4 do mockup
       fh = Math.min(caixa.h, caixa.w * 4 / 3); fw = fh * 3 / 4;
     }
-    const fx = caixa.x + (caixa.w - fw) / 2, fy = caixa.y + (caixa.h - fh) / 2;
+    const fx = caixa.x + (caixa.w - fw) / 2, fy = caixa.y;
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 40 * k; ctx.shadowOffsetY = 12 * k;
     ctx.fillStyle = '#121212'; ctx.fillRect(fx, fy, fw, fh);
     ctx.restore();
     if (img && img.width) {
-      ctx.drawImage(img, fx, fy, fw, fh);
+      // recorte centralizado do que passar da caixa
+      const sw = fw / escala, sh = fh / escala;
+      ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, fx, fy, fw, fh);
     } else {
       const g = ctx.createLinearGradient(fx, fy, fx + fw, fy + fh);
       g.addColorStop(0, '#242424'); g.addColorStop(1, '#121212');
@@ -243,6 +251,13 @@
       vinil(ctx, fx + fw / 2, fy + fh / 2, fw * 0.31);
     }
     ctx.strokeStyle = 'rgba(240,240,240,0.05)'; ctx.lineWidth = Math.max(1, k); ctx.strokeRect(fx, fy, fw, fh);
+    // degradê na base da foto, onde o texto encosta
+    if (fy + fh > metaTopo - 40 * k) {
+      const gTopo = metaTopo - 70 * k, gBase = fy + fh;
+      const sombra = ctx.createLinearGradient(0, gTopo, 0, gBase);
+      sombra.addColorStop(0, 'rgba(16,16,16,0)'); sombra.addColorStop(0.55, 'rgba(16,16,16,0.72)'); sombra.addColorStop(1, 'rgba(16,16,16,0.92)');
+      ctx.fillStyle = sombra; ctx.fillRect(fx, gTopo, fw, gBase - gTopo);
+    }
 
     // álbum + artista
     let y = metaTopo;

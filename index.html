@@ -7,16 +7,16 @@
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Hilla — sua prateleira de discos, wishlist e audições</title>
-  <meta name="description" content="Organize sua prateleira de vinis e CDs, descubra os discos que faltam com base no que você ouve no Spotify e registre suas audições. Grátis." />
+  <title>Hilla — app para catalogar seus discos de vinil e CDs</title>
+  <meta name="description" content="App grátis para catalogar sua coleção de discos de vinil, CDs e fitas. Monte sua wishlist, descubra o que comprar com base no que você ouve no Spotify e registre suas audições." />
   <link rel="canonical" href="https://hilla.com.br/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Hilla" />
-  <meta property="og:description" content="Sua prateleira de discos, wishlist e audições em um só lugar." />
+  <meta property="og:title" content="Hilla — catalogue sua coleção de discos" />
+  <meta property="og:description" content="Catalogue seus vinis e CDs, monte sua wishlist e registre o que você ouve. Grátis." />
   <meta property="og:url" content="https://hilla.com.br/" />
   <meta property="og:image" content="https://hilla.com.br/apple-touch-icon.png" />
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32" />
+  <link rel="stylesheet" href="style.css?v=33" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -26,6 +26,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Hilla" />
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Hilla", "url": "https://hilla.com.br/", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web, Android, iOS", "inLanguage": "pt-BR", "description": "App grátis para catalogar sua coleção de discos de vinil, CDs e fitas, montar wishlist e registrar audições.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "BRL"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "A Hilla é grátis?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Para catalogar seus discos, montar a wishlist e registrar audições, basta entrar com sua conta Google."}}, {"@type": "Question", "name": "Como catalogar meus discos de vinil e CDs?", "acceptedAnswer": {"@type": "Answer", "text": "Adicione cada disco pelo nome, pelo código de barras ou importando uma planilha. A Hilla completa sozinha a capa, o ano e o gênero, e você marca o formato e a condição."}}, {"@type": "Question", "name": "Como a Hilla sabe quais discos recomendar?", "acceptedAnswer": {"@type": "Answer", "text": "Ela olha o que você ouve no Spotify e o que já tem na prateleira, e sugere os álbuns que faltam, dizendo o porquê de cada um."}}, {"@type": "Question", "name": "Serve para quem está começando uma coleção?", "acceptedAnswer": {"@type": "Answer", "text": "Serve. A wishlist ajuda a decidir a primeira compra e as próximas, e a prateleira cresce junto com você."}}, {"@type": "Question", "name": "Posso mostrar minha coleção para outras pessoas?", "acceptedAnswer": {"@type": "Answer", "text": "Pode. Cada colecionador tem um perfil público opcional, com a prateleira, a wishlist e as últimas audições, que dá para compartilhar por link."}}]}]}</script>
 </head>
 <body>
 
@@ -39,7 +40,7 @@
       <section>
         <div class="page-eyebrow">Bem-vindo de volta</div>
         <h1 class="lg-title">Sua prateleira <span class="accent">está esperando.</span></h1>
-        <p class="lg-lede">Um companheiro pra sua prateleira física. Seu gosto, sua estante, sua próxima compra.</p>
+        <p class="lg-lede">O app grátis para catalogar sua coleção de discos de vinil, CDs e fitas. Seu gosto, sua estante, sua próxima compra.</p>
         <div class="lg-pilares">
           <div class="lg-pilar"><span class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><div><strong>Prateleira</strong><span>Cada disco que você tem, com formato, condição e capa.</span></div></div>
           <div class="lg-pilar"><span class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></span><div><strong>Wishlist priorizada</strong><span>Recomendações a partir do que você ouve, com o porquê de cada uma.</span></div></div>
@@ -60,6 +61,14 @@
         </div>
       </section>
     </main>
+    <section class="lg-faq" aria-labelledby="lgFaqTitulo">
+      <h2 id="lgFaqTitulo">Perguntas frequentes</h2>
+      <details><summary>A Hilla é grátis?</summary><p>Sim. Para catalogar seus discos, montar a wishlist e registrar audições, basta entrar com sua conta Google.</p></details>
+      <details><summary>Como catalogar meus discos de vinil e CDs?</summary><p>Adicione cada disco pelo nome, pelo código de barras ou importando uma planilha. A Hilla completa sozinha a capa, o ano e o gênero, e você marca o formato e a condição.</p></details>
+      <details><summary>Como a Hilla sabe quais discos recomendar?</summary><p>Ela olha o que você ouve no Spotify e o que já tem na prateleira, e sugere os álbuns que faltam, dizendo o porquê de cada um.</p></details>
+      <details><summary>Serve para quem está começando uma coleção?</summary><p>Serve. A wishlist ajuda a decidir a primeira compra e as próximas, e a prateleira cresce junto com você.</p></details>
+      <details><summary>Posso mostrar minha coleção para outras pessoas?</summary><p>Pode. Cada colecionador tem um perfil público opcional, com a prateleira, a wishlist e as últimas audições, que dá para compartilhar por link.</p></details>
+    </section>
   </div>
   <!-- ===== APP ===== -->
   <div id="appScreen" style="display:none;">

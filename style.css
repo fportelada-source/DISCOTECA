@@ -3734,3 +3734,10 @@
 
 /* símbolo (cacho de hilla) ao lado do nome no topo */
 a.app-nav-logo::before { content: ""; display: inline-block; width: 26px; height: 26px; margin-right: 8px; vertical-align: -5px; background: url("simbolo-mini.svg") center / contain no-repeat; }
+
+/* Perguntas frequentes na tela de entrada (também ajudam o Google) */
+.lg-faq { max-width: 760px; padding: 8px 0 56px; display: flex; flex-direction: column; gap: 10px; }
+.lg-faq h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+.lg-faq details { border: 1px solid var(--card-line); border-radius: 14px; background: var(--card); padding: 14px 18px; }
+.lg-faq summary { cursor: pointer; font-weight: 600; font-size: 14.5px; }
+.lg-faq p { margin: 10px 0 0; font-size: 13.5px; line-height: 1.6; opacity: 0.65; }

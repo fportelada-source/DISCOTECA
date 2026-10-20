@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Hilla — Perfil</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32" />
+  <link rel="stylesheet" href="style.css?v=33" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -174,6 +174,7 @@
             <div class="set-toggle-item"><div class="left"><div class="title">Perfil público</div><div class="sub">Visível pra qualquer pessoa com o link</div></div><button class="set-toggle" data-campo="privacidade_perfil_publico"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar valor da prateleira</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_valor"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar wishlist</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_wishlist"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Aparecer no Google</div><div class="sub">Seu perfil público pode aparecer nas buscas, com seu nome e seus discos</div></div><button class="set-toggle" data-campo="privacidade_busca"><div class="dot"></div></button></div>
           </div>
 
 
@@ -559,7 +560,7 @@ function coletarConfiguracoes() {
     notif_discografia: false,               // idem
     notif_email: false,                     // e-mail não existe
     privacidade_perfil_publico: pegarToggle('privacidade_perfil_publico'),
-    privacidade_busca: false,               // opção removida (não existe busca)
+    privacidade_busca: pegarToggle('privacidade_busca') && pegarToggle('privacidade_perfil_publico'),   // só vale com o perfil público
     privacidade_valor: pegarToggle('privacidade_valor'),
     privacidade_wishlist: pegarToggle('privacidade_wishlist'),
     tema: 'dark',

@@ -8,8 +8,9 @@
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Perfil · Hilla</title>
+  <meta name="description" content="Prateleira de discos, wishlist e audições de um colecionador na Hilla." />
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32" />
+  <link rel="stylesheet" href="style.css?v=33" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -176,6 +177,7 @@ function apiFetch(url, opcoes = {}) {
         })
         .then(renderPerfil)
         .catch(err => {
+          try { const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'; document.head.appendChild(m); } catch (e) {}
           document.getElementById('perfil-content').innerHTML =
             `<div style="text-align:center; padding:80px 20px;">${err.message || 'Erro ao carregar perfil'}</div>`;
         });
@@ -261,6 +263,19 @@ function apiFetch(url, opcoes = {}) {
       const ano = data.data_criacao ? data.data_criacao.split('-')[0] : '';
       const avatarHtml = data.foto_url ? `<img src="${escapeHtml(data.foto_url)}" alt="${nome}">` : nome.charAt(0).toUpperCase();
       const formatosBadge = (data.formatos_possuidos || []).map(f => NOME_FORMATO[f] || f).join(' · ');
+
+      // Google: título e descrição com o nome e os discos; sem "Aparecer no Google", noindex
+      try {
+        const artistasTop = [...new Set((data.recentes || []).map(d => d.artista).filter(Boolean))].slice(0, 4);
+        document.title = `Prateleira de ${data.nome_exibicao || data.nome || 'colecionador'} · ${data.total_discos || 0} discos · Hilla`;
+        const desc = document.querySelector('meta[name="description"]');
+        if (desc) desc.setAttribute('content', `${data.total_discos || 0} discos de vinil, CD e mais na Hilla` + (artistasTop.length ? `: ${artistasTop.join(', ')} e outros.` : '.'));
+        if (!data.no_google) {
+          const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'; document.head.appendChild(m);
+        } else {
+          const l = document.createElement('link'); l.rel = 'canonical'; l.href = 'https://hilla.com.br/perfil-publico.html?id=' + ppUserId; document.head.appendChild(l);
+        }
+      } catch (e) {}
 
       let html = `
         <div class="pp-hero-banner">

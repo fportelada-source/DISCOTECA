@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://hilla.com.br/sitemap.xml
+Sitemap: https://fportelada.pythonanywhere.com/sitemap-perfis.xml

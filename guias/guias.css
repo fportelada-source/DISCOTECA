@@ -79,3 +79,13 @@ footer .marca{font-size:20px}
 
 .cat-titulo{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:44px 0 0}
 .lista-guias{margin-top:16px}
+
+/* navegação do app (só para quem está logado) */
+header .in{flex-wrap:nowrap}
+.app-links{display:flex;gap:22px;flex:1;margin-left:24px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.app-links::-webkit-scrollbar{display:none}
+.app-links a{color:var(--mute);text-decoration:none;font-size:14.5px;font-weight:500;white-space:nowrap}
+.app-links a:hover,.app-links a.at{color:var(--fg)}
+.app-links a.at{box-shadow:inset 0 -2px 0 var(--gold);padding-bottom:4px}
+[hidden]{display:none!important}
+@media (max-width:760px){header .in{flex-wrap:wrap}.app-links{order:3;flex-basis:100%;margin:6px 0 0;gap:18px}}

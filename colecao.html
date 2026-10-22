@@ -1018,7 +1018,7 @@ function carregarDados() {
     }
 
     function checarAnosFaltantes() {
-      const faltando = colecao.filter(d => !d.ano_lancamento || !d.ano_original).length;
+      const faltando = colecao.filter(d => (!d.ano_lancamento || !d.ano_original) && !d.anos_verificado).length;
       const banner = document.getElementById('bannerAnoFaltante');
       const texto = document.getElementById('textoAnoFaltante');
       const dispensadoPara = localStorage.getItem('discoteca_banner_ano_dispensado');
@@ -1034,7 +1034,7 @@ function carregarDados() {
       const btnFechar = document.getElementById('btnFecharBannerAno');
       if (btnFechar) {
         btnFechar.addEventListener('click', function() {
-          const faltando = colecao.filter(d => !d.ano_lancamento || !d.ano_original).length;
+          const faltando = colecao.filter(d => (!d.ano_lancamento || !d.ano_original) && !d.anos_verificado).length;
           localStorage.setItem('discoteca_banner_ano_dispensado', String(faltando));
           document.getElementById('bannerAnoFaltante').style.display = 'none';
         });

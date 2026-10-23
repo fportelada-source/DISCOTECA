@@ -345,6 +345,76 @@
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   }
 
+
+  // Recap mensal (mockup A2 aprovado): "Outubro" + "18h de disco", mosaico de até 6 capas, 4 números.
+  // Story respeita as áreas que o Instagram cobre: 14% em cima, 20% embaixo.
+  function desenharRecap(ctx, W, H, r, imgs) {
+    const story = H / W > 1.5, k = W / 1080;
+    ctx.fillStyle = FUNDO; ctx.fillRect(0, 0, W, H);
+    const cx = W / 2, cy = H * 0.45, alcance = Math.hypot(W, H) / 2;
+    ctx.save();
+    for (let rr = 7 * k; rr < alcance; rr += 7 * k) {
+      ctx.globalAlpha = 0.9 * Math.max(0, 1 - rr / alcance);
+      ctx.strokeStyle = 'rgba(201,162,76,0.05)'; ctx.lineWidth = 1.2 * k; ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    const vin = ctx.createRadialGradient(cx, cy, 0, cx, cy, alcance);
+    vin.addColorStop(0.3, 'rgba(0,0,0,0)'); vin.addColorStop(1, 'rgba(0,0,0,0.4)');
+    ctx.fillStyle = vin; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+    const px = 86 * k, larg = W - px * 2;
+    const topo = story ? H * 0.155 : 80 * k, base = story ? H * 0.80 : H - 70 * k;
+    // cabeçalho
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+    ctx.font = `800 ${40 * k}px Inter, sans-serif`; espacar(ctx, 7 * k); ctx.fillStyle = OURO;
+    ctx.fillText((r.nome_mes || '').toUpperCase(), px, topo); espacar(ctx, 0);
+    logoHilla(ctx, W - px, topo - 4 * k, 46 * k, 'right', TEXTO, 0.75);
+    const horasTxt = r.horas >= 1 ? `${Math.round(r.horas)}h de disco` : `${r.minutos || 0} min de disco`;
+    ctx.font = `900 ${92 * k}px Inter, sans-serif`; espacar(ctx, -3.5 * k); ctx.fillStyle = TEXTO;
+    ctx.fillText(horasTxt, px, topo + 58 * k); espacar(ctx, 0);
+    // números (de baixo pra cima)
+    const urlY = base - 44 * k;
+    const numTopo = urlY - 40 * k - 2 * (64 * k + 30 * k) - 34 * k;
+    const nums = [[r.artista ? r.artista.nome : '—', 'ARTISTA DO MÊS', true], [String(r.first_spins || 0), 'FIRST SPINS'],
+                  [String(r.novos_prateleira || 0), 'NA PRATELEIRA'], [String(r.novos_wishlist || 0), 'NA WISHLIST']];
+    nums.forEach(([v, rot, ouro], i) => {
+      const x = px + (i % 2) * (larg / 2 + 20 * k), y = numTopo + Math.floor(i / 2) * (64 * k + 30 * k + 34 * k);
+      ctx.font = `900 ${58 * k}px Inter, sans-serif`; espacar(ctx, -2 * k); ctx.fillStyle = ouro ? OURO : TEXTO;
+      ctx.fillText(quebrar(ctx, v, larg / 2 - 30 * k, 1)[0] || '', x, y);
+      ctx.font = `600 ${24 * k}px Inter, sans-serif`; espacar(ctx, 2.5 * k); ctx.fillStyle = 'rgba(240,240,240,0.55)';
+      ctx.fillText(rot, x, y + 70 * k); espacar(ctx, 0);
+    });
+    // mosaico: ocupa o espaço entre o título e os números
+    const mTopo = topo + 58 * k + 92 * k + 44 * k, mBase = numTopo - 48 * k;
+    const n = Math.min(imgs.length, 6);
+    const lay = n >= 6 ? [3, 2] : n >= 4 ? [2, 2] : n === 3 ? [3, 1] : n === 2 ? [2, 1] : [1, 1];
+    const gap = 16 * k, cols = lay[0], rows = lay[1];
+    let lado = Math.min((larg - gap * (cols - 1)) / cols, (mBase - mTopo - gap * (rows - 1)) / rows);
+    const totalW = cols * lado + gap * (cols - 1), totalH = rows * lado + gap * (rows - 1);
+    const ox = px + (larg - totalW) / 2, oy = mTopo + (mBase - mTopo - totalH) / 2;
+    for (let i = 0; i < cols * rows && i < n; i++) {
+      const x = ox + (i % cols) * (lado + gap), y = oy + Math.floor(i / cols) * (lado + gap), it = imgs[i];
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 30 * k; ctx.shadowOffsetY = 10 * k;
+      ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, lado, lado, 14 * k) : ctx.rect(x, y, lado, lado); ctx.fill();
+      ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, lado, lado, 14 * k) : ctx.rect(x, y, lado, lado); ctx.clip();
+      if (it.img) cobrir(ctx, it.img, x, y, lado, lado);
+      else {
+        const g = ctx.createLinearGradient(x, y, x + lado, y + lado); g.addColorStop(0, '#2a2620'); g.addColorStop(1, '#121212');
+        ctx.fillStyle = g; ctx.fillRect(x, y, lado, lado);
+        ctx.fillStyle = 'rgba(240,240,240,0.7)'; ctx.font = `800 ${Math.max(22, lado * 0.09)}px Inter, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const ls = quebrar(ctx, (it.album || '').toUpperCase(), lado - 30 * k, 4);
+        ls.forEach((l, j) => ctx.fillText(l, x + lado / 2, y + lado / 2 + (j - (ls.length - 1) / 2) * lado * 0.11));
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      }
+      ctx.restore();
+    }
+    // marca
+    ctx.textBaseline = 'top';
+    logoHilla(ctx, W / 2, urlY, 34 * k, 'center', '#5a5a5a', null, '.com.br');
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  }
   // ---------- modal ----------
   let estado = null;
   function montar() {
@@ -424,6 +494,8 @@
     if (estado.tipo === 'audicao') {
       const img = estado.usarFoto && estado.imgFoto ? estado.imgFoto : estado.imgCapa;
       desenharAudicao(ctx, W, H, estado.dados, img, { data: estado.mostrarData });
+    } else if (estado.tipo === 'recap') {
+      desenharRecap(ctx, W, H, estado.dados, estado.capas);
     } else {
       desenharWishlist(ctx, W, H, estado.dados, estado.capas);
     }
@@ -477,6 +549,18 @@
   }
 
   window.DiscotecaCompartilhar = {
+    recap(r) {   // r: resposta de /recap
+      if (!r || r.silencioso) return;
+      const nome = (r.nome_mes || '');
+      abrir({
+        tipo: 'recap', dados: r, formato: 'story', titulo: `Compartilhar ${nome}`, sub: 'O seu mês em discos.',
+        alt: `Recap de ${nome} na Hilla`, nomeArquivo: `hilla-recap-${r.mes}.png`,
+        texto: `Meu ${nome} em discos, na Hilla.`, link: 'https://hilla.com.br',
+        async preparar() {
+          this.capas = await Promise.all((r.mosaico || []).slice(0, 6).map(async m => ({ album: m.album, img: await carregarCapa(m.capa_url, m.artista, m.album) })));
+        }
+      });
+    },
     audicao(a) {   // a: { id, artista, album, data, capa_url, foto }
       if (!a || !a.id) return;
       abrir({

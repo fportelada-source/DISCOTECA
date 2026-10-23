@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Hilla — Estatísticas</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=35" />
+  <link rel="stylesheet" href="style.css?v=36" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -96,6 +96,15 @@
             <p style="font-size:13px;">Adicione discos à sua prateleira para ver as estatísticas.</p>
           </div>
         </div>
+
+        <!-- SEU MÊS (recap mensal) -->
+        <section class="st-card rc" id="recap" aria-labelledby="rcTitulo">
+          <div class="rc-topo">
+            <h2 id="rcTitulo">Seu mês <span class="rc-parcial" id="rcParcial" hidden>até agora</span></h2>
+            <label class="rc-sel"><span class="sr-only">Mês</span><select id="rcMes" aria-label="Escolher mês"></select></label>
+          </div>
+          <div id="rcCorpo"><div class="rc-carregando">Carregando seu mês…</div></div>
+        </section>
 
         <div id="stConteudo" style="display:none;">
 
@@ -704,5 +713,83 @@ function renderMarcos(estante, avancadas) {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
+  <script src="compartilhar.js?v=12"></script>
+<script>
+// ===== Seu mês (recap mensal) =====
+(function () {
+  const sel = document.getElementById('rcMes'), corpo = document.getElementById('rcCorpo');
+  let atual = null, buscandoDuracoes = false;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  const urlCapa = u => (u && /^https:\/\//.test(u)) ? u : '';
+  function mosaico(itens) {
+    const n = Math.min(itens.length, 6);
+    const mostrar = n >= 6 ? 6 : n >= 4 ? 4 : n;
+    return `<div class="rc-mos n${mostrar}">` + itens.slice(0, mostrar).map(m => {
+      const c = urlCapa(m.capa_url);
+      return `<div class="rc-cp" title="${esc(m.album)} · ${esc(m.artista)}"${c ? ` style="background-image:url('${esc(c)}')"` : ''}>${c ? '' : `<span>${esc(m.album)}</span>`}</div>`;
+    }).join('') + '</div>';
+  }
+  function render(r) {
+    atual = r;
+    document.getElementById('rcParcial').hidden = !r.em_andamento;
+    if (r.silencioso) {
+      corpo.innerHTML = `<div class="rc-silencio"><div class="rc-disco" aria-hidden="true"></div><h3>Seu mês foi muito silencioso.</h3>
+        <p>Nenhuma audição registrada em ${esc(r.nome_mes)}. Vamos ouvir algo?</p><a class="btn-primary rc-btn" href="audicoes.html">Registrar uma audição</a></div>`;
+      return;
+    }
+    const horas = r.horas >= 1 ? `cerca de ${Math.round(r.horas)} h` : `${r.minutos} min`;
+    corpo.innerHTML = `<div class="rc-grid">${mosaico(r.mosaico || [])}
+      <div class="rc-nums">
+        <div class="rc-n dest"><b>${horas}</b><span>de disco ouvido em ${esc(r.nome_mes)}</span><small>${r.audicoes} ${r.audicoes === 1 ? 'audição' : 'audições'}${r.duracoes_estimadas ? ' · alguns discos com duração estimada' : ''}</small></div>
+        ${r.artista ? `<div class="rc-n art"><span>Artista do mês</span><b>${esc(r.artista.nome)}</b><span>${r.artista.audicoes} ${r.artista.audicoes === 1 ? 'audição' : 'audições'}</span></div>` : ''}
+        <div class="rc-n"><b>${r.first_spins}</b><span>First spins</span></div>
+        <div class="rc-n"><b>${r.dias}</b><span>dias com audição</span></div>
+        <div class="rc-n"><b>${r.novos_prateleira}</b><span>discos na Prateleira</span></div>
+        <div class="rc-n"><b>${r.novos_wishlist}</b><span>discos na wishlist</span></div>
+      </div></div>
+      <div class="rc-acoes"><button type="button" class="btn-primary rc-btn" id="rcCompartilhar">Compartilhar</button></div>`;
+    document.getElementById('rcCompartilhar').addEventListener('click', () => {
+      if (window.DiscotecaCompartilhar && window.DiscotecaCompartilhar.recap) window.DiscotecaCompartilhar.recap(atual);
+    });
+  }
+  async function carregar(mes) {
+    corpo.innerHTML = '<div class="rc-carregando">Carregando seu mês…</div>';
+    try {
+      const r = await (await apiFetch(API_URL + '/recap' + (mes ? '?mes=' + encodeURIComponent(mes) : ''))).json();
+      if (!r || r.erro) { corpo.innerHTML = '<div class="rc-carregando">Não consegui carregar o mês agora.</div>'; return; }
+      if (!sel.options.length) {
+        sel.innerHTML = (r.meses || []).map(m => `<option value="${esc(m.mes)}">${esc(m.nome)}</option>`).join('');
+      }
+      sel.value = r.mes;
+      render(r);
+      completarDuracoes(r);
+    } catch (e) { corpo.innerHTML = '<div class="rc-carregando">Não consegui carregar o mês agora.</div>'; }
+  }
+  // busca no MusicBrainz a duração dos discos do mês, aos poucos, e atualiza as horas
+  async function completarDuracoes(r) {
+    if (buscandoDuracoes || !r.duracoes_pendentes) return;
+    buscandoDuracoes = true;
+    try {
+      for (let i = 0; i < 15; i++) {
+        const d = await (await apiFetch(API_URL + '/recap/duracoes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mes: r.mes }) })).json();
+        if (!d || d.erro || d.bloqueado || !d.feitos || !d.pendentes) break;
+      }
+      if (atual && atual.mes === r.mes) {
+        const novo = await (await apiFetch(API_URL + '/recap?mes=' + encodeURIComponent(r.mes))).json();
+        if (novo && !novo.erro && sel.value === novo.mes) render(novo);
+      }
+    } catch (e) {} finally { buscandoDuracoes = false; }
+  }
+  sel.addEventListener('change', () => carregar(sel.value));
+  function iniciar() {
+    try { if (!localStorage.getItem('discoteca_session_token')) return; } catch (e) { return; }
+    const mes = new URLSearchParams(location.search).get('mes');
+    carregar(mes && /^\d{4}-\d{2}$/.test(mes) ? mes : null);
+    if (location.hash === '#recap') setTimeout(() => { const el = document.getElementById('recap'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
+})();
+</script>
+
 </body>
 </html>

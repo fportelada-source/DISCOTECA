@@ -3747,3 +3747,11 @@ a.app-nav-logo::before { content: ""; display: inline-block; width: 26px; height
 .lg-guias a { color: var(--paper); font-weight: 600; font-size: 14.5px; text-decoration: none; border-bottom: 1px solid var(--card-line); padding: 10px 0; }
 .lg-guias a:hover { color: var(--terracotta); }
 .lg-guias a.todos { border: 0; color: var(--terracotta); font-size: 13.5px; }
+
+/* Ler código de barras: no topo do cadastro (antes ficava escondido na seção Edição) */
+.form-section .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+.form-section .section-head .section-title { margin-bottom: 0; }
+.btn-ler-codigo { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--terracotta); color: var(--terracotta); background: transparent; border-radius: 999px; padding: 6px 12px 6px 10px; font: 600 12.5px 'Inter', sans-serif; cursor: pointer; min-height: 32px; }
+.btn-ler-codigo:hover { background: var(--terracotta-wash); }
+.btn-ler-codigo:disabled { opacity: 0.5; cursor: wait; }
+#barcodeStatus { margin: -4px 0 10px; }

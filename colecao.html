@@ -10,7 +10,7 @@
   <title>Hilla — Prateleira</title>
   <link href="fonts.css?v=1" rel="stylesheet">
   <script src="html5-qrcode.min.js?v=2.3.8"></script>
-  <link rel="stylesheet" href="style.css?v=34" />
+  <link rel="stylesheet" href="style.css?v=35" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -199,7 +199,9 @@
         <div class="form-grid">
 
           <div class="form-section">
-            <div class="section-title">Álbum</div>
+            <div class="section-head"><div class="section-title">Álbum</div><button type="button" class="btn-ler-codigo" id="btnBarcode" aria-label="Ler código de barras com a câmera"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="13" y1="8" x2="13" y2="16"/><line x1="17" y1="8" x2="17" y2="16"/></svg><span>Ler código</span></button></div>
+            <input type="file" id="inputFotoBarcode" accept="image/*" capture="environment" style="display:none;">
+            <div class="cover-help" id="barcodeStatus" style="display:none;"></div>
             <div class="form-row">
               <div class="form-group">
                 <label>Artista <span class="required">*</span></label>
@@ -283,10 +285,9 @@
                 <label>Código de Barras</label>
                 <div class="barcode-row">
                   <input type="text" id="campo-codigo-barras" placeholder="Ex: 042284834181">
-                  <button type="button" class="btn-scan" id="btnBarcode"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Ler</button>
-                  <input type="file" id="inputFotoBarcode" accept="image/*" capture="environment" style="display:none;">
+                  
                 </div>
-                <div class="cover-help" id="barcodeStatus" style="display:none;"></div>
+                
                 <div id="barcode-reader-oculto" style="display:none;"></div>
               </div>
               <div class="form-group">
@@ -1800,14 +1801,17 @@ function carregarDados() {
             document.getElementById('campo-notas').value = (d.gravadora ? 'Gravadora: ' + d.gravadora : '');
             document.getElementById('form-msg').innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Dados preenchidos automaticamente!';
             document.getElementById('form-msg').className = 'form-msg success';
+            { const bs = document.getElementById('barcodeStatus'); bs.style.display = 'block'; bs.textContent = 'Pronto: artista, álbum, formato e ano preenchidos. Confira e salve.'; }
           } else {
             document.getElementById('form-msg').innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ Código lido, mas não encontramos dados. Preencha manualmente.';
             document.getElementById('form-msg').className = 'form-msg error';
+            { const bs = document.getElementById('barcodeStatus'); bs.style.display = 'block'; bs.textContent = 'Código lido, mas o Discogs não tem esse disco. Preencha à mão.'; }
           }
         })
         .catch(() => {
           document.getElementById('form-msg').innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ Erro ao buscar dados. Preencha manualmente.';
           document.getElementById('form-msg').className = 'form-msg error';
+            { const bs = document.getElementById('barcodeStatus'); bs.style.display = 'block'; bs.textContent = 'Não consegui buscar agora. Tente de novo ou preencha à mão.'; }
         });
     }
 

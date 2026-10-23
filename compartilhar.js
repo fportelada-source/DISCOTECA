@@ -372,17 +372,23 @@
     const horasTxt = r.horas >= 1 ? `${Math.round(r.horas)}h de disco` : `${r.minutos || 0} min de disco`;
     ctx.font = `900 ${92 * k}px Inter, sans-serif`; espacar(ctx, -3.5 * k); ctx.fillStyle = TEXTO;
     ctx.fillText(horasTxt, px, topo + 58 * k); espacar(ctx, 0);
-    // números (de baixo pra cima)
+    // números (de baixo pra cima), nas mesmas 3 colunas do mosaico:
+    // linha 1 = artista (2 colunas) + first spins; linha 2 = prateleira, wishlist, dias
     const urlY = base - 44 * k;
-    const numTopo = urlY - 40 * k - 2 * (64 * k + 30 * k) - 34 * k;
-    const nums = [[r.artista ? r.artista.nome : '—', 'ARTISTA DO MÊS', true], [String(r.first_spins || 0), 'FIRST SPINS'],
-                  [String(r.novos_prateleira || 0), 'NA PRATELEIRA'], [String(r.novos_wishlist || 0), 'NA WISHLIST']];
-    nums.forEach(([v, rot, ouro], i) => {
-      const x = px + (i % 2) * (larg / 2 + 20 * k), y = numTopo + Math.floor(i / 2) * (64 * k + 30 * k + 34 * k);
+    const colW = (larg - 2 * 16 * k) / 3, linhaH = 64 * k + 30 * k + 34 * k;
+    const numTopo = urlY - 40 * k - 2 * linhaH + 34 * k;
+    const nums = [
+      [r.artista ? r.artista.nome : '—', 'ARTISTA DO MÊS', 0, 0, 2, true],
+      [String(r.first_spins || 0), 'FIRST SPINS', 2, 0, 1],
+      [String(r.novos_prateleira || 0), 'NA PRATELEIRA', 0, 1, 1],
+      [String(r.novos_wishlist || 0), 'NA WISHLIST', 1, 1, 1],
+      [String(r.dias || 0), r.dias === 1 ? 'DIA COM AUDIÇÃO' : 'DIAS COM AUDIÇÃO', 2, 1, 1]];
+    nums.forEach(([v, rot, col, lin, span, ouro]) => {
+      const x = px + col * (colW + 16 * k), y = numTopo + lin * linhaH, w = colW * span + 16 * k * (span - 1);
       ctx.font = `900 ${58 * k}px Inter, sans-serif`; espacar(ctx, -2 * k); ctx.fillStyle = ouro ? OURO : TEXTO;
-      ctx.fillText(quebrar(ctx, v, larg / 2 - 30 * k, 1)[0] || '', x, y);
-      ctx.font = `600 ${24 * k}px Inter, sans-serif`; espacar(ctx, 2.5 * k); ctx.fillStyle = 'rgba(240,240,240,0.55)';
-      ctx.fillText(rot, x, y + 70 * k); espacar(ctx, 0);
+      ctx.fillText(quebrar(ctx, v, w - 10 * k, 1)[0] || '', x, y);
+      ctx.font = `600 ${22 * k}px Inter, sans-serif`; espacar(ctx, 2 * k); ctx.fillStyle = 'rgba(240,240,240,0.55)';
+      ctx.fillText(quebrar(ctx, rot, w - 4 * k, 1)[0] || '', x, y + 70 * k); espacar(ctx, 0);
     });
     // mosaico: ocupa o espaço entre o título e os números
     const mTopo = topo + 58 * k + 92 * k + 44 * k, mBase = numTopo - 48 * k;

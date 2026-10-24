@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Hilla — Audições</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=37" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -150,6 +150,19 @@
           <div id="audBuscaBloco">
             <input type="search" id="audBusca" placeholder="Buscar disco na sua prateleira..." autocomplete="off">
             <div class="aud-res" id="audRes" role="listbox" aria-label="Discos da prateleira"></div>
+            <button type="button" class="aud-link" id="audForaAbrir" style="margin-top:8px;">Não está na prateleira? Disco de fora</button>
+            <div id="audForaBloco" style="display:none;margin-top:8px;">
+              <input type="text" id="audForaArtista" placeholder="Artista" maxlength="200" autocomplete="off" style="margin-bottom:6px;">
+              <input type="text" id="audForaAlbum" placeholder="Álbum" maxlength="200" autocomplete="off" style="margin-bottom:6px;">
+              <label for="audForaOrigem">Onde ouviu <span class="aud-opc">(opcional)</span></label>
+              <select id="audForaOrigem">
+                <option value="emprestado">Emprestado</option>
+                <option value="casa">Na casa de alguém</option>
+                <option value="loja">Na loja</option>
+                <option value="outro" selected>Outro</option>
+              </select>
+              <button type="button" class="btn-secondary" id="audForaOk" style="margin-top:8px;">Usar este disco</button>
+            </div>
           </div>
         </div>
 
@@ -637,7 +650,7 @@ function abrirAdd(diaIso, editarIdx) {
     el('audAddTitulo').textContent = 'Editar audição';
     el('audData').value = it.data; el('audHora').value = it.hora || ''; el('audNota').value = it.nota || '';
     el('audFirstSpin').setAttribute('aria-pressed', it.first_spin ? 'true' : 'false');
-    audDiscoSel = { id: it.colecao_id, artista: it.artista, album: it.album, editando: true };
+    audDiscoSel = { id: it.colecao_id, artista: it.artista, album: it.album, editando: true, origem: it.origem };
     irParaPasso('form');
   } else {
     el('audAddTitulo').textContent = 'Adicionar audição';
@@ -680,6 +693,7 @@ function renderDiscoSel() {
   if (audDiscoSel) {
     box.style.display = 'flex'; busca.style.display = 'none';
     box.innerHTML = `<span class="aud-item-txt"><strong>${escapeHtml(audDiscoSel.artista || '')}</strong><span>${escapeHtml(audDiscoSel.album || '')}</span></span>
+      ${(audDiscoSel.fora || audDiscoSel.origem) ? '<span class="aud-opc" style="margin-left:auto;margin-right:8px;">de fora</span>' : ''}
       <button type="button" class="aud-link" id="audTrocarDisco">Trocar</button>`;
   } else {
     box.style.display = 'none'; busca.style.display = 'block';
@@ -753,12 +767,14 @@ async function salvarAudicao() {
           { data, hora: el('audHora').value, nota: el('audNota').value, first_spin: el('audFirstSpin').getAttribute('aria-pressed') === 'true' },
           // só reenvia o disco se a pessoa TROCOU — se o disco original já
           // saiu da Prateleira, editar data/hora/nota continua funcionando
-          audDiscoSel.editando ? {} : { colecao_id: audDiscoSel.id }
+          (audDiscoSel.editando || audDiscoSel.fora) ? {} : { colecao_id: audDiscoSel.id }
         ))
       });
     } else {
       const fd = new FormData();
-      fd.append('colecao_id', audDiscoSel.id);
+      if (audDiscoSel.fora) {
+        fd.append('artista', audDiscoSel.artista); fd.append('album', audDiscoSel.album); fd.append('origem', audDiscoSel.origem);
+      } else fd.append('colecao_id', audDiscoSel.id);
       fd.append('data', data);
       fd.append('hora', el('audHora').value);
       fd.append('nota', el('audNota').value);
@@ -768,7 +784,9 @@ async function salvarAudicao() {
     }
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.erro || 'Erro ao salvar.');
+    const foiFora = !audEditandoId && audDiscoSel.fora ? { artista: audDiscoSel.artista, album: audDiscoSel.album } : null;
     fecharAdd();
+    if (foiFora) convidarWishlist(foiFora);
     const [y, m] = data.split('-').map(Number);
     audMes = { y, m: m - 1 };
     await carregarMes(data);
@@ -786,7 +804,44 @@ function mudarMes(delta) {
   carregarMes();
 }
 
+// Depois de ouvir um disco de fora: convite pra wishlist
+function convidarWishlist(disco) {
+  const t = document.createElement('div');
+  t.setAttribute('role', 'status');
+  t.style.cssText = 'position:fixed;left:50%;bottom:88px;transform:translateX(-50%);z-index:9999;background:var(--card,#222);color:var(--text,#fff);border:1px solid var(--border,#444);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.35);max-width:calc(100% - 32px);';
+  const txt = document.createElement('span'); txt.textContent = 'Gostou? Adicionar à wishlist';
+  const sim = document.createElement('button'); sim.type = 'button'; sim.className = 'btn-primary'; sim.textContent = 'Adicionar';
+  const nao = document.createElement('button'); nao.type = 'button'; nao.className = 'aud-link'; nao.textContent = 'Agora não';
+  const fechar = () => t.remove();
+  nao.onclick = fechar;
+  sim.onclick = async () => {
+    sim.disabled = true;
+    try {
+      const r = await apiFetch(`${API_URL}/adicionar_recomendacao`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ artista: disco.artista, album: disco.album }) });
+      const d = await r.json().catch(() => ({}));
+      txt.textContent = r.ok ? 'Adicionado à wishlist ✓' : (d.erro || 'Não deu pra adicionar.');
+    } catch { txt.textContent = 'Erro de conexão.'; }
+    sim.remove(); nao.textContent = 'Fechar'; setTimeout(fechar, 3000);
+  };
+  t.append(txt, sim, nao); document.body.appendChild(t);
+  setTimeout(() => { if (document.body.contains(t) && !sim.disabled) fechar(); }, 12000);
+}
+
 function ligarEventos() {
+  el('audForaAbrir').addEventListener('click', () => {
+    const b = el('audForaBloco'); b.style.display = b.style.display === 'none' ? 'block' : 'none';
+    if (b.style.display === 'block') { el('audForaArtista').value = el('audBusca').value.trim(); el('audForaAlbum').focus(); }
+  });
+  el('audForaOk').addEventListener('click', () => {
+    const artista = el('audForaArtista').value.trim(), album = el('audForaAlbum').value.trim();
+    const msg = el('audMsg');
+    if (!artista || !album) { msg.textContent = 'Informe artista e álbum.'; msg.className = 'form-msg error'; return; }
+    msg.textContent = '';
+    audDiscoSel = { fora: true, id: null, artista, album, origem: el('audForaOrigem').value };
+    el('audForaBloco').style.display = 'none';
+    renderDiscoSel();
+  });
+
   el('audMesAnt').addEventListener('click', () => mudarMes(-1));
   el('audMesProx').addEventListener('click', () => mudarMes(1));
 

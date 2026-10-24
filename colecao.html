@@ -10,7 +10,7 @@
   <title>Hilla — Prateleira</title>
   <link href="fonts.css?v=1" rel="stylesheet">
   <script src="html5-qrcode.min.js?v=2.3.8"></script>
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=37" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -1647,8 +1647,10 @@ function carregarDados() {
         favorito: document.getElementById('campo-favorito').value === '1',
         capa_url: document.getElementById('campo-capa-manual').value.trim(),
         genero: document.getElementById('campo-genero').value.trim(),
-        avaliacao: parseInt(document.getElementById('campo-avaliacao').value) || 0
+        avaliacao: parseInt(document.getElementById('campo-avaliacao').value) || 0,
+        confirmar_duplicado: window._hillaConfDup === true
       };
+      window._hillaConfDup = false;
 
       if (!dados.artista || !dados.album) {
         msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ Artista e álbum são obrigatórios!';
@@ -1673,6 +1675,18 @@ function carregarDados() {
         })
         .then(r => r.json())
         .then(resultado => {
+          if (resultado.duplicado) {
+            // mesmo disco, mesmo formato: pergunta antes (pode ser segunda cópia de propósito)
+            msg.innerHTML = '';
+            const t = document.createElement('span'); t.textContent = resultado.mensagem + ' ';
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-secondary';
+            b.textContent = 'Adicionar mesmo assim'; b.style.marginLeft = '6px';
+            b.onclick = () => { window._hillaConfDup = true; formAdicionar.requestSubmit(); };
+            msg.append(t, b);
+            msg.className = 'form-msg';
+            btn.disabled = false;
+            return;
+          }
           if (resultado.sucesso) {
             msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ' + resultado.mensagem;
             msg.className = 'form-msg success';

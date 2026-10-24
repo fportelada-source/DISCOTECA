@@ -1889,6 +1889,17 @@ function carregarDados() {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
+  <script src="autocomplete.js?v=1"></script>
+  <script>
+    HillaAuto.ligar({
+      artista: document.getElementById('campo-artista'),
+      album: document.getElementById('campo-album'),
+      aoEscolher: function (it) {   // só preenche o que estiver vazio
+        var f = function (id, v) { var e = document.getElementById(id); if (e && !e.value && v) { e.value = v; e.dispatchEvent(new Event('change', { bubbles: true })); } };
+        f('campo-ano', it.ano); f('campo-genero', it.genero); f('campo-capa-manual', it.capa_url);
+      }
+    });
+  </script>
 <script>
 // Volta ao Mundo: descobre, aos poucos e por trás, o país dos artistas da prateleira.
 (function () {

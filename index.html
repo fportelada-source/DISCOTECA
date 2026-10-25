@@ -6,7 +6,7 @@
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — app para catalogar seus discos de vinil e CDs</title>
   <meta name="description" content="App grátis para catalogar sua coleção de discos de vinil, CDs e fitas. Monte sua wishlist, descubra o que comprar com base no que você ouve no Spotify e registre suas audições." />
   <link rel="canonical" href="https://hilla.com.br/" />
@@ -16,7 +16,7 @@
   <meta property="og:url" content="https://hilla.com.br/" />
   <meta property="og:image" content="https://hilla.com.br/apple-touch-icon.png" />
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -631,8 +631,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
       <h1 class="dash-title">Sua prateleira <span class="accent">está esperando.</span></h1>
       <p class="dash-lede">${totalDiscos} ${totalDiscos === 1 ? 'disco' : 'discos'}, ${artistasUnicos.size} ${artistasUnicos.size === 1 ? 'artista' : 'artistas'} e ${wishlist.length} na wishlist.</p>
       <div class="dash-tags">
-        <a href="colecao.html" class="dash-tag on">Tudo</a>
-        ${formatosTag.map(f => `<a href="${f.href}" class="dash-tag">${f.label}</a>`).join('')}
+        ${formatosTag.map(f => `<a href="${f.href}" class="dash-tag dash-tag-link">${f.label} <small>${f.valor}</small><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></a>`).join('')}
       </div>
     </div>`;
 
@@ -682,15 +681,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
 
   html += `<div id="dashNesteDia"></div>`;   // card "Neste dia" (preenchido por notificacoes.js)
 
-  // ===== BARRA DE NÚMEROS =====
-  html += `<div class="dash-stats">`;
-  html += `<a href="colecao.html" class="dash-stat-item"><div class="number">${totalDiscos}</div><div class="label">Discos</div></a>`;
-  formatosTag.forEach(s => {
-    html += `<a href="${s.href}" class="dash-stat-item"><div class="number">${s.valor}</div><div class="label">${s.label === 'CD' ? 'CDs' : s.label}</div></a>`;
-  });
-  html += `<a href="estatisticas.html" class="dash-stat-item"><div class="number">${artistasUnicos.size}</div><div class="label">Artistas</div></a>`;
-  html += `<a href="wishlist.html" class="dash-stat-item"><div class="number">${wishlist.length}</div><div class="label">Wishlist</div></a>`;
-  html += `</div>`;
+  // (barra de números removida: repetia o que já está na frase do topo e nos atalhos de formato)
 
   // ===== PRÓXIMAS COMPRAS (lista numerada, como a lista de faixas do Musadio) =====
   html += `<section class="dash-sec"><div class="dash-section-title">Próximas compras <a href="wishlist.html" class="see-all">ver wishlist completa</a></div>`;
@@ -913,5 +904,6 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
   <script src="onboarding.js?v=2" data-auto="1"></script>
   <script src="notificacoes.js?v=4"></script>
+  <script src="navegacao.js?v=1"></script>
 </body>
 </html>

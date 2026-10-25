@@ -74,13 +74,13 @@
         if (!itens.length) return fechar();
         lista.innerHTML = itens.map((it, i) => {
           if (campo === 'artista') {
-            return `<button type="button" class="ha-it" role="option" data-i="${i}"><span class="ha-cv">♪</span>
+            return `<button type="button" class="ha-it" role="option" data-i="${i}"><span class="ha-cv"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
               <span class="ha-tx"><b>${realce(it.artista, q)}</b><span>${it.meus ? it.meus + (it.meus > 1 ? ' discos seus' : ' disco seu') : 'na Hilla'}</span></span>
               ${it.meus ? '<span class="ha-pill">seu</span>' : ''}</button>`;
           }
           const sub = [artistaEscolhido && norm(artistaEscolhido) === norm(it.artista) ? '' : it.artista, it.ano, it.onde === 'prateleira' ? it.formato : ''].filter(Boolean).join(' · ');
           const pill = it.onde === 'prateleira' ? '<span class="ha-pill">na prateleira</span>' : it.onde === 'wishlist' ? '<span class="ha-pill ha-g">na wishlist</span>' : '';
-          const cv = it.capa_url ? `<span class="ha-cv" style="background-image:url('${esc(it.capa_url)}')"></span>` : '<span class="ha-cv">♪</span>';
+          const cv = it.capa_url ? `<span class="ha-cv" style="background-image:url('${esc(it.capa_url)}')"></span>` : '<span class="ha-cv"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>';
           return `<button type="button" class="ha-it" role="option" data-i="${i}">${cv}
             <span class="ha-tx"><b>${realce(it.album, q)}</b><span>${esc(sub)}</span></span>${pill}</button>`;
         }).join('');

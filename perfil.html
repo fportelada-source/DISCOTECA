@@ -6,10 +6,10 @@
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Perfil</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -86,7 +86,7 @@
             <div class="sub">Configure a Hilla do seu jeito</div>
           </div>
           <div>
-            <button class="btn-save" id="btnSalvarTudo">Salvar alterações</button>
+            <span class="set-salvo" id="setSalvo" role="status" aria-live="polite">Salva sozinho</span>
           </div>
         </div>
 
@@ -568,26 +568,30 @@ function coletarConfiguracoes() {
   };
 }
 
+// Salva sozinho: cada mudança feita pela pessoa agenda um salvamento.
+// Só reage a ação de verdade (digitar, tocar), nunca ao carregamento da página.
+let _salvarTimer = null;
+function agendarSalvar(espera) {
+  clearTimeout(_salvarTimer);
+  const st = document.getElementById('setSalvo');
+  if (st) { st.textContent = 'Salvando…'; st.className = 'set-salvo'; }
+  _salvarTimer = setTimeout(salvarConfiguracoes, espera == null ? 700 : espera);
+}
 function salvarConfiguracoes() {
-  const btn = document.getElementById('btnSalvarTudo');
-  btn.disabled = true;
-  btn.textContent = 'Salvando...';
+  const st = document.getElementById('setSalvo');
   apiFetch(API_URL + '/configuracoes', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(coletarConfiguracoes())
+    body: JSON.stringify(coletarConfiguracoes()),
+    keepalive: true
   })
     .then(r => r.json())
     .then(d => {
-      btn.disabled = false;
-      btn.textContent = 'Salvar alterações';
-      mostrarMsg(d.sucesso ? 'Configurações salvas!' : (d.erro || 'Erro ao salvar.'), d.sucesso ? 'success' : 'error');
+      if (!st) return;
+      st.textContent = d.sucesso ? 'Salvo' : (d.erro || 'Erro ao salvar');
+      st.className = 'set-salvo ' + (d.sucesso ? 'ok' : 'erro');
     })
-    .catch(() => {
-      btn.disabled = false;
-      btn.textContent = 'Salvar alterações';
-      mostrarMsg('Erro de conexão.', 'error');
-    });
+    .catch(() => { if (st) { st.textContent = 'Erro de conexão — tente de novo'; st.className = 'set-salvo erro'; } });
 }
 
 // ================================================================
@@ -638,7 +642,15 @@ function enviarImportacaoCsv() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('btnSalvarTudo').addEventListener('click', salvarConfiguracoes);
+  // texto: salva ao sair do campo (e enquanto digita, com pausa); botões e chaves: na hora
+  document.querySelectorAll('#campo-nome-exibicao, #campo-localizacao, #campo-bio, #campo-spotify, #campo-discogs, #campo-instagram').forEach(inp => {
+    inp.addEventListener('input', ev => { if (ev.isTrusted) agendarSalvar(1500); });
+    inp.addEventListener('change', ev => { if (ev.isTrusted) agendarSalvar(0); });
+  });
+  document.addEventListener('click', ev => {
+    if (ev.isTrusted && ev.target.closest('.set-toggle, .opt')) setTimeout(() => agendarSalvar(300), 0);
+  });
+  window.addEventListener('pagehide', () => { if (_salvarTimer) { clearTimeout(_salvarTimer); salvarConfiguracoes(); } });
 
   document.querySelectorAll('.set-selector-row .options').forEach(grupo => {
     if (grupo.querySelector('.opt.disabled')) return; // aparência: só ilustrativo por enquanto
@@ -828,6 +840,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
   <script src="onboarding.js?v=2"></script>
   <script src="notificacoes.js?v=4"></script>
+  <script src="navegacao.js?v=1"></script>
   <script src="conquistas.js?v=7"></script>
 </body>
 </html>

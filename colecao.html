@@ -6,11 +6,11 @@
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Prateleira</title>
   <link href="fonts.css?v=1" rel="stylesheet">
   <script src="html5-qrcode.min.js?v=2.3.8"></script>
-  <link rel="stylesheet" href="style.css?v=37" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -90,7 +90,7 @@
       <div class="app-main">
 
         <!-- TOP BAR -->
-        <div class="app-topbar app-toolbar">
+        <div class="app-topbar app-toolbar" style="display:none;">
           <div class="search" style="position:relative;">
             <span class="search-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
             <input type="text" id="colSearchTop" placeholder="Buscar álbuns, artistas, prateleira...">
@@ -111,7 +111,7 @@
         <div id="bannerAnoFaltante" class="col-fix-banner" style="display:none;">
           <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
           <span class="texto" id="textoAnoFaltante"></span>
-          <button id="btnCorrigirAnos" class="btn-fix" type="button">Corrigir automaticamente</button>
+          <button id="btnCorrigirAnos" class="btn-fix" type="button">Corrigir</button>
           <button id="btnFecharBannerAno" class="btn-fix-close" type="button" title="Dispensar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
 
@@ -128,9 +128,10 @@
             <button class="pill" data-formato="cassete">Cassete</button>
             <button class="pill" data-formato="dvd_bluray">DVD/Blu-ray</button>
           </div>
-          <select id="sortSelect" class="col-sort-select" onchange="aplicarFiltros()">
-            <option value="data_mais_recente">Mais recente</option>
-            <option value="data_mais_antiga">Mais antigo</option>
+          <div class="col-ctl-linha">
+          <select id="sortSelect" class="col-sort-select" onchange="aplicarFiltros()" aria-label="Ordenar">
+            <option value="data_mais_recente">Recentes</option>
+            <option value="data_mais_antiga">Antigos</option>
             <option value="preco_maior">Maior preço</option>
             <option value="preco_menor">Menor preço</option>
             <option value="alfabetica_a-z">A–Z (artista)</option>
@@ -140,14 +141,11 @@
             <button class="active" data-view="cards" onclick="setView('cards')" title="Cards" aria-label="Ver em cards"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
             <button data-view="list" onclick="setView('list')" title="Lista"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
           </div>
-          <button class="add-btn" id="btnAbrirModal" title="Adicionar disco manualmente">+</button>
-        </div>
-
-        <!-- AGRUPAMENTO -->
-        <div class="col-controls" id="groupControls" style="margin-top:-14px; display:none;">
-          <div class="group-toggle" id="groupToggle">
-            <button class="active" data-group="separado" onclick="setGroup('separado')"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Separado</button>
-            <button data-group="junto" onclick="setGroup('junto')"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Juntar</button>
+          <select id="groupSelect" class="col-sort-select" onchange="setGroup(this.value)" aria-label="Agrupar">
+            <option value="separado">Por formato</option>
+            <option value="junto">Tudo junto</option>
+          </select>
+          <button class="add-btn col-add-texto" id="btnAbrirModal" title="Adicionar disco (atalho: N)"><span aria-hidden="true">+</span> Adicionar</button>
           </div>
         </div>
 
@@ -189,6 +187,7 @@
           </div>
         </div>
         <div class="right">
+          <button type="button" id="btnOuviAgora" class="btn-ouvi" style="display:none;" onclick="ouviAgora(document.getElementById('campo-id').value)"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><polygon points="7 4 20 12 7 20 7 4"/></svg> Ouvi agora</button>
           <button type="button" id="btnFavoritar" class="fav-btn" title="Marcar como favorito"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></button>
           <button type="button" class="close-btn" id="btnFecharModal"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
@@ -227,16 +226,22 @@
                   <option value="Blu-ray">Blu-ray</option>
                 </select>
               </div>
-              <div class="form-group">
+              <div class="form-group hb-extra">
                 <label>Ano</label>
                 <input type="number" id="campo-ano" placeholder="Ex: 1988" min="1900" max="2100" step="1">
               </div>
-              <div class="form-group">
+              <div class="form-group hb-extra">
                 <label>Preço (R$)</label>
                 <input type="number" id="campo-preco" placeholder="0.00" step="0.01">
               </div>
             </div>
           </div>
+
+          <button type="button" class="col-mais-detalhes" id="btnMaisDetalhes" aria-expanded="false" aria-controls="maisDetalhes" onclick="mostrarDetalhesDisco(this.getAttribute('aria-expanded') !== 'true')">
+            <span>Mais detalhes</span><small>ano, preço, condição, capa, notas</small>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="maisDetalhes" class="col-detalhes">
 
           <div class="form-section">
             <div class="section-title">Sua Cópia</div>
@@ -337,8 +342,10 @@
             </div>
           </div>
 
+          </div><!-- /maisDetalhes -->
         </div>
 
+        <div class="form-msg" id="form-msg"></div>
         <div class="modal-v2-actions">
           <div class="left">
             <button type="button" id="btnRemoverDisco" class="btn-danger" style="display:none;"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Remover este disco</button>
@@ -348,7 +355,6 @@
             <button type="submit" class="btn btn-primary" id="btn-submit">Salvar Disco</button>
           </div>
         </div>
-        <div class="form-msg" id="form-msg"></div>
       </form>
     </div>
   </div>
@@ -774,10 +780,10 @@ function carregarDados() {
         ${generoTop ? `<span class="dot">·</span><span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="6" cy="18" r="3"/><path d="M9 15L18 6"/><path d="M15 3l6 6"/><path d="M13 9l4 4"/></svg> ${escapeHtml(generoTop)}</span>` : ''}
       `;
 
-      statsEl.innerHTML = `
-        ${valorTotal > 0 ? `<div class="stat"><div class="num">R$ ${Math.round(valorTotal)}</div><div class="label">Valor</div></div>` : ''}
-        <div class="stat"><div class="num">+${novosEsteAno}</div><div class="label">Este ano</div></div>
-      `;
+      statsEl.innerHTML = '';
+      statsEl.style.display = 'none';
+      if (novosEsteAno > 0) subEl.insertAdjacentHTML('beforeend', `<span class="dot">·</span><span class="col-sub-ano">+${novosEsteAno} este ano</span>`);
+      if (valorTotal > 0) subEl.insertAdjacentHTML('beforeend', `<span class="dot">·</span><span>R$ ${Math.round(valorTotal).toLocaleString('pt-BR')}</span>`);
     }
 
     function renderInsightsColecao() {
@@ -974,16 +980,13 @@ function carregarDados() {
       document.querySelectorAll('#viewToggle button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === view);
       });
-      document.getElementById('groupControls').style.display = 'flex';
       aplicarView();
     }
 
     function setGroup(group) {
       groupPreference = group;
       localStorage.setItem('discoteca_group', group);
-      document.querySelectorAll('#groupToggle button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.group === group);
-      });
+      const gs = document.getElementById('groupSelect'); if (gs) gs.value = group;
       renderColecao();
       renderLista();
       aplicarView();
@@ -1024,7 +1027,8 @@ function carregarDados() {
       const texto = document.getElementById('textoAnoFaltante');
       const dispensadoPara = localStorage.getItem('discoteca_banner_ano_dispensado');
       if (faltando > 0 && dispensadoPara !== String(faltando)) {
-        texto.textContent = `${faltando} disco${faltando > 1 ? 's' : ''} sem o ano original do álbum — provavelmente de uma importação do Discogs. A correção também completa gênero e limpa nomes tipo "Artista (2)". Alguns podem não ter esse dado cadastrado no Discogs e continuar faltando mesmo após corrigir.`;
+        texto.textContent = `${faltando} disco${faltando > 1 ? 's' : ''} sem ano original`;
+        texto.title = 'Provavelmente de uma importação do Discogs. A correção também completa gênero e limpa nomes tipo "Artista (2)". Alguns podem continuar sem ano se o Discogs não tiver esse dado.';
         banner.style.display = 'flex';
       } else {
         banner.style.display = 'none';
@@ -1068,7 +1072,7 @@ function carregarDados() {
         .then(d => {
           if (!d.sucesso) {
             btn.disabled = false;
-            btn.textContent = 'Corrigir automaticamente';
+            btn.textContent = 'Corrigir';
             texto.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (d.erro || 'Erro ao corrigir.');
             return;
           }
@@ -1079,14 +1083,14 @@ function carregarDados() {
             rodarCorrecaoEmLotes(novoTotalCorrigido, novoTotalVerificado);
           } else {
             btn.disabled = false;
-            btn.textContent = 'Corrigir automaticamente';
+            btn.textContent = 'Corrigir';
             texto.textContent = `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ${novoTotalCorrigido} de ${novoTotalVerificado} discos corrigidos.` + (d.nao_encontrados.length > 0 ? ` Não achei: ${d.nao_encontrados.slice(0, 3).join(', ')}${d.nao_encontrados.length > 3 ? '...' : ''}` : '');
             carregarDados();
           }
         })
         .catch((err) => {
           btn.disabled = false;
-          btn.textContent = 'Corrigir automaticamente';
+          btn.textContent = 'Corrigir';
           texto.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Erro de conexão ao corrigir (' + err.message + '). Tenta de novo — o que já foi corrigido fica salvo.';
         });
     }
@@ -1120,6 +1124,7 @@ function carregarDados() {
         const corFundo = getCorFallback(item.artista);
         return `
           <div class="album-card" data-artista="${escapeHtml(item.artista || '')}" data-album="${escapeHtml(item.album || '')}" data-id="${item.id || ''}"${item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : ''} onclick="editarDisco('${item.id || ''}')">
+            <button type="button" class="wl-mais" onclick="event.stopPropagation(); menuDisco('${item.id || ''}')" aria-label="Opções de ${escapeHtml(item.album || '')}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
             <div class="art" id="art-${uniqueId}" style="background-color:${corFundo};">
               ${item.favorito ? '<span class="fav-indicator"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></span>' : ''}
               <span class="format-badge ${chave}">${label}</span>
@@ -1279,7 +1284,7 @@ function carregarDados() {
         else formatClass = '';
 
         html += `
-          <tr>
+          <tr data-id="${item.id || ''}">
             <td><strong>${escapeHtml(item.artista) || '?'}</strong></td>
             <td>${escapeHtml(item.album) || '?'}</td>
             <td title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</td>
@@ -1580,6 +1585,8 @@ function carregarDados() {
           atualizarBotaoFavoritar();
         }
         document.getElementById('btnRemoverDisco').style.display = 'block';
+        document.getElementById('btnOuviAgora').style.display = 'inline-flex';
+        mostrarDetalhesDisco(true);
       } else {
         document.getElementById('modalTitle').textContent = 'Adicionar Disco';
         document.getElementById('modalSub').textContent = 'Novo disco';
@@ -1605,6 +1612,8 @@ function carregarDados() {
         atualizarEstrelas(0);
         atualizarBotaoFavoritar();
         document.getElementById('btnRemoverDisco').style.display = 'none';
+        document.getElementById('btnOuviAgora').style.display = 'none';
+        mostrarDetalhesDisco(false);
       }
 
       modal.classList.add('open');
@@ -1712,20 +1721,65 @@ function carregarDados() {
     }
     window.editarDisco = editarDisco;
 
+    function esconderDisco(id, esconder) {
+      document.querySelectorAll(`.album-card[data-id="${id}"], tr[data-id="${id}"]`).forEach(el => { el.style.display = esconder ? 'none' : ''; });
+    }
     function removerDisco(id) {
-      abrirConfirm('Tem certeza que deseja remover este disco da prateleira?', function() {
-        apiFetch(API_URL + `/remover_disco/${id}`, { method: 'DELETE' })
+      const d = colecao.find(x => String(x.id) === String(id));
+      esconderDisco(id, true);
+      HillaNav.desfazer({
+        texto: `${d ? d.album : 'Disco'} removido`,
+        executar: () => apiFetch(API_URL + `/remover_disco/${id}`, { method: 'DELETE', keepalive: true })
           .then(r => r.json())
-          .then(data => {
-            if (data.sucesso) {
-              carregarDados();
-            } else {
-              alert('' + (data.erro || 'Erro ao remover'));
-            }
-          })
-          .catch(() => alert('Erro de conexão'));
+          .then(data => { if (data.sucesso) carregarDados(); else { esconderDisco(id, false); HillaNav.aviso(data.erro || 'Erro ao remover'); } })
+          .catch(() => { esconderDisco(id, false); HillaNav.aviso('Erro de conexão'); }),
+        aoDesfazer: () => esconderDisco(id, false)
       });
     }
+
+    // "Ouvi agora": registra a audição de hoje, na hora atual, com um toque
+    function ouviAgora(id) {
+      const d = colecao.find(x => String(x.id) === String(id));
+      if (!d) return;
+      const agora = new Date(), p2 = n => String(n).padStart(2, '0');
+      const fd = new FormData();
+      fd.append('colecao_id', id);
+      fd.append('data', `${agora.getFullYear()}-${p2(agora.getMonth() + 1)}-${p2(agora.getDate())}`);
+      fd.append('hora', `${p2(agora.getHours())}:${p2(agora.getMinutes())}`);
+      fd.append('nota', ''); fd.append('first_spin', '0');
+      if (typeof fecharModal === 'function' && document.getElementById('campo-id').value === String(id)) fecharModal();
+      apiFetch(`${API_URL}/audicoes`, { method: 'POST', body: fd })
+        .then(r => r.json().then(j => ({ ok: r.ok, j })))
+        .then(({ ok, j }) => {
+          if (!ok) { HillaNav.aviso(j.erro || 'Não deu para registrar.'); return; }
+          HillaNav.desfazer({
+            texto: `Audição registrada · ${d.album}`, tempo: 6000,
+            executar: () => {},   // já está salva; "Desfazer" apaga
+            aoDesfazer: () => apiFetch(`${API_URL}/audicoes/${j.id}`, { method: 'DELETE' }).then(() => HillaNav.aviso('Audição desfeita')).catch(() => {})
+          });
+        })
+        .catch(() => HillaNav.aviso('Erro de conexão.'));
+    }
+    window.ouviAgora = ouviAgora;
+
+    function menuDisco(id) {
+      const d = colecao.find(x => String(x.id) === String(id));
+      if (!d) return;
+      HillaNav.menu('Opções', [
+        { ic: 'play', nome: 'Ouvi agora', sub: 'Registra a audição de hoje', acao: () => ouviAgora(id) },
+        { ic: 'editar', nome: 'Editar', acao: () => editarDisco(id) },
+        { ic: 'lixo', nome: 'Remover', perigo: true, acao: () => removerDisco(id) }
+      ]);
+    }
+    window.menuDisco = menuDisco;
+
+    // Formulário curto: só artista, álbum e formato na frente
+    function mostrarDetalhesDisco(abrir) {
+      const f = document.getElementById('form-adicionar');
+      f.classList.toggle('hb-detalhes-abertos', !!abrir);
+      document.getElementById('btnMaisDetalhes').setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    }
+    window.mostrarDetalhesDisco = mostrarDetalhesDisco;
     window.removerDisco = removerDisco;
 
     // ================================================================
@@ -1889,7 +1943,8 @@ function carregarDados() {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
-  <script src="autocomplete.js?v=1"></script>
+  <script src="navegacao.js?v=1"></script>
+  <script src="autocomplete.js?v=2"></script>
   <script>
     HillaAuto.ligar({
       artista: document.getElementById('campo-artista'),

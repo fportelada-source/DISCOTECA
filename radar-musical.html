@@ -6,10 +6,10 @@
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Radar Musical</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -494,18 +494,27 @@ function renderRadarLista(artistas, containerId, vazioId) {
     return;
   }
 
+  // quem tem sinal de escuta vem primeiro; os adicionados à mão ficam num grupo
+  // com um título só, em vez da mesma frase repetida em cada linha
+  const semSinal = it => !it.sinal && it.estado !== 'somente_exploracao';
+  artistas = [...artistas.filter(it => !semSinal(it)), ...artistas.filter(semSinal)];
+  const primeiroSem = artistas.findIndex(semSinal);
+  const comSinal = primeiroSem === -1 ? artistas.length : primeiroSem;
   el.innerHTML = artistas.map((item, i) => {
     const s = item.sinal;
+    const titulo = i === primeiroSem
+      ? `<div class="radar-grupo">Adicionados por você, sem sinal de escuta <span>${artistas.length - comSinal}</span></div>`
+      : (i === 0 && comSinal > 0 && primeiroSem !== -1 ? '<div class="radar-grupo">Com sinal de escuta</div>' : '');
     const pct = s ? Math.min(100, Math.round((s.pontuacao_total / 30) * 100)) : 0;
     const chave = `${containerId}-${i}`;
     const abrirDeFoco = radarFoco.has((item.artista || '').toLowerCase());
-    return `
+    return titulo + `
       <div class="radar-card${abrirDeFoco ? ' expanded' : ''}" data-chave="${chave}" data-artista="${escapeHtml(item.artista)}">
         <div class="radar-top" onclick="toggleRadarCard('${chave}')">
           <div class="left">
             <div>
               <div class="name">${escapeHtml(item.artista)}</div>
-              <div class="summary">${escapeHtml(montarResumoFechado(item))}</div>
+              ${semSinal(item) ? '' : `<div class="summary">${escapeHtml(montarResumoFechado(item))}</div>`}
             </div>
           </div>
           <div class="right">
@@ -636,5 +645,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
+  <script src="navegacao.js?v=1"></script>
 </body>
 </html>

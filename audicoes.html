@@ -6,10 +6,10 @@
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Audições</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=37" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -819,7 +819,7 @@ function convidarWishlist(disco) {
     try {
       const r = await apiFetch(`${API_URL}/adicionar_recomendacao`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ artista: disco.artista, album: disco.album }) });
       const d = await r.json().catch(() => ({}));
-      txt.textContent = r.ok ? 'Adicionado à wishlist ✓' : (d.erro || 'Não deu pra adicionar.');
+      txt.textContent = r.ok ? 'Adicionado à wishlist' : (d.erro || 'Não deu pra adicionar.');
     } catch { txt.textContent = 'Erro de conexão.'; }
     sim.remove(); nao.textContent = 'Fechar'; setTimeout(fechar, 3000);
   };
@@ -940,7 +940,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
-  <script src="autocomplete.js?v=1"></script>
+  <script src="navegacao.js?v=1"></script>
+  <script src="autocomplete.js?v=2"></script>
   <script>HillaAuto.ligar({ artista: document.getElementById('audForaArtista'), album: document.getElementById('audForaAlbum') });</script>
   <script src="compartilhar.js?v=13"></script>
 </body>

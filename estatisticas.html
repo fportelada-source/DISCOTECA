@@ -6,10 +6,10 @@
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Estatísticas</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -712,6 +712,7 @@ function renderMarcos(estante, avancadas) {
     }
   </script>
   <script src="notificacoes.js?v=4"></script>
+  <script src="navegacao.js?v=1"></script>
   <script src="compartilhar.js?v=13"></script>
 <script>
 // ===== Seu mês (recap mensal) =====
@@ -746,7 +747,8 @@ function renderMarcos(estante, avancadas) {
         <div class="rc-n"><b>${r.novos_prateleira}</b><span>discos na Prateleira</span></div>
         <div class="rc-n"><b>${r.novos_wishlist}</b><span>discos na wishlist</span></div>
       </div></div>
-      <div class="rc-acoes"><button type="button" class="btn-primary rc-btn" id="rcCompartilhar">Compartilhar</button></div>`;
+      <div class="rc-acoes"><button type="button" class="btn-primary rc-btn" id="rcCompartilhar">Compartilhar</button>
+        <p class="rc-nota">As capas são os discos com mais audições no mês (no empate, o ouvido por último), completadas com os que entraram na Prateleira. O artista do mês soma as audições de todos os discos dele. As horas usam a duração de cada álbum no MusicBrainz.</p></div>`;
     document.getElementById('rcCompartilhar').addEventListener('click', () => {
       if (window.DiscotecaCompartilhar && window.DiscotecaCompartilhar.recap) window.DiscotecaCompartilhar.recap(atual);
     });

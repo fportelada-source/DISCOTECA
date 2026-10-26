@@ -201,6 +201,21 @@ function limparSessao() {
   localStorage.removeItem('discoteca_session_token');
 }
 
+// Resposta da API: 401 = sessão vencida (volta pro login); outro erro = falha
+// de verdade (NUNCA tratar como "lista vazia": isso já fez gente achar que
+// tinha perdido os discos).
+function jsonOuErro(r) {
+  if (r.status === 401) { limparSessao(); window.location.reload(); throw new Error('401'); }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+function mostrarErroCarga(el, tentar) {
+  if (!el) return;
+  el.innerHTML = '<div class="hb-erro-carga" role="alert"><b>Não foi possível carregar agora.</b><span>Seus dados estão guardados — é só uma falha de conexão ou do servidor.</span><button type="button" class="hb-erro-tentar">Tentar de novo</button></div>';
+  el.style.display = '';
+  const b = el.querySelector('.hb-erro-tentar'); if (b) b.addEventListener('click', tentar);
+}
+
 function ativarTelaApp(nome) {
   const loginScreen = document.getElementById('loginScreen');
   const appScreen = document.getElementById('appScreen');
@@ -343,7 +358,7 @@ function carregarRadarPadrao(manterAberto) {
   ) : new Set();
 
   apiFetch(API_URL + '/radar_musical')
-    .then(r => r.json())
+    .then(jsonOuErro)
     .then(d => {
       radarArtistasAtuais = (d && Array.isArray(d.artistas)) ? d.artistas : [];
       renderRadarLista(radarArtistasAtuais, 'radarLista', 'radarVazio');
@@ -356,9 +371,11 @@ function carregarRadarPadrao(manterAberto) {
         if (numerosAbertos.has(artista)) toggleNumeros(chave);
       });
     })
-    .catch(() => {
+    .catch(e => {
+      if (String(e && e.message) === '401') return;
       radarArtistasAtuais = [];
-      renderRadarLista([], 'radarLista', 'radarVazio');
+      const v = document.getElementById('radarVazio'); if (v) v.style.display = 'none';
+      mostrarErroCarga(document.getElementById('radarLista'), () => carregarRadarPadrao(true));
     });
 }
 

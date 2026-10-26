@@ -477,9 +477,24 @@ function onPaginaPronta() {
 function carregarConfiguracoes() {
   if (!usuarioId) return;
   apiFetch(API_URL + '/configuracoes')
-    .then(r => r.json())
-    .then(data => preencherPagina(data))
-    .catch(() => mostrarMsg('Erro ao carregar configurações.', 'error'));
+    .then(r => {
+      if (r.status === 401) { limparSessao(); window.location.reload(); throw new Error('401'); }
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    })
+    .then(data => {
+      if (!data || data.erro) throw new Error('dados');
+      preencherPagina(data);
+      configCarregada = true;   // só a partir daqui o salvar automático pode gravar
+      const st = document.getElementById('setSalvo');
+      if (st) { st.textContent = 'Salva sozinho'; st.className = 'set-salvo'; }
+    })
+    .catch(() => {
+      configCarregada = false;
+      const st = document.getElementById('setSalvo');
+      if (st) { st.textContent = 'Não carregou — recarregue a página'; st.className = 'set-salvo erro'; }
+      mostrarMsg('Não foi possível carregar suas configurações. Recarregue a página antes de mudar algo — nada será salvo até lá.', 'error');
+    });
 }
 
 function escapeHtml(texto) {
@@ -571,13 +586,21 @@ function coletarConfiguracoes() {
 // Salva sozinho: cada mudança feita pela pessoa agenda um salvamento.
 // Só reage a ação de verdade (digitar, tocar), nunca ao carregamento da página.
 let _salvarTimer = null;
+let configCarregada = false;
 function agendarSalvar(espera) {
+  if (!configCarregada) {
+    // página abriu sem os dados: salvar agora gravaria campos vazios por cima dos seus
+    mostrarMsg('Suas configurações não carregaram. Recarregue a página — nada foi salvo.', 'error');
+    return;
+  }
   clearTimeout(_salvarTimer);
   const st = document.getElementById('setSalvo');
   if (st) { st.textContent = 'Salvando…'; st.className = 'set-salvo'; }
   _salvarTimer = setTimeout(salvarConfiguracoes, espera == null ? 700 : espera);
 }
 function salvarConfiguracoes() {
+  if (!configCarregada) return;
+  _salvarTimer = null;
   const st = document.getElementById('setSalvo');
   apiFetch(API_URL + '/configuracoes', {
     method: 'PUT',
@@ -674,11 +697,29 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   document.getElementById('btnEnviarCsv').addEventListener('click', enviarImportacaoCsv);
 
+  // Downloads com o login no cabeçalho (abrir o endereço direto não leva o
+  // X-Session-Token e o servidor respondia "Usuário não logado").
+  function baixarArquivo(botao, rota, nome, okMsg) {
+    botao.disabled = true;
+    apiFetch(API_URL + rota)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url; link.download = nome;
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        mostrarMsg(okMsg, 'success');
+      })
+      .catch(() => mostrarMsg('Não foi possível baixar agora. Tente de novo em instantes.', 'error'))
+      .finally(() => { botao.disabled = false; });
+  }
   document.getElementById('btnExportarCsv').addEventListener('click', function() {
-    window.location.href = API_URL + '/exportar_colecao';
+    baixarArquivo(this, '/exportar_colecao', 'hilla_prateleira.csv', 'Prateleira exportada.');
   });
   document.getElementById('btnBackup').addEventListener('click', function() {
-    window.location.href = API_URL + '/backup_dados';
+    const d = new Date(), p2 = n => String(n).padStart(2, '0');
+    baixarArquivo(this, '/backup_dados', `hilla_backup_${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}.json`, 'Backup baixado.');
   });
 
   document.getElementById('inputRestaurarBackup').addEventListener('change', function() {

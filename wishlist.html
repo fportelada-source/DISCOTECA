@@ -460,6 +460,21 @@ function limparSessao() {
   localStorage.removeItem('discoteca_session_token');
 }
 
+// Resposta da API: 401 = sessão vencida (volta pro login); outro erro = falha
+// de verdade (NUNCA tratar como "lista vazia": isso já fez gente achar que
+// tinha perdido os discos).
+function jsonOuErro(r) {
+  if (r.status === 401) { limparSessao(); window.location.reload(); throw new Error('401'); }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+function mostrarErroCarga(el, tentar) {
+  if (!el) return;
+  el.innerHTML = '<div class="hb-erro-carga" role="alert"><b>Não foi possível carregar agora.</b><span>Seus dados estão guardados — é só uma falha de conexão ou do servidor.</span><button type="button" class="hb-erro-tentar">Tentar de novo</button></div>';
+  el.style.display = '';
+  const b = el.querySelector('.hb-erro-tentar'); if (b) b.addEventListener('click', tentar);
+}
+
 function ativarTelaApp(nome) {
   const loginScreen = document.getElementById('loginScreen');
   const appScreen = document.getElementById('appScreen');
@@ -603,12 +618,16 @@ function onPaginaPronta() {
 function carregarDados() {
   if (!usuarioId) return;
   apiFetch(API_URL + '/recomendacoes')
-    .then(r => r.json())
+    .then(jsonOuErro)
     .then(data => {
-      recomendacoes = Array.isArray(data) ? data : [];
+      if (!Array.isArray(data)) throw new Error('formato');
+      recomendacoes = data;
       renderRecomendacoes(recomendacoes);
     })
-    .catch(() => {});
+    .catch(e => {
+      if (String(e && e.message) === '401') return;
+      mostrarErroCarga(document.getElementById('compras-container'), carregarDados);
+    });
 }
 
 
@@ -1197,7 +1216,7 @@ function adicionarLacunaWishlist(indice, idxAlbum, btnEl) {
   })
     .then(r => r.json())
     .then(d => {
-      if (!d.sucesso) {
+      if (!d.sucesso && !d.ja_na_wishlist) {   // já estava na wishlist conta como feito
         btnEl.disabled = false;
         btnEl.textContent = 'Adicionar';
         return;
@@ -1479,8 +1498,10 @@ function renderRecomendacoes(dados) {
         album: document.getElementById('wish-album').value.trim(),
         tier: document.getElementById('wish-tier').value,
         notas: document.getElementById('wish-notas').value.trim(),
-        capa_url: document.getElementById('wish-capa-manual').value.trim()
+        capa_url: document.getElementById('wish-capa-manual').value.trim(),
+        confirmar_duplicado: window._hillaWishConfDup === true
       };
+      window._hillaWishConfDup = false;
 
       if (!dados.artista || !dados.album) {
         msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ Artista e álbum são obrigatórios!';
@@ -1503,6 +1524,16 @@ function renderRecomendacoes(dados) {
             formWish.reset();
             btn.disabled = false;
             setTimeout(() => modalWish.classList.remove('open'), 1000);
+          } else if (resultado.na_prateleira) {
+            // já está na prateleira: pergunta antes (pode ser outra edição de propósito)
+            msg.innerHTML = '';
+            const t = document.createElement('span'); t.textContent = resultado.mensagem + ' ';
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-secondary';
+            b.textContent = 'Adicionar mesmo assim'; b.style.marginLeft = '6px';
+            b.onclick = () => { window._hillaWishConfDup = true; formWish.requestSubmit(); };
+            msg.append(t, b);
+            msg.className = 'form-msg';
+            btn.disabled = false;
           } else {
             msg.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ' + (resultado.erro || 'Erro ao adicionar');
             msg.className = 'form-msg error';

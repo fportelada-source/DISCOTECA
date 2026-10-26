@@ -225,6 +225,21 @@ function limparSessao() {
   localStorage.removeItem('discoteca_user_nome');
   localStorage.removeItem('discoteca_session_token');
 }
+
+// Resposta da API: 401 = sessão vencida (volta pro login); outro erro = falha
+// de verdade (NUNCA tratar como "lista vazia": isso já fez gente achar que
+// tinha perdido os discos).
+function jsonOuErro(r) {
+  if (r.status === 401) { limparSessao(); window.location.reload(); throw new Error('401'); }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+function mostrarErroCarga(el, tentar) {
+  if (!el) return;
+  el.innerHTML = '<div class="hb-erro-carga" role="alert"><b>Não foi possível carregar agora.</b><span>Seus dados estão guardados — é só uma falha de conexão ou do servidor.</span><button type="button" class="hb-erro-tentar">Tentar de novo</button></div>';
+  el.style.display = '';
+  const b = el.querySelector('.hb-erro-tentar'); if (b) b.addEventListener('click', tentar);
+}
 function ativarTelaApp(nome) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
@@ -449,7 +464,7 @@ function adicionarLacunaWishlist(indice, idxAlbum, btnEl) {
   })
     .then(r => r.json())
     .then(d => {
-      if (!d.sucesso) {
+      if (!d.sucesso && !d.ja_na_wishlist) {   // já estava na wishlist conta como feito
         btnEl.disabled = false;
         btnEl.textContent = 'Adicionar';
         return;
@@ -482,12 +497,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function carregarDashboard() {
   Promise.all([
-    apiFetch(API_URL + '/colecao').then(r => r.json()),
-    apiFetch(API_URL + '/recomendacoes').then(r => r.json()),
+    apiFetch(API_URL + '/colecao').then(jsonOuErro),
+    apiFetch(API_URL + '/recomendacoes').then(jsonOuErro),
     apiFetch(API_URL + '/estatisticas_colecao').then(r => r.json()),
     apiFetch(API_URL + '/perfil/' + usuarioId).then(r => r.json())
   ]).then(([colecao, wishlist, stats, perfil]) => {
-    dashColecao = Array.isArray(colecao) ? colecao : [];
+    if (!Array.isArray(colecao) || !Array.isArray(wishlist)) throw new Error('formato');
+    dashColecao = colecao;
     dashWishlist = Array.isArray(wishlist) ? wishlist : [];
     renderDashboard(
       dashColecao,
@@ -495,9 +511,9 @@ function carregarDashboard() {
       stats && !stats.erro ? stats : {},
       perfil && !perfil.erro ? perfil : {}
     );
-  }).catch(() => {
-    document.getElementById('dashContent').innerHTML =
-      '<div style="opacity:0.5; font-size:13px;">Não consegui carregar o dashboard. Tenta recarregar a página.</div>';
+  }).catch(e => {
+    if (String(e && e.message) === '401') return;
+    mostrarErroCarga(document.getElementById('dashContent'), carregarDashboard);
   });
 }
 

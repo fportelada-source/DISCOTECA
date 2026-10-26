@@ -585,6 +585,21 @@ function limparSessao() {
   localStorage.removeItem('discoteca_session_token');
 }
 
+// Resposta da API: 401 = sessão vencida (volta pro login); outro erro = falha
+// de verdade (NUNCA tratar como "lista vazia": isso já fez gente achar que
+// tinha perdido os discos).
+function jsonOuErro(r) {
+  if (r.status === 401) { limparSessao(); window.location.reload(); throw new Error('401'); }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+function mostrarErroCarga(el, tentar) {
+  if (!el) return;
+  el.innerHTML = '<div class="hb-erro-carga" role="alert"><b>Não foi possível carregar agora.</b><span>Seus dados estão guardados — é só uma falha de conexão ou do servidor.</span><button type="button" class="hb-erro-tentar">Tentar de novo</button></div>';
+  el.style.display = '';
+  const b = el.querySelector('.hb-erro-tentar'); if (b) b.addEventListener('click', tentar);
+}
+
 function ativarTelaApp(nome) {
   const loginScreen = document.getElementById('loginScreen');
   const appScreen = document.getElementById('appScreen');
@@ -743,9 +758,10 @@ function carregarPreferenciasColecao() {
 function carregarDados() {
   if (!usuarioId) return;
   apiFetch(API_URL + '/colecao')
-    .then(r => r.json())
+    .then(jsonOuErro)
     .then(data => {
-      colecao = Array.isArray(data) ? data : [];
+      if (!Array.isArray(data)) throw new Error('formato');
+      colecao = data;
       colecaoFiltrada = [...colecao];
       renderHeroColecao();
       renderInsightsColecao();
@@ -754,7 +770,11 @@ function carregarDados() {
       aplicarFiltros();
       checarAnosFaltantes();
     })
-    .catch(() => {});
+    .catch(e => {
+      if (String(e && e.message) === '401') return;
+      const lv = document.getElementById('listView'); if (lv) lv.style.display = 'none';
+      mostrarErroCarga(document.getElementById('colecao-container'), carregarDados);
+    });
   sincronizarBadge();
 }
 
@@ -1572,7 +1592,7 @@ function carregarDados() {
           document.getElementById('campo-condicao-midia').value = disco.condicao_midia || '';
           document.getElementById('campo-condicao-capa').value = disco.condicao_capa || '';
           document.getElementById('campo-preco').value = disco.preco || '';
-          document.getElementById('campo-data').value = disco.data_adicao || '';
+          document.getElementById('campo-data').value = (disco.data_adicao || '').slice(0, 10);   // Discogs manda data com hora; o campo só aceita AAAA-MM-DD
           document.getElementById('campo-notas').value = disco.notas || '';
           document.getElementById('campo-tags').value = disco.tags || '';
           atualizarAtalhosTags();

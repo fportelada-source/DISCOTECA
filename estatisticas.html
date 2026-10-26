@@ -273,6 +273,13 @@ function limparSessao() {
   localStorage.removeItem('discoteca_session_token');
 }
 
+function mostrarErroCarga(el, tentar) {
+  if (!el) return;
+  el.innerHTML = '<div class="hb-erro-carga" role="alert"><b>Não foi possível carregar agora.</b><span>Seus dados estão guardados — é só uma falha de conexão ou do servidor.</span><button type="button" class="hb-erro-tentar">Tentar de novo</button></div>';
+  el.style.display = '';
+  const b = el.querySelector('.hb-erro-tentar'); if (b) b.addEventListener('click', tentar);
+}
+
 function ativarTelaApp(nome) {
   const loginScreen = document.getElementById('loginScreen');
   const appScreen = document.getElementById('appScreen');
@@ -429,6 +436,14 @@ function carregarDados() {
     const containerPlayer = document.getElementById('estatisticas-player');
     const containerEstante = document.getElementById('estatisticas-estante');
 
+    // Servidor com erro não é "conta vazia": mostra a falha e deixa tentar de novo
+    if (dadosPlayer && dadosPlayer.erro && dadosEstante && dadosEstante.erro) {
+      vazioUnificado.style.display = 'none';
+      conteudo.style.display = 'block';
+      containerPlayer.innerHTML = '';
+      mostrarErroCarga(containerEstante, carregarDados);
+      return;
+    }
     if (playerVazio && estanteVazia) {
       vazioUnificado.style.display = 'block';
       conteudo.style.display = 'none';

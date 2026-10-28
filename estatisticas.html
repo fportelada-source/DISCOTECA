@@ -106,64 +106,114 @@
         </section>
 
         <div id="stConteudo" style="display:none;">
+          <!-- ABAS + PERÍODO (trocar não recarrega nada) -->
+          <div class="sp-topo">
+            <div class="sp-abas" role="tablist" aria-label="Seções das estatísticas">
+              <button class="sp-aba on" role="tab" aria-selected="true" data-aba="prat" id="tab-prat" aria-controls="pane-prat">Prateleira</button>
+              <button class="sp-aba" role="tab" aria-selected="false" data-aba="aud" id="tab-aud" aria-controls="pane-aud">Audições</button>
+              <button class="sp-aba" role="tab" aria-selected="false" data-aba="din" id="tab-din" aria-controls="pane-din">Dinheiro</button>
+              <button class="sp-aba" role="tab" aria-selected="false" data-aba="wish" id="tab-wish" aria-controls="pane-wish">Wishlist</button>
+            </div>
+            <div class="sp-per" id="spPeriodo" role="group" aria-label="Período"></div>
+          </div>
 
-          <!-- OVERVIEW -->
-          <div class="st-overview-grid" id="stOverview"></div>
-
-          <!-- PLAYER x ESTANTE -->
-          <div class="st-two-col">
+          <!-- ===== PRATELEIRA ===== -->
+          <section class="sp-pane on" id="pane-prat" role="tabpanel" aria-labelledby="tab-prat">
+            <div class="sp-kpis" id="spKpiPrat"></div>
             <div class="st-card">
-              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg> No seu <span class="accent">player</span></h3><span class="sub">do Spotify</span></div>
-              <div id="estatisticas-player"></div>
+              <div class="card-header sp-ch"><h3>Crescimento da <span class="accent">prateleira</span></h3>
+                <div class="sp-ctrl"><div class="sp-seg" id="spModoCres" role="group" aria-label="Medida"><button class="on" data-m="qtd">Discos</button><button data-m="rs">R$ gasto</button><button data-m="acum">Acumulado</button></div>
+                <label class="sp-tg"><input type="checkbox" class="sp-fmt-toggle"><span class="sp-sw" aria-hidden="true"></span>Por formato</label></div></div>
+              <div class="sp-bars" id="spCres"></div>
+              <div class="sp-leg" hidden></div>
+              <div class="sp-det" id="spCresDet" aria-live="polite"></div>
+            </div>
+            <div class="sp-grid">
+              <div class="st-card"><div class="card-header"><h3>Décadas <span class="accent">da prateleira</span></h3><span class="sub">ano original do álbum</span></div><div id="spDecadas"></div></div>
+              <div class="st-card"><div class="card-header"><h3>Gêneros <span class="accent">da prateleira</span></h3><span class="sub"></span></div><div id="spGeneros"></div></div>
+              <div class="st-card"><div class="card-header"><h3>De onde vêm seus <span class="accent">artistas</span></h3><span class="sub"></span></div><div id="spPaises"></div></div>
+              <div class="st-card"><div class="card-header"><h3>Estado das suas <span class="accent">cópias</span></h3><span class="sub">condição da mídia</span></div><div id="spEstado"></div></div>
             </div>
             <div class="st-card">
+            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Top <span class="accent">artistas</span></h3><span class="sub">por discos na estante</span></div>
+            <div class="st-rank-list" id="stTopArtistas"></div>
+          </div>
+            <div class="st-card">
+            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da <span class="accent">prateleira</span></h3><span class="sub">curiosidades</span></div>
+            <div class="st-insights-grid" id="stInsights"></div>
+          </div>
+            <div class="st-two-col">
+              <div class="st-card">
               <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Na sua <span class="accent">estante</span></h3><span class="sub">prateleira física</span></div>
               <div id="estatisticas-estante"></div>
             </div>
-          </div>
+              <div class="st-card">
+              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3a2 2 0 0 1-2 4h-1"/><path d="M7 5H4a2 2 0 0 0 2 4h1"/></svg> Marcos da <span class="accent">prateleira</span></h3><span class="sub">celebre</span></div>
+              <div class="st-insights-grid" id="stMarcos" style="grid-template-columns:1fr 1fr;"></div>
+            </div>
+            </div>
+          </section>
 
-          <!-- CRESCIMENTO DA PRATELEIRA -->
-          <div class="st-card">
-            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Crescimento da <span class="accent">prateleira</span></h3><span class="sub">últimos 12 meses</span></div>
-            <div class="st-growth" id="stCrescimento"></div>
-          </div>
-
-          <!-- WISHLIST PROGRESS + VALOR -->
-          <div class="st-two-col">
+          <!-- ===== AUDIÇÕES ===== -->
+          <section class="sp-pane" id="pane-aud" role="tabpanel" aria-labelledby="tab-aud" hidden>
+            <div class="sp-kpis" id="spKpiAud"></div>
             <div class="st-card">
-              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Progresso da <span class="accent">wishlist</span></h3><span class="sub" id="stWishlistTotal"></span></div>
-              <div id="stWishlistProgress"></div>
+              <div class="card-header sp-ch"><h3>Audições por <span class="accent">mês</span></h3>
+                <div class="sp-ctrl"><div class="sp-seg" id="spModoAud" role="group" aria-label="Medida"><button class="on" data-m="h">Horas</button><button data-m="n">Audições</button><button data-m="fs">First spins</button></div></div></div>
+              <div class="sp-bars" id="spAud"></div>
+              <p class="sp-nota">Parte cheia: discos da prateleira. Parte listrada: discos de fora (emprestados, na loja). Horas usam a duração do álbum no MusicBrainz (45 min quando ela não é conhecida).</p>
+            </div>
+            <div class="sp-grid sp-grid-2-1">
+              <div class="st-card"><div class="card-header"><h3>Seu ano em <span class="accent">audições</span></h3><span class="sub">cada quadrado é um dia</span></div><div id="spHeat"></div></div>
+              <div class="st-card"><div class="card-header"><h3>Quando você <span class="accent">ouve</span></h3><span class="sub"></span></div><div id="spRelogio"></div></div>
+            </div>
+            <div class="sp-grid">
+              <div class="st-card"><div class="card-header"><h3>Esperando a <span class="accent">agulha</span></h3><span class="sub">nunca registrados</span></div><div id="spAgulha"></div></div>
+              <div class="st-card"><div class="card-header"><h3>Mais <span class="accent">ouvidos</span></h3><span class="sub">no período</span></div><div id="spMaisOuvidos"></div></div>
+            </div>
+            <div class="st-two-col">
+              <div class="st-card">
+              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg> No seu <span class="accent">player</span></h3><span class="sub">do Spotify</span></div>
+              <div id="estatisticas-player"></div>
+            </div>
+              <div class="st-card">
+              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Ouvido vs <span class="accent">possuído</span></h3><span class="sub">lacunas</span></div>
+              <div id="stCruzamento"></div>
+            </div>
+            </div>
+          </section>
+
+          <!-- ===== DINHEIRO ===== -->
+          <section class="sp-pane" id="pane-din" role="tabpanel" aria-labelledby="tab-din" hidden>
+            <div class="sp-kpis" id="spKpiDin"></div>
+            <div class="st-card">
+              <div class="card-header sp-ch"><h3>Gasto por <span class="accent">mês</span></h3>
+                <div class="sp-ctrl"><label class="sp-tg"><input type="checkbox" class="sp-fmt-toggle"><span class="sp-sw" aria-hidden="true"></span>Por formato</label></div></div>
+              <div class="sp-bars" id="spGasto"></div>
+              <div class="sp-leg" hidden></div>
+              <p class="sp-nota" id="spGastoNota"></p>
+            </div>
+            <div class="sp-grid">
+              <div class="st-card"><div class="card-header"><h3>Discos que mais <span class="accent">se pagaram</span></h3><span class="sub">preço ÷ audições</span></div><div id="spSePagaram"></div></div>
+              <div class="st-card"><div class="card-header"><h3>Preço médio por <span class="accent">formato</span></h3><span class="sub"></span></div><div id="spPrecoFmt"></div></div>
             </div>
             <div class="st-card">
               <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Valor da <span class="accent">prateleira</span></h3><span class="sub">estimado</span></div>
               <div id="stValor"></div>
             </div>
-          </div>
+          </section>
 
-          <!-- TOP ARTISTAS -->
-          <div class="st-card">
-            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Top <span class="accent">artistas</span></h3><span class="sub">por discos na estante</span></div>
-            <div class="st-rank-list" id="stTopArtistas"></div>
-          </div>
-
-          <!-- DESTAQUES DA PRATELEIRA -->
-          <div class="st-card">
-            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da <span class="accent">prateleira</span></h3><span class="sub">curiosidades</span></div>
-            <div class="st-insights-grid" id="stInsights"></div>
-          </div>
-
-          <!-- OUVIDO VS POSSUÍDO + MARCOS -->
-          <div class="st-two-col">
-            <div class="st-card">
-              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Ouvido vs <span class="accent">possuído</span></h3><span class="sub">lacunas</span></div>
-              <div id="stCruzamento"></div>
+          <!-- ===== WISHLIST ===== -->
+          <section class="sp-pane" id="pane-wish" role="tabpanel" aria-labelledby="tab-wish" hidden>
+            <div class="st-two-col">
+              <div class="st-card">
+              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Progresso da <span class="accent">wishlist</span></h3><span class="sub" id="stWishlistTotal"></span></div>
+              <div id="stWishlistProgress"></div>
             </div>
-            <div class="st-card">
-              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3a2 2 0 0 1-2 4h-1"/><path d="M7 5H4a2 2 0 0 0 2 4h1"/></svg> Marcos da <span class="accent">prateleira</span></h3><span class="sub">celebre</span></div>
-              <div class="st-insights-grid" id="stMarcos" style="grid-template-columns:1fr 1fr;"></div>
+              <div class="st-card"><div class="card-header"><h3>Quanto falta <span class="accent">gastar</span></h3><span class="sub">estimativa</span></div><div id="spFalta"></div></div>
             </div>
-          </div>
-
+            <div class="st-card"><div class="card-header"><h3>Da wishlist para a <span class="accent">prateleira</span></h3><span class="sub">entradas e compras por mês</span></div><div class="sp-bars sp-bars-baixo" id="spWishFluxo"></div><p class="sp-nota" id="spWishNota"></p></div>
+          </section>
         </div>
       </div>
     </div>
@@ -457,14 +507,13 @@ function carregarDados() {
 
     renderEstatisticasPlayer(dadosPlayer, playerVazio);
     renderEstatisticasEstante(dadosEstante, estanteVazia);
-    renderOverview(dadosPlayer, dadosEstante, wishlist);
-    renderCrescimento(dadosEstante);
     renderWishlistProgress(avancadas.wishlist_progress);
     renderValor(dadosEstante);
     renderTopArtistas(dadosEstante);
     renderInsightsDestaques(dadosEstante);
     renderCruzamento(avancadas.ouvido_vs_possuido, playerVazio, estanteVazia);
     renderMarcos(dadosEstante, avancadas);
+    if (window.HillaStats) HillaStats.carregar();
   });
 }
 
@@ -729,6 +778,7 @@ function renderMarcos(estante, avancadas) {
   <script src="notificacoes.js?v=4"></script>
   <script src="navegacao.js?v=1"></script>
   <script src="compartilhar.js?v=13"></script>
+  <script src="estatisticas-painel.js?v=1"></script>
 <script>
 // ===== Seu mês (recap mensal) =====
 (function () {

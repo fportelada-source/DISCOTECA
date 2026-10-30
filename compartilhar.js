@@ -348,10 +348,49 @@
 
   // Recap mensal (mockup A2 aprovado): "Outubro" + "18h de disco", mosaico de até 6 capas, 4 números.
   // Story respeita as áreas que o Instagram cobre: 14% em cima, 20% embaixo.
+  // Calendário do mês ao fundo da story: um quadrado por dia, bem apagado, com o
+  // número no canto e as iniciais da semana. Dias com audição em dourado com brilho.
+  // Some para 20% atrás dos textos (título e números) e volta aos poucos.
+  function desenharDiasDoMes(ctx, W, H, r, k, story) {
+    const N = +r.dias_mes || 0, ouv = r.dias_ouvidos || {}, ini = +r.primeiro_dia_semana || 0;
+    if (!N) return;
+    const topo = story ? H * 0.155 : 80 * k, base = story ? H * 0.80 : H - 70 * k;
+    const urlY = base - 44 * k, linhaH = 128 * k, numTopo = urlY - 40 * k - 2 * linhaH + 34 * k;
+    const textos = [[topo - 10 * k, topo + 160 * k], [numTopo - 10 * k, urlY + 50 * k]];
+    const fade = 90 * k, PISO = 0.2;
+    const forca = (y0, y1) => Math.min(...textos.map(([a, b]) => {
+      if (y1 > a && y0 < b) return PISO;
+      const dist = y1 <= a ? a - y1 : y0 - b;
+      return Math.max(PISO, Math.min(1, dist / fade));
+    }));
+    const cols = 7, rows = Math.ceil((N + ini) / 7);
+    const mx = 30 * k, gap = 26 * k, l = (W - 2 * mx - gap * (cols - 1)) / cols;
+    const y0 = story ? H * 0.07 : 72 * k, passoY = rows > 1 ? (H * (story ? 0.86 : 0.88) - l) / (rows - 1) : 0;
+    ctx.save();
+    ctx.font = `800 ${30 * k}px Inter, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillStyle = `rgba(240,240,240,${0.09 * forca(y0 - 44 * k, y0)})`;
+    'STQQSSD'.split('').forEach((c, i) => ctx.fillText(c, mx + i * (l + gap) + l / 2, y0 - 14 * k));
+    for (let d = 1; d <= N; d++) {
+      const p = d - 1 + ini, x = mx + (p % 7) * (l + gap), y = y0 + Math.floor(p / 7) * passoY;
+      const n = +ouv[d] || 0, f = forca(y, y + l);
+      ctx.save();
+      if (n > 0) {
+        ctx.shadowColor = `rgba(201,162,76,${0.35 * f})`; ctx.shadowBlur = (n >= 3 ? 30 : 22) * k;
+        ctx.fillStyle = `rgba(201,162,76,${(n >= 3 ? 0.13 : n === 2 ? 0.10 : 0.075) * f})`;
+      } else ctx.fillStyle = `rgba(240,240,240,${0.018 * f})`;
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, l, l, l * 0.2) : ctx.rect(x, y, l, l); ctx.fill();
+      ctx.restore();
+      ctx.font = `700 ${l * 0.2}px Inter, sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillStyle = n > 0 ? `rgba(201,162,76,${0.30 * f})` : `rgba(240,240,240,${0.08 * f})`;
+      ctx.fillText(String(d), x + l * 0.13, y + l * 0.11);
+    }
+    ctx.restore();
+  }
   function desenharRecap(ctx, W, H, r, imgs) {
     const story = H / W > 1.5, k = W / 1080;
     ctx.fillStyle = FUNDO; ctx.fillRect(0, 0, W, H);
     const cx = W / 2, cy = H * 0.45, alcance = Math.hypot(W, H) / 2;
+    desenharDiasDoMes(ctx, W, H, r, k, story);   // calendário bem apagado, por baixo dos sulcos
     ctx.save();
     for (let rr = 7 * k; rr < alcance; rr += 7 * k) {
       ctx.globalAlpha = 0.9 * Math.max(0, 1 - rr / alcance);

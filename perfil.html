@@ -731,6 +731,20 @@ document.addEventListener('DOMContentLoaded', function() {
       }[st];
       el.innerHTML = `<span class="push-ponto ${st === 'ativo' ? 'on' : ''}"></span><span>${textos[0]}</span>` +
         (textos[1] ? `<button type="button" class="push-btn ${textos[2]}" id="pushBotao">${textos[1]}</button>` : '');
+      if (st === 'ativo') {
+        el.insertAdjacentHTML('beforeend', '<button type="button" class="push-btn pri" id="pushTeste">Mandar um teste</button><span class="push-teste-msg" id="pushTesteMsg" aria-live="polite"></span>');
+        document.getElementById('pushTeste').onclick = async (ev) => {
+          const bt = ev.currentTarget, msg = document.getElementById('pushTesteMsg');
+          bt.disabled = true; msg.textContent = 'Enviando…';
+          try {
+            const r = await apiFetch(API_URL + '/push/teste', { method: 'POST' });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok || !d.enviados) throw new Error(d.erro || 'O servidor não conseguiu entregar. Tente desativar e ativar de novo.');
+            msg.textContent = 'Enviado! Deve chegar em alguns segundos.';
+          } catch (e) { msg.textContent = e.message; msg.classList.add('push-erro'); }
+          setTimeout(() => { bt.disabled = false; }, 4000);
+        };
+      }
       document.getElementById('pushTipos').style.opacity = st === 'ativo' ? '1' : '0.5';
       const b = document.getElementById('pushBotao');
       if (b) b.onclick = async () => {
@@ -956,6 +970,6 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="notificacoes.js?v=4"></script>
   <script src="navegacao.js?v=1"></script>
   <script src="push.js?v=2"></script>
-  <script src="conquistas.js?v=7"></script>
+  <script src="conquistas.js?v=8"></script>
 </body>
 </html>

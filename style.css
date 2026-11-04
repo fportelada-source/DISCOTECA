@@ -4081,3 +4081,4 @@ a.app-nav-logo::before { content: ""; display: inline-block; width: 26px; height
 .push-sim { background: var(--terracotta); border: 0; color: #111; }
 .push-convite-msg { margin: 10px 0 0 !important; }
 .push-convite-msg:empty { display: none; }
+.push-erro { flex-basis: 100%; color: #e0634f; font-size: 13px; }

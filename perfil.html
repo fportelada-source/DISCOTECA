@@ -738,7 +738,14 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
           if (st === 'ativo') { await HillaPush.desativar(); mostrarMsg('Notificações desativadas neste aparelho.', 'success'); }
           else { await HillaPush.ativar(); mostrarMsg('Notificações ativadas! Os avisos chegam às 19h.', 'success'); }
-        } catch (e) { mostrarMsg(e.message === 'bloqueado' ? 'Você bloqueou as notificações. Dá para liberar nas configurações do navegador.' : e.message, 'error'); }
+        } catch (e) {
+          // erro aparece aqui mesmo, no cartão (a mensagem do topo fica fora da tela)
+          await pintar();
+          const txt = e && e.message === 'bloqueado' ? 'Você bloqueou as notificações. Dá para liberar nas configurações do navegador.'
+            : 'Não deu para ativar: ' + ((e && (e.message || e.name)) || 'erro desconhecido');
+          el.insertAdjacentHTML('beforeend', `<span class="push-erro">${escapeHtml(txt)}</span>`);
+          return;
+        }
         pintar();
       };
     }
@@ -948,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="onboarding.js?v=2"></script>
   <script src="notificacoes.js?v=4"></script>
   <script src="navegacao.js?v=1"></script>
-  <script src="push.js?v=1"></script>
+  <script src="push.js?v=2"></script>
   <script src="conquistas.js?v=7"></script>
 </body>
 </html>

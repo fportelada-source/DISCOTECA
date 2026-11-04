@@ -43,12 +43,15 @@
     const reg = await registro();
     await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
-    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: chaveBytes(k.chave) });
+    if (!sub) {
+      try { sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: chaveBytes(k.chave) }); }
+      catch (e) { throw new Error('o navegador recusou a inscrição (' + (e.name || '') + ': ' + (e.message || '') + ')'); }
+    }
     const s = await apiFetch(`${API_URL}/push/inscrever`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inscricao: sub.toJSON(), aparelho: nomeAparelho() })
     });
-    if (!s.ok) throw new Error('Não deu para salvar a inscrição. Tente de novo.');
+    if (!s.ok) { let m = ''; try { m = (await s.json()).erro || ''; } catch (e) {} throw new Error('o servidor recusou (' + s.status + (m ? ': ' + m : '') + ')'); }
     return true;
   }
 

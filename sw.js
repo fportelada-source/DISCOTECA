@@ -23,7 +23,7 @@
 // CACHE_NAME tem número de versão — se algum dia mudar o que entra
 // no "esqueleto" (nova página, etc.), sobe esse número, igual já
 // fazemos com style.css?v=N.
-const CACHE_NAME = 'discoteca-shell-v13';
+const CACHE_NAME = 'discoteca-shell-v14';
 
 const PAGINAS_HTML = [
   './index.html',
@@ -144,6 +144,38 @@ self.addEventListener('fetch', (evento) => {
         }
         return respostaRede;
       });
+    })
+  );
+});
+
+
+// ===== Notificações push (Seu mês, lançamentos, conquistas...) =====
+// O servidor manda {titulo, texto, url, tag}. Tocar abre a tela certa.
+self.addEventListener('push', (evento) => {
+  let d = {};
+  try { d = evento.data ? evento.data.json() : {}; } catch (e) { d = { texto: evento.data && evento.data.text() }; }
+  evento.waitUntil(self.registration.showNotification(d.titulo || 'Hilla', {
+    body: d.texto || '',
+    icon: './icon-192.png',
+    badge: './favicon-32.png',
+    tag: d.tag || 'hilla',
+    data: { url: d.url || './index.html' }
+  }));
+});
+
+self.addEventListener('notificationclick', (evento) => {
+  evento.notification.close();
+  const alvo = (evento.notification.data && evento.notification.data.url) || './index.html';
+  evento.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((janelas) => {
+      for (const j of janelas) {
+        if (new URL(j.url).origin === self.location.origin && 'focus' in j) {
+          if (new URL(alvo, self.location.href).origin === self.location.origin) j.navigate(alvo);
+          else self.clients.openWindow(alvo);   // link externo (ex.: Spotify)
+          return j.focus();
+        }
+      }
+      return self.clients.openWindow(alvo);
     })
   );
 });

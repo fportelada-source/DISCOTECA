@@ -141,6 +141,22 @@
             <div class="pp-empty-note" id="notifFavoritosNota" style="display:none; margin-top:6px;">Para receber lançamentos, marque como favorito (estrela) pelo menos um disco do artista na Prateleira.</div>
           </div>
 
+
+          <!-- NOTIFICAÇÕES NO CELULAR (push) -->
+          <div class="set-card" id="pushCard">
+            <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg> Notificações no celular</h3><span class="sub">com a Hilla fechada</span></div>
+            <div class="pp-empty-note" style="margin-bottom:10px;">Avisos às 19h: no máximo um por dia, fora o Seu mês e as conquistas.</div>
+            <div class="push-estado" id="pushEstado" aria-live="polite">Verificando este aparelho…</div>
+            <div id="pushTipos">
+              <div class="set-toggle-item"><div class="left"><div class="title">Seu mês</div><div class="sub">No último dia do mês</div></div><button class="set-toggle" data-push="push_recap" aria-label="Seu mês no celular"><div class="dot"></div></button></div>
+              <div class="set-toggle-item"><div class="left"><div class="title">Lançamentos</div><div class="sub">Disco novo de artista favorito na sua prateleira</div></div><button class="set-toggle" data-push="push_lancamentos" aria-label="Lançamentos no celular"><div class="dot"></div></button></div>
+              <div class="set-toggle-item"><div class="left"><div class="title">Conquistas</div><div class="sub">Quando você desbloqueia uma</div></div><button class="set-toggle" data-push="push_conquistas" aria-label="Conquistas no celular"><div class="dot"></div></button></div>
+              <div class="set-toggle-item"><div class="left"><div class="title">Aniversário na prateleira</div><div class="sub">Faz 1 ano que um disco chegou</div></div><button class="set-toggle" data-push="push_aniversario" aria-label="Aniversário na prateleira no celular"><div class="dot"></div></button></div>
+              <div class="set-toggle-item"><div class="left"><div class="title">Lembranças</div><div class="sub">O que você ouviu neste dia, anos atrás</div></div><button class="set-toggle" data-push="push_lembrancas" aria-label="Lembranças no celular"><div class="dot"></div></button></div>
+              <div class="set-toggle-item"><div class="left"><div class="title">Faz tempo</div><div class="sub">Disco parado há muito tempo</div></div><button class="set-toggle" data-push="push_faz_tempo" aria-label="Faz tempo no celular"><div class="dot"></div></button></div>
+            </div>
+          </div>
+
           <!-- IMPORTAR E EXPORTAR -->
           <div class="set-card">
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Importar e exportar</h3><span class="sub">gerencie seus dados</span></div>
@@ -671,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
     inp.addEventListener('change', ev => { if (ev.isTrusted) agendarSalvar(0); });
   });
   document.addEventListener('click', ev => {
-    if (ev.isTrusted && ev.target.closest('.set-toggle, .opt')) setTimeout(() => agendarSalvar(300), 0);
+    if (ev.isTrusted && ev.target.closest('.set-toggle:not([data-push]):not([data-notif]), .opt')) setTimeout(() => agendarSalvar(300), 0);
   });
   window.addEventListener('pagehide', () => { if (_salvarTimer) { clearTimeout(_salvarTimer); salvarConfiguracoes(); } });
 
@@ -688,6 +704,56 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.set-toggle').forEach(btn => {
     btn.addEventListener('click', function() { this.classList.toggle('active'); });
   });
+
+
+  // ===== Notificações no celular (push) =====
+  (async function iniciarPush() {
+    const el = document.getElementById('pushEstado');
+    if (!el || !window.HillaPush) return;
+    const botoes = [...document.querySelectorAll('[data-push]')];
+    async function carregarPrefs() {
+      try {
+        const r = await apiFetch(API_URL + '/push/preferencias');
+        if (!r.ok) throw 0;
+        const p = await r.json();
+        botoes.forEach(b => b.classList.toggle('active', !!p[b.dataset.push]));
+        return p;
+      } catch (e) { return null; }
+    }
+    async function pintar() {
+      const st = await HillaPush.estado();
+      const textos = {
+        ativo: ['Ativadas neste aparelho.', 'Desativar neste aparelho', 'sec'],
+        inativo: ['Desativadas neste aparelho.', 'Ativar neste aparelho', 'pri'],
+        bloqueado: ['As notificações da Hilla estão bloqueadas nas configurações do navegador deste aparelho. Libere por lá e volte aqui.', '', ''],
+        instalar: ['No iPhone, as notificações só funcionam com a Hilla instalada: no Safari, toque em Compartilhar → Adicionar à Tela de Início, abra a Hilla por lá e volte aqui.', '', ''],
+        sem_suporte: ['Este navegador não aceita notificações. No Android use o Chrome; no iPhone, instale a Hilla na tela de início.', '', '']
+      }[st];
+      el.innerHTML = `<span class="push-ponto ${st === 'ativo' ? 'on' : ''}"></span><span>${textos[0]}</span>` +
+        (textos[1] ? `<button type="button" class="push-btn ${textos[2]}" id="pushBotao">${textos[1]}</button>` : '');
+      document.getElementById('pushTipos').style.opacity = st === 'ativo' ? '1' : '0.5';
+      const b = document.getElementById('pushBotao');
+      if (b) b.onclick = async () => {
+        b.disabled = true;
+        try {
+          if (st === 'ativo') { await HillaPush.desativar(); mostrarMsg('Notificações desativadas neste aparelho.', 'success'); }
+          else { await HillaPush.ativar(); mostrarMsg('Notificações ativadas! Os avisos chegam às 19h.', 'success'); }
+        } catch (e) { mostrarMsg(e.message === 'bloqueado' ? 'Você bloqueou as notificações. Dá para liberar nas configurações do navegador.' : e.message, 'error'); }
+        pintar();
+      };
+    }
+    botoes.forEach(b => b.addEventListener('click', () => {
+      setTimeout(async () => {
+        const corpo = {}; corpo[b.dataset.push] = b.classList.contains('active');
+        try {
+          const r = await apiFetch(API_URL + '/push/preferencias', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+          if (!r.ok) throw 0;
+        } catch (e) { b.classList.toggle('active'); mostrarMsg('Não deu para salvar agora.', 'error'); }
+      }, 0);
+    }));
+    await carregarPrefs();
+    pintar();
+  })();
 
   document.getElementById('btnAbrirImportCsv').addEventListener('click', function() {
     window.location.href = 'importar.html';
@@ -882,6 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="onboarding.js?v=2"></script>
   <script src="notificacoes.js?v=4"></script>
   <script src="navegacao.js?v=1"></script>
+  <script src="push.js?v=1"></script>
   <script src="conquistas.js?v=7"></script>
 </body>
 </html>

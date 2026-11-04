@@ -787,6 +787,7 @@ async function salvarAudicao() {
     const foiFora = !audEditandoId && audDiscoSel.fora ? { artista: audDiscoSel.artista, album: audDiscoSel.album } : null;
     fecharAdd();
     if (foiFora) convidarWishlist(foiFora);
+    else if (!audEditandoId && window.HillaPush) setTimeout(() => HillaPush.convidar(), 900);   // convite de notificações, uma vez só
     const [y, m] = data.split('-').map(Number);
     audMes = { y, m: m - 1 };
     await carregarMes(data);
@@ -941,6 +942,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
   <script src="notificacoes.js?v=4"></script>
   <script src="navegacao.js?v=1"></script>
+  <script src="push.js?v=1"></script>
   <script src="autocomplete.js?v=2"></script>
   <script>HillaAuto.ligar({ artista: document.getElementById('audForaArtista'), album: document.getElementById('audForaAlbum') });</script>
   <script src="compartilhar.js?v=14"></script>

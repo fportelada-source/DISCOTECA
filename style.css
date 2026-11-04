@@ -4062,3 +4062,22 @@ a.app-nav-logo::before { content: ""; display: inline-block; width: 26px; height
 .sp-clock i { display: block; height: 22px; border-radius: 4px; }
 @media (max-width: 700px) { .sp-bars.sp-val-longo .sp-col:not(.sel) .sp-val { visibility: hidden; } }
 @media (max-width: 600px) { .sp-abas { gap: 4px; } .sp-aba { flex: 1 1 0; padding: 0 6px; font-size: 13px; min-width: 0; } }
+
+/* ========== Notificações push ========== */
+.push-estado { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; line-height: 1.5; }
+.push-ponto { width: 9px; height: 9px; border-radius: 50%; background: #555; flex-shrink: 0; }
+.push-ponto.on { background: #7E9A6A; box-shadow: 0 0 8px rgba(126, 154, 106, .7); }
+.push-btn { min-height: 40px; padding: 0 16px; border-radius: 20px; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; margin-left: auto; }
+.push-btn.pri { background: var(--terracotta); color: #111; border: 0; }
+.push-btn.sec { background: none; color: var(--paper); border: 1px solid #444; }
+#pushTipos { transition: opacity .2s; }
+.push-convite { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 1150; width: min(420px, calc(100% - 24px)); background: #1f1f1f; color: var(--paper); border: 1px solid #333; border-radius: 18px; padding: 16px; box-shadow: 0 12px 34px rgba(0, 0, 0, .55); }
+@media (max-width: 960px) { .hb-com-barra .push-convite { bottom: calc(86px + env(safe-area-inset-bottom)); } }
+.push-convite b { display: block; font-size: 15px; margin-bottom: 4px; }
+.push-convite p { margin: 0 0 12px; font-size: 13px; color: var(--ink-soft); }
+.push-convite-l { display: flex; gap: 8px; }
+.push-convite-l button { flex: 1; min-height: 42px; border-radius: 21px; font: inherit; font-weight: 700; cursor: pointer; }
+.push-nao { background: none; border: 1px solid #444; color: var(--paper); }
+.push-sim { background: var(--terracotta); border: 0; color: #111; }
+.push-convite-msg { margin: 10px 0 0 !important; }
+.push-convite-msg:empty { display: none; }

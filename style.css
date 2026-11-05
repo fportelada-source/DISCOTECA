@@ -4084,3 +4084,18 @@ a.app-nav-logo::before { content: ""; display: inline-block; width: 26px; height
 .push-erro { flex-basis: 100%; color: #e0634f; font-size: 13px; }
 .push-teste-msg { flex-basis: 100%; font-size: 13px; color: var(--ink-soft); }
 .push-teste-msg:empty { display: none; }
+
+/* Retrospectiva do ano: banner nas Estatísticas */
+.retro-banner { display: flex; align-items: center; gap: 16px; padding: 18px 20px; margin-bottom: 20px; border-radius: 18px; text-decoration: none; color: var(--paper, #F0F0F0);
+  background: radial-gradient(ellipse at 0% 50%, rgba(201,162,76,0.22), rgba(201,162,76,0.04) 60%), #151410; border: 1px solid rgba(201,162,76,0.35); }
+.retro-banner[hidden] { display: none; }
+.retro-banner:hover { border-color: #C9A24C; }
+.retro-banner:focus-visible { outline: 2px solid #C9A24C; outline-offset: 2px; }
+.retro-banner-disco { width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0; background: radial-gradient(circle, #C9A24C 0 9px, #0b0b0b 10px), repeating-radial-gradient(circle, #1d1b16 0 2px, #0b0b0b 2px 4px);
+  animation: retroGira 8s linear infinite; }
+@keyframes retroGira { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .retro-banner-disco { animation: none; } }
+.retro-banner-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.retro-banner-tx small { font-size: 10.5px; letter-spacing: 0.16em; color: #C9A24C; font-weight: 600; }
+.retro-banner-tx b { font-size: 17px; letter-spacing: -0.01em; }
+.retro-banner-tx span { font-size: 12.5px; color: #9a9a9a; }

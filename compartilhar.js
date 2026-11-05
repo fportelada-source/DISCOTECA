@@ -633,6 +633,7 @@
         async preparar() { [this.dados.usuario, this.capas] = await Promise.all([arrobaPerfil(usuarioId), Promise.all(nove.map(d => carregarCapa(d.capa_url, d.artista, d.album)))]); }
       });
     },
-    _desenhar: { desenharAudicao, desenharWishlist }   // usado nos testes
+    _desenhar: { desenharAudicao, desenharWishlist },   // usado nos testes
+    _util: { carregarCapa, logoHilla, espacar, quebrar, cobrir, fontesProntas, contar }   // usado pela retrospectiva
   };
 })();

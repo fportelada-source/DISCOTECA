@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Estatísticas</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=38" />
+  <link rel="stylesheet" href="style.css?v=39" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -95,6 +95,13 @@
             <p style="font-size:13px;">Adicione discos à sua prateleira para ver as estatísticas.</p>
           </div>
         </div>
+
+        <!-- RETROSPECTIVA DO ANO (aparece a partir de 15/12, até o fim de janeiro) -->
+        <a class="retro-banner" id="retroBanner" href="retrospectiva.html" hidden>
+          <span class="retro-banner-disco" aria-hidden="true"></span>
+          <span class="retro-banner-tx"><small>RETROSPECTIVA</small><b id="retroBannerTit">Seu ano em discos</b><span>Horas, artistas, discos e o mês mais forte.</span></span>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
 
         <!-- SEU MÊS (recap mensal) -->
         <section class="st-card rc" id="recap" aria-labelledby="rcTitulo">
@@ -780,6 +787,21 @@ function renderMarcos(estante, avancadas) {
   <script src="compartilhar.js?v=14"></script>
   <script src="estatisticas-painel.js?v=1"></script>
 <script>
+// ===== Retrospectiva do ano: banner de 15/12 a 31/01 =====
+(function () {
+  const h = new Date(), m = h.getMonth() + 1, d = h.getDate();
+  const ano = m === 12 && d >= 15 ? h.getFullYear() : m === 1 ? h.getFullYear() - 1 : null;
+  if (!ano || !localStorage.getItem('discoteca_session_token')) return;
+  const hoje = `${h.getFullYear()}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  apiFetch(`${API_URL}/retrospectiva?ano=${ano}&hoje=${hoje}`).then(r => r.json()).then(r => {
+    if (!r || !r.disponivel) return;
+    const b = document.getElementById('retroBanner');
+    b.href = 'retrospectiva.html?ano=' + ano;
+    document.getElementById('retroBannerTit').textContent = `Sua retrospectiva ${ano} está pronta`;
+    b.hidden = false;
+  }).catch(() => {});
+})();
+
 // ===== Seu mês (recap mensal) =====
 (function () {
   const sel = document.getElementById('rcMes'), corpo = document.getElementById('rcCorpo');

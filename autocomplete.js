@@ -43,10 +43,33 @@
     const k = norm(artista);
     if (!k) return Promise.resolve([]);
     if (!discografias[k]) {
-      discografias[k] = apiFetch(`${API_URL}/sugestoes/discografia?artista=${encodeURIComponent(artista)}`)
+      // 1º o próprio navegador pergunta ao MusicBrainz (o IP do servidor vive barrado);
+      // se falhar, tenta pelo servidor como antes.
+      const peloServidor = () => apiFetch(`${API_URL}/sugestoes/discografia?artista=${encodeURIComponent(artista)}`)
         .then(r => r.ok ? r.json() : { itens: [] }).then(d => d.itens || []).catch(() => []);
+      discografias[k] = discografiaMB(artista).catch(() => null).then(l => l && l.length ? l : peloServidor());
     }
     return discografias[k];
+  }
+  async function discografiaMB(artista) {
+    const MB = 'https://musicbrainz.org/ws/2/';
+    const r = await fetch(MB + 'artist/?fmt=json&limit=3&query=' + encodeURIComponent('artist:"' + artista + '"'));
+    if (!r.ok) throw new Error('mb ' + r.status);
+    const cand = ((await r.json()).artists || []).filter(a => +(a.score || 0) >= 90);
+    if (!cand.length) return [];
+    await new Promise(ok => setTimeout(ok, 1100));   // regra do MusicBrainz: 1 pedido por segundo
+    const g = await fetch(MB + 'release-group?fmt=json&type=album&limit=100&artist=' + cand[0].id);
+    if (!g.ok) throw new Error('mb ' + g.status);
+    const vistos = new Set(), itens = [];
+    for (const rg of (await g.json())['release-groups'] || []) {
+      if (rg['primary-type'] !== 'Album' || (rg['secondary-types'] || []).length) continue;   // só estúdio
+      const t = (rg.title || '').trim(), n = norm(t);
+      if (!t || vistos.has(n)) continue;
+      vistos.add(n);
+      const ano = (rg['first-release-date'] || '').slice(0, 4);
+      itens.push({ album: t, ano: /^\d{4}$/.test(ano) ? +ano : null });
+    }
+    return itens.sort((a, b) => (a.ano || 9999) - (b.ano || 9999));
   }
 
   function ligar(cfg) {

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://fportelada.pythonanywhere.com https://musicbrainz.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
@@ -1679,7 +1679,7 @@ function renderRecomendacoes(dados) {
 
   <script src="notificacoes.js?v=4"></script>
   <script src="navegacao.js?v=1"></script>
-  <script src="autocomplete.js?v=2"></script>
+  <script src="autocomplete.js?v=3"></script>
   <script>HillaAuto.ligar({ artista: document.getElementById('wish-artista'), album: document.getElementById('wish-album') });</script>
   <script src="compartilhar.js?v=14"></script>
 </body>

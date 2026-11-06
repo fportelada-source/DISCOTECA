@@ -4099,3 +4099,26 @@ a.app-nav-logo::before { content: ""; display: inline-block; width: 26px; height
 .retro-banner-tx small { font-size: 10.5px; letter-spacing: 0.16em; color: #C9A24C; font-weight: 600; }
 .retro-banner-tx b { font-size: 17px; letter-spacing: -0.01em; }
 .retro-banner-tx span { font-size: 12.5px; color: #9a9a9a; }
+
+/* Levar tudo (Configurações): modal de exportação */
+.lt-novo { font-size: 10px; color: #C9A24C; border: 1px solid rgba(201,162,76,0.4); border-radius: 8px; padding: 1px 6px; margin-left: 4px; vertical-align: 1px; font-weight: 600; }
+.lt-ov { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.6); display: flex; align-items: flex-end; justify-content: center; }
+.lt-md { width: 100%; max-width: 440px; background: #1c1c1c; border: 1px solid #333; border-bottom: 0; border-radius: 22px 22px 0 0; padding: 22px 18px calc(22px + env(safe-area-inset-bottom)); color: #F0F0F0; }
+@media (min-width: 700px) { .lt-ov { align-items: center; } .lt-md { border-radius: 22px; border-bottom: 1px solid #333; } }
+.lt-md h2 { font-size: 18px; margin: 0 0 4px; }
+.lt-sub { color: #9a9a9a; font-size: 12.5px; margin: 0 0 14px; }
+.lt-op { display: flex; gap: 12px; padding: 13px; border: 1px solid #333; border-radius: 14px; margin-bottom: 10px; align-items: flex-start; cursor: pointer; position: relative; }
+.lt-op input { position: absolute; opacity: 0; pointer-events: none; }
+.lt-op:has(input:checked) { border-color: #C9A24C; background: rgba(201,162,76,0.07); }
+.lt-op:has(input:focus-visible) { outline: 2px solid #C9A24C; outline-offset: 2px; }
+.lt-rd { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; margin-top: 2px; }
+.lt-op input:checked + .lt-rd { border-color: #C9A24C; background: radial-gradient(circle, #C9A24C 0 4px, transparent 5px); }
+.lt-op b { display: block; font-size: 14px; }
+.lt-op small { display: block; font-size: 12px; color: #9a9a9a; margin-top: 2px; }
+.lt-nota { font-size: 12.5px; color: #9a9a9a; margin: 4px 2px 10px; }
+.lt-go { width: 100%; min-height: 46px; border-radius: 23px; border: 0; background: #C9A24C; color: #111; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+.lt-cn { width: 100%; min-height: 44px; border: 0; background: none; color: #9a9a9a; font: inherit; margin-top: 4px; cursor: pointer; }
+.lt-go:focus-visible, .lt-cn:focus-visible { outline: 2px solid #C9A24C; outline-offset: 2px; }
+.lt-bar { height: 8px; border-radius: 4px; background: #2a2a2a; overflow: hidden; margin: 14px 0 10px; }
+.lt-bar i { display: block; height: 100%; width: 0; background: #C9A24C; transition: width .3s; }
+.lt-lst { font-size: 12.5px; color: #9a9a9a; line-height: 1.8; min-height: 40px; }

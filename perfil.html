@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Perfil</title>
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=38" />
+  <link rel="stylesheet" href="style.css?v=39" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -170,11 +170,11 @@
                 <button id="btnExportarCsv">Exportar</button>
               </div>
               <div class="set-action-card">
-                <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div><div class="name">Backup completo</div><div class="desc">Tudo em JSON</div>
-                <button id="btnBackup">Baixar</button>
+                <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div><div class="name">Levar tudo <span class="lt-novo">NOVO</span></div><div class="desc">Prateleira, wishlist, audições e fotos num arquivo .zip</div>
+                <button class="primary" id="btnLevarTudo">Baixar</button>
               </div>
               <div class="set-action-card">
-                <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="name">Restaurar backup</div><div class="desc">A partir de um arquivo .json</div>
+                <div class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="name">Restaurar backup</div><div class="desc">A partir do backup.json (está dentro do .zip do Levar tudo)</div>
                 <div style="position:relative; overflow:hidden; display:inline-block;">
                   <button type="button" id="btnRestaurarBackupLabel">Escolher arquivo</button>
                   <input type="file" id="inputRestaurarBackup" accept=".json,application/json" style="position:absolute; left:0; top:0; opacity:0; width:100%; height:100%; cursor:pointer;">
@@ -804,9 +804,9 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btnExportarCsv').addEventListener('click', function() {
     baixarArquivo(this, '/exportar_colecao', 'hilla_prateleira.csv', 'Prateleira exportada.');
   });
-  document.getElementById('btnBackup').addEventListener('click', function() {
-    const d = new Date(), p2 = n => String(n).padStart(2, '0');
-    baixarArquivo(this, '/backup_dados', `hilla_backup_${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}.json`, 'Backup baixado.');
+  document.getElementById('btnLevarTudo').addEventListener('click', function() {
+    if (window.HillaLevarTudo) HillaLevarTudo.abrir();
+    else mostrarMsg('Não foi possível abrir agora. Recarregue a página e tente de novo.', 'error');
   });
 
   document.getElementById('inputRestaurarBackup').addEventListener('change', function() {
@@ -971,5 +971,6 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="navegacao.js?v=1"></script>
   <script src="push.js?v=2"></script>
   <script src="conquistas.js?v=9"></script>
+  <script src="levar-tudo.js?v=1"></script>
 </body>
 </html>

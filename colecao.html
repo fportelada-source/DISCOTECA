@@ -28,6 +28,7 @@
     .tag-atalho.sugerido { opacity: 1; border-color: var(--terracotta); border-style: dashed; }
     .tag-atalho.on { opacity: 1; background: var(--terracotta); border-color: var(--terracotta); border-style: solid; color: var(--ink); font-weight: 700; }
     .tag-atalho:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
+    .list-view .format-badge.dvd_bluray { color: #8FBF8A; border-color: #8FBF8A; }
   </style>
 </head>
 <body>
@@ -1251,12 +1252,15 @@ function carregarDados() {
         const vinil = [];
         const cd = [];
         const cassete = [];
+        const dvd = [];
         const outros = [];
         colecaoFiltrada.forEach(item => {
           const f = item.formato || '';
-          if (f.includes('LP') || f.includes('EP') || f.includes('Vinil')) vinil.push(item);
-          else if (f.includes('CD')) cd.push(item);
-          else if (f.includes('Cassete') || f.toLowerCase().includes('cassette')) cassete.push(item);
+          const k = classeFormato(item.formato);   // mesma regra dos cards
+          if (k === 'vinil') vinil.push(item);
+          else if (k === 'cd') cd.push(item);
+          else if (k === 'cassete') cassete.push(item);
+          else if (k === 'dvd_bluray') dvd.push(item);
           else outros.push(item);
         });
 
@@ -1264,6 +1268,7 @@ function carregarDados() {
           { nome: 'Vinil', icone: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>', items: vinil, cls: 'vinil' },
           { nome: 'CD', icone: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>', items: cd, cls: 'cd' },
           { nome: 'Cassete', icone: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/></svg>', items: cassete, cls: 'cassete' },
+          { nome: 'DVD/Blu-ray', icone: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>', items: dvd, cls: '' },
           { nome: 'Outros', icone: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>', items: outros, cls: '' }
         ];
 
@@ -1297,18 +1302,16 @@ function carregarDados() {
 
       items.forEach(item => {
         const f = item.formato || '';
-        let formatClass = '';
-        if (f.includes('LP') || f.includes('EP') || f.includes('Vinil')) formatClass = 'vinil';
-        else if (f.includes('CD')) formatClass = 'cd';
-        else if (f.includes('Cassete') || f.toLowerCase().includes('cassette')) formatClass = 'cassete';
-        else formatClass = '';
+        const k = classeFormato(f);
+        const formatClass = k === 'outros' ? '' : k;
+        const rotuloFormato = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD' }[k] || '';
 
         html += `
           <tr data-id="${item.id || ''}">
             <td><strong>${escapeHtml(item.artista) || '?'}</strong></td>
             <td>${escapeHtml(item.album) || '?'}</td>
             <td title="${item.ano_lancamento && item.ano_original && item.ano_original !== item.ano_lancamento ? `Prensagem: ${item.ano_lancamento}` : ''}">${item.ano_original || item.ano_lancamento || '—'}</td>
-            <td><span class="format-badge ${formatClass}">${formatClass ? formatClass.charAt(0).toUpperCase() + formatClass.slice(1) : '—'}</span></td>
+            <td><span class="format-badge ${formatClass}">${rotuloFormato || escapeHtml(f) || '—'}</span></td>
             <td>
               <div class="list-actions">
                 <button class="edit" onclick="editarDisco('${item.id || ''}')" title="Editar"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>

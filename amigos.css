@@ -94,3 +94,8 @@
   .am-o1 { order: 1; } .am-o2 { order: 2; } .am-o3 { order: 3; } .am-o4 { order: 4; }
   .am-foto { max-height: 280px; }
 }
+.am-abas { display: flex; gap: 22px; border-bottom: 1px solid var(--card-line, #282828); margin: -4px 0 8px; }
+.am-abas button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--paper, #F0F0F0); opacity: .55; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 0 10px; margin-bottom: -1px; cursor: pointer; }
+.am-abas button b { font-weight: 800; margin-left: 4px; }
+.am-abas button[aria-selected="true"] { opacity: 1; border-bottom-color: var(--terracotta, #C9A24C); }
+.am-abas button:focus-visible { outline: 2px solid var(--terracotta, #C9A24C); outline-offset: 2px; }

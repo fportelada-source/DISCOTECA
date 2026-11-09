@@ -59,8 +59,9 @@
   // Item completo (página Amigos): com foto da audição e capa
   function itemFeed(i) {
     const [v, o, sub, fmt] = frase(i);
-    const foto = i.tipo === 'audicao' && i.foto ? `<img class="am-foto" src="${esc(API_URL + '/audicoes/foto/' + encodeURIComponent(i.foto) + '.jpg')}" alt="Foto da audição de ${esc(i.album)}" loading="lazy" onerror="this.remove()">` : '';
-    const thumb = !foto && (i.capa_url || i.tipo === 'audicao' || i.tipo === 'compra' || i.tipo === 'prateleira') ? capa(i.capa_url) :
+    const dt = i.alvo ? ` data-dt="${esc(i.alvo)}"` : '';   // dois toques na imagem = curtir
+    const foto = i.tipo === 'audicao' && i.foto ? `<div class="am-dt am-dt-foto"${dt}><img class="am-foto" src="${esc(API_URL + '/audicoes/foto/' + encodeURIComponent(i.foto) + '.jpg')}" alt="Foto da audição de ${esc(i.album)}" loading="lazy" onerror="this.remove()"></div>` : '';
+    const thumb = !foto && (i.capa_url || i.tipo === 'audicao' || i.tipo === 'compra' || i.tipo === 'prateleira') ? `<span class="am-dt"${dt}>${capa(i.capa_url)}</span>` :
       (i.tipo === 'prateleira_lote' && i.capas && i.capas.length ? `<span class="am-pilha">${i.capas.slice(0, 3).map(u => capa(u)).join('')}</span>` : '');
     return `<article class="am-post">
       <a href="${perfil(i.usuario_id)}" class="am-post-av">${avatar({ id: i.usuario_id, nome: i.nome, foto_url: i.foto_usuario }, 40)}</a>
@@ -68,8 +69,63 @@
         <div class="am-post-topo"><div class="am-post-tx"><a href="${perfil(i.usuario_id)}"><b>${esc(i.nome)}</b></a> ${v} <b>${esc(o)}</b>${fmt ? `<span class="am-fmt">${fmt}</span>` : ''}
           ${sub ? `<span class="am-sub">${esc(sub)}</span>` : ''}</div>${thumb}<span class="am-quando">${tempo(i.quando)}</span></div>
         ${foto}
+        ${i.alvo ? `<div class="am-lk-linha" data-alvo="${esc(i.alvo)}">${linhaCurtida(i)}</div>` : ''}
       </div></article>`;
   }
+
+  // ---------- curtir ----------
+  const CORACAO = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+  function linhaCurtida(i) {
+    const n = i.curtidas || 0, quem = i.quem_curtiu || [];
+    const extra = n > quem.length ? ` e mais ${n - quem.length}` : '';
+    const nomes = quem.length ? (quem.length === 1 ? quem[0] : quem.slice(0, -1).join(', ') + (extra ? ', ' + quem[quem.length - 1] : ' e ' + quem[quem.length - 1])) + extra : '';
+    return `<button type="button" class="am-lk${i.curti ? ' on' : ''}" data-curtir aria-pressed="${i.curti ? 'true' : 'false'}" aria-label="${i.curti ? 'Descurtir' : 'Curtir'}">${CORACAO}<span>${n ? n : 'Curtir'}</span></button>${nomes ? `<span class="am-lk-quem">${esc(nomes)}</span>` : ''}`;
+  }
+  async function curtir(linha, quer) {
+    const alvo = linha.dataset.alvo, bt = linha.querySelector('[data-curtir]');
+    const antes = linha.innerHTML;
+    // otimista: muda na hora, confirma com o servidor
+    bt.classList.toggle('on', quer); bt.setAttribute('aria-pressed', quer ? 'true' : 'false');
+    if (quer) { bt.classList.remove('am-pula'); void bt.offsetWidth; bt.classList.add('am-pula'); }
+    try {
+      const r = await api('/amigos/curtir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ alvo, curtir: quer }) });
+      linha.innerHTML = linhaCurtida(r);
+      if (quer) linha.querySelector('[data-curtir]').classList.add('am-pula');
+    } catch (e) {
+      linha.innerHTML = antes;
+      if (window.HillaNav) HillaNav.aviso('Não deu para curtir agora. Tente de novo.');
+    }
+  }
+  function explosao(zona) {
+    const c = document.createElement('span');
+    c.className = 'am-explode'; c.innerHTML = CORACAO.replace('width="17" height="17"', 'width="64" height="64"');
+    zona.appendChild(c); setTimeout(() => c.remove(), 900);
+  }
+  function curtirPorDoisToques(zona) {
+    const linha = document.querySelector(`.am-lk-linha[data-alvo="${CSS.escape(zona.dataset.dt)}"]`);
+    if (!linha) return;
+    explosao(zona);
+    const bt = linha.querySelector('[data-curtir]');
+    if (bt && !bt.classList.contains('on')) curtir(linha, true);   // dois toques só curtem, nunca descurtem
+  }
+  document.addEventListener('click', e => {
+    const bt = e.target.closest('.am-lk-linha [data-curtir]');
+    if (!bt) return;
+    e.preventDefault();
+    const linha = bt.closest('.am-lk-linha');
+    curtir(linha, !bt.classList.contains('on'));
+  });
+  document.addEventListener('dblclick', e => {
+    const z = e.target.closest('[data-dt]'); if (!z) return;
+    e.preventDefault(); curtirPorDoisToques(z);
+  });
+  let ultimoToque = { t: 0, el: null };
+  document.addEventListener('touchend', e => {
+    const z = e.target.closest('[data-dt]'); if (!z) return;
+    const agora = Date.now();
+    if (ultimoToque.el === z && agora - ultimoToque.t < 320) { e.preventDefault(); curtirPorDoisToques(z); ultimoToque = { t: 0, el: null }; }
+    else ultimoToque = { t: agora, el: z };
+  }, { passive: false });
 
   // ---------- botão seguir (com desfazer otimista simples) ----------
   async function seguir(id, quer, botao) {

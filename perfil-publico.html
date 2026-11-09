@@ -10,7 +10,7 @@
   <title>Perfil · Hilla</title>
   <meta name="description" content="Prateleira de discos, wishlist e audições de um colecionador na Hilla." />
   <link href="fonts.css?v=1" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=38" />
+  <link rel="stylesheet" href="style.css?v=39" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b0b0b" />
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=4" />
@@ -20,7 +20,84 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Hilla" />
-  <link rel="stylesheet" href="amigos.css?v=1" />
+  <link rel="stylesheet" href="amigos.css?v=2" />
+  <style>
+    /* Perfil público enxuto (09/11/2026) */
+    .pp-page { max-width: 1180px; padding: 22px 16px 60px; }
+    .p2-topo { display: grid; grid-template-columns: auto 1fr; gap: 14px 16px; align-items: center; }
+    .p2-av { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; font-size: 30px; font-weight: 800; color: #111; background: linear-gradient(135deg, #E8C87A, #9E7A2E); }
+    .p2-av img { width: 100%; height: 100%; object-fit: cover; }
+    .p2-nome { font-size: 24px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 0; }
+    .p2-titulo { font-size: 12.5px; font-weight: 600; color: var(--terracotta); margin-top: 3px; }
+    .p2-meta { font-size: 12.5px; opacity: .6; margin-top: 3px; }
+    .p2-bio { grid-column: 1 / -1; margin: 0; font-size: 14px; line-height: 1.5; opacity: .85; }
+    .p2-id .p2-bio, .p2-id .p2-chips { display: none; }
+    .p2-chips { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+    .p2-chips .p2-chip, .p2-chips a { font-size: 12px; border: 1px solid var(--card-line); border-radius: 12px; padding: 3px 10px; opacity: .8; color: var(--paper); text-decoration: none; }
+    .p2-chips a:hover { opacity: 1; border-color: var(--terracotta); }
+    .p2-seguir { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; margin: 0 !important; }
+    .p2-seguir .am-nums { gap: 14px; }
+    .p2-seguir .am-btn { margin-left: auto; min-height: 40px; padding: 0 22px; font-size: 14px; }
+    .p2-corpo { margin-top: 18px; }
+    .p2-nums { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; }
+    .p2-nums::-webkit-scrollbar { display: none; }
+    .p2-nums div { flex: 1 0 64px; background: var(--card-bg, #1A1A1A); border: 1px solid var(--card-line); border-radius: 12px; padding: 9px 6px; text-align: center; }
+    .p2-nums b { display: block; font-size: 18px; font-weight: 800; }
+    .p2-nums span { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; opacity: .55; }
+    .p2-nums .v b { color: var(--vinil-color); } .p2-nums .c b { color: var(--cd-color); } .p2-nums .f b { color: var(--cassete-color); } .p2-nums .d b { color: #8FBF8A; }
+    .p2-compat-cel { margin-bottom: 20px; }
+    .p2-compat-desk { display: none !important; }
+    .am-perfil-compat { grid-template-columns: 1fr !important; }
+    .p2-sec { margin-bottom: 24px; }
+    .p2-sh { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .p2-sh h2 { font-size: 17px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+    .p2-cont { font-size: 12.5px; color: var(--terracotta); text-decoration: none; }
+    .p2-nota { font-size: 12px; opacity: .5; margin: -4px 0 10px; }
+    .p2-g4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .p2-esq, .p2-dir, .p2-disco { min-width: 0; }
+    .p2-faixa { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x proximity; padding-bottom: 6px; scrollbar-width: thin; }
+    .p2-faixa .p2-disco { flex: 0 0 96px; scroll-snap-align: start; }
+    .p2-cv { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; display: grid; place-items: center; color: rgba(255,255,255,.18); font-size: 26px; }
+    .p2-lb { margin-top: 6px; font-size: 12px; line-height: 1.25; min-width: 0; }
+    .p2-lb b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p2-lb span { display: block; font-size: 11px; opacity: .55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p2-tier { position: absolute; top: 5px; left: 5px; font-size: 10px; font-weight: 800; color: #111; border-radius: 6px; padding: 0 6px; line-height: 16px; }
+    .p2-lista .p2-it { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--card-line); }
+    .p2-lista .p2-it:first-child { border-top: 0; padding-top: 0; }
+    .p2-mini { width: 40px; height: 40px; border-radius: 5px; overflow: hidden; flex-shrink: 0; background: linear-gradient(135deg, #2a2721, #151410); }
+    .p2-mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .p2-tx { flex: 1; min-width: 0; font-size: 13.5px; }
+    .p2-tx b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p2-tx span { display: block; font-size: 12px; opacity: .55; }
+    .p2-q { font-size: 11.5px; opacity: .45; white-space: nowrap; }
+    .p2-dest { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .p2-dest div { background: var(--card-bg, #1A1A1A); border: 1px solid var(--card-line); border-radius: 12px; padding: 10px 12px; min-width: 0; }
+    .p2-dest b { display: block; color: var(--terracotta); font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p2-dest span { font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; opacity: .55; }
+    #ppConquistas h2 { font-size: 17px !important; }
+    #ppConquistas .cq-vitrine { grid-template-columns: 1fr; gap: 14px; margin-top: 10px; }
+    @media (min-width: 900px) {
+      .pp-page { padding: 34px 32px 70px; }
+      .p2-topo { grid-template-columns: auto 1fr auto; gap: 0 26px; padding-bottom: 26px; border-bottom: 1px solid var(--card-line); }
+      .p2-av { width: 104px; height: 104px; font-size: 42px; }
+      .p2-nome { font-size: 32px; }
+      .p2-id .p2-bio, .p2-id .p2-chips { display: flex; }
+      .p2-id .p2-bio { display: block; margin-top: 10px; max-width: 620px; }
+      .p2-id .p2-chips { margin-top: 10px; }
+      .p2-topo > .p2-bio, .p2-topo > .p2-chips { display: none; }
+      .p2-seguir { grid-column: auto; flex-direction: column-reverse; align-items: flex-end; gap: 12px; }
+      .p2-seguir .am-btn { margin-left: 0; min-height: 44px; padding: 0 34px; }
+      .p2-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 36px; margin-top: 28px; }
+      .p2-compat-cel { display: none !important; }
+      .p2-compat-desk { display: grid !important; margin-bottom: 24px; }
+      .p2-compat-desk[hidden] { display: none !important; }
+      .p2-nums b { font-size: 20px; }
+      .p2-faixa { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); overflow: visible; }
+      .p2-faixa .p2-disco:nth-child(n+7) { display: none; }
+      .p2-g4 { gap: 14px; }
+      .p2-cv { border-radius: 8px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -119,6 +196,10 @@ function apiFetch(url, opcoes = {}) {
       s.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>';
       return s;
     };
+    function rotuloData(v) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v || '');
+      return m ? `${m[3]}/${m[2]}` : '';
+    }
     function rotuloDataAudicao(iso, hora) {
       const [y, m, d] = iso.split('-').map(Number);
       const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
@@ -137,21 +218,12 @@ function apiFetch(url, opcoes = {}) {
         const d = await r.json();
         const itens = Array.isArray(d.itens) ? d.itens : [];
         if (!itens.length) return;
-        const cards = itens.map(it => {
+        const linhas = itens.slice(0, 5).map(it => {
           const foto = (it.foto && /^[0-9a-f]{32}$/.test(it.foto)) ? `${API_URL}/audicoes/foto/${it.foto}_t.jpg` : (it.capa_url || null);
-          const img = foto
-            ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml((it.artista || '') + ' — ' + (it.album || ''))}" loading="lazy" onerror="this.replaceWith(ppPlaceholder())">`
-            : `<span class="aud-ph" aria-hidden="true"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span>`;
-          return `<div class="pp-aud-item">
-            <span class="pp-aud-img">${img}</span>
-            <strong>${escapeHtml(it.artista || '')}</strong>
-            <span class="alb">${escapeHtml(it.album || '')}</span>
-            <small>${escapeHtml(rotuloDataAudicao(it.data, it.hora))}</small>
-          </div>`;
+          const img = foto ? `<img src="${escapeHtml(foto)}" alt="" loading="lazy" onerror="this.remove()">` : '';
+          return `<div class="p2-it"><span class="p2-mini">${img}</span><div class="p2-tx"><b>${escapeHtml(it.album || '')}</b><span>${escapeHtml(it.artista || '')}</span></div><span class="p2-q">${escapeHtml(rotuloDataAudicao(it.data, it.hora))}</span></div>`;
         }).join('');
-        box.innerHTML = `<div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Últimas audições</h2><a class="see-all" href="audicoes.html?u=${ppUserId}">Ver todas as audições &rarr;</a></div>
-          <div class="pp-aud-sub">Discos que passaram pela vitrola recentemente.</div>
-          <div class="pp-aud-strip">${cards}</div>`;
+        box.innerHTML = `<div class="p2-sh"><h2>Últimas audições</h2><a class="p2-cont" href="audicoes.html?u=${ppUserId}">ver todas</a></div><div class="p2-lista">${linhas}</div>`;
         box.style.display = 'block';
       } catch (e) { /* módulo é opcional: falhar não pode derrubar o perfil */ }
     }
@@ -278,181 +350,102 @@ function apiFetch(url, opcoes = {}) {
         }
       } catch (e) {}
 
-      let html = `
-        <div class="pp-hero-banner">
-          <div class="pp-hero-inner">
-            <div class="pp-avatar">${avatarHtml}</div>
-            <div class="pp-meta">
-              <div class="pp-name">${nome}${formatosBadge ? `<span class="badge">${formatosBadge}</span>` : ''}</div>${data.titulo ? `<div class="pp-titulo">${escapeHtml(data.titulo)}</div>` : ''}
-              ${data.bio ? `<div class="pp-bio">${escapeHtml(data.bio)}</div>` : ''}
-              <div class="pp-details">
-                ${data.localizacao ? `<span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${escapeHtml(data.localizacao)}</span>` : ''}
-                ${ano ? `<span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> membro desde ${ano}</span>` : ''}
-                <span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg> ${data.total_discos || 0} discos</span>
-              </div>
-              <div class="am-perfil-topo" id="amPerfilTopo" hidden></div>
-              ${(data.spotify_url || data.discogs_url || data.instagram_url) ? `
-                <div class="pp-social-links">
-                  ${linkPerfil(data.spotify_url, 'Spotify')}
-                  ${linkPerfil(data.discogs_url, 'Discogs')}
-                  ${linkPerfil(data.instagram_url, 'Instagram')}
-                </div>
-              ` : ''}
-              ${data.generos_favoritos && data.generos_favoritos.length > 0 ? `
-                <div class="pp-genre-tags">
-                  ${data.generos_favoritos.map((g, i) => `<span class="tag${i < 3 ? ' active' : ''}">${escapeHtml(g)}</span>`).join('')}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        </div>
-      `;
+      // ===== Layout enxuto (09/11/2026): topo compacto, capas pequenas, duas colunas no computador =====
+      const ic = d => `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+      const capaMini = (item, extra) => `<div class="p2-cv" ${montarCoverDiv(item)}>${extra || ''}<span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span></div>`;
+      const disco = (item, extra) => `<div class="p2-disco">${capaMini(item, extra)}<div class="p2-lb"><b>${escapeHtml(item.album) || 'Álbum'}</b><span>${escapeHtml(item.artista) || 'Artista'}</span></div></div>`;
+      const sec = (titulo, corpo, link) => `<section class="p2-sec"><div class="p2-sh"><h2>${titulo}</h2>${link || ''}</div>${corpo}</section>`;
 
       const vinil = (data.colecao_por_formato && data.colecao_por_formato.vinil.length) || 0;
       const cds = (data.colecao_por_formato && data.colecao_por_formato.cd.length) || 0;
       const cassetes = (data.colecao_por_formato && data.colecao_por_formato.cassete.length) || 0;
-      html += `
-        <div class="pp-stats-row">
-          <div class="pp-stat-item"><div class="number">${data.total_discos || 0}</div><div class="label">Discos</div></div>
-          <div class="pp-stat-item"><div class="number">${data.total_artistas || 0}</div><div class="label">Artistas</div></div>
-          <div class="pp-stat-item"><div class="number"><span class="accent">${vinil}</span></div><div class="label">Vinil</div></div>
-          <div class="pp-stat-item"><div class="number"><span class="accent">${cds}</span></div><div class="label">CDs</div></div>
-          <div class="pp-stat-item"><div class="number"><span class="accent">${cassetes}</span></div><div class="label">Cassetes</div></div>
-          <div class="pp-stat-item"><div class="number">${data.total_wishlist || 0}</div><div class="label">Wishlist</div></div>
-        </div>
-      `;
+      const dvds = (data.colecao_por_formato && data.colecao_por_formato.dvd_bluray.length) || 0;
 
-      html += `<div class="am-perfil-compat" id="amPerfilCompat" hidden></div>`;
-      if (data.prateleira_oculta) html += `<div class="pp-empty-note" style="margin:0 0 20px;">A prateleira deste colecionador é privada.</div>`;
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Álbuns favoritos</h2></div>`;
-      if (data.favoritos && data.favoritos.length > 0) {
-        if (data.favoritos_e_provisorio) {
-          html += `<div class="pp-empty-note" style="margin-bottom:10px;">Ninguém foi marcado como favorito ainda — mostrando os mais recentes por enquanto.</div>`;
+      // bio e etiquetas: ao lado do nome no computador, embaixo de tudo no celular (o CSS mostra um ou outro)
+      const bioChips = (data.bio ? `<p class="p2-bio">${escapeHtml(data.bio)}</p>` : '') + `<div class="p2-chips">
+              ${formatosBadge ? `<span class="p2-chip">${formatosBadge}</span>` : ''}
+              ${linkPerfil(data.spotify_url, 'Spotify')}${linkPerfil(data.discogs_url, 'Discogs')}${linkPerfil(data.instagram_url, 'Instagram')}
+              ${(data.generos_favoritos || []).slice(0, 3).map(g => `<span class="p2-chip">${escapeHtml(g)}</span>`).join('')}
+            </div>`;
+      let html = `
+        <header class="p2-topo">
+          <div class="p2-av">${avatarHtml}</div>
+          <div class="p2-id">
+            <h1 class="p2-nome">${nome}</h1>
+            ${data.titulo ? `<div class="p2-titulo">${escapeHtml(data.titulo)}</div>` : ''}
+            <div class="p2-meta">${[data.localizacao ? escapeHtml(data.localizacao) : '', ano ? 'na Hilla desde ' + ano : ''].filter(Boolean).join(' · ')}</div>
+            ${bioChips}
+          </div>
+          ${bioChips}
+          <div class="p2-seguir am-perfil-topo" id="amPerfilTopo" hidden></div>
+        </header>
+        <div class="p2-corpo"><div class="p2-esq">`;
+
+      if (!data.prateleira_oculta) {
+        html += `<div class="p2-nums">
+          <div><b>${data.total_discos || 0}</b><span>Discos</span></div>
+          <div><b>${data.total_artistas || 0}</b><span>Artistas</span></div>
+          ${vinil ? `<div class="v"><b>${vinil}</b><span>Vinil</span></div>` : ''}
+          ${cds ? `<div class="c"><b>${cds}</b><span>CDs</span></div>` : ''}
+          ${cassetes ? `<div class="f"><b>${cassetes}</b><span>Fitas</span></div>` : ''}
+          ${dvds ? `<div class="d"><b>${dvds}</b><span>DVDs</span></div>` : ''}
+          ${data.total_wishlist != null ? `<div><b>${data.total_wishlist}</b><span>Wishlist</span></div>` : ''}
+        </div>`;
+      } else {
+        html += `<div class="pp-empty-note" style="margin:0 0 20px;">A prateleira deste colecionador é privada.</div>`;
+      }
+      // "Vocês dois" vai aqui no celular (no computador, a coluna da direita mostra a mesma caixa)
+      html += `<div class="am-perfil-compat p2-compat-cel" id="amPerfilCompat" hidden></div>`;
+
+      if (!data.prateleira_oculta) {
+        if (data.favoritos && data.favoritos.length) {
+          html += sec('Favoritos', (data.favoritos_e_provisorio ? `<div class="p2-nota">Nenhum favorito marcado ainda. Mostrando os mais recentes.</div>` : '') +
+            `<div class="p2-g4">${data.favoritos.slice(0, 4).map(i => disco(i)).join('')}</div>`);
         }
-        html += `<div class="pp-fav-grid">`;
-        data.favoritos.forEach((item, idx) => {
-          html += `
-            <div class="pp-fav-item">
-              <div class="cover" ${montarCoverDiv(item)}>
-                <span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg></span>
-                <span class="rank">#${idx + 1}</span>
-              </div>
-              <div class="info"><div class="title">${escapeHtml(item.album) || 'Álbum'}</div><div class="artist">${escapeHtml(item.artista) || 'Artista'}</div></div>
-            </div>
-          `;
-        });
-        html += `</div>`;
-      } else {
-        html += `<div class="pp-empty-note">Este colecionador ainda não tem discos.</div>`;
+        if (data.recentes && data.recentes.length) {
+          html += sec('Adicionados recentemente', `<div class="p2-faixa">${data.recentes.slice(0, 12).map(i => disco(i)).join('')}</div>`);
+        }
       }
-      html += `</div>`;
+      if (data.wishlist && data.wishlist.length) {
+        const n = data.total_wishlist || data.wishlist.length;
+        html += sec('Wishlist', `<div class="p2-faixa">${data.wishlist.slice(0, 18).map(i => disco(i, `<span class="p2-tier" style="background:${CORES_TIER[i.tier] || 'var(--c-color)'}">${escapeHtml(i.tier || '')}</span>`)).join('')}</div>`,
+          `<span class="p2-cont">${n} ${n === 1 ? 'disco' : 'discos'}</span>`);
+      }
+      html += `</div><aside class="p2-dir">`;
+      html += `<div class="am-perfil-compat p2-compat-desk" id="amPerfilCompatDesk" hidden></div>`;
+      html += `<section class="p2-sec" id="ppConquistas" style="display:none;"></section>`;
+      html += `<section class="p2-sec" id="ppAudicoes" style="display:none;"></section>`;
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Adicionados recentemente</h2></div>`;
-      if (data.recentes && data.recentes.length > 0) {
-        html += `<div class="pp-recent-scroll">`;
-        data.recentes.forEach(item => {
-          html += `
-            <div class="pp-recent-item">
-              <div class="cover" ${montarCoverDiv(item)}><span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span></div>
-              <div class="info">
-                <div class="title">${escapeHtml(item.album) || 'Álbum'}</div>
-                <div class="artist">${escapeHtml(item.artista) || 'Artista'}</div>
-                <div class="date">adicionado em ${item.data_adicao || '—'}</div>
-              </div>
-            </div>
-          `;
-        });
-        html += `</div>`;
-      } else {
-        html += `<div class="pp-empty-note">Nenhuma adição ainda.</div>`;
-      }
-      html += `</div>`;
-
-      html += `<div class="pp-section" id="ppConquistas" style="display:none;"></div>`;   // 5 últimas conquistas (conquistas.js)
-      html += `<div class="pp-section" id="ppAudicoes" style="display:none;"></div>`;
-
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Wishlist atual</h2></div>`;
-      if (data.wishlist && data.wishlist.length > 0) {
-        ppWishlistCompleta = data.wishlist;
-        ppWishlistPagina = 0;
-        html += `<div class="pp-wishlist-wrap">
-          <button type="button" id="ppWishlistAnterior" class="pp-wishlist-arrow" onclick="mudarPaginaWishlist(-1)" aria-label="Página anterior"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div class="pp-wishlist-grid" id="ppWishlistGrid"></div>
-          <button type="button" id="ppWishlistProximo" class="pp-wishlist-arrow" onclick="mudarPaginaWishlist(1)" aria-label="Próxima página"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg></button>
-        </div>
-        <div class="pp-wishlist-contador" id="ppWishlistContador"></div>`;
-      } else {
-        ppWishlistCompleta = [];
-        html += `<div class="pp-empty-note">Sem itens na wishlist no momento.</div>`;
-      }
-      html += `</div>`;
-
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Destaques da prateleira</h2></div><div class="pp-highlights-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">`;
-      if (data.genero_predominante) {
-        html += `<div class="pp-highlight-card"><div class="value">${data.genero_predominante_pct}%</div><div class="label">${escapeHtml(data.genero_predominante)}</div><div class="sub">gênero predominante</div></div>`;
-      }
-      if (data.decada_favorita) {
-        html += `<div class="pp-highlight-card"><div class="value">${data.decada_favorita.nome}</div><div class="label">década favorita</div><div class="sub">${data.decada_favorita.contagem} discos</div></div>`;
-      }
-      // Formato favorito: calculado dos grupos que o perfil já recebe (Vinil = LP/2xLP/EP...)
+      // Destaques
+      const dest = [];
+      if (data.genero_predominante) dest.push([`${data.genero_predominante_pct}% ${escapeHtml(data.genero_predominante)}`, 'Gênero']);
+      if (data.decada_favorita) dest.push([data.decada_favorita.nome, `Década · ${data.decada_favorita.contagem}`]);
+      if (data.banda_mais_presente) dest.push([escapeHtml(data.banda_mais_presente), 'Artista mais presente']);
       const _nomesFmt = { vinil: 'Vinil', cd: 'CD', cassete: 'Cassete', dvd_bluray: 'DVD/Blu-ray' };
       const _porFmt = data.colecao_por_formato || {};
       const _contFmt = Object.keys(_nomesFmt).map(k => [k, (_porFmt[k] || []).length]).filter(x => x[1] > 0);
       const _totFmt = _contFmt.reduce((s, x) => s + x[1], 0);
-      if (_totFmt) {
-        const [kFmt, nFmt] = _contFmt.reduce((a, b) => (b[1] > a[1] ? b : a));
-        html += `<div class="pp-highlight-card"><div class="value">${Math.round(nFmt / _totFmt * 100)}%</div><div class="label">${_nomesFmt[kFmt]}</div><div class="sub">formato favorito</div></div>`;
-      }
-      if (data.valor_total) {
-        html += `<div class="pp-highlight-card"><div class="value">R$ ${data.valor_total}</div><div class="label">valor da prateleira</div><div class="sub">estimado</div></div>`;
-      }
-      html += `</div></div>`;
+      if (_totFmt) { const [kFmt, nFmt] = _contFmt.reduce((a, b) => (b[1] > a[1] ? b : a)); dest.push([`${Math.round(nFmt / _totFmt * 100)}% ${_nomesFmt[kFmt]}`, 'Formato']); }
+      if (data.valor_total) dest.push([`R$ ${data.valor_total}`, 'Valor da prateleira']);
+      if (dest.length) html += sec('Destaques', `<div class="p2-dest">${dest.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div>`);
 
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Linha do tempo</h2></div><div class="pp-timeline">`;
-      if (data.recentes && data.recentes.length > 0) {
-        data.recentes.slice(0, 5).forEach(item => {
-          html += `<div class="pp-timeline-item"><span class="icon">+</span><span class="text"><strong>${escapeHtml(item.album) || 'Álbum'}</strong> — ${escapeHtml(item.artista) || 'Artista'} adicionado à prateleira</span><span class="time">${item.data_adicao || ''}</span></div>`;
-        });
-      } else {
-        html += `<div class="pp-empty-note">Nenhuma atividade ainda.</div>`;
+      // Linha do tempo
+      if (data.recentes && data.recentes.length) {
+        html += sec('Linha do tempo', `<div class="p2-lista">${data.recentes.slice(0, 5).map(i => `<div class="p2-it"><div class="p2-tx"><b>${escapeHtml(i.album) || 'Álbum'} · ${escapeHtml(i.artista) || 'Artista'}</b><span>entrou na prateleira</span></div><span class="p2-q">${escapeHtml(rotuloData(i.data_adicao))}</span></div>`).join('')}</div>`);
       }
-      html += `</div></div>`;
-
-      html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Prévia da estante</h2></div>`;
-      const todosDiscos = data.colecao_por_formato
-        ? [...data.colecao_por_formato.vinil, ...data.colecao_por_formato.cd, ...data.colecao_por_formato.cassete, ...data.colecao_por_formato.dvd_bluray]
-        : [];
-      if (todosDiscos.length > 0) {
-        html += `<div class="pp-shelf-grid">`;
-        todosDiscos.slice(0, 24).forEach(item => {
-          html += `<div class="pp-shelf-item" title="${escapeHtml(item.artista) || 'Artista'} — ${escapeHtml(item.album) || 'Álbum'}" ${montarCoverDiv(item)}><span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 22 12 12 22 2 12"/></svg></span></div>`;
-        });
-        html += `</div>`;
-      } else {
-        html += `<div class="pp-empty-note">Prateleira vazia.</div>`;
-      }
-      html += `</div>`;
-
-      html += `
-        <div class="pp-section">
-          <div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Gostos em comum</h2></div>
-          <div class="pp-shared-taste">
-            <div class="circle">—</div>
-            <div class="info">
-              <div class="label">compatibilidade com</div>
-              <div class="name">Em breve — comparação entre colecionadores</div>
-              <div class="tags"><span>Chega quando a Hilla tiver mais de um usuário ativo</span></div>
-            </div>
-          </div>
-        </div>
-      `;
+      html += `</aside></div>`;
 
       container.innerHTML = html;
       if (window.DiscotecaConquistas) { DiscotecaConquistas.estilo(); DiscotecaConquistas.renderPublico(document.getElementById('ppConquistas'), data.conquistas_vitrine); }
       carregarAudicoesPublicas();
       renderWishlistPagina();
       configurarLazyLoadCapas();
-      if (window.HillaAmigos) HillaAmigos.blocoPerfil(document.getElementById('amPerfilTopo'), document.getElementById('amPerfilCompat'), ppUserId);
+      if (window.HillaAmigos) {
+        const cel = document.getElementById('amPerfilCompat'), desk = document.getElementById('amPerfilCompatDesk');
+        HillaAmigos.blocoPerfil(document.getElementById('amPerfilTopo'), cel, ppUserId);
+        // a mesma caixa aparece na coluna da direita no computador
+        new MutationObserver(() => { desk.innerHTML = cel.innerHTML; desk.hidden = cel.hidden; }).observe(cel, { childList: true, attributes: true, attributeFilter: ['hidden'] });
+      }
     }
 
     document.addEventListener('DOMContentLoaded', carregarPerfil);
@@ -464,7 +457,7 @@ function apiFetch(url, opcoes = {}) {
       });
     }
   </script>
-  <script src="amigos.js?v=1"></script>
+  <script src="amigos.js?v=2"></script>
   <script src="conquistas.js?v=9"></script>
 </body>
 </html>

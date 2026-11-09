@@ -99,3 +99,21 @@
 .am-abas button b { font-weight: 800; margin-left: 4px; }
 .am-abas button[aria-selected="true"] { opacity: 1; border-bottom-color: var(--terracotta, #C9A24C); }
 .am-abas button:focus-visible { outline: 2px solid var(--terracotta, #C9A24C); outline-offset: 2px; }
+
+/* curtir */
+.am-lk-linha { display: flex; align-items: center; gap: 10px; margin-top: 10px; min-height: 36px; }
+.am-lk { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 13px 0 10px; border-radius: 17px; border: 1px solid var(--card-line, #333); background: none; color: var(--paper, #F0F0F0); opacity: .75; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.am-lk:hover { opacity: 1; }
+.am-lk.on { opacity: 1; color: var(--terracotta, #C9A24C); border-color: rgba(201,162,76,.45); background: rgba(201,162,76,.10); }
+.am-lk.on svg { fill: currentColor; }
+.am-lk:focus-visible { outline: 2px solid var(--terracotta, #C9A24C); outline-offset: 2px; }
+.am-lk.am-pula svg { animation: amPula .4s cubic-bezier(.2,.8,.2,1.4); }
+@keyframes amPula { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+.am-lk-quem { font-size: 12.5px; opacity: .55; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.am-dt { position: relative; display: block; touch-action: manipulation; -webkit-user-select: none; user-select: none; cursor: pointer; }
+.am-dt-foto { max-width: 520px; }
+.am-explode { position: absolute; left: 50%; top: 50%; color: var(--terracotta, #C9A24C); pointer-events: none; transform: translate(-50%, -50%) scale(0); filter: drop-shadow(0 4px 14px rgba(0,0,0,.5)); animation: amExplode .85s cubic-bezier(.2,.8,.2,1) forwards; z-index: 2; }
+.am-explode svg { fill: currentColor; stroke: none; display: block; }
+.am-capa + .am-explode, .am-dt:not(.am-dt-foto) .am-explode svg { width: 30px; height: 30px; }
+@keyframes amExplode { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 25% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 45% { transform: translate(-50%, -50%) scale(.95); } 75% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -60%) scale(1); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .am-lk.am-pula svg, .am-explode { animation-duration: .01s; } }

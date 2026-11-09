@@ -30,6 +30,7 @@
     .tag-atalho:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
     .list-view .format-badge.dvd_bluray { color: #8FBF8A; border-color: #8FBF8A; }
   </style>
+  <link rel="stylesheet" href="amigos.css?v=1" />
 </head>
 <body>
 
@@ -193,6 +194,7 @@
           <button type="button" class="close-btn" id="btnFecharModal"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
       </div>
+      <div class="am-quem" id="amigosQuemTem" hidden></div>
       <form id="form-adicionar">
         <input type="hidden" id="campo-id" value="">
         <input type="hidden" id="campo-favorito" value="0">
@@ -1610,7 +1612,9 @@ function carregarDados() {
         document.getElementById('btnRemoverDisco').style.display = 'block';
         document.getElementById('btnOuviAgora').style.display = 'inline-flex';
         mostrarDetalhesDisco(true);
+        if (window.HillaAmigos && disco) HillaAmigos.quemTem(document.getElementById('amigosQuemTem'), disco.artista, disco.album);
       } else {
+        const qt = document.getElementById('amigosQuemTem'); if (qt) { qt.hidden = true; qt.innerHTML = ''; }
         document.getElementById('modalTitle').textContent = 'Adicionar Disco';
         document.getElementById('modalSub').textContent = 'Novo disco';
         document.getElementById('modalCoverPreview').innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -1965,9 +1969,10 @@ function carregarDados() {
       });
     }
   </script>
-  <script src="notificacoes.js?v=4"></script>
-  <script src="navegacao.js?v=1"></script>
+  <script src="notificacoes.js?v=5"></script>
+  <script src="navegacao.js?v=2"></script>
   <script src="autocomplete.js?v=3"></script>
+  <script src="amigos.js?v=1"></script>
   <script>
     HillaAuto.ligar({
       artista: document.getElementById('campo-artista'),

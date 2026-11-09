@@ -151,6 +151,7 @@
               <div class="set-toggle-item"><div class="left"><div class="title">Seu mês</div><div class="sub">No último dia do mês</div></div><button class="set-toggle" data-push="push_recap" aria-label="Seu mês no celular"><div class="dot"></div></button></div>
               <div class="set-toggle-item"><div class="left"><div class="title">Lançamentos</div><div class="sub">Disco novo de artista favorito na sua prateleira</div></div><button class="set-toggle" data-push="push_lancamentos" aria-label="Lançamentos no celular"><div class="dot"></div></button></div>
               <div class="set-toggle-item"><div class="left"><div class="title">Conquistas</div><div class="sub">Quando você desbloqueia uma</div></div><button class="set-toggle" data-push="push_conquistas" aria-label="Conquistas no celular"><div class="dot"></div></button></div>
+              <div class="set-toggle-item"><div class="left"><div class="title">Amigos</div><div class="sub">Novo seguidor e disco da sua wishlist na prateleira de quem você segue</div></div><button class="set-toggle" data-push="push_amigos" aria-label="Amigos no celular"><div class="dot"></div></button></div>
               <div class="set-toggle-item"><div class="left"><div class="title">Aniversário na prateleira</div><div class="sub">Faz 1 ano que um disco chegou</div></div><button class="set-toggle" data-push="push_aniversario" aria-label="Aniversário na prateleira no celular"><div class="dot"></div></button></div>
               <div class="set-toggle-item"><div class="left"><div class="title">Lembranças</div><div class="sub">O que você ouviu neste dia, anos atrás</div></div><button class="set-toggle" data-push="push_lembrancas" aria-label="Lembranças no celular"><div class="dot"></div></button></div>
               <div class="set-toggle-item"><div class="left"><div class="title">Faz tempo</div><div class="sub">Disco parado há muito tempo</div></div><button class="set-toggle" data-push="push_faz_tempo" aria-label="Faz tempo no celular"><div class="dot"></div></button></div>
@@ -190,6 +191,9 @@
             <div class="set-toggle-item"><div class="left"><div class="title">Perfil público</div><div class="sub">Visível pra qualquer pessoa com o link</div></div><button class="set-toggle" data-campo="privacidade_perfil_publico"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar valor da prateleira</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_valor"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar wishlist</div><div class="sub">No perfil público</div></div><button class="set-toggle" data-campo="privacidade_wishlist"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Mostrar prateleira</div><div class="sub">No perfil público e para quem segue você</div></div><button class="set-toggle" data-campo="privacidade_prateleira" aria-label="Mostrar prateleira"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Mostrar minhas audições</div><div class="sub">Para quem segue você, no Início e na página Amigos</div></div><button class="set-toggle" data-campo="privacidade_feed_audicoes" aria-label="Mostrar minhas audições"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Mostrar minhas compras</div><div class="sub">Discos novos na prateleira, para quem segue você</div></div><button class="set-toggle" data-campo="privacidade_feed_compras" aria-label="Mostrar minhas compras"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Aparecer no Google</div><div class="sub">Seu perfil público pode aparecer nas buscas, com seu nome e seus discos</div></div><button class="set-toggle" data-campo="privacidade_busca"><div class="dot"></div></button></div>
           </div>
 
@@ -543,7 +547,8 @@ function preencherPagina(data) {
   selecionarOpcao('optVisualizacao', data.visualizacao_padrao || 'cards');
 
   ['notif_price_drop', 'notif_wishlist', 'notif_novidades', 'notif_discografia', 'notif_email',
-   'privacidade_perfil_publico', 'privacidade_busca', 'privacidade_valor', 'privacidade_wishlist'].forEach(campo => {
+   'privacidade_perfil_publico', 'privacidade_busca', 'privacidade_valor', 'privacidade_wishlist',
+   'privacidade_prateleira', 'privacidade_feed_audicoes', 'privacidade_feed_compras'].forEach(campo => {
     const btn = document.querySelector(`.set-toggle[data-campo="${campo}"]`);
     if (btn) btn.classList.toggle('active', !!data[campo]);
   });
@@ -594,6 +599,9 @@ function coletarConfiguracoes() {
     privacidade_busca: pegarToggle('privacidade_busca') && pegarToggle('privacidade_perfil_publico'),   // só vale com o perfil público
     privacidade_valor: pegarToggle('privacidade_valor'),
     privacidade_wishlist: pegarToggle('privacidade_wishlist'),
+    privacidade_prateleira: pegarToggle('privacidade_prateleira'),
+    privacidade_feed_audicoes: pegarToggle('privacidade_feed_audicoes'),
+    privacidade_feed_compras: pegarToggle('privacidade_feed_compras'),
     tema: 'dark',
     idioma: 'pt-BR'
   };
@@ -967,8 +975,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="onboarding.js?v=2"></script>
-  <script src="notificacoes.js?v=4"></script>
-  <script src="navegacao.js?v=1"></script>
+  <script src="notificacoes.js?v=5"></script>
+  <script src="navegacao.js?v=2"></script>
   <script src="push.js?v=2"></script>
   <script src="conquistas.js?v=9"></script>
   <script src="levar-tudo.js?v=1"></script>

@@ -20,6 +20,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Hilla" />
+  <link rel="stylesheet" href="amigos.css?v=1" />
 </head>
 <body>
 
@@ -289,6 +290,7 @@ function apiFetch(url, opcoes = {}) {
                 ${ano ? `<span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> membro desde ${ano}</span>` : ''}
                 <span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg> ${data.total_discos || 0} discos</span>
               </div>
+              <div class="am-perfil-topo" id="amPerfilTopo" hidden></div>
               ${(data.spotify_url || data.discogs_url || data.instagram_url) ? `
                 <div class="pp-social-links">
                   ${linkPerfil(data.spotify_url, 'Spotify')}
@@ -320,6 +322,8 @@ function apiFetch(url, opcoes = {}) {
         </div>
       `;
 
+      html += `<div class="am-perfil-compat" id="amPerfilCompat" hidden></div>`;
+      if (data.prateleira_oculta) html += `<div class="pp-empty-note" style="margin:0 0 20px;">A prateleira deste colecionador é privada.</div>`;
       html += `<div class="pp-section"><div class="pp-section-header"><h2><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Álbuns favoritos</h2></div>`;
       if (data.favoritos && data.favoritos.length > 0) {
         if (data.favoritos_e_provisorio) {
@@ -448,6 +452,7 @@ function apiFetch(url, opcoes = {}) {
       carregarAudicoesPublicas();
       renderWishlistPagina();
       configurarLazyLoadCapas();
+      if (window.HillaAmigos) HillaAmigos.blocoPerfil(document.getElementById('amPerfilTopo'), document.getElementById('amPerfilCompat'), ppUserId);
     }
 
     document.addEventListener('DOMContentLoaded', carregarPerfil);
@@ -459,6 +464,7 @@ function apiFetch(url, opcoes = {}) {
       });
     }
   </script>
+  <script src="amigos.js?v=1"></script>
   <script src="conquistas.js?v=9"></script>
 </body>
 </html>

@@ -27,6 +27,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Hilla" />
   <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Hilla", "url": "https://hilla.com.br/", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web, Android, iOS", "inLanguage": "pt-BR", "description": "App grátis para catalogar sua coleção de discos de vinil, CDs e fitas, montar wishlist e registrar audições.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "BRL"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "A Hilla é grátis?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Para catalogar seus discos, montar a wishlist e registrar audições, basta entrar com sua conta Google."}}, {"@type": "Question", "name": "Como catalogar meus discos de vinil e CDs?", "acceptedAnswer": {"@type": "Answer", "text": "Adicione cada disco pelo nome, pelo código de barras ou importando uma planilha. A Hilla completa sozinha a capa, o ano e o gênero, e você marca o formato e a condição."}}, {"@type": "Question", "name": "Como a Hilla sabe quais discos recomendar?", "acceptedAnswer": {"@type": "Answer", "text": "Ela olha o que você ouve no Spotify e o que já tem na prateleira, e sugere os álbuns que faltam, dizendo o porquê de cada um."}}, {"@type": "Question", "name": "Serve para quem está começando uma coleção?", "acceptedAnswer": {"@type": "Answer", "text": "Serve. A wishlist ajuda a decidir a primeira compra e as próximas, e a prateleira cresce junto com você."}}, {"@type": "Question", "name": "Posso mostrar minha coleção para outras pessoas?", "acceptedAnswer": {"@type": "Answer", "text": "Pode. Cada colecionador tem um perfil público opcional, com a prateleira, a wishlist e as últimas audições, que dá para compartilhar por link."}}]}]}</script>
+  <link rel="stylesheet" href="amigos.css?v=1" />
 </head>
 <body>
 
@@ -800,6 +801,7 @@ function renderDashboard(colecao, wishlist, stats, perfil) {
     </section>`;
 
   document.getElementById('dashContent').innerHTML = html;
+  if (window.HillaAmigos) { HillaAmigos.blocoHome(document.getElementById('dashContent')); setTimeout(HillaAmigos.verificarAviso, 900); }
   carregarCapasFaltantesDashboard();
   iniciarDeck();
   if (window.DiscotecaNotificacoes) DiscotecaNotificacoes.preencherNesteDia();
@@ -919,7 +921,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script src="onboarding.js?v=2" data-auto="1"></script>
-  <script src="notificacoes.js?v=4"></script>
-  <script src="navegacao.js?v=1"></script>
+  <script src="amigos.js?v=1"></script>
+  <script src="notificacoes.js?v=5"></script>
+  <script src="navegacao.js?v=2"></script>
 </body>
 </html>

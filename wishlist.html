@@ -36,6 +36,7 @@
     .art-fallback[data-sem-capa]::after { content: "capa não encontrada"; display: block; margin-top: 8px; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
     .alem-lista .art-fallback[data-sem-capa]::after { display: none; }
   </style>
+  <link rel="stylesheet" href="amigos.css?v=1" />
 </head>
 <body>
 
@@ -127,6 +128,7 @@
         </div>
 
         <!-- ===== WISHLIST GRID ===== -->
+        <div id="amigosAlerta" hidden></div>
         <div id="compras-container"></div>
 
         <!-- ALÉM DO STREAMING (antes "Descobertas" / Adjacent Discovery — nomes internos de função continuam usando "descoberta" por trás, só o texto visível mudou) -->
@@ -1677,9 +1679,11 @@ function renderRecomendacoes(dados) {
     </div>
   </div>
 
-  <script src="notificacoes.js?v=4"></script>
-  <script src="navegacao.js?v=1"></script>
+  <script src="notificacoes.js?v=5"></script>
+  <script src="navegacao.js?v=2"></script>
   <script src="autocomplete.js?v=3"></script>
+  <script src="amigos.js?v=1"></script>
+  <script>if (window.HillaAmigos) HillaAmigos.alertaWishlist(document.getElementById('amigosAlerta'));</script>
   <script>HillaAuto.ligar({ artista: document.getElementById('wish-artista'), album: document.getElementById('wish-album') });</script>
   <script src="compartilhar.js?v=14"></script>
 </body>

@@ -76,6 +76,35 @@
     .p2-dest span { font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; opacity: .55; }
     #ppConquistas h2 { font-size: 17px !important; }
     #ppConquistas .cq-vitrine { grid-template-columns: 1fr; gap: 14px; margin-top: 10px; }
+    #ppConquistas .cq-vitrine-topo { align-items: baseline; }
+    #ppConquistas .cq-vitrine-resumo { font-size: 12px; }
+    #ppConquistas .cq-destaque { gap: 16px; }
+    #ppConquistas .cq-destaque .cq-selo { width: 112px; }
+    @media (min-width: 900px) {
+      /* na coluna da direita: selos em 3 colunas alinhadas à largura, sem deslocar para a direita */
+      #ppConquistas .cq-outras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-content: stretch; max-width: none; gap: 10px; }
+      #ppConquistas .cq-outras .cq-selo { width: auto; flex: none; }
+    }
+    /* wishlist: faixa que desliza no celular (até 18), grade de 6 no computador */
+    .p2-wl { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x proximity; padding-bottom: 6px; scrollbar-width: thin; }
+    .p2-wl .p2-disco { flex: 0 0 96px; scroll-snap-align: start; }
+    .p2-wl .p2-disco:nth-child(n+19) { display: none; }
+    .p2-wl .p2-disco[hidden] { display: none !important; }
+    .p2-mais { display: block; width: 100%; margin-top: 14px; min-height: 44px; border-radius: 12px; border: 1px dashed var(--card-line); background: none; color: var(--terracotta); font: inherit; font-weight: 600; font-size: 13.5px; cursor: pointer; }
+    .p2-mais[hidden] { display: none; }
+    .p2-mais:hover { border-color: var(--terracotta); }
+    .p2-mais:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
+    /* conquistas no celular: sem o cartão grande; o destaque vira o 1º selo de uma faixa só */
+    @media (max-width: 899px) {
+      #ppConquistas .cq-vitrine { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-top: 10px; scrollbar-width: thin; }
+      #ppConquistas .cq-destaque, #ppConquistas .cq-outras { display: contents; }
+      #ppConquistas .cq-destaque-texto { display: none; }
+      #ppConquistas .cq-selo, #ppConquistas .cq-destaque .cq-selo, #ppConquistas .cq-outras .cq-selo { flex: 0 0 96px; width: 96px; padding: 8px 6px; }
+      #ppConquistas .cq-selo .cq-meta { display: none; }
+      #ppConquistas .cq-selo .cq-rotulo { font-size: 9px; margin-top: 6px; }
+      #ppConquistas .cq-vitrine-resumo { font-size: 11.5px; }
+    }
+    #ppConquistas .cq-selo { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
     @media (min-width: 900px) {
       .pp-page { padding: 34px 32px 70px; }
       .p2-topo { grid-template-columns: auto 1fr auto; gap: 0 26px; padding-bottom: 26px; border-bottom: 1px solid var(--card-line); }
@@ -87,13 +116,15 @@
       .p2-topo > .p2-bio, .p2-topo > .p2-chips { display: none; }
       .p2-seguir { grid-column: auto; flex-direction: column-reverse; align-items: flex-end; gap: 12px; }
       .p2-seguir .am-btn { margin-left: 0; min-height: 44px; padding: 0 34px; }
-      .p2-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 36px; margin-top: 28px; }
+      .p2-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 36px; margin-top: 28px; align-items: start; }
       .p2-compat-cel { display: none !important; }
       .p2-compat-desk { display: grid !important; margin-bottom: 24px; }
       .p2-compat-desk[hidden] { display: none !important; }
       .p2-nums b { font-size: 20px; }
       .p2-faixa { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); overflow: visible; }
       .p2-faixa .p2-disco:nth-child(n+7) { display: none; }
+      .p2-wl { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); overflow: visible; }
+      .p2-wl .p2-disco:nth-child(n+19) { display: block; }
       .p2-g4 { gap: 14px; }
       .p2-cv { border-radius: 8px; }
     }
@@ -209,6 +240,64 @@ function apiFetch(url, opcoes = {}) {
       const base = diff === 0 ? 'Hoje' : diff === 1 ? 'Ontem' : `${d} ${meses[m - 1]}`;
       return hora && diff <= 1 ? `${base} · ${hora}` : base;
     }
+    // ================================================================
+    // COLUNAS DO COMPUTADOR: as duas terminam juntas.
+    // Wishlist grande: cresce em linhas completas de 6 até a altura da direita; o resto no "Ver todos".
+    // Wishlist pequena: Destaques e/ou Linha do tempo descem para a esquerda, o que equilibrar melhor.
+    // ================================================================
+    let wlExpandida = false;
+    function equilibrarColunas() {
+      const esq = document.querySelector('.p2-esq'), dir = document.querySelector('.p2-dir');
+      if (!esq || !dir) return;
+      const wl = document.getElementById('ppWl'), mais = document.getElementById('ppWlMais');
+      const blocos = ['ppDest', 'ppLinha'].map(id => document.getElementById(id)).filter(Boolean);
+      // volta tudo para o lugar de origem
+      blocos.forEach(b => dir.appendChild(b));
+      const itens = wl ? [...wl.children] : [];
+      itens.forEach(i => { i.hidden = false; });
+      if (mais) mais.hidden = true;
+      if (window.innerWidth < 900) return;   // celular: uma coluna só, a faixa da wishlist mostra 18 (CSS)
+      const alt = el => el.getBoundingClientRect().height;
+      const POR_LINHA = 6;
+      if (wl && itens.length && !wlExpandida) {
+        const linhaH = alt(itens[0]) + 10;
+        const semWl = alt(esq) - alt(wl);
+        const total = Math.ceil(itens.length / POR_LINHA);
+        if (semWl + total * linhaH > alt(dir)) {   // não cabe tudo: corta em linhas completas
+          if (mais) mais.hidden = false;
+          const semWlComBotao = alt(esq) - alt(wl);
+          // o número de linhas que deixa as duas colunas mais perto da mesma altura
+          const linhas = Math.min(total - 1, Math.max(1, Math.round((alt(dir) - semWlComBotao + 10) / linhaH)));
+          if (mais) mais.hidden = true;
+          if (linhas < total) {
+            itens.forEach((i, k) => { i.hidden = k >= linhas * POR_LINHA; });
+            if (mais) mais.hidden = false;
+            return;
+          }
+        }
+      }
+      // wishlist pequena (ou já aberta): testa descer Linha do tempo, Destaques ou os dois
+      const combos = [[], ...blocos.map(b => [b]).reverse(), blocos.length > 1 ? blocos : null].filter(Boolean);
+      let melhor = null, menor = Infinity;
+      combos.forEach(c => {
+        blocos.forEach(b => dir.appendChild(b));
+        c.forEach(b => esq.appendChild(b));
+        const d = Math.abs(alt(esq) - alt(dir));
+        if (d < menor - 1) { menor = d; melhor = c; }
+      });
+      blocos.forEach(b => dir.appendChild(b));
+      (melhor || []).forEach(b => esq.appendChild(b));
+    }
+    let _redim = null;
+    const reequilibrar = () => { clearTimeout(_redim); _redim = setTimeout(equilibrarColunas, 150); };
+    window.addEventListener('resize', reequilibrar);
+    // a coluna da direita termina de carregar depois (Vocês dois, audições): refaz a conta quando ela muda de tamanho
+    let _altDir = 0;
+    const _obsDir = 'ResizeObserver' in window ? new ResizeObserver(en => {
+      const h = Math.round(en[0].contentRect.height);
+      if (Math.abs(h - _altDir) > 4) { _altDir = h; reequilibrar(); }
+    }) : null;
+
     async function carregarAudicoesPublicas() {
       const box = document.getElementById('ppAudicoes');
       if (!box || !ppUserId) return;
@@ -355,6 +444,7 @@ function apiFetch(url, opcoes = {}) {
       const capaMini = (item, extra) => `<div class="p2-cv" ${montarCoverDiv(item)}>${extra || ''}<span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span></div>`;
       const disco = (item, extra) => `<div class="p2-disco">${capaMini(item, extra)}<div class="p2-lb"><b>${escapeHtml(item.album) || 'Álbum'}</b><span>${escapeHtml(item.artista) || 'Artista'}</span></div></div>`;
       const sec = (titulo, corpo, link) => `<section class="p2-sec"><div class="p2-sh"><h2>${titulo}</h2>${link || ''}</div>${corpo}</section>`;
+      const secId = (id, titulo, corpo, link) => `<section class="p2-sec" id="${id}"><div class="p2-sh"><h2>${titulo}</h2>${link || ''}</div>${corpo}</section>`;
 
       const vinil = (data.colecao_por_formato && data.colecao_por_formato.vinil.length) || 0;
       const cds = (data.colecao_por_formato && data.colecao_por_formato.cd.length) || 0;
@@ -408,7 +498,10 @@ function apiFetch(url, opcoes = {}) {
       }
       if (data.wishlist && data.wishlist.length) {
         const n = data.total_wishlist || data.wishlist.length;
-        html += sec('Wishlist', `<div class="p2-faixa">${data.wishlist.slice(0, 18).map(i => disco(i, `<span class="p2-tier" style="background:${CORES_TIER[i.tier] || 'var(--c-color)'}">${escapeHtml(i.tier || '')}</span>`)).join('')}</div>`,
+        // todos os discos vão para a página: no celular a faixa mostra 18; no computador a grade cresce
+        // até a altura da coluna da direita (ver equilibrarColunas) e o resto fica no "Ver todos"
+        html += sec('Wishlist', `<div class="p2-wl" id="ppWl">${data.wishlist.map(i => disco(i, `<span class="p2-tier" style="background:${CORES_TIER[i.tier] || 'var(--c-color)'}">${escapeHtml(i.tier || '')}</span>`)).join('')}</div>
+          <button type="button" class="p2-mais" id="ppWlMais" hidden>Ver todos os ${data.wishlist.length} discos</button>`,
           `<span class="p2-cont">${n} ${n === 1 ? 'disco' : 'discos'}</span>`);
       }
       html += `</div><aside class="p2-dir">`;
@@ -427,17 +520,21 @@ function apiFetch(url, opcoes = {}) {
       const _totFmt = _contFmt.reduce((s, x) => s + x[1], 0);
       if (_totFmt) { const [kFmt, nFmt] = _contFmt.reduce((a, b) => (b[1] > a[1] ? b : a)); dest.push([`${Math.round(nFmt / _totFmt * 100)}% ${_nomesFmt[kFmt]}`, 'Formato']); }
       if (data.valor_total) dest.push([`R$ ${data.valor_total}`, 'Valor da prateleira']);
-      if (dest.length) html += sec('Destaques', `<div class="p2-dest">${dest.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div>`);
+      if (dest.length) html += secId('ppDest', 'Destaques', `<div class="p2-dest">${dest.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div>`);
 
       // Linha do tempo
       if (data.recentes && data.recentes.length) {
-        html += sec('Linha do tempo', `<div class="p2-lista">${data.recentes.slice(0, 5).map(i => `<div class="p2-it"><div class="p2-tx"><b>${escapeHtml(i.album) || 'Álbum'} · ${escapeHtml(i.artista) || 'Artista'}</b><span>entrou na prateleira</span></div><span class="p2-q">${escapeHtml(rotuloData(i.data_adicao))}</span></div>`).join('')}</div>`);
+        html += secId('ppLinha', 'Linha do tempo', `<div class="p2-lista">${data.recentes.slice(0, 5).map(i => `<div class="p2-it"><div class="p2-tx"><b>${escapeHtml(i.album) || 'Álbum'} · ${escapeHtml(i.artista) || 'Artista'}</b><span>entrou na prateleira</span></div><span class="p2-q">${escapeHtml(rotuloData(i.data_adicao))}</span></div>`).join('')}</div>`);
       }
       html += `</aside></div>`;
 
       container.innerHTML = html;
       if (window.DiscotecaConquistas) { DiscotecaConquistas.estilo(); DiscotecaConquistas.renderPublico(document.getElementById('ppConquistas'), data.conquistas_vitrine); }
-      carregarAudicoesPublicas();
+      const mais = document.getElementById('ppWlMais');
+      if (mais) mais.addEventListener('click', () => { wlExpandida = true; equilibrarColunas(); });
+      equilibrarColunas();
+      if (_obsDir) _obsDir.observe(document.querySelector('.p2-dir'));
+      carregarAudicoesPublicas().then(equilibrarColunas);
       renderWishlistPagina();
       configurarLazyLoadCapas();
       if (window.HillaAmigos) {
@@ -458,6 +555,6 @@ function apiFetch(url, opcoes = {}) {
     }
   </script>
   <script src="amigos.js?v=2"></script>
-  <script src="conquistas.js?v=9"></script>
+  <script src="conquistas.js?v=10"></script>
 </body>
 </html>

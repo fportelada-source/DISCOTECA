@@ -19,6 +19,40 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Hilla" />
+  <style>
+    /* Configurações no celular: botões alinhados e espaçados (10/11/2026) */
+    .push-acoes { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+    .push-acoes .push-btn { margin-left: 0; }
+    .set-perfil-link-cel { display: none; }
+    @media (max-width: 600px) {
+      /* Bio do tamanho dos outros campos */
+      .set-row textarea { flex: 1 1 100%; width: 100%; min-height: 84px; }
+      /* "Ver perfil público": sai do título e vira um botão inteiro no fim do card */
+      #setLinkPerfilPublico { display: none; }
+      .set-perfil-link-cel { display: block; margin-top: 16px; }
+      .set-perfil-link-cel a { display: flex !important; justify-content: center; width: 100%; box-sizing: border-box; min-height: 44px; align-items: center; white-space: nowrap; }
+      /* Notificações: os dois botões lado a lado, mesmo tamanho */
+      .push-acoes { flex: 1 1 100%; display: grid; grid-template-columns: 1fr 1fr; margin: 6px 0 0; }
+      .push-acoes .push-btn:only-child { grid-column: 1 / -1; }
+      /* Conquistas: "Ver todas" na linha da contagem; seletor na largura toda */
+      .cq-acoes { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+      .cq-titulo-linha { flex-direction: column; align-items: stretch !important; gap: 10px; }
+      .cq-titulo-linha select { width: 100%; }
+      /* Linhas com texto + botão: botão sempre da mesma largura, alinhado à direita */
+      .set-toggle-item > .set-acao, .set-toggle-item > a.set-acao { flex: 0 0 104px; width: 104px; text-align: center; justify-content: center; box-sizing: border-box; padding-left: 0; padding-right: 0; }
+      .set-toggle-item > .left { flex: 1; min-width: 0; }
+      /* Importar e exportar: viram linhas (ícone, nome e descrição, botão) */
+      .set-action-card { display: grid !important; grid-template-columns: 30px 1fr 104px; grid-template-rows: auto auto; column-gap: 12px; text-align: left !important; align-items: center; padding: 14px !important; }
+      .set-action-card .icon { grid-column: 1; grid-row: 1 / 3; margin: 0 !important; justify-content: flex-start !important; }
+      .set-action-card .name { grid-column: 2; grid-row: 1; }
+      .set-action-card .desc { grid-column: 2; grid-row: 2; margin: 2px 0 0 !important; }
+      .set-action-card > button, .set-action-card > div[style*="position:relative"] { grid-column: 3; grid-row: 1 / 3; width: 104px; }
+      .set-action-card > div[style*="position:relative"] { display: block !important; }
+      .set-action-card button { width: 104px !important; margin: 0 !important; padding-left: 4px !important; padding-right: 4px !important; white-space: nowrap; font-size: 12.5px; }
+      #statusRestaurarBackup { grid-column: 2 / 4; grid-row: 3; }
+      #btnRestaurarBackupLabel { font-size: 11.5px !important; }
+    }
+  </style>
 </head>
 <body>
 
@@ -111,6 +145,7 @@
             <div class="set-row"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span class="label">Spotify</span><input type="url" id="campo-spotify" placeholder="https://open.spotify.com/user/..."></div>
             <div class="set-row"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="label">Discogs</span><input type="url" id="campo-discogs" placeholder="https://discogs.com/user/..."></div>
             <div class="set-row"><span class="icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><span class="label">Instagram</span><input type="url" id="campo-instagram" placeholder="https://instagram.com/..."></div>
+            <div class="set-perfil-link-cel" id="setLinkPerfilPublicoCel"></div>
           </div>
 
           <!-- PREFERÊNCIAS DA PRATELEIRA -->
@@ -202,7 +237,7 @@
           <div class="set-card" id="conquistasCard">
             <span id="conquistas"></span>
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg> Conquistas</h3><span class="sub">o que você já alcançou</span></div>
-            <div class="cq-acoes"><span class="cq-resumo" id="cqResumo">Carregando…</span><button type="button" class="set-acao" id="cqVerTodos" aria-expanded="false" aria-controls="cqGrade">Ver todos</button></div>
+            <div class="cq-acoes"><span class="cq-resumo" id="cqResumo">Carregando…</span><button type="button" class="set-acao" id="cqVerTodos" aria-expanded="false" aria-controls="cqGrade">Ver todas</button></div>
             <div class="cq-grade" id="cqGrade" hidden></div>
             <div class="set-toggle-item cq-titulo-linha"><div class="left"><div class="title">Título no perfil</div><div class="sub">Aparece abaixo do seu nome no perfil público</div></div><select id="cqTitulo" aria-label="Título no perfil" disabled><option value="">Sem título</option></select></div>
           </div>
@@ -212,8 +247,8 @@
             <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacidade e dados</h3><span class="sub">seus direitos (LGPD)</span></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Política de Privacidade</div><div class="sub">Quais dados guardamos, por quê e por quanto tempo</div></div><a class="set-acao" href="privacidade.html">Ler</a></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Termos de Uso</div><div class="sub">Regras de uso da Hilla</div></div><a class="set-acao" href="termos.html">Ler</a></div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Exportar meus dados</div><div class="sub">Tudo que guardamos sobre você, num arquivo JSON</div></div><button type="button" class="set-acao" id="btnExportarMeusDados">Exportar</button></div>
-            <div class="set-toggle-item"><div class="left"><div class="title">Sair de todos os aparelhos</div><div class="sub">Encerra todas as sessões abertas, inclusive esta</div></div><button type="button" class="set-acao" id="btnSairTodos">Sair de todos</button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Exportar meus dados</div><div class="sub">Arquivo técnico (JSON), pela LGPD. Para levar tudo com fotos, use Levar tudo</div></div><button type="button" class="set-acao" id="btnExportarMeusDados">Exportar</button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Sair de todos os aparelhos</div><div class="sub">Encerra todas as sessões abertas, inclusive esta</div></div><button type="button" class="set-acao" id="btnSairTodos">Sair</button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Excluir minha conta</div><div class="sub">Apaga permanentemente todos os seus dados</div></div><button type="button" class="set-acao perigo" id="btnExcluirMinhaConta">Excluir</button></div>
           </div>
 
@@ -535,6 +570,7 @@ function preencherPagina(data) {
   const ano = data.data_criacao ? data.data_criacao.split('-')[0] : '';
   document.getElementById('setMembroDesde').textContent = ano || '—';
   document.getElementById('setLinkPerfilPublico').innerHTML = `<a href="perfil-publico.html?id=${data.id}" target="_blank" class="btn-outline-terracota"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> Ver perfil público</a>`;
+  const _celLink = document.getElementById('setLinkPerfilPublicoCel'); if (_celLink) _celLink.innerHTML = document.getElementById('setLinkPerfilPublico').innerHTML;
 
   document.getElementById('campo-nome-exibicao').value = data.nome_exibicao || '';
   document.getElementById('campo-localizacao').value = data.localizacao || '';
@@ -731,16 +767,17 @@ document.addEventListener('DOMContentLoaded', function() {
     async function pintar() {
       const st = await HillaPush.estado();
       const textos = {
-        ativo: ['Ativadas neste aparelho.', 'Desativar neste aparelho', 'sec'],
+        ativo: ['Ativadas neste aparelho.', 'Desativar', 'sec'],
         inativo: ['Desativadas neste aparelho.', 'Ativar neste aparelho', 'pri'],
         bloqueado: ['As notificações da Hilla estão bloqueadas nas configurações do navegador deste aparelho. Libere por lá e volte aqui.', '', ''],
         instalar: ['No iPhone, as notificações só funcionam com a Hilla instalada: no Safari, toque em Compartilhar → Adicionar à Tela de Início, abra a Hilla por lá e volte aqui.', '', ''],
         sem_suporte: ['Este navegador não aceita notificações. No Android use o Chrome; no iPhone, instale a Hilla na tela de início.', '', '']
       }[st];
       el.innerHTML = `<span class="push-ponto ${st === 'ativo' ? 'on' : ''}"></span><span>${textos[0]}</span>` +
-        (textos[1] ? `<button type="button" class="push-btn ${textos[2]}" id="pushBotao">${textos[1]}</button>` : '');
+        (textos[1] ? `<div class="push-acoes"><button type="button" class="push-btn ${textos[2]}" id="pushBotao">${textos[1]}</button></div>` : '');
       if (st === 'ativo') {
-        el.insertAdjacentHTML('beforeend', '<button type="button" class="push-btn pri" id="pushTeste">Mandar um teste</button><span class="push-teste-msg" id="pushTesteMsg" aria-live="polite"></span>');
+        el.querySelector('.push-acoes').insertAdjacentHTML('beforeend', '<button type="button" class="push-btn pri" id="pushTeste">Mandar um teste</button>');
+        el.insertAdjacentHTML('beforeend', '<span class="push-teste-msg" id="pushTesteMsg" aria-live="polite"></span>');
         document.getElementById('pushTeste').onclick = async (ev) => {
           const bt = ev.currentTarget, msg = document.getElementById('pushTesteMsg');
           bt.disabled = true; msg.textContent = 'Enviando…';
@@ -978,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="notificacoes.js?v=5"></script>
   <script src="navegacao.js?v=2"></script>
   <script src="push.js?v=2"></script>
-  <script src="conquistas.js?v=9"></script>
+  <script src="conquistas.js?v=10"></script>
   <script src="levar-tudo.js?v=1"></script>
 </body>
 </html>

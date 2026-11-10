@@ -207,6 +207,15 @@
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') esconderBalao(); });
     window.addEventListener('scroll', esconderBalao, { passive: true });
+    // toque longo (celular): abre o balão sem precisar soltar; o toque normal continua funcionando
+    let pressao = null;
+    document.addEventListener('touchstart', e => {
+      const s = alvo(e); if (!s) return;
+      clearTimeout(pressao);
+      pressao = setTimeout(() => { mostrarBalao(s); abertoEm = Date.now() + 600; if (navigator.vibrate) try { navigator.vibrate(10); } catch (x) {} }, 450);
+    }, { passive: true });
+    ['touchend', 'touchmove', 'touchcancel'].forEach(t => document.addEventListener(t, () => clearTimeout(pressao), { passive: true }));
+    document.addEventListener('contextmenu', e => { if (alvo(e)) e.preventDefault(); });
   }
   function chamar(caminho, opcoes) {
     if (typeof apiFetch === 'function' && typeof API_URL !== 'undefined') return apiFetch(API_URL + caminho, opcoes || {});
@@ -218,7 +227,7 @@
     if (!card) return;
     estilo(); ligarBalao();
     const resumo = card.querySelector('#cqResumo'), grade = card.querySelector('#cqGrade'), botao = card.querySelector('#cqVerTodos'), sel = card.querySelector('#cqTitulo');
-    const abrirGrade = (abrir) => { grade.hidden = !abrir; botao.textContent = abrir ? 'Esconder' : 'Ver todos'; botao.setAttribute('aria-expanded', abrir ? 'true' : 'false'); };
+    const abrirGrade = (abrir) => { grade.hidden = !abrir; botao.textContent = abrir ? 'Esconder' : 'Ver todas'; botao.setAttribute('aria-expanded', abrir ? 'true' : 'false'); };
     botao.addEventListener('click', () => abrirGrade(grade.hidden));
     sel.addEventListener('change', () => {
       chamar('/conquistas/titulo', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conquista_id: sel.value }) })

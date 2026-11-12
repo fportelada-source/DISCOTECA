@@ -1,0 +1,50 @@
+/* Hilla Academy: encaixe do curso dentro do Hilla (menu, rodapé e barra do celular do app) */
+
+/* A barra do curso fica logo abaixo do menu do Hilla e rola junto com a página */
+.header { position: relative; top: auto; z-index: 40; background: #121212; }
+.ac-voltar { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: 13px; font-weight: 500; white-space: nowrap; text-decoration: none; }
+.ac-voltar:hover { color: var(--text); }
+.brand-name span { letter-spacing: .12em; }
+
+/* A barra de baixo do celular é a do Hilla (navegacao.js); a do curso sai */
+.tabbar { display: none !important; }
+
+/* O sumário da aula gruda embaixo do menu do Hilla */
+:root { --header-h: 71px; }
+
+/* Rodapé do Hilla */
+.app-footer { margin-top: 0; }
+main { padding-bottom: 72px; }
+
+@media (max-width: 960px) {
+  :root { --header-h: 59px; }
+  .header { height: auto; }
+  .header-in { flex-wrap: wrap; height: auto; padding: 10px 16px; row-gap: 6px; }
+  .header .nav { display: flex; order: 3; width: 100%; overflow-x: auto; scrollbar-width: none; margin: 0 -6px; }
+  .header .nav::-webkit-scrollbar { display: none; }
+  .header .nav a { padding: 6px 12px; font-size: 13px; white-space: nowrap; }
+  .search-btn { min-width: 0; }
+  .search-btn .lbl, .search-btn kbd { display: none; }
+  main { padding-bottom: 40px; }
+}
+@media (max-width: 420px) {
+  .brand-mark { display: none; }
+  .brand-name { font-size: 12px; letter-spacing: .14em; }
+}
+
+/* O curso usa nomes de classe que também existem no style.css do Hilla.
+   Aqui desfazemos o que vazaria do Hilla para dentro do curso. */
+:where(#app, .header, #overlay, #toast) .btn { background: none; color: inherit; cursor: pointer; width: auto; }
+:where(#app, .header, #overlay, #toast) .btn:hover { opacity: 1; }
+:where(#app, .header, #overlay, #toast) .card { border-top: 1px solid var(--line-soft); }
+:where(#app, .header, #overlay, #toast) .card:not(.lesson):hover { transform: none; }
+:where(#app, .header, #overlay, #toast) .hero { padding-top: 0; padding-left: 0; padding-right: 0; overflow: visible; position: static; transition: none; }
+:where(#app, .header, #overlay, #toast) .hero::before { content: none; }
+:where(#app, .header, #overlay, #toast) .hero h1 { font-family: inherit; font-size: clamp(34px, 5.4vw, 64px); font-weight: 800; letter-spacing: -.035em; line-height: 1.15; max-width: none; text-transform: none; }
+:where(#app, .header, #overlay, #toast) .hero h1 span { color: inherit; }
+:where(#app, .header, #overlay, #toast) svg.lg { display: inline; margin: 0; padding: 0; max-width: none; min-height: 0; }
+:where(#app, .header, #overlay, #toast) .meta-row { border-top: 0; padding-top: 0; justify-content: normal; font-family: inherit; }
+:where(#app, .header, #overlay, #toast) .modal { max-height: none; overflow-y: visible; padding: 0; }
+:where(#app, .header, #overlay, #toast) .section { padding: 0; }
+:where(#app, .header, #overlay, #toast) .sr-only { border: 0; margin: 0; padding: 0; }
+.tt .own { color: var(--gold); display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; margin-left: 8px; }

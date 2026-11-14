@@ -725,6 +725,9 @@ function renderValorDiscogs(r) {
     el.innerHTML = `<p class="vd-tit">Calculando a sua coleção…</p>
       <div class="vd-barra"><i style="width:${pct}%"></i></div>
       <p class="vd-txt">${r.feitos} de ${r.total} discos. Ficará pronta em breve. Avisamos quando estiver pronta.</p>`;
+    // enquanto calcula, a barra se atualiza sozinha; quando termina, o card vira o resultado
+    clearTimeout(window._vdTimer);
+    window._vdTimer = setTimeout(carregarValorDiscogs, 30000);
     return;
   }
   if (r.status !== 'pronto') {

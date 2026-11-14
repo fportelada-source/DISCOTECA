@@ -21,7 +21,7 @@
 
   const E = {
     dados: null, carregando: false,
-    aba: lerPref('aba', 'prat'),
+    aba: new URLSearchParams(location.search).get('aba') || lerPref('aba', 'prat'),   // ?aba=din vem do aviso do valor no Discogs
     per: '12m',
     modoCres: 'qtd', modoAud: 'h',
     porFmt: lerPref('fmt', '0') === '1',

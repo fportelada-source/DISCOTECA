@@ -126,7 +126,7 @@ function apiFetch(url, opcoes = {}) {
   if (tok) apiFetch(API_URL + '/academy/resumo').then(r => r.ok ? r.json() : null).then(d => { if (d) { resumo = d; desenhar(); } }).catch(() => {});
 })();
   </script>
-  <script src="notificacoes.js?v=5"></script>
+  <script src="notificacoes.js?v=6"></script>
   <script src="navegacao.js?v=2"></script>
 </body>
 </html>

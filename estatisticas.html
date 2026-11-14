@@ -19,6 +19,27 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Hilla" />
+  <style>
+    /* Valor no Discogs */
+    .vd-tit { margin: 0 0 6px; font-weight: 700; font-size: 16px; }
+    .vd-txt { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.5; }
+    .vd-btn { margin-top: 14px; background: var(--terracotta); color: #101010; border: 0; border-radius: 999px; padding: 11px 18px; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .vd-btn2 { background: none; border: 1px solid var(--card-line); color: var(--paper); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+    .vd-btn:disabled, .vd-btn2:disabled { opacity: .5; cursor: default; }
+    .vd-barra { height: 8px; background: var(--card-line); border-radius: 6px; margin: 12px 0 8px; overflow: hidden; }
+    .vd-barra i { display: block; height: 100%; background: var(--terracotta); transition: width .4s; }
+    .vd-dica { margin: 12px 0 0; font-size: 13px; color: var(--ink-soft); border-left: 2px solid var(--terracotta); padding-left: 10px; line-height: 1.5; }
+    .vd-lista { margin-top: 14px; }
+    .vd-li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--card-line); font-size: 14px; }
+    .vd-li > div:first-child { min-width: 0; }
+    .vd-li b { font-weight: 600; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .vd-li em { font-style: normal; color: var(--ink-soft); font-size: 12px; }
+    .vd-li-v { text-align: right; white-space: nowrap; font-weight: 600; }
+    .vd-li-v a { display: block; color: var(--terracotta); font-size: 12px; font-weight: 500; }
+    .vd-rod { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; font-size: 12px; color: var(--ink-soft); }
+    .vd-erro { margin: 10px 0 0; color: #e0705f; font-size: 13px; }
+    @media (max-width: 600px) { .vd-rod { flex-direction: column; align-items: flex-start; } }
+  </style>
 </head>
 <body>
 
@@ -207,6 +228,10 @@
             <div class="st-card">
               <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Valor da <span class="accent">prateleira</span></h3><span class="sub">estimado</span></div>
               <div id="stValor"></div>
+            </div>
+            <div class="st-card" id="valor-discogs">
+              <div class="card-header"><h3><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;display:inline-block;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/></svg> Valor no <span class="accent">Discogs</span></h3><span class="sub">a partir de</span></div>
+              <div id="stValorDiscogs"><div class="pp-empty-note">Carregando…</div></div>
             </div>
           </section>
 
@@ -516,6 +541,7 @@ function carregarDados() {
     renderEstatisticasEstante(dadosEstante, estanteVazia);
     renderWishlistProgress(avancadas.wishlist_progress);
     renderValor(dadosEstante);
+    carregarValorDiscogs();
     renderTopArtistas(dadosEstante);
     renderInsightsDestaques(dadosEstante);
     renderCruzamento(avancadas.ouvido_vs_possuido, playerVazio, estanteVazia);
@@ -688,6 +714,56 @@ function renderValor(estante) {
   `;
 }
 
+// ===== VALOR NO DISCOGS (estimativa pedida pela pessoa, calculada em segundo plano) =====
+function vdReais(v) { return 'R$ ' + Math.round(v).toLocaleString('pt-BR'); }
+function vdData(s) { const [a, m, d] = String(s).split('-'); return `${d}/${m}/${a}`; }
+function renderValorDiscogs(r) {
+  const el = document.getElementById('stValorDiscogs');
+  if (!el) return;
+  if (r.status === 'rodando') {
+    const pct = r.total ? Math.round(r.feitos / r.total * 100) : 0;
+    el.innerHTML = `<p class="vd-tit">Calculando a sua coleção…</p>
+      <div class="vd-barra"><i style="width:${pct}%"></i></div>
+      <p class="vd-txt">${r.feitos} de ${r.total} discos. Ficará pronta em breve. Avisamos quando estiver pronta.</p>`;
+    return;
+  }
+  if (r.status !== 'pronto') {
+    el.innerHTML = `<p class="vd-tit">Quanto vale a sua coleção hoje?</p>
+      <p class="vd-txt">O Hilla procura cada disco no Discogs e soma as edições mais baratas à venda. Ficará pronta em breve: pode fechar o app, avisamos quando estiver pronta.</p>
+      <button type="button" class="vd-btn" id="vdIniciar">Estimar valor da coleção</button><p class="vd-erro" id="vdErro" hidden></p>`;
+  } else {
+    const lista = (r.top || []).map(t => `<div class="vd-li"><div><b>${escapeHtml(t.artista)} · ${escapeHtml(t.album)}</b><em>${escapeHtml(t.formato || '')} · ${t.tipo === 'exato' ? 'exato' : 'a partir de'}</em></div>
+      <div class="vd-li-v">${vdReais(t.valor)}${t.link ? ` <a href="${t.link}" target="_blank" rel="noopener">ver no Discogs</a>` : ''}</div></div>`).join('');
+    const faltam = r.avaliados - r.exatos;
+    el.innerHTML = `<p class="vd-tit">Estimativa da coleção em ${vdData(r.data)}</p>
+      <div class="st-value-hero">a partir de ${vdReais(r.valor)}</div>
+      <div class="st-value-sub">${r.com_preco} de ${r.avaliados} discos com preço à venda no Discogs</div>
+      ${faltam > 0 ? `<p class="vd-dica">Valor exato em ${r.exatos} ${r.exatos === 1 ? 'disco' : 'discos'} (pelo código de barras). Nos outros, usamos a edição mais barata à venda. Escaneie o código de barras para deixar a estimativa mais precisa.</p>` : ''}
+      ${lista ? `<div class="vd-lista">${lista}</div>` : ''}
+      <div class="vd-rod"><span>Os preços mudam todo dia no Discogs. ${r.pode_estimar ? 'Você já pode estimar de novo.' : `Pode estimar de novo a partir de ${vdData(r.proxima)}.`}</span>
+      ${r.pode_estimar ? '<button type="button" class="vd-btn2" id="vdIniciar">Estimar de novo</button>' : ''}</div><p class="vd-erro" id="vdErro" hidden></p>`;
+  }
+  const b = document.getElementById('vdIniciar');
+  if (b) b.addEventListener('click', async () => {
+    b.disabled = true;
+    try {
+      const resp = await apiFetch(`${API_URL}/valor_discogs/iniciar`, { method: 'POST' });
+      const d = await resp.json();
+      if (!resp.ok) throw new Error(d.erro || 'Não foi possível começar agora.');
+      renderValorDiscogs(d);
+    } catch (e) {
+      b.disabled = false;
+      const er = document.getElementById('vdErro'); er.textContent = e.message; er.hidden = false;
+    }
+  });
+}
+async function carregarValorDiscogs() {
+  try {
+    const r = await apiFetch(`${API_URL}/valor_discogs`);
+    if (r.ok) renderValorDiscogs(await r.json());
+  } catch (e) { console.error('[valor discogs]', e); }
+}
+
 // ===== TOP ARTISTAS =====
 function escapeHtml(texto) {
   if (texto === null || texto === undefined) return '';
@@ -782,10 +858,10 @@ function renderMarcos(estante, avancadas) {
       });
     }
   </script>
-  <script src="notificacoes.js?v=5"></script>
+  <script src="notificacoes.js?v=6"></script>
   <script src="navegacao.js?v=2"></script>
   <script src="compartilhar.js?v=14"></script>
-  <script src="estatisticas-painel.js?v=1"></script>
+  <script src="estatisticas-painel.js?v=2"></script>
 <script>
 // ===== Retrospectiva do ano: banner de 15/12 a 31/01 =====
 (function () {

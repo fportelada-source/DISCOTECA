@@ -31,6 +31,15 @@
     .list-view .format-badge.dvd_bluray { color: #8FBF8A; border-color: #8FBF8A; }
   </style>
   <link rel="stylesheet" href="amigos.css?v=2" />
+  <style>
+    /* Editar disco: Escanear ao lado do código de barras e o aviso "Ache sua edição exata" */
+    .barcode-row .btn-escanear-edicao { flex: none; border-radius: 10px; }
+    .btn-escanear-edicao[hidden], .dica-edicao[hidden], .edicao-status[hidden] { display: none !important; }
+    .dica-edicao { margin-top: 8px; font-size: 12.5px; line-height: 1.45; color: var(--ink-soft); border-left: 2px solid var(--terracotta); padding-left: 10px; }
+    .dica-edicao b { color: var(--paper); font-weight: 600; }
+    .edicao-status { margin-top: 8px; font-size: 12.5px; line-height: 1.45; color: var(--ink-soft); }
+    .edicao-status.ok { color: #8fd19e; }
+  </style>
 </head>
 <body>
 
@@ -293,9 +302,12 @@
                 <label>Código de Barras</label>
                 <div class="barcode-row">
                   <input type="text" id="campo-codigo-barras" placeholder="Ex: 042284834181">
-                  
+                  <button type="button" class="btn-ler-codigo btn-escanear-edicao" id="btnEscanearEdicao" hidden aria-label="Escanear o código de barras com a câmera"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="13" y1="8" x2="13" y2="16"/><line x1="17" y1="8" x2="17" y2="16"/></svg><span>Escanear</span></button>
+                  <input type="file" id="inputFotoEdicao" accept="image/*" capture="environment" style="display:none;">
                 </div>
-                
+                <div class="dica-edicao" id="dicaEdicaoExata" hidden><b>Ache sua edição exata.</b> Com o código de barras, o Hilla sabe qual é a sua prensagem e o valor no Discogs fica exato.</div>
+                <div class="edicao-status" id="edicaoStatus" hidden></div>
+
                 <div id="barcode-reader-oculto" style="display:none;"></div>
               </div>
               <div class="form-group">
@@ -1645,7 +1657,45 @@ function carregarDados() {
 
       modal.classList.add('open');
       document.getElementById('barcodeStatus').style.display = 'none';
+      // Editar disco: botão Escanear ao lado do código de barras e o aviso "Ache sua edição exata"
+      document.getElementById('btnEscanearEdicao').hidden = !discoId;
+      document.getElementById('edicaoStatus').hidden = true;
+      atualizarDicaEdicao();
     }
+
+    function atualizarDicaEdicao() {
+      document.getElementById('dicaEdicaoExata').hidden = !editandoId || !!document.getElementById('campo-codigo-barras').value.trim();
+    }
+    document.getElementById('campo-codigo-barras').addEventListener('input', atualizarDicaEdicao);
+
+    // Na edição, ler o código NÃO mexe em artista, álbum nem notas: só preenche o campo
+    // e mostra qual edição o Discogs encontrou, para a pessoa conferir antes de salvar.
+    document.getElementById('btnEscanearEdicao').addEventListener('click', () => document.getElementById('inputFotoEdicao').click());
+    document.getElementById('inputFotoEdicao').addEventListener('change', function (e) {
+      const arquivo = e.target.files && e.target.files[0];
+      if (!arquivo) return;
+      const st = document.getElementById('edicaoStatus'), btn = document.getElementById('btnEscanearEdicao');
+      st.hidden = false; st.className = 'edicao-status'; st.textContent = 'Lendo o código de barras da foto...';
+      btn.disabled = true;
+      new Html5Qrcode('barcode-reader-oculto').scanFile(arquivo, false)
+        .then(codigo => {
+          document.getElementById('campo-codigo-barras').value = codigo;
+          atualizarDicaEdicao();
+          st.textContent = 'Código lido: ' + codigo + '. Procurando a edição...';
+          return apiFetch(API_URL + `/buscar_por_codigo_barras?codigo=${encodeURIComponent(codigo)}`).then(r => r.json()).then(data => {
+            if (data.sucesso && data.disco) {
+              const d = data.disco;
+              const extra = [d.formato, d.ano, d.gravadora].filter(Boolean).join(' · ');
+              st.className = 'edicao-status ok';
+              st.textContent = `Edição encontrada: ${d.artista || ''} – ${d.album || ''}${extra ? ' · ' + extra : ''}. Confira e salve.`;
+            } else {
+              st.textContent = 'Código lido, mas o Discogs não tem essa edição. Você pode salvar mesmo assim.';
+            }
+          }).catch(() => { st.textContent = 'Código lido. Não consegui conferir a edição agora, mas você pode salvar.'; });
+        })
+        .catch(() => { st.textContent = 'Não consegui ler um código de barras nessa foto. Tente de novo, mais perto e com boa luz, ou digite o código.'; })
+        .finally(() => { btn.disabled = false; e.target.value = ''; });
+    });
     window.abrirModal = abrirModal;
 
     function fecharModal() {

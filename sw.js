@@ -23,7 +23,7 @@
 // CACHE_NAME tem número de versão — se algum dia mudar o que entra
 // no "esqueleto" (nova página, etc.), sobe esse número, igual já
 // fazemos com style.css?v=N.
-const CACHE_NAME = 'discoteca-shell-v16';
+const CACHE_NAME = 'discoteca-shell-v17';
 
 const PAGINAS_HTML = [
   './index.html',
@@ -36,6 +36,7 @@ const PAGINAS_HTML = [
   './perfil.html',
   './perfil-publico.html',
   './amigos.html',
+  './seguidores.html',
   './academy.html'
 ];
 

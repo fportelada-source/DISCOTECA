@@ -229,7 +229,11 @@
   function blocoPerfil(alvoTopo, alvoCompat, id) {
     api('/amigos/relacao/' + encodeURIComponent(id)).then(r => {
       if (alvoTopo) {
-        alvoTopo.innerHTML = `<div class="am-nums"><span><b id="amSeguidores">${r.seguidores}</b> ${r.seguidores === 1 ? 'seguidor' : 'seguidores'}</span><span><b>${r.seguindo_total}</b> seguindo</span></div>` +
+        // no próprio perfil, os números levam para a página de seguidores (como no Instagram)
+        const num = (n, rot, aba, idn) => r.eu_mesmo
+          ? `<a href="seguidores.html?aba=${aba}" class="am-num-link"><b${idn ? ` id="${idn}"` : ''}>${n}</b> ${rot}</a>`
+          : `<span><b${idn ? ` id="${idn}"` : ''}>${n}</b> ${rot}</span>`;
+        alvoTopo.innerHTML = `<div class="am-nums">${num(r.seguidores, r.seguidores === 1 ? 'seguidor' : 'seguidores', 'seguidores', 'amSeguidores')}${num(r.seguindo_total, 'seguindo', 'seguindo')}</div>` +
           (r.eu_mesmo ? '' : r.logado ? botaoSeguir({ id, seguindo: r.seguindo, nome: '' }) :
             `<a class="am-btn" href="index.html">Entrar para seguir</a>`);
         alvoTopo.hidden = false;

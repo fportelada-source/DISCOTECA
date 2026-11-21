@@ -6,6 +6,10 @@
   <!-- Não roda dentro de outro site (anti-clickjacking): o GitHub Pages não permite o cabeçalho X-Frame-Options -->
   <style id="antiFrame">html { display: none !important; }</style>
   <script>if (window.top === window.self) { document.getElementById('antiFrame').remove(); } else { try { window.top.location = window.self.location; } catch (e) {} }</script>
+  <!-- Sessão já salva neste navegador: o app aparece direto, sem piscar a tela de login.
+       Sem sessão, nada muda. Sessão vencida: a página limpa a sessão e recarrega no login. -->
+  <style>html.hb-logado #loginScreen { display: none !important; } html.hb-logado #appScreen { display: block !important; }</style>
+  <script>try { if (localStorage.getItem('discoteca_user_id') && localStorage.getItem('discoteca_user_nome') && localStorage.getItem('discoteca_session_token')) document.documentElement.classList.add('hb-logado'); } catch (e) {}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hilla — Wishlist</title>
   <link href="fonts.css?v=1" rel="stylesheet">
@@ -459,6 +463,7 @@ function carregarSessao() {
   return null;
 }
 function limparSessao() {
+  document.documentElement.classList.remove('hb-logado');   // a tela de login volta a poder aparecer
   localStorage.removeItem('discoteca_user_id');
   localStorage.removeItem('discoteca_user_nome');
   localStorage.removeItem('discoteca_session_token');

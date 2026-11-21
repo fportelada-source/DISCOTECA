@@ -523,6 +523,40 @@
       catch (e) { window.prompt('Copie o link:', estado.link); }
     });
   }
+  // Aniversário do disco (mockup aprovado): sulcos de vinil a 10%, número de anos em ouro,
+  // a capa no meio, o nome do disco e "Está na minha prateleira". Funciona em post e story.
+  function desenharAniversario(ctx, W, H, d, img) {
+    const k = W / 360;
+    ctx.fillStyle = FUNDO; ctx.fillRect(0, 0, W, H);
+    const brilho = ctx.createRadialGradient(W / 2, H * 0.3, 0, W / 2, H * 0.3, W * 0.9);
+    brilho.addColorStop(0, '#3b2b14'); brilho.addColorStop(1, 'rgba(13,13,13,0)');
+    ctx.fillStyle = brilho; ctx.fillRect(0, 0, W, H);
+    const cyCapa = H * 0.56;
+    ctx.save(); ctx.globalAlpha = 0.1; ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = Math.max(1, k * 0.9);
+    for (let r = 4 * k; r < Math.hypot(W, H); r += 4 * k) { ctx.beginPath(); ctx.arc(W / 2, cyCapa, r, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.restore();
+    ctx.textBaseline = 'alphabetic';
+    logoHilla(ctx, W / 2, H * 0.075, 22 * k, 'center');
+    ctx.textAlign = 'center'; ctx.fillStyle = OURO;
+    ctx.font = `900 ${120 * k}px Inter, sans-serif`; espacar(ctx, -6 * k);
+    ctx.fillText(String(d.anos), W / 2, H * 0.27);
+    espacar(ctx, 6 * k); ctx.fillStyle = TEXTO; ctx.font = `700 ${16 * k}px Inter, sans-serif`;
+    ctx.fillText(d.anos === 1 ? 'ANO' : 'ANOS', W / 2, H * 0.27 + 32 * k);
+    espacar(ctx, 0);
+    const lado = Math.min(W * 0.6, H * 0.36), x = (W - lado) / 2, y = cyCapa - lado / 2;
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 40 * k; ctx.shadowOffsetY = 18 * k;
+    ctx.fillStyle = '#1a1a1a'; ctx.fillRect(x, y, lado, lado); ctx.restore();
+    if (img) cobrir(ctx, img, x, y, lado, lado); else vinil(ctx, W / 2, cyCapa, lado * 0.46);
+    ctx.textAlign = 'center';   // vinil() volta o alinhamento para a esquerda
+    let ty = y + lado + 46 * k;
+    ctx.fillStyle = TEXTO; ctx.font = `800 ${22 * k}px Inter, sans-serif`;
+    quebrar(ctx, d.album, W * 0.84, 2).forEach(l => { ctx.fillText(l, W / 2, ty); ty += 27 * k; });
+    ctx.fillStyle = '#cccccc'; ctx.font = `400 ${14 * k}px Inter, sans-serif`;
+    ctx.fillText(quebrar(ctx, d.artista + (d.ano ? ' · ' + d.ano : ''), W * 0.84, 1)[0] || '', W / 2, ty + 2 * k);
+    ctx.fillStyle = '#bbbbbb'; ctx.font = `400 ${13 * k}px Inter, sans-serif`;
+    ctx.fillText('Está na minha prateleira', W / 2, H - 34 * k);
+    ctx.textAlign = 'left';
+  }
   function msg(t) { const m = document.getElementById('shMsg'); if (m) m.textContent = t || ''; }
   function fechar() {
     const o = document.getElementById('shOverlay'); if (o) o.classList.remove('aberto');
@@ -541,6 +575,8 @@
       desenharAudicao(ctx, W, H, estado.dados, img, { data: estado.mostrarData });
     } else if (estado.tipo === 'recap') {
       desenharRecap(ctx, W, H, estado.dados, estado.capas);
+    } else if (estado.tipo === 'aniversario') {
+      desenharAniversario(ctx, W, H, estado.dados, estado.imgCapa);
     } else {
       desenharWishlist(ctx, W, H, estado.dados, estado.capas);
     }
@@ -633,7 +669,16 @@
         async preparar() { [this.dados.usuario, this.capas] = await Promise.all([arrobaPerfil(usuarioId), Promise.all(nove.map(d => carregarCapa(d.capa_url, d.artista, d.album)))]); }
       });
     },
-    _desenhar: { desenharAudicao, desenharWishlist },   // usado nos testes
+    aniversario(d) {   // d: { id, artista, album, ano, anos, capa_url }
+      if (!d || !d.anos) return;
+      abrir({
+        tipo: 'aniversario', dados: d, formato: 'story', titulo: 'Compartilhar aniversário', sub: `${d.album} faz ${d.anos} ${d.anos === 1 ? 'ano' : 'anos'} hoje.`,
+        alt: `${d.anos} anos de ${d.album} — ${d.artista}`, nomeArquivo: `hilla-${d.anos}-anos.png`,
+        texto: `Hoje ${d.album} — ${d.artista} faz ${d.anos} ${d.anos === 1 ? 'ano' : 'anos'}. Está na minha prateleira.`, link: 'https://hilla.com.br',
+        async preparar() { this.imgCapa = await carregarCapa(d.capa_url, d.artista, d.album); }
+      });
+    },
+    _desenhar: { desenharAudicao, desenharWishlist, desenharAniversario },   // usado nos testes
     _util: { carregarCapa, logoHilla, espacar, quebrar, cobrir, fontesProntas, contar }   // usado pela retrospectiva
   };
 })();

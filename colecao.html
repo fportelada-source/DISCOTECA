@@ -2052,7 +2052,7 @@ function carregarDados() {
   }
   async function preencher() {
     if (rodando || typeof apiFetch !== 'function') return;
-    rodando = true;
+    rodando = true; window._mbOcupado = true;   // a busca das datas originais espera esta terminar (1 consulta/s no MusicBrainz)
     try {
       for (let volta = 0; volta < 200; volta++) {
         const r = await apiFetch(API_URL + '/conquistas/paises/preencher', { method: 'POST' });
@@ -2065,9 +2065,52 @@ function carregarDados() {
         }
         await pausa(1500);
       }
-    } catch (e) {} finally { rodando = false; }
+    } catch (e) {} finally { rodando = false; window._mbOcupado = false; }
   }
   window.addEventListener('load', () => setTimeout(preencher, 4000));
+})();
+</script>
+<script>
+// Aniversário do disco: descobre, aos poucos e por trás, a data ORIGINAL de lançamento
+// (primeiro lançamento do álbum no MusicBrainz, não a de reedições). Data incompleta
+// (só ano ou mês) vai vazia: esse disco não recebe aviso, para nunca avisar no dia errado.
+(function () {
+  const pausa = (ms) => new Promise(ok => setTimeout(ok, ms));
+  const aspas = (s) => String(s).replace(/["\\]/g, ' ');
+  const simples = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+  async function dataOriginal(artista, album) {
+    const q = `releasegroup:"${aspas(album)}" AND artist:"${aspas(artista)}"`;
+    const r = await fetch('https://musicbrainz.org/ws/2/release-group/?fmt=json&limit=5&query=' + encodeURIComponent(q));
+    if (!r.ok) throw new Error('mb ' + r.status);
+    const d = await r.json();
+    const alvo = simples(album);
+    const g = (d['release-groups'] || []).find(x => (x.score || 0) >= 90 && simples(x.title) === alvo) ||
+              (d['release-groups'] || []).find(x => (x.score || 0) >= 98);
+    const data = g && g['first-release-date'];
+    return /^\d{4}-\d{2}-\d{2}$/.test(data || '') ? data : null;
+  }
+  async function preencher() {
+    if (typeof apiFetch !== 'function') return;
+    for (let espera = 0; window._mbOcupado && espera < 120; espera++) await pausa(5000);
+    try {
+      for (let lote = 0; lote < 10; lote++) {   // até 300 discos por visita à Prateleira
+        const r = await apiFetch(API_URL + '/colecao/sem_data_original');
+        if (!r.ok) return;
+        const itens = (await r.json()).itens || [];
+        if (!itens.length) return;
+        const achados = [];
+        for (const it of itens) {
+          if (document.hidden) await new Promise(ok => document.addEventListener('visibilitychange', ok, { once: true }));
+          try { achados.push({ id: it.id, data: await dataOriginal(it.artista, it.album) }); }
+          catch (e) { await pausa(5000); }   // erro de rede ou limite: tenta de novo numa próxima visita
+          await pausa(1100);   // MusicBrainz: 1 consulta por segundo
+        }
+        if (!achados.length) return;
+        await apiFetch(API_URL + '/colecao/data_original', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ itens: achados }) });
+      }
+    } catch (e) {}
+  }
+  window.addEventListener('load', () => setTimeout(preencher, 6000));
 })();
 </script>
 </body>

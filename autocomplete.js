@@ -17,7 +17,14 @@
 .ha-tx b em{font-style:normal;color:var(--terracotta,#C9A24C)}
 .ha-tx span{display:block;font-size:12px;color:var(--ink-soft,#9a9a9a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ha-pill{font-size:10px;border:1px solid var(--terracotta,#C9A24C);color:var(--terracotta,#C9A24C);border-radius:99px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
-.ha-pill.ha-g{border-color:var(--card-line,#3a3a3a);color:var(--ink-soft,#9a9a9a)}`;
+.ha-pill.ha-g{border-color:var(--card-line,#3a3a3a);color:var(--ink-soft,#9a9a9a)}
+.ha-est{display:flex;gap:10px;align-items:center;padding:10px 12px;min-height:48px;color:var(--ink-soft,#9a9a9a)}
+.ha-est .ha-cv{background:none}
+.ha-est b{color:var(--paper,#F0F0F0);font-weight:500}
+.ha-est.ha-vazio b{color:var(--ink-soft,#9a9a9a)}
+.ha-gira{animation:ha-gira 1s linear infinite}
+@keyframes ha-gira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ha-gira{animation:none}}`;
     document.head.appendChild(css);
   }
 
@@ -38,7 +45,9 @@
     }).join('');
   }
 
-  const discografias = {};   // artista normalizado -> promessa (1 consulta por artista por página)
+  const discografias = {};
+  const prontas = new Set();   // artistas cuja discografia já chegou
+  const avisados = new Set();  // artistas que já mostraram "nenhum disco" (aviso aparece 1x)   // artista normalizado -> promessa (1 consulta por artista por página)
   function discografia(artista) {
     const k = norm(artista);
     if (!k) return Promise.resolve([]);
@@ -47,7 +56,7 @@
       // se falhar, tenta pelo servidor como antes.
       const peloServidor = () => apiFetch(`${API_URL}/sugestoes/discografia?artista=${encodeURIComponent(artista)}`)
         .then(r => r.ok ? r.json() : { itens: [] }).then(d => d.itens || []).catch(() => []);
-      discografias[k] = discografiaMB(artista).catch(() => null).then(l => l && l.length ? l : peloServidor());
+      discografias[k] = discografiaMB(artista).catch(() => null).then(l => l && l.length ? l : peloServidor()).then(l => { prontas.add(k); return l; });
     }
     return discografias[k];
   }
@@ -93,6 +102,14 @@
       let itens = [], sel = -1, timer = null, pedido = 0;
 
       const fechar = () => { lista.hidden = true; input.setAttribute('aria-expanded', 'false'); sel = -1; };
+      // aviso dentro da lista (não é uma sugestão: não dá pra tocar nem escolher)
+      function estado(tipo) {
+        itens = []; sel = -1;
+        lista.innerHTML = tipo === 'buscando'
+          ? '<div class="ha-est" role="status"><span class="ha-cv"><svg class="ha-gira" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#3a3a3a" stroke-width="3"/><path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="#C9A24C" stroke-width="3" stroke-linecap="round"/></svg></span><span class="ha-tx"><b>Buscando a discografia...</b><span>Leva alguns segundos</span></span></div>'
+          : '<div class="ha-est ha-vazio" role="status"><span class="ha-cv">?</span><span class="ha-tx"><b>Nenhum disco encontrado</b><span>Pode digitar o nome normalmente</span></span></div>';
+        lista.hidden = false; input.setAttribute('aria-expanded', 'false');
+      }
       function desenhar(q) {
         if (!itens.length) return fechar();
         lista.innerHTML = itens.map((it, i) => {
@@ -123,6 +140,7 @@
         try { const r = await apiFetch(url); if (r.ok) lst = (await r.json()).itens || []; } catch {}
         // álbum com artista preenchido: completa com a discografia (MusicBrainz, 1x por artista)
         if (campo === 'album' && art && lst.length < 8) {
+          if (!prontas.has(norm(art)) && meu === pedido && document.activeElement === input) estado('buscando');
           const disc = await discografia(art);
           const vistos = new Set(lst.map(x => norm(x.album)));
           const toks = norm(q).split(' ').filter(Boolean);
@@ -134,6 +152,10 @@
           }
         }
         if (meu !== pedido || document.activeElement !== input) return;
+        if (!lst.length && campo === 'album' && art) {
+          if (avisados.has(norm(art))) { itens = []; return fechar(); }
+          avisados.add(norm(art)); return estado('vazio');
+        }
         itens = lst; sel = -1; desenhar(q);
       }
 

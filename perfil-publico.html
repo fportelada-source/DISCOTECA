@@ -22,6 +22,13 @@
   <meta name="apple-mobile-web-app-title" content="Hilla" />
   <link rel="stylesheet" href="amigos.css?v=3" />
   <style>
+    .p2-cv { position: relative; }
+    .rar-selo { position: absolute; left: 6px; bottom: 6px; z-index: 2; font: 700 9px 'Inter', sans-serif; letter-spacing: 1px; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; line-height: 1.2; }
+    .rar-raro { border: 1px solid #C9A24C; color: #D9B968; background: rgba(16,16,16,.85); }
+    .rar-muito_raro { border: 1px solid #C9A24C; color: #E6C877; background: #3a301a; }
+    .rar-rarissimo { background: linear-gradient(90deg,#E6C877,#A9843A); color: #101010; }
+  </style>
+  <style>
     /* Perfil público enxuto (09/11/2026) */
     .pp-page { max-width: 1180px; padding: 22px 16px 60px; }
     .p2-topo { display: grid; grid-template-columns: auto 1fr; gap: 14px 16px; align-items: center; }
@@ -393,6 +400,12 @@ function apiFetch(url, opcoes = {}) {
       renderWishlistPagina();
     }
 
+    // Selo de raro: só vem do servidor quando o dono ligou "Mostrar meus discos raros"
+    function seloRaroPublico(item) {
+      const nomes = { raro: 'Raro', muito_raro: 'Muito raro', rarissimo: 'Raríssimo' };
+      return nomes[item.raro] ? `<span class="rar-selo rar-${item.raro}">${nomes[item.raro]}</span>` : '';
+    }
+
     function montarCoverDiv(item) {
       const cor = getCor(item.artista);
       const capaAttr = item.capa_url ? ` data-capa="${escapeHtml(item.capa_url)}"` : '';
@@ -441,7 +454,7 @@ function apiFetch(url, opcoes = {}) {
 
       // ===== Layout enxuto (09/11/2026): topo compacto, capas pequenas, duas colunas no computador =====
       const ic = d => `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-      const capaMini = (item, extra) => `<div class="p2-cv" ${montarCoverDiv(item)}>${extra || ''}<span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span></div>`;
+      const capaMini = (item, extra) => `<div class="p2-cv" ${montarCoverDiv(item)}>${extra || ''}${seloRaroPublico(item)}<span class="fallback-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span></div>`;
       const disco = (item, extra) => `<div class="p2-disco">${capaMini(item, extra)}<div class="p2-lb"><b>${escapeHtml(item.album) || 'Álbum'}</b><span>${escapeHtml(item.artista) || 'Artista'}</span></div></div>`;
       const sec = (titulo, corpo, link) => `<section class="p2-sec"><div class="p2-sh"><h2>${titulo}</h2>${link || ''}</div>${corpo}</section>`;
       const secId = (id, titulo, corpo, link) => `<section class="p2-sec" id="${id}"><div class="p2-sh"><h2>${titulo}</h2>${link || ''}</div>${corpo}</section>`;

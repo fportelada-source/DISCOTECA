@@ -233,6 +233,7 @@
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar prateleira</div><div class="sub">No perfil público e para quem segue você</div></div><button class="set-toggle" data-campo="privacidade_prateleira" aria-label="Mostrar prateleira"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar minhas audições</div><div class="sub">Para quem segue você, no Início e na página Amigos</div></div><button class="set-toggle" data-campo="privacidade_feed_audicoes" aria-label="Mostrar minhas audições"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Mostrar minhas compras</div><div class="sub">Discos novos na prateleira, para quem segue você</div></div><button class="set-toggle" data-campo="privacidade_feed_compras" aria-label="Mostrar minhas compras"><div class="dot"></div></button></div>
+            <div class="set-toggle-item"><div class="left"><div class="title">Mostrar meus discos raros</div><div class="sub">Amigos e seguidores veem o selo de raridade nos seus discos. Começa desligado.</div></div><button class="set-toggle" data-campo="privacidade_raros" aria-label="Mostrar meus discos raros"><div class="dot"></div></button></div>
             <div class="set-toggle-item"><div class="left"><div class="title">Aparecer no Google</div><div class="sub">Seu perfil público pode aparecer nas buscas, com seu nome e seus discos</div></div><button class="set-toggle" data-campo="privacidade_busca"><div class="dot"></div></button></div>
           </div>
 
@@ -589,7 +590,7 @@ function preencherPagina(data) {
 
   ['notif_price_drop', 'notif_wishlist', 'notif_novidades', 'notif_discografia', 'notif_email',
    'privacidade_perfil_publico', 'privacidade_busca', 'privacidade_valor', 'privacidade_wishlist',
-   'privacidade_prateleira', 'privacidade_feed_audicoes', 'privacidade_feed_compras'].forEach(campo => {
+   'privacidade_prateleira', 'privacidade_feed_audicoes', 'privacidade_feed_compras', 'privacidade_raros'].forEach(campo => {
     const btn = document.querySelector(`.set-toggle[data-campo="${campo}"]`);
     if (btn) btn.classList.toggle('active', !!data[campo]);
   });
@@ -643,6 +644,7 @@ function coletarConfiguracoes() {
     privacidade_prateleira: pegarToggle('privacidade_prateleira'),
     privacidade_feed_audicoes: pegarToggle('privacidade_feed_audicoes'),
     privacidade_feed_compras: pegarToggle('privacidade_feed_compras'),
+    privacidade_raros: pegarToggle('privacidade_raros'),
     tema: 'dark',
     idioma: 'pt-BR'
   };

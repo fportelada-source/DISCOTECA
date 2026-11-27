@@ -272,7 +272,7 @@
     }).catch(() => { corpo.innerHTML = '<div class="dica">Não deu para carregar as edições agora. Tente de novo em instantes.</div>'; });
   }
 
-  setInterval(() => { if (dados && dados.checados < dados.total && document.visibilityState === 'visible') carregar(); }, 60000);
+  setInterval(() => { if (dados && dados.checados < dados.total && document.visibilityState === 'visible') carregar(); }, 15000);
 
   // ---------- abrir pela notificação: colecao.html?raros=1&disco=ID ----------
   const q = new URLSearchParams(location.search);

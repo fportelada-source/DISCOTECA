@@ -43,6 +43,11 @@
     .dica-edicao b { color: var(--paper); font-weight: 600; }
     .edicao-status { margin-top: 8px; font-size: 12.5px; line-height: 1.45; color: var(--ink-soft); }
     .edicao-status.ok { color: #8fd19e; }
+    /* Menus Recentes / Por formato: seta própria, com o mesmo respiro da borda que o texto */
+    .col-sort-select { -webkit-appearance: none; appearance: none; padding-right: 30px !important; background-repeat: no-repeat; background-position: right 12px center; background-size: 12px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F0F0F0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); }
+    .col-sort-select option { background: #1A1A1A; color: #F0F0F0; }
+    @media (min-width: 900px) { #sortSelect, #groupSelect { min-width: 150px; } }
   </style>
 </head>
 <body>

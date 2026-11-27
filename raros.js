@@ -36,7 +36,7 @@
     .rar-pode b { display: block; font-size: 14px; }
     .rar-pode span { font-size: 12px; color: var(--ink-soft); }
     .rar-pode .ir { margin-left: auto; font-weight: 600; font-size: 13px; color: #D9B968; }
-    .rar-fonte { font-size: 12px; color: #777; margin-top: 14px; }
+    .rar-fonte { font-size: 12px; color: #777; margin: 14px 0 36px; }
     .rar-vazio { color: var(--ink-soft); font-size: 14px; line-height: 1.5; padding: 20px 0; }
     .rar-box { margin: 0 0 14px; background: var(--card); border: 1px solid var(--card-line); border-radius: 14px; padding: 14px 16px; }
     .rar-box.convite { border-color: rgba(201,162,76,.45); }
@@ -84,8 +84,9 @@
     const box = document.getElementById('formatPills');
     if (!box) return;
     let pill = box.querySelector('.pill-raros');
-    const n = Object.keys(raros).length + Object.keys(pode).length;
-    if (!n) { if (pill) pill.remove(); if (ativo) sair(); return; }
+    // aparece sempre (com a coleção checando, vazia de raros ou não); o número só conta raros de verdade
+    if (!dados || !dados.total) { if (pill) pill.remove(); if (ativo) sair(); return; }
+    const n = Object.keys(raros).length;
     if (!pill) {
       pill = document.createElement('button');
       pill.type = 'button';
@@ -93,7 +94,7 @@
       pill.addEventListener('click', e => { e.stopPropagation(); ativo ? voltarParaTudo() : entrar(); });
       box.appendChild(pill);
     }
-    pill.innerHTML = `Raros <i>${n}</i>`;
+    pill.innerHTML = n ? `Raros <i>${n}</i>` : 'Raros';
     pill.classList.toggle('active', ativo);
   }
 
@@ -138,12 +139,16 @@
         <div><b>${esc(x.album)}</b><span>${esc(x.artista)}</span></div><div class="ir">Descobrir</div>
       </div>`).join('');
     const checando = dados.checados < dados.total;
+    const situacao = checando
+      ? `<p class="rar-intro"><b style="color:var(--paper)">Estamos olhando sua coleção: ${fmt(dados.checados)} de ${fmt(dados.total)} discos.</b> Pode levar um tempo, porque o Discogs limita as consultas. Você recebe um aviso quando terminar.</p>`
+      : (!rs.length && !ps.length ? '<p class="rar-intro"><b style="color:var(--paper)">Nenhum raro por enquanto.</b> A checagem se repete todo mês: um disco comum hoje pode virar raro.</p>' : '');
     box.innerHTML = `
-      <p class="rar-intro">Comparamos sua coleção de vinil com o Discogs: um disco é raro quando pouca gente tem, muita gente quer e quase ninguém vende.${checando ? ' Ainda estamos olhando o resto da sua coleção.' : ''}</p>
+      ${situacao}
+      <p class="rar-intro">Comparamos sua coleção de vinil com o Discogs: um disco é raro quando pouca gente tem, muita gente quer e quase ninguém vende.</p>
       <div class="rar-view">
         <div class="rar-col">
           <div class="rar-sec">Seus raros · ${rs.length}</div>
-          ${rs.length ? `<div class="col-grid">${cards}</div>` : '<div class="rar-vazio">Nenhum disco raro confirmado ainda. Os da lista "Pode ser raro" dependem de você descobrir qual é a sua edição.</div>'}
+          ${rs.length ? `<div class="col-grid">${cards}</div>` : `<div class="rar-vazio">${ps.length ? 'Nenhum disco raro confirmado ainda. Os da lista "Pode ser raro" dependem de você descobrir qual é a sua edição.' : (checando ? 'Nenhum raro até agora.' : 'Nenhum disco raro na sua coleção hoje.')}</div>`}
           <div class="rar-fonte">Dados do Discogs. Atualizado todo mês.</div>
         </div>
         ${ps.length ? `<div class="rar-lado"><div class="rar-sec">Pode ser raro · ${ps.length}</div>
@@ -267,11 +272,13 @@
     }).catch(() => { corpo.innerHTML = '<div class="dica">Não deu para carregar as edições agora. Tente de novo em instantes.</div>'; });
   }
 
+  setInterval(() => { if (dados && dados.checados < dados.total && document.visibilityState === 'visible') carregar(); }, 60000);
+
   // ---------- abrir pela notificação: colecao.html?raros=1&disco=ID ----------
   const q = new URLSearchParams(location.search);
   function iniciar() {
     carregar().then(() => {
-      if (q.get('raros') === '1' && (Object.keys(raros).length || Object.keys(pode).length)) entrar();
+      if (q.get('raros') === '1' && dados && dados.total) entrar();
       const d = q.get('disco');
       if (d && typeof window.editarDisco === 'function') setTimeout(() => window.editarDisco(d), 400);
     });
